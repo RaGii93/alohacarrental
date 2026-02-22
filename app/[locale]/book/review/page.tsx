@@ -139,7 +139,7 @@ export default async function BookingReviewPage({
           {booking.invoiceUrl && (
             <DocumentPreview
               url={booking.invoiceUrl}
-              title="Invoice"
+              title="Billing Document"
               openLabel={t("booking.openOriginal")}
               emptyLabel={t("booking.documentUnavailable")}
             />

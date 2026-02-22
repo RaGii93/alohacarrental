@@ -300,10 +300,10 @@ export default async function AdminDashboardPage({
             </Card>
           </div>
           <Card className="mt-4 p-4">
-            <p className="font-semibold mb-3">Recent Invoices</p>
+            <p className="font-semibold mb-3">Recent Billing Documents</p>
             <div className="space-y-2">
               {recentInvoices.length === 0 && (
-                <p className="text-sm text-muted-foreground">No invoices yet.</p>
+                <p className="text-sm text-muted-foreground">No billing documents yet.</p>
               )}
               {recentInvoices.map((inv) => (
                 <div key={inv.id} className="flex flex-col gap-2 rounded-md border p-3 md:flex-row md:items-center md:justify-between">
@@ -315,7 +315,7 @@ export default async function AdminDashboardPage({
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <a href={getBlobProxyUrl(inv.invoiceUrl, { download: true }) || undefined} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View PDF</a>
-                    <a href={`mailto:${inv.customerEmail}?subject=${encodeURIComponent(`Invoice ${inv.bookingCode}`)}&body=${encodeURIComponent(`Hello ${inv.customerName},\n\nYour invoice is attached/available at:\n${getBlobProxyUrl(inv.invoiceUrl, { download: true }) || inv.invoiceUrl}\n\nThank you.`)}`} className="text-blue-600 hover:underline">Email client</a>
+                    <a href={`mailto:${inv.customerEmail}?subject=${encodeURIComponent(`Billing Document ${inv.bookingCode}`)}&body=${encodeURIComponent(`Hello ${inv.customerName},\n\nYour billing document is attached/available at:\n${getBlobProxyUrl(inv.invoiceUrl, { download: true }) || inv.invoiceUrl}\n\nThank you.`)}`} className="text-blue-600 hover:underline">Email client</a>
                   </div>
                 </div>
               ))}

@@ -15,7 +15,8 @@ import { getBlobProxyUrl } from "@/lib/blob";
 import {
   confirmBookingAction,
   declineBookingAction,
-  generateInvoiceAction,
+  sendInvoiceEstimateAction,
+  createSalesReceiptAction,
   applyDiscountCodeToBookingAction,
   addExtraToBookingAction,
 } from "@/actions/booking";
@@ -68,15 +69,27 @@ export function BookingDetailClient({
     }
   };
 
-  const handleGenerateInvoice = async () => {
+  const handleSendInvoiceEstimate = async () => {
     setIsLoading(true);
-    const result = await generateInvoiceAction(booking.id, locale);
+    const result = await sendInvoiceEstimateAction(booking.id, locale);
     setIsLoading(false);
     if (result.success) {
-      toast.success("Invoice created. Payment marked as received and vehicle locked ON_RENT.");
+      toast.success("Invoice sent to client for payment.");
       router.refresh();
     } else {
-      toast.error(result.error || "Error creating invoice");
+      toast.error(result.error || "Error sending invoice");
+    }
+  };
+
+  const handleCreateSalesReceipt = async () => {
+    setIsLoading(true);
+    const result = await createSalesReceiptAction(booking.id, locale);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Sales receipt created. Payment marked as received and vehicle set ON_RENT.");
+      router.refresh();
+    } else {
+      toast.error(result.error || "Error creating sales receipt");
     }
   };
 
@@ -86,7 +99,7 @@ export function BookingDetailClient({
     const result = await applyDiscountCodeToBookingAction(booking.id, discountCode, locale);
     setIsLoading(false);
     if (result.success) {
-      toast.success("Discount applied and invoice updated.");
+      toast.success("Discount applied and invoice resent.");
       router.refresh();
     } else {
       toast.error(result.error || "Failed to apply discount");
@@ -99,7 +112,7 @@ export function BookingDetailClient({
     const result = await addExtraToBookingAction(booking.id, extraId, extraQty, locale);
     setIsLoading(false);
     if (result.success) {
-      toast.success("Extra added and invoice updated.");
+      toast.success("Extra added and invoice resent.");
       setExtraId("");
       setExtraQty(1);
       router.refresh();
@@ -335,10 +348,10 @@ export function BookingDetailClient({
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
               >
-                📄 Invoice
+                📄 Billing Document
               </a>
               <a
-                href={`mailto:${booking.customerEmail}?subject=${encodeURIComponent(`Invoice ${booking.bookingCode}`)}&body=${encodeURIComponent(`Hello ${booking.customerName},\n\nYour invoice is ready.\n\nDownload: ${invoiceDownloadUrl || booking.invoiceUrl}\n\nThank you.`)}`}
+                href={`mailto:${booking.customerEmail}?subject=${encodeURIComponent(`Billing Document ${booking.bookingCode}`)}&body=${encodeURIComponent(`Hello ${booking.customerName},\n\nYour billing document is ready.\n\nDownload: ${invoiceDownloadUrl || booking.invoiceUrl}\n\nThank you.`)}`}
                 className="text-blue-600 hover:underline"
               >
                 Send by Email
@@ -370,10 +383,17 @@ export function BookingDetailClient({
             {isLoading ? "Processing..." : "Confirm Booking"}
           </Button>
           <Button
-            onClick={handleGenerateInvoice}
-            disabled={isLoading || !!booking.invoiceUrl}
+            onClick={handleSendInvoiceEstimate}
+            disabled={isLoading}
           >
-            {isLoading ? "Processing..." : booking.invoiceUrl ? "Invoice Created" : "Create Invoice + Receive Payment"}
+            {isLoading ? "Processing..." : booking.invoiceUrl ? "Resend Invoice (Payment Request)" : "Send Invoice (Payment Request)"}
+          </Button>
+          <Button
+            onClick={handleCreateSalesReceipt}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {isLoading ? "Processing..." : "Create Sales Receipt (Payment Received)"}
           </Button>
           <Button
             onClick={handleDecline}

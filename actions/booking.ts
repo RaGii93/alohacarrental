@@ -6,7 +6,6 @@ import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { uploadBuffer, uploadFile } from "@/lib/uploads";
 import { categoryBookingFormSchemaRefined } from "@/lib/validators";
-import { Prisma } from "@prisma/client";
 import { bookingEmailHtml, sendEmail } from "@/lib/email";
 import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
@@ -170,82 +169,133 @@ export async function addBookingNoteAction(
   }
 }
 
-export async function generateInvoiceAction(bookingId: string, locale: string) {
+async function buildAndUploadInvoiceDocument(bookingId: string) {
+  const booking = await db.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      vehicle: true,
+      category: true,
+      pickupLocationRef: true,
+      dropoffLocationRef: true,
+    },
+  });
+
+  if (!booking) {
+    return { success: false as const, error: "Booking not found" };
+  }
+  if (!booking.vehicleId || !booking.vehicle) {
+    return { success: false as const, error: "No vehicle assigned to booking" };
+  }
+  if (booking.status === "DECLINED" || booking.status === "CANCELLED") {
+    return { success: false as const, error: "Cannot invoice declined/cancelled booking" };
+  }
+
+  const { extras: adjustmentExtras, discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
+  const rentalDays = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  const baseRental = booking.category.dailyRate * rentalDays;
+  const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
+  const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
+
+  const invoiceBuffer = await generateInvoicePDF({
+    orderId: booking.id,
+    bookingCode: booking.bookingCode,
+    customerName: booking.customerName,
+    customerEmail: booking.customerEmail,
+    customerPhone: booking.customerPhone,
+    vehicleName: booking.vehicle.name || "-",
+    categoryName: booking.category.name,
+    pickupLocation: booking.pickupLocationRef?.name || booking.pickupLocation || "-",
+    dropoffLocation: booking.dropoffLocationRef?.name || booking.dropoffLocation || "-",
+    startDate: booking.startDate,
+    endDate: booking.endDate,
+    baseRentalAmount: baseRental,
+    extrasAmount: extrasTotal,
+    discountAmount,
+    totalAmount: booking.totalAmount,
+    discountCode: bookingDiscount?.code,
+    extras: adjustmentExtras.map((line) => ({
+      name: line.extraName,
+      quantity: line.quantity,
+      lineTotal: line.lineTotal,
+    })),
+    paymentInstructions: getTenantConfig().paymentInstructions,
+    tenantConfig: getTenantConfig(),
+  });
+  const signature = invoiceBuffer.subarray(0, 4).toString("utf8");
+  if (signature !== "%PDF" || invoiceBuffer.length < 500) {
+    return { success: false as const, error: "Generated invoice PDF is invalid or empty" };
+  }
+
+  const uploadResult = await uploadBuffer(
+    invoiceBuffer,
+    "invoices",
+    `invoice-${booking.bookingCode}.pdf`,
+    "application/pdf"
+  );
+  if (!uploadResult.success || !uploadResult.url) {
+    return { success: false as const, error: uploadResult.error || "Failed to upload invoice" };
+  }
+
+  return { success: true as const, booking, invoiceUrl: uploadResult.url };
+}
+
+export async function sendInvoiceEstimateAction(bookingId: string, locale: string) {
   try {
     const session = await getSession();
-    if (!session) {
-      return { success: false, error: "Unauthorized" };
-    }
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
 
-    // Check license
-    if (!isLicenseActive() && session.role !== "ROOT") {
-      return { success: false, error: "BOOKING_DISABLED" };
-    }
+    const generated = await buildAndUploadInvoiceDocument(bookingId);
+    if (!generated.success) return { success: false, error: generated.error };
 
-    const booking = await db.booking.findUnique({
-      where: { id: bookingId },
-      include: {
-        vehicle: true,
-        category: true,
-        pickupLocationRef: true,
-        dropoffLocationRef: true,
-      },
+    const updated = await db.$transaction(async (tx) => {
+      const updatedBooking = await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          invoiceUrl: generated.invoiceUrl,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "INVOICE_SENT_PAYMENT_REQUEST",
+          bookingId,
+        },
+      });
+      return updatedBooking;
     });
 
-    if (!booking) {
-      return { success: false, error: "Booking not found" };
-    }
-    if (!booking.vehicleId || !booking.vehicle) {
-      return { success: false, error: "No vehicle assigned to booking" };
-    }
-    if (booking.status === "DECLINED" || booking.status === "CANCELLED") {
-      return { success: false, error: "Cannot invoice declined/cancelled booking" };
-    }
-    const { extras: adjustmentExtras, discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
+    try {
+      await sendEmail({
+        to: updated.customerEmail,
+        subject: `Invoice for Payment - ${updated.bookingCode}`,
+        html: bookingEmailHtml({
+          title: "Your invoice is ready for payment",
+          customerName: updated.customerName,
+          bookingCode: updated.bookingCode,
+          startDate: updated.startDate,
+          endDate: updated.endDate,
+          totalAmountCents: updated.totalAmount,
+          invoiceUrl: generated.invoiceUrl,
+          documentLabel: "Invoice",
+        }),
+      });
+    } catch {}
 
-    const rentalDays = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
-    const baseRental = booking.category.dailyRate * rentalDays;
-    const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
-    const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
-    const invoiceBuffer = await generateInvoicePDF({
-      orderId: booking.id,
-      bookingCode: booking.bookingCode,
-      customerName: booking.customerName,
-      customerEmail: booking.customerEmail,
-      customerPhone: booking.customerPhone,
-      vehicleName: booking.vehicle.name || "-",
-      categoryName: booking.category.name,
-      pickupLocation: booking.pickupLocationRef?.name || booking.pickupLocation || "-",
-      dropoffLocation: booking.dropoffLocationRef?.name || booking.dropoffLocation || "-",
-      startDate: booking.startDate,
-      endDate: booking.endDate,
-      baseRentalAmount: baseRental,
-      extrasAmount: extrasTotal,
-      discountAmount,
-      totalAmount: booking.totalAmount,
-      discountCode: bookingDiscount?.code,
-      extras: adjustmentExtras.map((line) => ({
-        name: line.extraName,
-        quantity: line.quantity,
-        lineTotal: line.lineTotal,
-      })),
-      paymentInstructions: getTenantConfig().paymentInstructions,
-      tenantConfig: getTenantConfig(),
-    });
-    const signature = invoiceBuffer.subarray(0, 4).toString("utf8");
-    if (signature !== "%PDF" || invoiceBuffer.length < 500) {
-      return { success: false, error: "Generated invoice PDF is invalid or empty" };
-    }
+    return { success: true, booking: updated };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to send invoice" };
+  }
+}
 
-    const uploadResult = await uploadBuffer(
-      invoiceBuffer,
-      "invoices",
-      `invoice-${booking.bookingCode}.pdf`,
-      "application/pdf"
-    );
-    if (!uploadResult.success || !uploadResult.url) {
-      return { success: false, error: uploadResult.error || "Failed to upload invoice" };
-    }
+export async function createSalesReceiptAction(bookingId: string, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+
+    const generated = await buildAndUploadInvoiceDocument(bookingId);
+    if (!generated.success) return { success: false, error: generated.error };
 
     const updated = await db.$transaction(async (tx) => {
       const bookingCols = await tx.$queryRaw<Array<{ column_name: string }>>`
@@ -259,7 +309,7 @@ export async function generateInvoiceAction(bookingId: string, locale: string) {
         where: { id: bookingId },
         data: {
           status: "CONFIRMED",
-          invoiceUrl: uploadResult.url!,
+          invoiceUrl: generated.invoiceUrl,
           ...(hasPaymentReceivedAt ? ({ paymentReceivedAt: new Date() } as any) : {}),
         } as any,
       });
@@ -271,13 +321,13 @@ export async function generateInvoiceAction(bookingId: string, locale: string) {
         } catch {}
       }
       await tx.vehicle.update({
-        where: { id: booking.vehicleId! },
+        where: { id: generated.booking.vehicleId! },
         data: { status: "ON_RENT" },
       });
       await tx.auditLog.create({
         data: {
           adminUserId: session.adminUserId,
-          action: "INVOICE_CREATED_PAYMENT_RECEIVED",
+          action: "SALES_RECEIPT_CREATED_PAYMENT_RECEIVED",
           bookingId,
         },
       });
@@ -287,23 +337,28 @@ export async function generateInvoiceAction(bookingId: string, locale: string) {
     try {
       await sendEmail({
         to: updated.customerEmail,
-        subject: `Invoice Ready - ${updated.bookingCode}`,
+        subject: `Sales Receipt - ${updated.bookingCode}`,
         html: bookingEmailHtml({
-          title: "Your updated invoice is ready",
+          title: "Payment received. Your sales receipt is ready",
           customerName: updated.customerName,
           bookingCode: updated.bookingCode,
           startDate: updated.startDate,
           endDate: updated.endDate,
           totalAmountCents: updated.totalAmount,
-          invoiceUrl: uploadResult.url,
+          invoiceUrl: generated.invoiceUrl,
+          documentLabel: "Sales receipt",
         }),
       });
     } catch {}
 
     return { success: true, booking: updated };
   } catch (error: any) {
-    return { success: false, error: error.message || "Failed to generate invoice" };
+    return { success: false, error: error.message || "Failed to create sales receipt" };
   }
+}
+
+export async function generateInvoiceAction(bookingId: string, locale: string) {
+  return createSalesReceiptAction(bookingId, locale);
 }
 
 async function recomputeBookingTotals(bookingId: string) {
@@ -373,7 +428,7 @@ export async function applyDiscountCodeToBookingAction(bookingId: string, code: 
     });
 
     await recomputeBookingTotals(bookingId);
-    const invoiceResult = await generateInvoiceAction(bookingId, locale);
+    const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
     if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Discount applied but invoice update failed" };
 
     return { success: true };
@@ -407,7 +462,7 @@ export async function addExtraToBookingAction(bookingId: string, extraId: string
     });
 
     await recomputeBookingTotals(bookingId);
-    const invoiceResult = await generateInvoiceAction(bookingId, locale);
+    const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
     if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Extra added but invoice update failed" };
 
     return { success: true };
@@ -588,12 +643,17 @@ export async function createCategoryBookingAction(
           })
           .filter(Boolean) as Array<{ extraId: string; quantity: number; lineTotal: number }>;
       } else {
-        const extraRows = await db.$queryRaw<Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }>>`
-          SELECT id, "pricingType", amount
-          FROM "Extra"
-          WHERE "isActive" = true
-            AND id IN (${Prisma.join(selectedExtras.map((entry) => entry.extraId))})
-        `;
+        const ids = selectedExtras.map((entry) => entry.extraId).filter(Boolean);
+        const extraRows =
+          ids.length > 0
+            ? await db.$queryRawUnsafe<Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }>>(
+                `SELECT id, "pricingType", amount
+                 FROM "Extra"
+                 WHERE "isActive" = true
+                   AND id IN (${ids.map((_, i) => `$${i + 1}`).join(",")})`,
+                ...ids
+              )
+            : [];
         const extraMap = new Map(extraRows.map((row) => [row.id, row]));
         resolvedExtras = selectedExtras
           .map((entry) => {
@@ -612,7 +672,7 @@ export async function createCategoryBookingAction(
     // Database transaction to allocate vehicle
     let booking;
     try {
-      booking = await db.$transaction(async (tx: Prisma.TransactionClient) =>  {
+      booking = await db.$transaction(async (tx) =>  {
         // Find available vehicle in category for the date range
         const availableVehicle = await tx.vehicle.findFirst({
           where: {

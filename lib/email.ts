@@ -48,8 +48,10 @@ export function bookingEmailHtml(input: {
   endDate: Date;
   totalAmountCents: number;
   invoiceUrl?: string | null;
+  documentLabel?: string;
 }) {
   const tenant = getTenantConfig();
+  const documentLabel = input.documentLabel || "Billing document";
   return `
     <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto;">
       <h2>${tenant.tenantName}</h2>
@@ -59,7 +61,7 @@ export function bookingEmailHtml(input: {
       <p>Pickup: ${input.startDate.toLocaleString()}</p>
       <p>Dropoff: ${input.endDate.toLocaleString()}</p>
       <p>Total: <strong>${tenant.currency} ${(input.totalAmountCents / 100).toFixed(2)}</strong></p>
-      ${input.invoiceUrl ? `<p>Invoice: <a href="${input.invoiceUrl}">${input.invoiceUrl}</a></p>` : ""}
+      ${input.invoiceUrl ? `<p>${documentLabel}: <a href="${input.invoiceUrl}">${input.invoiceUrl}</a></p>` : ""}
       <p style="color:#6b7280;font-size:12px;">This is a no-reply mailbox. Please do not reply to this email.</p>
       <hr />
       <p>${tenant.address}</p>
