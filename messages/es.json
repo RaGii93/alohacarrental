@@ -1,0 +1,201 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "booking": "Reservar un Vehículo",
+    "admin": "Panel de Administración",
+    "logout": "Cerrar Sesión",
+    "login": "Iniciar Sesión"
+  },
+  "common": {
+    "name": "EdgeRent Lite",
+    "phone": "Teléfono",
+    "email": "Correo Electrónico",
+    "currency": "$",
+    "loading": "Cargando...",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "decline": "Rechazar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información",
+    "pending": "Pendiente",
+    "confirmed": "Confirmado",
+    "declined": "Rechazado",
+    "cancelled": "Cancelado"
+  },
+  "landing": {
+    "title": "Bienvenido a EdgeRent Lite",
+    "subtitle": "Reserva tu vehículo fácilmente",
+    "tagline": "Conduce Tus Sueños",
+    "badge": "🚗 Servicio Premium de Alquiler de Vehículos",
+    "cta": "Comenzar Reserva",
+    "features": "Proceso de reserva rápido • Pagos seguros • Conductores verificados",
+    "stats": {
+      "vehicles": "500+",
+      "vehiclesLabel": "Vehículos",
+      "customers": "10K+",
+      "customersLabel": "Clientes Satisfechos",
+      "locations": "50+",
+      "locationsLabel": "Ubicaciones",
+      "support": "24/7",
+      "supportLabel": "Soporte"
+    },
+    "whyChoose": {
+      "title": "¿Por Qué Elegir EdgeRent?",
+      "subtitle": "Experimenta lo mejor en alquiler de vehículos con nuestros servicios premium y soporte al cliente incomparable.",
+      "features": {
+        "selection": {
+          "title": "Amplia Selección",
+          "description": "Elige de nuestra diversa flota de vehículos"
+        },
+        "security": {
+          "title": "Reserva Segura",
+          "description": "Procesamiento de pagos seguro y protegido"
+        },
+        "support": {
+          "title": "Soporte 24/7",
+          "description": "Asistencia al cliente las 24 horas"
+        },
+        "rating": {
+          "title": "Mejor Calificado",
+          "description": "Confiado por miles de clientes"
+        }
+      }
+    },
+    "ctaSection": {
+      "title": "¿Listo para Comenzar Tu Viaje?",
+      "subtitle": "Reserva tu vehículo perfecto hoy y experimenta la libertad de la carretera.",
+      "button": "Reservar Ahora"
+    }
+  },
+  "booking": {
+    "title": "Reservar un Vehículo",
+    "customerName": "Nombre Completo",
+    "customerEmail": "Correo Electrónico",
+    "customerPhone": "Número de Teléfono",
+    "selectVehicle": "Seleccionar Vehículo",
+    "startDate": "Fecha de Recogida",
+    "endDate": "Fecha de Devolución",
+    "pickupLocation": "Ubicación de Recogida",
+    "dropoffLocation": "Ubicación de Devolución",
+    "notes": "Notas Especiales",
+    "driverLicense": "Licencia de Conducir",
+    "paymentProof": "Comprobante de Pago",
+    "submit": "Enviar Reserva",
+    "selectDateRange": "Seleccionar rango de fechas",
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "email": "Ingresa una dirección de correo válida",
+      "phoneRequired": "El número de teléfono es obligatorio",
+      "dateInvalid": "Rango de fechas inválido",
+      "endBeforeStart": "La fecha de finalización debe ser posterior a la de inicio",
+      "vehicleRequired": "Por favor selecciona un vehículo",
+      "bookingDisabled": "Las reservas están actualmente deshabilitadas. Por favor, contáctanos.",
+      "vehicleUnavailable": "Este vehículo no está disponible para las fechas seleccionadas.",
+      "fileRequired": "Por favor carga los archivos requeridos",
+      "fileSize": "El tamaño del archivo no debe exceder 8MB",
+      "fileType": "Solo se permiten archivos JPG, PNG y PDF"
+    },
+    "success": {
+      "title": "¡Reserva Enviada!",
+      "message": "Tu número de referencia es: {{orderId}}",
+      "next": "Nos pondremos en contacto pronto para confirmarla."
+    }
+  },
+  "admin": {
+    "title": "Panel de Administración",
+    "login": {
+      "title": "Inicio de Sesión de Administrador",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "submit": "Iniciar Sesión",
+      "errors": {
+        "required": "Este campo es obligatorio",
+        "invalidCredentials": "Correo electrónico o contraseña inválidos",
+        "forbidden": "Acceso denegado"
+      }
+    },
+    "tabs": {
+      "pending": "Pendientes",
+      "confirmed": "Confirmadas",
+      "declined": "Rechazadas"
+    },
+    "bookings": {
+      "title": "Reservas",
+      "table": {
+        "id": "ID",
+        "customer": "Cliente",
+        "vehicle": "Vehículo",
+        "dates": "Fechas",
+        "total": "Total",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "detail": {
+        "title": "Detalles de la Reserva",
+        "customerInfo": "Información del Cliente",
+        "bookingInfo": "Información de la Reserva",
+        "files": "Archivos",
+        "notes": "Notas",
+        "actions": "Acciones",
+        "confirm": "Confirmar Reserva",
+        "decline": "Rechazar Reserva",
+        "addNote": "Agregar Nota",
+        "generateInvoice": "Generar Factura",
+        "declineReason": "Razón del Rechazo",
+        "confirmSuccess": "Reserva confirmada exitosamente",
+        "declineSuccess": "Reserva rechazada exitosamente",
+        "invoiceGenerated": "Factura generada y enviada"
+      }
+    },
+    "vehicles": {
+      "title": "Administrar Vehículos",
+      "add": "Agregar Vehículo",
+      "edit": "Editar Vehículo",
+      "name": "Nombre del Vehículo",
+      "plate": "Número de Placa",
+      "category": "Categoría",
+      "dailyRate": "Tarifa Diaria",
+      "status": "Estado",
+      "active": "Activo",
+      "maintenance": "Mantenimiento",
+      "inactive": "Inactivo",
+      "notes": "Notas",
+      "created": "Vehículo creado exitosamente",
+      "updated": "Vehículo actualizado exitosamente",
+      "table": {
+        "name": "Nombre",
+        "plate": "Placa",
+        "category": "Categoría",
+        "rate": "Tarifa Diaria",
+        "status": "Estado",
+        "actions": "Acciones"
+      }
+    },
+    "billingRequired": {
+      "title": "Facturación Requerida",
+      "message": "Tu licencia ha sido suspendida. Por favor, contáctanos para reanudar el acceso."
+    },
+    "logout": "Cerrar Sesión"
+  },
+  "errors": {
+    "notFound": "Página no encontrada",
+    "unauthorized": "No autorizado",
+    "forbidden": "Prohibido",
+    "serverError": "Ocurrió un error en el servidor",
+    "tryAgain": "Intentar de nuevo"
+  }
+}

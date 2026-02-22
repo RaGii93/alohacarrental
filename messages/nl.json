@@ -1,0 +1,201 @@
+{
+  "nav": {
+    "home": "Startpagina",
+    "booking": "Voertuig Reserveren",
+    "admin": "Beheerpaneel",
+    "logout": "Afmelden",
+    "login": "Aanmelden"
+  },
+  "common": {
+    "name": "EdgeRent Lite",
+    "phone": "Telefoonnummer",
+    "email": "E-mailadres",
+    "currency": "€",
+    "loading": "Laden...",
+    "submit": "Verzenden",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "save": "Opslaan",
+    "close": "Sluiten",
+    "confirm": "Bevestigen",
+    "decline": "Afwijzen",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "search": "Zoeken",
+    "filter": "Filteren",
+    "export": "Exporteren",
+    "import": "Importeren",
+    "error": "Fout",
+    "success": "Succes",
+    "warning": "Waarschuwing",
+    "info": "Informatie",
+    "pending": "In afwachting",
+    "confirmed": "Bevestigd",
+    "declined": "Afgewezen",
+    "cancelled": "Geannuleerd"
+  },
+  "landing": {
+    "title": "Welkom bij EdgeRent Lite",
+    "subtitle": "Reserveer je voertuig gemakkelijk",
+    "tagline": "Rijd Je Dromen",
+    "badge": "🚗 Premium Voertuig Verhuur Service",
+    "cta": "Start Nu met Reserveren",
+    "features": "Snel reserveringsproces • Veilige betalingen • Geverifieerde bestuurders",
+    "stats": {
+      "vehicles": "500+",
+      "vehiclesLabel": "Voertuigen",
+      "customers": "10K+",
+      "customersLabel": "Tevreden Klanten",
+      "locations": "50+",
+      "locationsLabel": "Locaties",
+      "support": "24/7",
+      "supportLabel": "Ondersteuning"
+    },
+    "whyChoose": {
+      "title": "Waarom EdgeRent Kiezen?",
+      "subtitle": "Ervaar het beste in voertuigverhuur met onze premium diensten en onverslaanbare klantenservice.",
+      "features": {
+        "selection": {
+          "title": "Brede Selectie",
+          "description": "Kies uit onze diverse vloot voertuigen"
+        },
+        "security": {
+          "title": "Veilige Reservering",
+          "description": "Veilige en beveiligde betalingsverwerking"
+        },
+        "support": {
+          "title": "24/7 Ondersteuning",
+          "description": "24 uur per dag klantenservice"
+        },
+        "rating": {
+          "title": "Hoogst Beoordeeld",
+          "description": "Vertrouwd door duizenden klanten"
+        }
+      }
+    },
+    "ctaSection": {
+      "title": "Klaar om Je Reis te Beginnen?",
+      "subtitle": "Reserveer vandaag je perfecte voertuig en ervaar de vrijheid van de weg.",
+      "button": "Nu Reserveren"
+    }
+  },
+  "booking": {
+    "title": "Voertuig Reserveren",
+    "customerName": "Volledige Naam",
+    "customerEmail": "E-mailadres",
+    "customerPhone": "Telefoonnummer",
+    "selectVehicle": "Voertuig Selecteren",
+    "startDate": "Ophaaldatum",
+    "endDate": "Retouurdatum",
+    "pickupLocation": "Ophaallocatie",
+    "dropoffLocation": "Retourlocatie",
+    "notes": "Speciale Opmerkingen",
+    "driverLicense": "Rijbewijs",
+    "paymentProof": "Betalingsbewijs",
+    "submit": "Reservering Indienen",
+    "selectDateRange": "Selecteer datumbereik",
+    "errors": {
+      "required": "Dit veld is verplicht",
+      "email": "Voer een geldig e-mailadres in",
+      "phoneRequired": "Telefoonnummer is verplicht",
+      "dateInvalid": "Ongeldig datumbereik",
+      "endBeforeStart": "Einddatum moet na startdatum liggen",
+      "vehicleRequired": "Selecteer alstublieft een voertuig",
+      "bookingDisabled": "Reserveringen zijn momenteel uitgeschakeld. Neem contact met ons op.",
+      "vehicleUnavailable": "Dit voertuig is niet beschikbaar voor de geselecteerde data.",
+      "fileRequired": "Upload alstublieft de vereiste bestanden",
+      "fileSize": "Bestandsgrootte mag niet meer dan 8MB zijn",
+      "fileType": "Alleen JPG-, PNG- en PDF-bestanden zijn toegestaan"
+    },
+    "success": {
+      "title": "Reservering Ingediend!",
+      "message": "Je referentienummer is: {{orderId}}",
+      "next": "We nemen binnenkort contact met je op ter bevestiging."
+    }
+  },
+  "admin": {
+    "title": "Beheerpaneel",
+    "login": {
+      "title": "Beheeraanmelding",
+      "email": "E-mailadres",
+      "password": "Wachtwoord",
+      "submit": "Aanmelden",
+      "errors": {
+        "required": "Dit veld is verplicht",
+        "invalidCredentials": "Ongeldig e-mailadres of wachtwoord",
+        "forbidden": "Toegang geweigerd"
+      }
+    },
+    "tabs": {
+      "pending": "In afwachting",
+      "confirmed": "Bevestigd",
+      "declined": "Afgewezen"
+    },
+    "bookings": {
+      "title": "Reserveringen",
+      "table": {
+        "id": "ID",
+        "customer": "Klant",
+        "vehicle": "Voertuig",
+        "dates": "Data",
+        "total": "Totaal",
+        "status": "Status",
+        "actions": "Acties"
+      },
+      "detail": {
+        "title": "Reserveringsdetails",
+        "customerInfo": "Klantinformatie",
+        "bookingInfo": "Reserveringsinformatie",
+        "files": "Bestanden",
+        "notes": "Opmerkingen",
+        "actions": "Acties",
+        "confirm": "Reservering Bevestigen",
+        "decline": "Reservering Afwijzen",
+        "addNote": "Opmerking Toevoegen",
+        "generateInvoice": "Factuur Genereren",
+        "declineReason": "Reden van Afwijzing",
+        "confirmSuccess": "Reservering succesvol bevestigd",
+        "declineSuccess": "Reservering succesvol afgewezen",
+        "invoiceGenerated": "Factuur gegenereerd en verzonden"
+      }
+    },
+    "vehicles": {
+      "title": "Voertuigen Beheren",
+      "add": "Voertuig Toevoegen",
+      "edit": "Voertuig Bewerken",
+      "name": "Voertuignaam",
+      "plate": "Kentekenplaat",
+      "category": "Categorie",
+      "dailyRate": "Dagprijs",
+      "status": "Status",
+      "active": "Actief",
+      "maintenance": "Onderhoud",
+      "inactive": "Inactief",
+      "notes": "Opmerkingen",
+      "created": "Voertuig succesvol aangemaakt",
+      "updated": "Voertuig succesvol bijgewerkt",
+      "table": {
+        "name": "Naam",
+        "plate": "Kenteken",
+        "category": "Categorie",
+        "rate": "Dagprijs",
+        "status": "Status",
+        "actions": "Acties"
+      }
+    },
+    "billingRequired": {
+      "title": "Facturering Vereist",
+      "message": "Je licentie is opgeschort. Neem contact met ons op om het toegang te hervatten."
+    },
+    "logout": "Afmelden"
+  },
+  "errors": {
+    "notFound": "Pagina niet gevonden",
+    "unauthorized": "Niet geautoriseerd",
+    "forbidden": "Verboden",
+    "serverError": "Serverfout opgetreden",
+    "tryAgain": "Probeer opnieuw"
+  }
+}

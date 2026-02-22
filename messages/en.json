@@ -1,0 +1,201 @@
+{
+  "nav": {
+    "home": "Home",
+    "booking": "Book a Vehicle",
+    "admin": "Admin Panel",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "common": {
+    "name": "EdgeRent Lite",
+    "phone": "Phone",
+    "email": "Email",
+    "currency": "$",
+    "loading": "Loading...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "confirm": "Confirm",
+    "decline": "Decline",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "declined": "Declined",
+    "cancelled": "Cancelled"
+  },
+  "landing": {
+    "title": "Welcome to EdgeRent Lite",
+    "subtitle": "Book your vehicle with ease",
+    "tagline": "Drive Your Dreams",
+    "badge": "🚗 Premium Vehicle Rental Service",
+    "cta": "Start Booking Now",
+    "features": "Fast booking process • Secure payments • Verified drivers",
+    "stats": {
+      "vehicles": "500+",
+      "vehiclesLabel": "Vehicles",
+      "customers": "10K+",
+      "customersLabel": "Happy Customers",
+      "locations": "50+",
+      "locationsLabel": "Locations",
+      "support": "24/7",
+      "supportLabel": "Support"
+    },
+    "whyChoose": {
+      "title": "Why Choose EdgeRent?",
+      "subtitle": "Experience the best in vehicle rental with our premium services and unbeatable customer support.",
+      "features": {
+        "selection": {
+          "title": "Wide Selection",
+          "description": "Choose from our diverse fleet of vehicles"
+        },
+        "security": {
+          "title": "Secure Booking",
+          "description": "Safe and secure payment processing"
+        },
+        "support": {
+          "title": "24/7 Support",
+          "description": "Round-the-clock customer assistance"
+        },
+        "rating": {
+          "title": "Top Rated",
+          "description": "Trusted by thousands of customers"
+        }
+      }
+    },
+    "ctaSection": {
+      "title": "Ready to Start Your Journey?",
+      "subtitle": "Book your perfect vehicle today and experience the freedom of the road.",
+      "button": "Book Now"
+    }
+  },
+  "booking": {
+    "title": "Book a Vehicle",
+    "customerName": "Full Name",
+    "customerEmail": "Email Address",
+    "customerPhone": "Phone Number",
+    "selectVehicle": "Select Vehicle",
+    "startDate": "Pickup Date",
+    "endDate": "Return Date",
+    "pickupLocation": "Pickup Location",
+    "dropoffLocation": "Dropoff Location",
+    "notes": "Special Notes",
+    "driverLicense": "Driver's License",
+    "paymentProof": "Payment Proof",
+    "submit": "Submit Booking",
+    "selectDateRange": "Select date range",
+    "errors": {
+      "required": "This field is required",
+      "email": "Enter a valid email address",
+      "phoneRequired": "Phone number is required",
+      "dateInvalid": "Invalid date range",
+      "endBeforeStart": "End date must be after start date",
+      "vehicleRequired": "Please select a vehicle",
+      "bookingDisabled": "Booking is currently disabled. Please contact us.",
+      "vehicleUnavailable": "This vehicle is not available for the selected dates.",
+      "fileRequired": "Please upload required files",
+      "fileSize": "File size must not exceed 8MB",
+      "fileType": "Only JPG, PNG, and PDF files are allowed"
+    },
+    "success": {
+      "title": "Booking Submitted!",
+      "message": "Your booking reference is: {{orderId}}",
+      "next": "We will contact you shortly to confirm."
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "login": {
+      "title": "Admin Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "errors": {
+        "required": "This field is required",
+        "invalidCredentials": "Invalid email or password",
+        "forbidden": "Access denied"
+      }
+    },
+    "tabs": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "declined": "Declined"
+    },
+    "bookings": {
+      "title": "Bookings",
+      "table": {
+        "id": "ID",
+        "customer": "Customer",
+        "vehicle": "Vehicle",
+        "dates": "Dates",
+        "total": "Total",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "detail": {
+        "title": "Booking Details",
+        "customerInfo": "Customer Information",
+        "bookingInfo": "Booking Information",
+        "files": "Files",
+        "notes": "Notes",
+        "actions": "Actions",
+        "confirm": "Confirm Booking",
+        "decline": "Decline Booking",
+        "addNote": "Add Note",
+        "generateInvoice": "Generate Invoice",
+        "declineReason": "Decline Reason",
+        "confirmSuccess": "Booking confirmed successfully",
+        "declineSuccess": "Booking declined successfully",
+        "invoiceGenerated": "Invoice generated and sent"
+      }
+    },
+    "vehicles": {
+      "title": "Manage Vehicles",
+      "add": "Add Vehicle",
+      "edit": "Edit Vehicle",
+      "name": "Vehicle Name",
+      "plate": "Plate Number",
+      "category": "Category",
+      "dailyRate": "Daily Rate",
+      "status": "Status",
+      "active": "Active",
+      "maintenance": "Maintenance",
+      "inactive": "Inactive",
+      "notes": "Notes",
+      "created": "Vehicle created successfully",
+      "updated": "Vehicle updated successfully",
+      "table": {
+        "name": "Name",
+        "plate": "Plate",
+        "category": "Category",
+        "rate": "Daily Rate",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "billingRequired": {
+      "title": "Billing Required",
+      "message": "Your license has been suspended. Please contact us to resume access."
+    },
+    "logout": "Logout"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "serverError": "Server error occurred",
+    "tryAgain": "Try again"
+  }
+}

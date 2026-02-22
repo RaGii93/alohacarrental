@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUser {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(OWNER)
+  createdAt     DateTime  @default(now())
+  bookings      Booking[]
+  auditLogs     AuditLog[]
+
+  @@index([email])
+}
+
+enum Role {
+  ROOT
+  OWNER
+  STAFF
+}
+
+model Vehicle {
+  id            String    @id @default(cuid())
+  name          String
+  plateNumber   String?   @unique
+  category      String?
+  dailyRate     Int       // stored in cents
+  status        VehicleStatus @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime  @default(now())
+  bookings      Booking[]
+
+  @@index([status])
+}
+
+enum VehicleStatus {
+  ACTIVE
+  MAINTENANCE
+  INACTIVE
+}
+
+model Booking {
+  id                  String    @id @default(cuid())
+  vehicleId           String
+  vehicle             Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  customerName        String
+  customerEmail       String
+  customerPhone       String
+  startDate           DateTime
+  endDate             DateTime  // treated as exclusive end date for overlap logic
+  pickupLocation      String?
+  dropoffLocation     String?
+  totalAmount         Int       // stored in cents
+  status              BookingStatus @default(PENDING)
+  holdExpiresAt       DateTime  @default(dbgenerated("now() + INTERVAL '2 hours'"))
+  paymentProofUrl     String?
+  driverLicenseUrl    String?
+  notes               String?
+  invoiceUrl          String?
+  createdAt           DateTime  @default(now())
+  auditLogs           AuditLog[]
+
+  @@index([vehicleId, startDate, endDate])
+  @@index([status])
+  @@index([createdAt])
+  adminUsers AdminUser[]
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+  CANCELLED
+}
+
+model AuditLog {
+  id            String    @id @default(cuid())
+  adminUserId   String
+  adminUser     AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  action        String
+  bookingId     String?
+  booking       Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+
+  @@index([adminUserId])
+  @@index([createdAt])
+}
