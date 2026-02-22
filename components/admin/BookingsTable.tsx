@@ -17,10 +17,10 @@ interface Booking {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
-  vehicle: {
+  vehicle?: {
     id: string;
-    name: string;
-  };
+    name?: string | null;
+  } | null;
   startDate: Date;
   endDate: Date;
   totalAmount: number;
@@ -70,7 +70,7 @@ export function BookingsTable({
                 <div className="font-medium">{booking.customerName}</div>
                 <div className="text-sm text-gray-500">{booking.customerEmail}</div>
               </TableCell>
-              <TableCell>{booking.vehicle.name}</TableCell>
+              <TableCell>{booking.vehicle?.name ?? "—"}</TableCell>
               <TableCell>
                 <div className="text-sm">
                   {new Date(booking.startDate).toLocaleDateString()} -{" "}

@@ -6,6 +6,7 @@ import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { bookingFormSchemaRefined } from "@/lib/validators";
 import { uploadFile } from "@/lib/uploads";
+import type { Prisma } from "@prisma/client";
 
 export async function cancelExpiredHolds() {
   // Cancel PENDING bookings where holdExpiresAt < now
@@ -414,10 +415,11 @@ export async function createCategoryBookingAction(
     const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const totalAmount = category.dailyRate * Math.max(1, days);
 
+
     // Database transaction to allocate vehicle
     let booking;
     try {
-      booking = await db.$transaction(async (tx) => {
+      booking = await db.$transaction(async (tx: Prisma.TransactionClient) =>  {
         // Find available vehicle in category for the date range
         const availableVehicle = await tx.vehicle.findFirst({
           where: {
