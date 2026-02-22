@@ -92,6 +92,9 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
               <PopoverContent className="w-auto p-0 z-50">
                 <Calendar
                   mode="single"
+                  captionLayout="dropdown"
+                  fromYear={new Date().getFullYear()}
+                  toYear={new Date().getFullYear() + 3}
                   selected={bookingData.startDate || undefined}
                   onSelect={(date) => updateBookingData({ startDate: date || null })}
                   disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
@@ -122,6 +125,9 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
               <PopoverContent className="w-auto p-0 z-50">
                 <Calendar
                   mode="single"
+                  captionLayout="dropdown"
+                  fromYear={new Date().getFullYear()}
+                  toYear={new Date().getFullYear() + 3}
                   selected={bookingData.endDate || undefined}
                   onSelect={(date) => updateBookingData({ endDate: date || null })}
                   disabled={(date) => date < new Date() || date < new Date("1900-01-01")}

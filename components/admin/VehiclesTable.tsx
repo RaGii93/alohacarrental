@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,7 @@ export function VehiclesTable({
   categories: CategoryOption[];
   locale: string;
 }) {
+  const t = useTranslations();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Partial<Vehicle> | null>(null);
@@ -70,10 +72,10 @@ export function VehiclesTable({
     setIsLoading(false);
 
     if (result.success) {
-      toast.success("Vehicle deleted successfully");
+      toast.success(t("admin.vehicles.deleted"));
       router.refresh();
     } else {
-      toast.error(result.error || "Error deleting vehicle");
+      toast.error(result.error || t("admin.vehicles.errors.delete"));
     }
   };
 
@@ -86,17 +88,17 @@ export function VehiclesTable({
     setIsLoading(false);
 
     if (result.success) {
-      toast.success("Vehicle status updated");
+      toast.success(t("admin.vehicles.statusUpdated"));
       router.refresh();
     } else {
-      toast.error(result.error || "Error updating vehicle");
+      toast.error(result.error || t("admin.vehicles.errors.updateStatus"));
     }
   };
 
   return (
     <div className="space-y-4">
       <Button onClick={() => setSelectedVehicle({} as Partial<Vehicle>)}>
-        + Add Vehicle
+        + {t("admin.vehicles.add")}
       </Button>
 
       <VehicleDialog
@@ -110,12 +112,12 @@ export function VehiclesTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Plate</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Daily Rate</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>{t("admin.vehicles.table.name")}</TableHead>
+              <TableHead>{t("admin.vehicles.table.plate")}</TableHead>
+              <TableHead>{t("admin.vehicles.table.category")}</TableHead>
+              <TableHead>{t("admin.vehicles.table.rate")}</TableHead>
+              <TableHead>{t("admin.vehicles.table.status")}</TableHead>
+              <TableHead>{t("admin.vehicles.table.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -142,7 +144,7 @@ export function VehiclesTable({
                     variant="outline"
                     onClick={() => setSelectedVehicle(vehicle)}
                   >
-                    Edit
+                    {t("common.edit")}
                   </Button>
                   <Button
                     size="sm"
@@ -150,7 +152,7 @@ export function VehiclesTable({
                     onClick={() => handleDelete(vehicle.id)}
                     disabled={isLoading}
                   >
-                    Delete
+                    {t("common.delete")}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -161,7 +163,7 @@ export function VehiclesTable({
 
       {vehicles.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          No vehicles found
+          {t("admin.vehicles.empty")}
         </div>
       )}
     </div>

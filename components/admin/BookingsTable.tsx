@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -37,6 +38,7 @@ export function BookingsTable({
   locale: string;
   status:  string;
 }) {
+  const t = useTranslations();
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
@@ -55,12 +57,12 @@ export function BookingsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Customer</TableHead>
-            <TableHead>Vehicle</TableHead>
-            <TableHead>Dates</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>{t("admin.bookings.table.customer")}</TableHead>
+            <TableHead>{t("admin.bookings.table.vehicle")}</TableHead>
+            <TableHead>{t("admin.bookings.table.dates")}</TableHead>
+            <TableHead>{t("admin.bookings.table.total")}</TableHead>
+            <TableHead>{t("admin.bookings.table.status")}</TableHead>
+            <TableHead>{t("admin.bookings.table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -88,7 +90,7 @@ export function BookingsTable({
               <TableCell>
                 <Link href={`/${locale}/admin/bookings/${booking.id}`}>
                   <Button size="sm" variant="outline">
-                    View
+                    {t("admin.bookings.actions.view")}
                   </Button>
                 </Link>
               </TableCell>
@@ -99,7 +101,7 @@ export function BookingsTable({
 
       {bookings.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          No bookings found
+          {t("admin.bookings.empty")}
         </div>
       )}
     </div>

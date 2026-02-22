@@ -152,31 +152,24 @@
       "next": "We will contact you shortly to confirm."
     }
   },
-    "continue": "Continue",
-    "summary": "Summary",
-    "noVehicleSelected": "No vehicle selected",
-    "total": "Total",
-    "selectLocation": "Select location",
-    "selectDateRange": "Select date range",
-    "errors": {
-      "required": "This field is required",
-      "email": "Enter a valid email address",
-      "phoneRequired": "Phone number is required",
-      "dateInvalid": "Invalid date range",
-      "endBeforeStart": "End date must be after start date",
-      "vehicleRequired": "Please select a vehicle",
-      "bookingDisabled": "Booking is currently disabled. Please contact us.",
-      "vehicleUnavailable": "This vehicle is not available for the selected dates.",
-      "fileRequired": "Please upload required files",
-      "fileSize": "File size must not exceed 8MB",
-      "fileType": "Only JPG, PNG, and PDF files are allowed"
-    },
-    "success": {
-      "title": "Booking Submitted!",
-      "message": "Your booking reference is: {{orderId}}",
-      "next": "We will contact you shortly to confirm."
-    }
-  ,
+  "continue": "Continue",
+  "summary": "Summary",
+  "noVehicleSelected": "No vehicle selected",
+  "total": "Total",
+  "selectLocation": "Select location",
+  "selectDateRange": "Select date range",
+  "errors": {
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "serverError": "Server error occurred",
+    "tryAgain": "Try again"
+  },
+  "success": {
+    "title": "Booking Submitted!",
+    "message": "Your booking reference is: {{orderId}}",
+    "next": "We will contact you shortly to confirm."
+  },
   "extras": {
     "gps": "GPS",
     "childSeat": "Child Seat",
@@ -209,6 +202,10 @@
     },
     "bookings": {
       "title": "Bookings",
+      "empty": "No bookings found",
+      "actions": {
+        "view": "View"
+      },
       "table": {
         "id": "ID",
         "customer": "Customer",
@@ -250,6 +247,13 @@
       "notes": "Notes",
       "created": "Vehicle created successfully",
       "updated": "Vehicle updated successfully",
+      "deleted": "Vehicle deleted successfully",
+      "statusUpdated": "Vehicle status updated",
+      "empty": "No vehicles found",
+      "errors": {
+        "delete": "Error deleting vehicle",
+        "updateStatus": "Error updating vehicle status"
+      },
       "table": {
         "name": "Name",
         "plate": "Plate",
@@ -263,13 +267,48 @@
       "title": "Billing Required",
       "message": "Your license has been suspended. Please contact us to resume access."
     },
+    "dashboard": {
+      "header": {
+        "welcome": "Welcome, {user}",
+        "role": "Role: {role}",
+        "licenseActive": "License: Active",
+        "licenseSuspended": "License: Suspended"
+      },
+      "tabs": {
+        "bookings": "Bookings",
+        "deliveries": "Deliveries",
+        "returns": "Returns",
+        "financial": "Financial",
+        "fleet": "Fleet",
+        "vehicles": "Vehicle Management"
+      },
+      "deliveries": {
+        "title": "Upcoming Deliveries (Next 7 Days)"
+      },
+      "returns": {
+        "title": "Upcoming Returns (Next 7 Days)"
+      },
+      "financial": {
+        "title": "Financial Dashboard",
+        "confirmedRevenue": "Confirmed Revenue",
+        "pendingPipeline": "Pending Pipeline",
+        "monthRevenue": "Revenue This Month"
+      },
+      "fleet": {
+        "title": "Fleet Status & Forecast",
+        "totalVehicles": "Total Vehicles",
+        "activeVehicles": "Active",
+        "maintenanceVehicles": "Maintenance",
+        "inactiveVehicles": "Inactive",
+        "onRentNow": "On Rent Now",
+        "expectedDemand": "Expected Demand by Category (Next 7 Days)",
+        "noExpectedDemand": "No expected demand in the next 7 days"
+      },
+      "vehicles": {
+        "manage": "Manage Vehicles",
+        "pricing": "Pricing"
+      }
+    },
     "logout": "Logout"
-  },
-  "errors": {
-    "notFound": "Page not found",
-    "unauthorized": "Unauthorized",
-    "forbidden": "Forbidden",
-    "serverError": "Server error occurred",
-    "tryAgain": "Try again"
   }
 }

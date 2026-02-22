@@ -172,6 +172,10 @@
     },
     "bookings": {
       "title": "Reservas",
+      "empty": "No se encontraron reservas",
+      "actions": {
+        "view": "Ver"
+      },
       "table": {
         "id": "ID",
         "customer": "Cliente",
@@ -213,6 +217,13 @@
       "notes": "Notas",
       "created": "Vehículo creado exitosamente",
       "updated": "Vehículo actualizado exitosamente",
+      "deleted": "Vehículo eliminado exitosamente",
+      "statusUpdated": "Estado del vehículo actualizado",
+      "empty": "No se encontraron vehículos",
+      "errors": {
+        "delete": "Error al eliminar vehículo",
+        "updateStatus": "Error al actualizar estado del vehículo"
+      },
       "table": {
         "name": "Nombre",
         "plate": "Placa",
@@ -225,6 +236,48 @@
     "billingRequired": {
       "title": "Facturación Requerida",
       "message": "Tu licencia ha sido suspendida. Por favor, contáctanos para reanudar el acceso."
+    },
+    "dashboard": {
+      "header": {
+        "welcome": "Bienvenido, {user}",
+        "role": "Rol: {role}",
+        "licenseActive": "Licencia: Activa",
+        "licenseSuspended": "Licencia: Suspendida"
+      },
+      "tabs": {
+        "bookings": "Reservas",
+        "deliveries": "Entregas",
+        "returns": "Devoluciones",
+        "financial": "Finanzas",
+        "fleet": "Flota",
+        "vehicles": "Gestión de Vehículos"
+      },
+      "deliveries": {
+        "title": "Próximas Entregas (Siguientes 7 Días)"
+      },
+      "returns": {
+        "title": "Próximas Devoluciones (Siguientes 7 Días)"
+      },
+      "financial": {
+        "title": "Panel Financiero",
+        "confirmedRevenue": "Ingresos Confirmados",
+        "pendingPipeline": "Pendiente por Confirmar",
+        "monthRevenue": "Ingresos del Mes"
+      },
+      "fleet": {
+        "title": "Estado y Proyección de Flota",
+        "totalVehicles": "Total de Vehículos",
+        "activeVehicles": "Activos",
+        "maintenanceVehicles": "En Mantenimiento",
+        "inactiveVehicles": "Inactivos",
+        "onRentNow": "En Alquiler Ahora",
+        "expectedDemand": "Demanda Esperada por Categoría (Siguientes 7 Días)",
+        "noExpectedDemand": "No hay demanda esperada en los próximos 7 días"
+      },
+      "vehicles": {
+        "manage": "Gestionar Vehículos",
+        "pricing": "Precios"
+      }
     },
     "logout": "Cerrar Sesión"
   },

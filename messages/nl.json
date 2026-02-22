@@ -172,6 +172,10 @@
     },
     "bookings": {
       "title": "Reserveringen",
+      "empty": "Geen reserveringen gevonden",
+      "actions": {
+        "view": "Bekijken"
+      },
       "table": {
         "id": "ID",
         "customer": "Klant",
@@ -213,6 +217,13 @@
       "notes": "Opmerkingen",
       "created": "Voertuig succesvol aangemaakt",
       "updated": "Voertuig succesvol bijgewerkt",
+      "deleted": "Voertuig succesvol verwijderd",
+      "statusUpdated": "Voertuigstatus bijgewerkt",
+      "empty": "Geen voertuigen gevonden",
+      "errors": {
+        "delete": "Fout bij verwijderen van voertuig",
+        "updateStatus": "Fout bij bijwerken voertuigstatus"
+      },
       "table": {
         "name": "Naam",
         "plate": "Kenteken",
@@ -225,6 +236,48 @@
     "billingRequired": {
       "title": "Facturering Vereist",
       "message": "Je licentie is opgeschort. Neem contact met ons op om het toegang te hervatten."
+    },
+    "dashboard": {
+      "header": {
+        "welcome": "Welkom, {user}",
+        "role": "Rol: {role}",
+        "licenseActive": "Licentie: Actief",
+        "licenseSuspended": "Licentie: Opgeschort"
+      },
+      "tabs": {
+        "bookings": "Reserveringen",
+        "deliveries": "Leveringen",
+        "returns": "Innames",
+        "financial": "Financieel",
+        "fleet": "Vloot",
+        "vehicles": "Voertuigbeheer"
+      },
+      "deliveries": {
+        "title": "Aankomende Leveringen (Volgende 7 Dagen)"
+      },
+      "returns": {
+        "title": "Aankomende Innames (Volgende 7 Dagen)"
+      },
+      "financial": {
+        "title": "Financieel Dashboard",
+        "confirmedRevenue": "Bevestigde Omzet",
+        "pendingPipeline": "Wachtende Omzet",
+        "monthRevenue": "Omzet Deze Maand"
+      },
+      "fleet": {
+        "title": "Vlootstatus en Verwachting",
+        "totalVehicles": "Totaal Voertuigen",
+        "activeVehicles": "Actief",
+        "maintenanceVehicles": "Onderhoud",
+        "inactiveVehicles": "Inactief",
+        "onRentNow": "Nu Verhuurd",
+        "expectedDemand": "Verwachte Vraag per Categorie (Volgende 7 Dagen)",
+        "noExpectedDemand": "Geen verwachte vraag in de komende 7 dagen"
+      },
+      "vehicles": {
+        "manage": "Voertuigen Beheren",
+        "pricing": "Prijzen"
+      }
     },
     "logout": "Afmelden"
   },

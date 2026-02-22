@@ -37,10 +37,6 @@ export async function loginAction(email: string, password: string, locale: strin
 }
 
 export async function logoutAction(locale: string) {
-  try {
-    await destroySession();
-    redirect(`/${locale}/admin/login`);
-  } catch (error) {
-    return { success: false, error: "Logout failed" };
-  }
+  await destroySession();
+  redirect(`/${locale}`);
 }
