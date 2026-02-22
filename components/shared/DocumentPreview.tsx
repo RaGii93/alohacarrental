@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { getInlineBlobUrl, isPdfUrl } from "@/lib/blob";
+import { getBlobProxyUrl, getInlineBlobUrl, isPdfUrl } from "@/lib/blob";
 
 type DocumentPreviewProps = {
   url?: string | null;
@@ -13,8 +13,10 @@ type DocumentPreviewProps = {
 
 export function DocumentPreview({ url, title, openLabel, emptyLabel }: DocumentPreviewProps) {
   const inlineUrl = useMemo(() => getInlineBlobUrl(url), [url]);
+  const previewUrl = useMemo(() => getBlobProxyUrl(inlineUrl), [inlineUrl]);
+  const downloadUrl = useMemo(() => getBlobProxyUrl(url, { download: true }), [url]);
 
-  if (!inlineUrl) {
+  if (!inlineUrl || !previewUrl || !downloadUrl) {
     return <p className="text-sm text-muted-foreground">{emptyLabel}</p>;
   }
 
@@ -26,19 +28,19 @@ export function DocumentPreview({ url, title, openLabel, emptyLabel }: DocumentP
       <div className="overflow-hidden rounded-md border bg-muted/10">
         {pdf ? (
           <iframe
-            src={inlineUrl}
+            src={previewUrl}
             title={title}
             className="h-[420px] w-full"
           />
         ) : (
           <img
-            src={inlineUrl}
+            src={previewUrl}
             alt={title}
             className="max-h-[420px] w-full object-contain"
           />
         )}
       </div>
-      <a href={inlineUrl} target="_blank" rel="noopener noreferrer">
+      <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
         <Button type="button" variant="outline" size="sm">
           {openLabel}
         </Button>

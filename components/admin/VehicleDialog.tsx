@@ -68,7 +68,7 @@ export function VehicleDialog({
       plateNumber: vehicle?.plateNumber || "",
       categoryId: vehicle?.categoryId || "",
       dailyRate: vehicle?.dailyRate ? vehicle.dailyRate / 100 : 0,
-      status: (vehicle?.status as "ACTIVE" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
+      status: (vehicle?.status as "ACTIVE" | "ON_RENT" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
       notes: vehicle?.notes || "",
     },
   });
@@ -81,7 +81,7 @@ export function VehicleDialog({
         plateNumber: vehicle.plateNumber || "",
         categoryId: vehicle.categoryId || "",
         dailyRate: vehicle.dailyRate ? vehicle.dailyRate / 100 : 0,
-        status: (vehicle?.status as "ACTIVE" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
+        status: (vehicle?.status as "ACTIVE" | "ON_RENT" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
         notes: vehicle.notes || "",
       });
     }
@@ -219,6 +219,7 @@ export function VehicleDialog({
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="ON_RENT">On rent</SelectItem>
                       <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
                       <SelectItem value="INACTIVE">Inactive</SelectItem>
                     </SelectContent>

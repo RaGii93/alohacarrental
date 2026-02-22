@@ -10,6 +10,7 @@ const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
 export interface UploadResult {
   success: boolean;
   url?: string;
+  downloadUrl?: string;
   error?: string;
 }
 
@@ -62,12 +63,59 @@ export async function uploadFile(
 
     return {
       success: true,
-      url: result.url,
+      url: (result as any).downloadUrl || result.url,
+      downloadUrl: (result as any).downloadUrl || result.url,
     };
   } catch (error: any) {
     return {
       success: false,
       error: error?.message || "Failed to upload file",
+    };
+  }
+}
+
+export async function uploadBuffer(
+  bytes: Uint8Array,
+  folderPath: string,
+  fileName: string,
+  contentType: string
+): Promise<UploadResult> {
+  try {
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!blobToken && !process.env.VERCEL) {
+      return {
+        success: false,
+        error: "Missing BLOB_READ_WRITE_TOKEN environment variable",
+      };
+    }
+
+    const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const key = `${folderPath}/${Date.now()}-${safeName}`;
+    const payload = Buffer.from(bytes);
+    if (!hasValidFileSignature(payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength), contentType)) {
+      return {
+        success: false,
+        error: "Generated file appears corrupted or has invalid signature",
+      };
+    }
+    const blobPayload = new Blob([payload], { type: contentType });
+
+    const result = await put(key, blobPayload, {
+      access: "private",
+      addRandomSuffix: true,
+      token: blobToken,
+      contentType,
+    });
+
+    return {
+      success: true,
+      url: (result as any).downloadUrl || result.url,
+      downloadUrl: (result as any).downloadUrl || result.url,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error?.message || "Failed to upload generated file",
     };
   }
 }

@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload } from "lucide-react";
-import { uploadDriverLicenseAction } from "@/actions/booking";
 import { BookingData } from "../BookingWizard";
 import { DatePicker } from "@/components/ui/date-picker";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
@@ -46,7 +45,11 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
       const formData = new FormData();
       formData.append("driverLicense", file);
 
-      const result = await uploadDriverLicenseAction(formData);
+      const response = await fetch("/api/upload/license", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
       if (result.success) {
         updateBookingData({ driverLicenseUrl: result.driverLicenseUrl });
         toast.success(t("common.success"));

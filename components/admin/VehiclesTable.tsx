@@ -55,6 +55,8 @@ export function VehiclesTable({
         return "bg-green-100 text-green-800";
       case "MAINTENANCE":
         return "bg-yellow-100 text-yellow-800";
+      case "ON_RENT":
+        return "bg-blue-100 text-blue-800";
       case "INACTIVE":
         return "bg-red-100 text-red-800";
       default:
@@ -81,7 +83,7 @@ export function VehiclesTable({
 
   const handleStatusChange = async (
     vehicleId: string,
-    newStatus: "ACTIVE" | "MAINTENANCE" | "INACTIVE"
+    newStatus: "ACTIVE" | "ON_RENT" | "MAINTENANCE" | "INACTIVE"
   ) => {
     setIsLoading(true);
     const result = await setVehicleStatusAction(vehicleId, newStatus, locale);

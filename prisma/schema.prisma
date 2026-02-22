@@ -56,6 +56,7 @@ model Location {
 
 enum VehicleStatus {
   ACTIVE
+  ON_RENT
   MAINTENANCE
   INACTIVE
 }
@@ -101,10 +102,13 @@ model Booking {
   bookingCode         String    @unique
   holdExpiresAt       DateTime  @default(dbgenerated("now() + INTERVAL '2 hours'"))
   paymentProofUrl     String?
+  paymentReceivedAt   DateTime?
   termsAcceptedAt     DateTime?
   notes               String?
   invoiceUrl          String?
   createdAt           DateTime  @default(now())
+  bookingExtras       BookingExtra[]
+  bookingDiscount     BookingDiscount?
   auditLogs           AuditLog[]
 
   @@index([vehicleId, startDate, endDate])
@@ -135,4 +139,63 @@ model AuditLog {
 
   @@index([adminUserId])
   @@index([createdAt])
+}
+
+enum ExtraPricingType {
+  DAILY
+  FLAT
+}
+
+model Extra {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  pricingType ExtraPricingType @default(FLAT)
+  amount      Int
+  isActive    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  bookingExtras BookingExtra[]
+
+  @@index([isActive])
+}
+
+model BookingExtra {
+  id         String   @id @default(cuid())
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  extraId    String
+  extra      Extra    @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  quantity   Int      @default(1)
+  lineTotal  Int
+  createdAt  DateTime @default(now())
+
+  @@unique([bookingId, extraId])
+  @@index([bookingId])
+  @@index([extraId])
+}
+
+model DiscountCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  description String?
+  percentage  Int
+  isActive    Boolean  @default(true)
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  bookings    BookingDiscount[]
+}
+
+model BookingDiscount {
+  id             String       @id @default(cuid())
+  bookingId      String       @unique
+  booking        Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  discountCodeId String
+  discountCode   DiscountCode @relation(fields: [discountCodeId], references: [id], onDelete: Restrict)
+  percentage     Int
+  amount         Int
+  createdAt      DateTime     @default(now())
+
+  @@index([discountCodeId])
 }

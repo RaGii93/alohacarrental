@@ -30,9 +30,18 @@ export interface BookingData {
   driverLicenseUrl: string;
   notes: string;
   termsAccepted: boolean;
+  selectedExtras: Array<{ extraId: string; quantity: number }>;
 }
 
-export function BookingWizard({ locale, locations }: { locale: string; locations: { id: string; name: string; code?: string | null; address?: string | null }[] }) {
+export function BookingWizard({
+  locale,
+  locations,
+  extras,
+}: {
+  locale: string;
+  locations: { id: string; name: string; code?: string | null; address?: string | null }[];
+  extras: { id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }[];
+}) {
   const t = useTranslations();
   const [currentStep, setCurrentStep] = useState(1);
   const [availability, setAvailability] = useState<AvailabilityResult[]>([]);
@@ -53,6 +62,7 @@ export function BookingWizard({ locale, locations }: { locale: string; locations
     driverLicenseUrl: "",
     notes: "",
     termsAccepted: false,
+    selectedExtras: [],
   });
 
   const licenseActive = isLicenseActive();
@@ -124,6 +134,7 @@ export function BookingWizard({ locale, locations }: { locale: string; locations
             bookingData={bookingData}
             updateBookingData={updateBookingData}
             locations={locations}
+            extras={extras}
             locale={locale}
             onPrev={prevStep}
             disabled={!licenseActive}

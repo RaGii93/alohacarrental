@@ -4,9 +4,44 @@
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
-import { uploadFile } from "@/lib/uploads";
+import { uploadBuffer, uploadFile } from "@/lib/uploads";
 import { categoryBookingFormSchemaRefined } from "@/lib/validators";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { bookingEmailHtml, sendEmail } from "@/lib/email";
+import { getTenantConfig } from "@/lib/tenant";
+import { generateInvoicePDF } from "@/lib/pdf";
+
+async function loadBookingAdjustments(bookingId: string) {
+  let extras: Array<{ id: string; quantity: number; lineTotal: number; extraName: string }> = [];
+  let discount: { id: string; percentage: number; amount: number; code: string } | null = null;
+
+  try {
+    extras = await db.$queryRaw<Array<{ id: string; quantity: number; lineTotal: number; extraName: string }>>`
+      SELECT be.id, be.quantity, be."lineTotal", e.name as "extraName"
+      FROM "BookingExtra" be
+      JOIN "Extra" e ON e.id = be."extraId"
+      WHERE be."bookingId" = ${bookingId}
+      ORDER BY be."createdAt" ASC
+    `;
+  } catch {
+    extras = [];
+  }
+
+  try {
+    const rows = await db.$queryRaw<Array<{ id: string; percentage: number; amount: number; code: string }>>`
+      SELECT bd.id, bd.percentage, bd.amount, dc.code
+      FROM "BookingDiscount" bd
+      JOIN "DiscountCode" dc ON dc.id = bd."discountCodeId"
+      WHERE bd."bookingId" = ${bookingId}
+      LIMIT 1
+    `;
+    discount = rows[0] || null;
+  } catch {
+    discount = null;
+  }
+
+  return { extras, discount };
+}
 
 export async function cancelExpiredHolds() {
   // Cancel PENDING bookings where holdExpiresAt < now
@@ -50,6 +85,21 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
         bookingId,
       },
     });
+
+    try {
+      await sendEmail({
+        to: booking.customerEmail,
+        subject: `Booking Confirmed - ${booking.bookingCode}`,
+        html: bookingEmailHtml({
+          title: "Your booking has been confirmed",
+          customerName: booking.customerName,
+          bookingCode: booking.bookingCode,
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          totalAmountCents: booking.totalAmount,
+        }),
+      });
+    } catch {}
 
     return { success: true, booking };
   } catch (error: any) {
@@ -134,18 +184,235 @@ export async function generateInvoiceAction(bookingId: string, locale: string) {
 
     const booking = await db.booking.findUnique({
       where: { id: bookingId },
-      include: { vehicle: true },
+      include: {
+        vehicle: true,
+        category: true,
+        pickupLocationRef: true,
+        dropoffLocationRef: true,
+      },
     });
 
     if (!booking) {
       return { success: false, error: "Booking not found" };
     }
+    if (!booking.vehicleId || !booking.vehicle) {
+      return { success: false, error: "No vehicle assigned to booking" };
+    }
+    if (booking.status === "DECLINED" || booking.status === "CANCELLED") {
+      return { success: false, error: "Cannot invoice declined/cancelled booking" };
+    }
+    const { extras: adjustmentExtras, discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
 
-    // TODO: Generate PDF and upload to Blob
-    // For now, just return success
-    return { success: true, booking };
+    const rentalDays = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
+    const baseRental = booking.category.dailyRate * rentalDays;
+    const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
+    const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
+    const invoiceBuffer = await generateInvoicePDF({
+      orderId: booking.id,
+      bookingCode: booking.bookingCode,
+      customerName: booking.customerName,
+      customerEmail: booking.customerEmail,
+      customerPhone: booking.customerPhone,
+      vehicleName: booking.vehicle.name || "-",
+      categoryName: booking.category.name,
+      pickupLocation: booking.pickupLocationRef?.name || booking.pickupLocation || "-",
+      dropoffLocation: booking.dropoffLocationRef?.name || booking.dropoffLocation || "-",
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      baseRentalAmount: baseRental,
+      extrasAmount: extrasTotal,
+      discountAmount,
+      totalAmount: booking.totalAmount,
+      discountCode: bookingDiscount?.code,
+      extras: adjustmentExtras.map((line) => ({
+        name: line.extraName,
+        quantity: line.quantity,
+        lineTotal: line.lineTotal,
+      })),
+      paymentInstructions: getTenantConfig().paymentInstructions,
+      tenantConfig: getTenantConfig(),
+    });
+    const signature = invoiceBuffer.subarray(0, 4).toString("utf8");
+    if (signature !== "%PDF" || invoiceBuffer.length < 500) {
+      return { success: false, error: "Generated invoice PDF is invalid or empty" };
+    }
+
+    const uploadResult = await uploadBuffer(
+      invoiceBuffer,
+      "invoices",
+      `invoice-${booking.bookingCode}.pdf`,
+      "application/pdf"
+    );
+    if (!uploadResult.success || !uploadResult.url) {
+      return { success: false, error: uploadResult.error || "Failed to upload invoice" };
+    }
+
+    const updated = await db.$transaction(async (tx) => {
+      const bookingCols = await tx.$queryRaw<Array<{ column_name: string }>>`
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'Booking'
+      `;
+      const hasPaymentReceivedAt = bookingCols.some((c) => c.column_name === "paymentReceivedAt");
+
+      const updatedBooking = await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          status: "CONFIRMED",
+          invoiceUrl: uploadResult.url!,
+          ...(hasPaymentReceivedAt ? ({ paymentReceivedAt: new Date() } as any) : {}),
+        } as any,
+      });
+      if (hasPaymentReceivedAt) {
+        try {
+          await tx.$executeRaw`
+            UPDATE "Booking" SET "paymentReceivedAt" = ${new Date()} WHERE id = ${bookingId}
+          `;
+        } catch {}
+      }
+      await tx.vehicle.update({
+        where: { id: booking.vehicleId! },
+        data: { status: "ON_RENT" },
+      });
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "INVOICE_CREATED_PAYMENT_RECEIVED",
+          bookingId,
+        },
+      });
+      return updatedBooking;
+    });
+
+    try {
+      await sendEmail({
+        to: updated.customerEmail,
+        subject: `Invoice Ready - ${updated.bookingCode}`,
+        html: bookingEmailHtml({
+          title: "Your updated invoice is ready",
+          customerName: updated.customerName,
+          bookingCode: updated.bookingCode,
+          startDate: updated.startDate,
+          endDate: updated.endDate,
+          totalAmountCents: updated.totalAmount,
+          invoiceUrl: uploadResult.url,
+        }),
+      });
+    } catch {}
+
+    return { success: true, booking: updated };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to generate invoice" };
+  }
+}
+
+async function recomputeBookingTotals(bookingId: string) {
+  const booking = await db.booking.findUnique({
+    where: { id: bookingId },
+    include: { category: true },
+  });
+  if (!booking) throw new Error("Booking not found");
+
+  const { extras: adjustmentExtras, discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
+  const days = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  const baseRental = booking.category.dailyRate * days;
+  const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
+  const percentage = bookingDiscount?.percentage ?? 0;
+  const discountAmount = Math.round((baseRental * percentage) / 100);
+  const totalAmount = Math.max(0, baseRental - discountAmount + extrasTotal);
+
+  await db.booking.update({ where: { id: bookingId }, data: { totalAmount } });
+  if (bookingDiscount) {
+    if ((db as any).bookingDiscount && typeof (db as any).bookingDiscount.update === "function") {
+      await (db as any).bookingDiscount.update({
+        where: { id: bookingDiscount.id },
+        data: { amount: discountAmount },
+      });
+    } else {
+      await db.$executeRaw`
+        UPDATE "BookingDiscount"
+        SET amount = ${discountAmount}
+        WHERE id = ${bookingDiscount.id}
+      `;
+    }
+  }
+
+  return { booking, baseRental, extrasTotal, discountAmount, totalAmount };
+}
+
+export async function applyDiscountCodeToBookingAction(bookingId: string, code: string, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+
+    const normalized = String(code || "").trim().toUpperCase();
+    const discount = await db.discountCode.findUnique({ where: { code: normalized } });
+    if (!discount || !discount.isActive) return { success: false, error: "Invalid discount code" };
+    if (discount.expiresAt && discount.expiresAt < new Date()) return { success: false, error: "Discount code expired" };
+    if (discount.maxUses && discount.usedCount >= discount.maxUses) return { success: false, error: "Discount code usage exceeded" };
+
+    const existing = await db.bookingDiscount.findUnique({ where: { bookingId } });
+    await db.$transaction(async (tx) => {
+      if (existing) {
+        await tx.bookingDiscount.update({
+          where: { bookingId },
+          data: { discountCodeId: discount.id, percentage: discount.percentage },
+        });
+      } else {
+        await tx.bookingDiscount.create({
+          data: {
+            bookingId,
+            discountCodeId: discount.id,
+            percentage: discount.percentage,
+            amount: 0,
+          },
+        });
+        await tx.discountCode.update({ where: { id: discount.id }, data: { usedCount: { increment: 1 } } });
+      }
+    });
+
+    await recomputeBookingTotals(bookingId);
+    const invoiceResult = await generateInvoiceAction(bookingId, locale);
+    if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Discount applied but invoice update failed" };
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to apply discount" };
+  }
+}
+
+export async function addExtraToBookingAction(bookingId: string, extraId: string, quantity: number, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+
+    const booking = await db.booking.findUnique({
+      where: { id: bookingId },
+      include: { category: true, bookingExtras: true },
+    });
+    if (!booking) return { success: false, error: "Booking not found" };
+    const extra = await db.extra.findUnique({ where: { id: extraId } });
+    if (!extra || !extra.isActive) return { success: false, error: "Extra not available" };
+
+    const days = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
+    const qty = Math.max(1, Math.round(quantity || 1));
+    const lineTotal = extra.pricingType === "DAILY" ? extra.amount * days * qty : extra.amount * qty;
+
+    await db.bookingExtra.upsert({
+      where: { bookingId_extraId: { bookingId, extraId } },
+      update: { quantity: qty, lineTotal },
+      create: { bookingId, extraId, quantity: qty, lineTotal },
+    });
+
+    await recomputeBookingTotals(bookingId);
+    const invoiceResult = await generateInvoiceAction(bookingId, locale);
+    if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Extra added but invoice update failed" };
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to add extra" };
   }
 }
 
@@ -207,6 +474,7 @@ export async function createCategoryBookingAction(
     const pickupLocation = (formData.get("pickupLocation") as string | null) || null;
     const dropoffLocation = (formData.get("dropoffLocation") as string | null) || null;
     const notes = formData.get("notes") as string | null;
+    const extrasPayload = (formData.get("selectedExtras") as string | null) || "[]";
     const driverLicenseUrl = formData.get("driverLicenseUrl") as string;
     const termsAccepted = formData.get("termsAccepted") === "true";
 
@@ -255,6 +523,20 @@ export async function createCategoryBookingAction(
       termsAccepted,
       notes: notes || undefined,
     });
+    let selectedExtras: Array<{ extraId: string; quantity: number }> = [];
+    try {
+      const parsed = JSON.parse(extrasPayload);
+      if (Array.isArray(parsed)) {
+        selectedExtras = parsed
+          .map((entry: any) => ({
+            extraId: String(entry?.extraId || ""),
+            quantity: Math.max(1, Number(entry?.quantity || 1)),
+          }))
+          .filter((entry) => entry.extraId.length > 0);
+      }
+    } catch {
+      selectedExtras = [];
+    }
 
     // Resolve locations by ID (if sent)
     const [pickupLocationRecord, dropoffLocationRecord] = await Promise.all([
@@ -285,7 +567,46 @@ export async function createCategoryBookingAction(
 
     // Calculate days and total
     const days = Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const totalAmount = category.dailyRate * Math.max(1, days);
+    const baseTotal = category.dailyRate * Math.max(1, days);
+    let extrasTotal = 0;
+    let resolvedExtras: Array<{ extraId: string; quantity: number; lineTotal: number }> = [];
+    if (selectedExtras.length > 0) {
+      if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
+        const extraRows: Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }> = await (db as any).extra.findMany({
+          where: { id: { in: selectedExtras.map((entry) => entry.extraId) }, isActive: true },
+          select: { id: true, pricingType: true, amount: true },
+        });
+        const extraMap = new Map<string, { id: string; pricingType: "DAILY" | "FLAT"; amount: number }>(
+          extraRows.map((row) => [row.id, row])
+        );
+        resolvedExtras = selectedExtras
+          .map((entry) => {
+            const extra = extraMap.get(entry.extraId);
+            if (!extra) return null;
+            const lineTotal = extra.pricingType === "DAILY" ? extra.amount * Math.max(1, days) * entry.quantity : extra.amount * entry.quantity;
+            return { extraId: entry.extraId, quantity: entry.quantity, lineTotal };
+          })
+          .filter(Boolean) as Array<{ extraId: string; quantity: number; lineTotal: number }>;
+      } else {
+        const extraRows = await db.$queryRaw<Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }>>`
+          SELECT id, "pricingType", amount
+          FROM "Extra"
+          WHERE "isActive" = true
+            AND id IN (${Prisma.join(selectedExtras.map((entry) => entry.extraId))})
+        `;
+        const extraMap = new Map(extraRows.map((row) => [row.id, row]));
+        resolvedExtras = selectedExtras
+          .map((entry) => {
+            const extra = extraMap.get(entry.extraId);
+            if (!extra) return null;
+            const lineTotal = extra.pricingType === "DAILY" ? extra.amount * Math.max(1, days) * entry.quantity : extra.amount * entry.quantity;
+            return { extraId: entry.extraId, quantity: entry.quantity, lineTotal };
+          })
+          .filter(Boolean) as Array<{ extraId: string; quantity: number; lineTotal: number }>;
+      }
+      extrasTotal = resolvedExtras.reduce((sum, line) => sum + line.lineTotal, 0);
+    }
+    const totalAmount = baseTotal + extrasTotal;
 
 
     // Database transaction to allocate vehicle
@@ -301,8 +622,13 @@ export async function createCategoryBookingAction(
               none: {
                 startDate: { lt: validated.endDate },
                 endDate: { gt: validated.startDate },
-                status: { in: ["PENDING", "CONFIRMED"] },
-                holdExpiresAt: { gt: new Date() },
+                OR: [
+                  { status: "CONFIRMED" },
+                  {
+                    status: "PENDING",
+                    holdExpiresAt: { gt: new Date() },
+                  },
+                ],
               },
             },
           },
@@ -381,6 +707,26 @@ export async function createCategoryBookingAction(
         if (!persisted[0]?.birthDate || !persisted[0]?.licenseExpiryDate) {
           throw new Error("BOOKING_FIELDS_NOT_SAVED");
         }
+        if (resolvedExtras.length > 0) {
+          if ((tx as any).bookingExtra && typeof (tx as any).bookingExtra.createMany === "function") {
+            await (tx as any).bookingExtra.createMany({
+              data: resolvedExtras.map((line) => ({
+                bookingId: created.id,
+                extraId: line.extraId,
+                quantity: line.quantity,
+                lineTotal: line.lineTotal,
+              })),
+            });
+          } else {
+            for (const line of resolvedExtras) {
+              await tx.$executeRaw`
+                INSERT INTO "BookingExtra" ("bookingId", "extraId", quantity, "lineTotal")
+                VALUES (${created.id}, ${line.extraId}, ${line.quantity}, ${line.lineTotal})
+              `;
+            }
+          }
+        }
+
         return created;
       });
     } catch (error: any) {
@@ -392,6 +738,29 @@ export async function createCategoryBookingAction(
       }
       throw error;
     }
+
+    try {
+      const tenant = getTenantConfig();
+      const subject = `New Booking Created - ${booking.bookingCode}`;
+      const customerHtml = bookingEmailHtml({
+        title: "Booking request received",
+        customerName: booking.customerName,
+        bookingCode: booking.bookingCode,
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        totalAmountCents: booking.totalAmount,
+      });
+      await sendEmail({
+        to: booking.customerEmail,
+        subject,
+        html: customerHtml,
+      });
+      await sendEmail({
+        to: tenant.email,
+        subject: `New Booking Alert - ${booking.bookingCode}`,
+        html: customerHtml,
+      });
+    } catch {}
 
     return {
       success: true,

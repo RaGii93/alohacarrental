@@ -62,6 +62,17 @@ export async function updateVehicleAction(
 
     const validated = vehicleFormSchema.parse(formData);
 
+    const existingVehicle = await db.vehicle.findUnique({
+      where: { id: vehicleId },
+      select: { status: true },
+    });
+    if (!existingVehicle) {
+      return { success: false, error: "Vehicle not found" };
+    }
+    if (existingVehicle.status === "ON_RENT") {
+      return { success: false, error: "ON_RENT_VEHICLE_LOCKED" };
+    }
+
     const vehicle = await db.vehicle.update({
       where: { id: vehicleId },
       data: {
@@ -90,7 +101,7 @@ export async function updateVehicleAction(
 
 export async function setVehicleStatusAction(
   vehicleId: string,
-  status: "ACTIVE" | "MAINTENANCE" | "INACTIVE",
+  status: "ACTIVE" | "ON_RENT" | "MAINTENANCE" | "INACTIVE",
   locale: string
 ) {
   try {
@@ -102,6 +113,17 @@ export async function setVehicleStatusAction(
     // Check license
     if (!isLicenseActive() && session.role !== "ROOT") {
       return { success: false, error: "BOOKING_DISABLED" };
+    }
+
+    const existingVehicle = await db.vehicle.findUnique({
+      where: { id: vehicleId },
+      select: { status: true },
+    });
+    if (!existingVehicle) {
+      return { success: false, error: "Vehicle not found" };
+    }
+    if (existingVehicle.status === "ON_RENT" && status !== "ON_RENT") {
+      return { success: false, error: "ON_RENT_VEHICLE_LOCKED" };
     }
 
     const vehicle = await db.vehicle.update({
@@ -133,6 +155,17 @@ export async function deleteVehicleAction(vehicleId: string, locale: string) {
     // Check license
     if (!isLicenseActive() && session.role !== "ROOT") {
       return { success: false, error: "BOOKING_DISABLED" };
+    }
+
+    const existingVehicle = await db.vehicle.findUnique({
+      where: { id: vehicleId },
+      select: { status: true },
+    });
+    if (!existingVehicle) {
+      return { success: false, error: "Vehicle not found" };
+    }
+    if (existingVehicle.status === "ON_RENT") {
+      return { success: false, error: "ON_RENT_VEHICLE_LOCKED" };
     }
 
     const vehicle = await db.vehicle.delete({

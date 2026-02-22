@@ -81,8 +81,10 @@ export async function searchAvailabilityAction(
         FROM "Booking"
         WHERE "startDate" < ${endDate}
           AND "endDate" > ${startDate}
-          AND "status" IN ('PENDING', 'CONFIRMED')
-          AND "holdExpiresAt" > now()
+          AND (
+            "status" = 'CONFIRMED'
+            OR ("status" = 'PENDING' AND "holdExpiresAt" > now())
+          )
           AND "categoryId" = ${category.id}
       `;
       overlappingBookings = rows?.[0]?.count ?? 0;
@@ -93,8 +95,10 @@ export async function searchAvailabilityAction(
         JOIN "Vehicle" v ON v.id = b."vehicleId"
         WHERE b."startDate" < ${endDate}
           AND b."endDate" > ${startDate}
-          AND b."status" IN ('PENDING', 'CONFIRMED')
-          AND b."holdExpiresAt" > now()
+          AND (
+            b."status" = 'CONFIRMED'
+            OR (b."status" = 'PENDING' AND b."holdExpiresAt" > now())
+          )
           AND v."status" = 'ACTIVE'
           AND v."categoryId" = ${category.id}
       `;
@@ -106,8 +110,10 @@ export async function searchAvailabilityAction(
         JOIN "Vehicle" v ON v.id = b."vehicleId"
         WHERE b."startDate" < ${endDate}
           AND b."endDate" > ${startDate}
-          AND b."status" IN ('PENDING', 'CONFIRMED')
-          AND b."holdExpiresAt" > now()
+          AND (
+            b."status" = 'CONFIRMED'
+            OR (b."status" = 'PENDING' AND b."holdExpiresAt" > now())
+          )
           AND v."status" = 'ACTIVE'
           AND v."category" = ${category.name}
       `;

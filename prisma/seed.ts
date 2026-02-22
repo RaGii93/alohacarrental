@@ -92,6 +92,38 @@ async function main() {
   }
   console.log(`✓ Upserted ${categoriesData.length} categories`);
 
+  const extrasData = [
+    { name: "Fuel Service", description: "Fuel refill handling", pricingType: "FLAT" as const, amount: 2500, isActive: true },
+    { name: "Child Seat", description: "Safety child seat", pricingType: "DAILY" as const, amount: 600, isActive: true },
+    { name: "GPS Device", description: "Standalone GPS", pricingType: "DAILY" as const, amount: 450, isActive: true },
+    { name: "Additional Driver", description: "Second authorized driver", pricingType: "DAILY" as const, amount: 900, isActive: true },
+    { name: "Cleaning Package", description: "Post-rental deep cleaning", pricingType: "FLAT" as const, amount: 1800, isActive: true },
+  ];
+  for (const extra of extrasData) {
+    await prisma.extra.upsert({
+      where: { name: extra.name },
+      update: extra,
+      create: extra,
+    });
+  }
+  console.log(`✓ Upserted ${extrasData.length} extras`);
+
+  const discountCodes = [
+    { code: "WELCOME10", description: "Welcome discount", percentage: 10, isActive: true },
+    { code: "WEEKEND15", description: "Weekend offer", percentage: 15, isActive: true },
+    { code: "VIP20", description: "VIP customer", percentage: 20, isActive: true },
+    { code: "SPRING12", description: "Spring campaign", percentage: 12, isActive: true },
+    { code: "LOYAL5", description: "Loyalty discount", percentage: 5, isActive: true },
+  ];
+  for (const discount of discountCodes) {
+    await prisma.discountCode.upsert({
+      where: { code: discount.code },
+      update: discount,
+      create: discount,
+    });
+  }
+  console.log(`✓ Upserted ${discountCodes.length} discount codes`);
+
   const locationsData = [
     { code: "AIRPORT", name: "Airport Terminal", address: "Airport Rd, City" },
     { code: "DOWNTOWN", name: "Downtown Office", address: "123 Main St, City" },

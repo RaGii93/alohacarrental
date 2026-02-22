@@ -18,6 +18,26 @@ export default async function BookingPage({
     orderBy: { name: "asc" },
   });
 
+  let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
+  if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
+    extras = await (db as any).extra.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, pricingType: true, amount: true, description: true },
+      orderBy: { name: "asc" },
+    });
+  } else {
+    try {
+      extras = await db.$queryRaw<Array<any>>`
+        SELECT id, name, "pricingType", amount, description
+        FROM "Extra"
+        WHERE "isActive" = true
+        ORDER BY name ASC
+      `;
+    } catch {
+      extras = [];
+    }
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-4 flex justify-end">
@@ -25,7 +45,7 @@ export default async function BookingPage({
           <Button variant="outline">{t("booking.reviewLookup.cta")}</Button>
         </Link>
       </div>
-      <BookingWizard locale={locale} locations={locations} />
+      <BookingWizard locale={locale} locations={locations} extras={extras} />
     </div>
   );
 }

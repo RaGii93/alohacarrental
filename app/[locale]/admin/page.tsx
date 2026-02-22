@@ -6,9 +6,13 @@ import { db } from "@/lib/db";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookingsTable } from "@/components/admin/BookingsTable";
 import { VehiclesTable } from "@/components/admin/VehiclesTable";
+import { CategoriesTable } from "@/components/admin/CategoriesTable";
+import { ExtrasTable } from "@/components/admin/ExtrasTable";
+import { DiscountCodesTable } from "@/components/admin/DiscountCodesTable";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/actions/auth";
+import { getBlobProxyUrl } from "@/lib/blob";
 
 export default async function AdminDashboardPage({
   params,
@@ -76,11 +80,31 @@ export default async function AdminDashboardPage({
   });
 
   // Financial dashboard
-  const [confirmedRevenueAgg, pendingPipelineAgg, monthRevenueAgg] = await Promise.all([
+  const [confirmedRevenueAgg, pendingPipelineAgg, monthRevenueAgg, paidRevenueAgg] = await Promise.all([
     db.booking.aggregate({ where: { status: "CONFIRMED" }, _sum: { totalAmount: true } }),
     db.booking.aggregate({ where: { status: "PENDING" }, _sum: { totalAmount: true } }),
     db.booking.aggregate({ where: { status: "CONFIRMED", createdAt: { gte: monthStart } }, _sum: { totalAmount: true } }),
+    db.booking.aggregate({ where: { invoiceUrl: { not: null } }, _sum: { totalAmount: true } }),
   ]);
+  const confirmedCount = confirmed.length;
+  const paidConfirmedCount = confirmed.filter((b) => !!(b as any).invoiceUrl).length;
+  const unpaidConfirmedCount = confirmedCount - paidConfirmedCount;
+  const avgConfirmedValue = confirmedCount > 0 ? Math.round((confirmedRevenueAgg._sum.totalAmount ?? 0) / confirmedCount) : 0;
+  const conversionRate = pending.length + confirmed.length > 0 ? Math.round((confirmed.length / (pending.length + confirmed.length)) * 100) : 0;
+  const recentInvoices = await db.booking.findMany({
+    where: { invoiceUrl: { not: null } },
+    select: {
+      id: true,
+      bookingCode: true,
+      customerName: true,
+      customerEmail: true,
+      totalAmount: true,
+      invoiceUrl: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+  });
 
   // Fleet dashboard
   const [totalVehicles, activeVehicles, maintenanceVehicles, inactiveVehicles] = await Promise.all([
@@ -89,6 +113,18 @@ export default async function AdminDashboardPage({
     db.vehicle.count({ where: { status: "MAINTENANCE" } }),
     db.vehicle.count({ where: { status: "INACTIVE" } }),
   ]);
+  let onRentVehicles = 0;
+  try {
+    const rows = await db.$queryRaw<Array<{ count: number }>>`
+      SELECT COUNT(*)::int AS count
+      FROM "Vehicle"
+      WHERE "status" = 'ON_RENT'
+    `;
+    onRentVehicles = rows?.[0]?.count ?? 0;
+  } catch {
+    // Backward-compatible fallback when ON_RENT enum is not yet available.
+    onRentVehicles = 0;
+  }
   const onRentNow = await db.booking.count({
     where: {
       status: { in: ["PENDING", "CONFIRMED"] },
@@ -106,7 +142,50 @@ export default async function AdminDashboardPage({
     where: { isActive: true },
     orderBy: { sortOrder: "asc" },
   });
+  const allCategoryRows = await db.vehicleCategory.findMany({
+    include: {
+      _count: {
+        select: { vehicles: true, bookings: true },
+      },
+    },
+    orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }],
+  });
   const categoryNameMap = new Map(categories.map((category) => [category.id, category.name]));
+  let extras: Array<any> = [];
+  if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
+    extras = await (db as any).extra.findMany({ orderBy: { createdAt: "desc" } });
+  } else {
+    try {
+      extras = await db.$queryRaw<Array<any>>`
+        SELECT id, name, description, "pricingType", amount, "isActive", "createdAt"
+        FROM "Extra"
+        ORDER BY "createdAt" DESC
+      `;
+    } catch {
+      extras = [];
+    }
+  }
+
+  let discountCodes: Array<any> = [];
+  if ((db as any).discountCode && typeof (db as any).discountCode.findMany === "function") {
+    discountCodes = await (db as any).discountCode.findMany({ orderBy: { createdAt: "desc" } });
+  } else {
+    try {
+      discountCodes = await db.$queryRaw<Array<any>>`
+        SELECT id, code, description, percentage, "isActive", "maxUses", "usedCount", "expiresAt", "createdAt"
+        FROM "DiscountCode"
+        ORDER BY "createdAt" DESC
+      `;
+    } catch {
+      discountCodes = [];
+    }
+  }
+  const utilizationPct = totalVehicles > 0 ? Math.round((onRentVehicles / totalVehicles) * 100) : 0;
+  const returnsToday = returns.filter((booking) => {
+    const d = new Date(booking.endDate);
+    return d.toDateString() === now.toDateString();
+  }).length;
+  const topDemand = [...expectedDemandByCategory].sort((a, b) => b._count._all - a._count._all).slice(0, 3);
 
   // Vehicle management tab data
   const vehicleRows = await db.vehicle.findMany({
@@ -202,6 +281,46 @@ export default async function AdminDashboardPage({
               <p className="text-2xl font-bold">{currency(monthRevenueAgg._sum.totalAmount ?? 0)}</p>
             </Card>
           </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="p-4 bg-gradient-to-br from-emerald-50 to-white">
+              <p className="text-sm text-muted-foreground">Collected Revenue</p>
+              <p className="text-xl font-bold">{currency(paidRevenueAgg._sum.totalAmount ?? 0)}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-amber-50 to-white">
+              <p className="text-sm text-muted-foreground">Unpaid Confirmed</p>
+              <p className="text-xl font-bold">{unpaidConfirmedCount}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-blue-50 to-white">
+              <p className="text-sm text-muted-foreground">Average Booking</p>
+              <p className="text-xl font-bold">{currency(avgConfirmedValue)}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-violet-50 to-white">
+              <p className="text-sm text-muted-foreground">Pending→Confirmed</p>
+              <p className="text-xl font-bold">{conversionRate}%</p>
+            </Card>
+          </div>
+          <Card className="mt-4 p-4">
+            <p className="font-semibold mb-3">Recent Invoices</p>
+            <div className="space-y-2">
+              {recentInvoices.length === 0 && (
+                <p className="text-sm text-muted-foreground">No invoices yet.</p>
+              )}
+              {recentInvoices.map((inv) => (
+                <div key={inv.id} className="flex flex-col gap-2 rounded-md border p-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{inv.bookingCode} · {inv.customerName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {currency(inv.totalAmount)} · {new Date(inv.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <a href={getBlobProxyUrl(inv.invoiceUrl, { download: true }) || undefined} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View PDF</a>
+                    <a href={`mailto:${inv.customerEmail}?subject=${encodeURIComponent(`Invoice ${inv.bookingCode}`)}&body=${encodeURIComponent(`Hello ${inv.customerName},\n\nYour invoice is attached/available at:\n${getBlobProxyUrl(inv.invoiceUrl, { download: true }) || inv.invoiceUrl}\n\nThank you.`)}`} className="text-blue-600 hover:underline">Email client</a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         </TabsContent>
 
         <TabsContent value="fleet" className="mt-6 space-y-6">
@@ -216,6 +335,10 @@ export default async function AdminDashboardPage({
               <p className="text-2xl font-bold">{activeVehicles}</p>
             </Card>
             <Card className="p-4">
+              <p className="text-sm text-muted-foreground">On Rent Vehicles</p>
+              <p className="text-2xl font-bold">{onRentVehicles}</p>
+            </Card>
+            <Card className="p-4">
               <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.maintenanceVehicles")}</p>
               <p className="text-2xl font-bold">{maintenanceVehicles}</p>
             </Card>
@@ -226,6 +349,22 @@ export default async function AdminDashboardPage({
             <Card className="p-4">
               <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.onRentNow")}</p>
               <p className="text-2xl font-bold">{onRentNow}</p>
+            </Card>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="p-4 bg-gradient-to-br from-sky-50 to-white">
+              <p className="text-sm text-muted-foreground">Fleet Utilization</p>
+              <p className="text-2xl font-bold">{utilizationPct}%</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-orange-50 to-white">
+              <p className="text-sm text-muted-foreground">Returns Due Today</p>
+              <p className="text-2xl font-bold">{returnsToday}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-indigo-50 to-white">
+              <p className="text-sm text-muted-foreground">Top Demand Category</p>
+              <p className="text-lg font-bold">
+                {topDemand[0] ? `${categoryNameMap.get(topDemand[0].categoryId) || topDemand[0].categoryId} (${topDemand[0]._count._all})` : "-"}
+              </p>
             </Card>
           </div>
           <Card className="p-4">
@@ -249,6 +388,9 @@ export default async function AdminDashboardPage({
             <TabsList>
               <TabsTrigger value="manage">{t("admin.dashboard.vehicles.manage")}</TabsTrigger>
               <TabsTrigger value="pricing">{t("admin.dashboard.vehicles.pricing")}</TabsTrigger>
+              <TabsTrigger value="categories">Categories</TabsTrigger>
+              <TabsTrigger value="extras">Extras</TabsTrigger>
+              <TabsTrigger value="discounts">Discounts</TabsTrigger>
             </TabsList>
             <TabsContent value="manage" className="mt-4">
               <VehiclesTable vehicles={transformedVehicles} categories={vehicleCategories} locale={locale} />
@@ -263,6 +405,15 @@ export default async function AdminDashboardPage({
                   </Card>
                 ))}
               </div>
+            </TabsContent>
+            <TabsContent value="categories" className="mt-4">
+              <CategoriesTable categories={allCategoryRows as any} locale={locale} />
+            </TabsContent>
+            <TabsContent value="extras" className="mt-4">
+              <ExtrasTable extras={extras as any} locale={locale} />
+            </TabsContent>
+            <TabsContent value="discounts" className="mt-4">
+              <DiscountCodesTable discountCodes={discountCodes as any} locale={locale} />
             </TabsContent>
           </Tabs>
         </TabsContent>

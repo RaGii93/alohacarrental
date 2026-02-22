@@ -19,13 +19,14 @@ interface Step3ReviewProps {
   bookingData: BookingData;
   updateBookingData: (updates: Partial<BookingData>) => void;
   locations: { id: string; name: string; code?: string | null; address?: string | null }[];
+  extras: { id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }[];
   locale: string;
   onPrev: () => void;
   disabled: boolean;
   availability: AvailabilityResult[];
 }
 
-export function Step3Review({ bookingData, updateBookingData, locations, locale, onPrev, disabled, availability }: Step3ReviewProps) {
+export function Step3Review({ bookingData, updateBookingData, locations, extras, locale, onPrev, disabled, availability }: Step3ReviewProps) {
   const t = useTranslations();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,6 +73,7 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
       formData.append("dropoffLocationId", bookingData.dropoffLocationId);
       formData.append("driverLicenseUrl", bookingData.driverLicenseUrl);
       formData.append("notes", bookingData.notes);
+      formData.append("selectedExtras", JSON.stringify(bookingData.selectedExtras));
       formData.append("termsAccepted", "true");
 
       const result = await createCategoryBookingAction(formData, locale);
@@ -91,7 +93,13 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
   const days = pickupDateTime && dropoffDateTime ? calculateDays(pickupDateTime, dropoffDateTime) : 1;
   const selectedCategory = availability.find(cat => cat.categoryId === bookingData.categoryId);
   const categoryRate = selectedCategory?.dailyRate || 2500;
-  const totalAmount = categoryRate * days;
+  const baseAmount = categoryRate * days;
+  const extrasAmount = bookingData.selectedExtras.reduce((sum, item) => {
+    const extra = extras.find((row) => row.id === item.extraId);
+    if (!extra) return sum;
+    return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
+  }, 0);
+  const totalAmount = baseAmount + extrasAmount;
   const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocationId);
   const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocationId);
   const pickupLocationMapUrl = pickupLocation?.address
@@ -133,6 +141,13 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
               <h4 className="font-medium mb-2">{t("booking.pricePerDay")}</h4>
               <p>{formatCurrency(categoryRate)}</p>
             </div>
+
+            {extrasAmount > 0 && (
+              <div>
+                <h4 className="font-medium mb-2">Extras</h4>
+                <p>{formatCurrency(extrasAmount)}</p>
+              </div>
+            )}
 
             <div>
               <h4 className="font-medium mb-2">{t("booking.total")}</h4>
@@ -189,6 +204,61 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
                 )}
               </p>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {extras.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Extras</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {extras.map((extra) => {
+              const line = bookingData.selectedExtras.find((entry) => entry.extraId === extra.id);
+              const checked = !!line;
+              return (
+                <div key={extra.id} className="flex items-center justify-between gap-3 rounded-md border p-3">
+                  <div>
+                    <p className="font-medium">{extra.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {extra.pricingType === "DAILY" ? "Daily" : "Flat"} · {formatCurrency(extra.amount)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={(value) => {
+                        const next = [...bookingData.selectedExtras];
+                        const idx = next.findIndex((entry) => entry.extraId === extra.id);
+                        if (value) {
+                          if (idx === -1) next.push({ extraId: extra.id, quantity: 1 });
+                        } else if (idx >= 0) {
+                          next.splice(idx, 1);
+                        }
+                        updateBookingData({ selectedExtras: next });
+                      }}
+                      disabled={disabled}
+                    />
+                    <input
+                      type="number"
+                      min={1}
+                      value={line?.quantity ?? 1}
+                      disabled={!checked || disabled}
+                      onChange={(e) => {
+                        const qty = Math.max(1, parseInt(e.target.value || "1", 10));
+                        updateBookingData({
+                          selectedExtras: bookingData.selectedExtras.map((entry) =>
+                            entry.extraId === extra.id ? { ...entry, quantity: qty } : entry
+                          ),
+                        });
+                      }}
+                      className="h-8 w-16 rounded-md border px-2 text-sm"
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
       )}

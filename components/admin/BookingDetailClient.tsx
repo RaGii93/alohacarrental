@@ -11,21 +11,33 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
+import { getBlobProxyUrl } from "@/lib/blob";
 import {
   confirmBookingAction,
   declineBookingAction,
+  generateInvoiceAction,
+  applyDiscountCodeToBookingAction,
+  addExtraToBookingAction,
 } from "@/actions/booking";
 
 export function BookingDetailClient({
   booking,
   locale,
+  extras,
+  discountCodes,
 }: {
   booking: any;
   locale: string;
+  extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }>;
+  discountCodes: Array<{ id: string; code: string; percentage: number }>;
 }) {
   const router = useRouter();
   const t = useTranslations();
   const [isLoading, setIsLoading] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [extraId, setExtraId] = useState("");
+  const [extraQty, setExtraQty] = useState(1);
+  const invoiceDownloadUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true });
 
   const handleConfirm = async () => {
     setIsLoading(true);
@@ -53,6 +65,46 @@ export function BookingDetailClient({
       router.push(`/${locale}/admin`);
     } else {
       toast.error(result.error || "Error declining booking");
+    }
+  };
+
+  const handleGenerateInvoice = async () => {
+    setIsLoading(true);
+    const result = await generateInvoiceAction(booking.id, locale);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Invoice created. Payment marked as received and vehicle locked ON_RENT.");
+      router.refresh();
+    } else {
+      toast.error(result.error || "Error creating invoice");
+    }
+  };
+
+  const handleApplyDiscount = async () => {
+    if (!discountCode.trim()) return;
+    setIsLoading(true);
+    const result = await applyDiscountCodeToBookingAction(booking.id, discountCode, locale);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Discount applied and invoice updated.");
+      router.refresh();
+    } else {
+      toast.error(result.error || "Failed to apply discount");
+    }
+  };
+
+  const handleAddExtra = async () => {
+    if (!extraId) return;
+    setIsLoading(true);
+    const result = await addExtraToBookingAction(booking.id, extraId, extraQty, locale);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Extra added and invoice updated.");
+      setExtraId("");
+      setExtraQty(1);
+      router.refresh();
+    } else {
+      toast.error(result.error || "Failed to add extra");
     }
   };
 
@@ -178,11 +230,81 @@ export function BookingDetailClient({
                 ${(booking.totalAmount / 100).toFixed(2)}
               </dd>
             </div>
+            <div>
+              <dt className="text-gray-600">Payment Received</dt>
+              <dd className="font-medium">{booking.paymentReceivedAt ? new Date(booking.paymentReceivedAt).toLocaleString() : "No"}</dd>
+            </div>
           </dl>
         </div>
       </div>
 
       <Separator className="my-6" />
+
+      <div className="mb-8 space-y-4">
+        <h2 className="font-semibold">Pricing Adjustments</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-md border p-4 space-y-3">
+            <p className="text-sm font-medium">Apply discount code (rental-only %)</p>
+            <div className="flex gap-2">
+              <input
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                list="discount-codes"
+                placeholder="Enter code"
+                className="h-9 w-full rounded-md border px-3 text-sm"
+              />
+              <datalist id="discount-codes">
+                {discountCodes.map((d) => (
+                  <option key={d.id} value={d.code}>
+                    {d.code} ({d.percentage}%)
+                  </option>
+                ))}
+              </datalist>
+              <Button onClick={handleApplyDiscount} disabled={isLoading}>Apply</Button>
+            </div>
+            {booking.bookingDiscount && (
+              <p className="text-xs text-muted-foreground">
+                Applied: {booking.bookingDiscount.discountCode?.code} ({booking.bookingDiscount.percentage}%)
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-md border p-4 space-y-3">
+            <p className="text-sm font-medium">Add extras (daily or flat)</p>
+            <div className="flex gap-2">
+              <select
+                value={extraId}
+                onChange={(e) => setExtraId(e.target.value)}
+                className="h-9 w-full rounded-md border px-3 text-sm"
+              >
+                <option value="">Select extra</option>
+                {extras.map((ex) => (
+                  <option key={ex.id} value={ex.id}>
+                    {ex.name} ({ex.pricingType}, ${(ex.amount / 100).toFixed(2)})
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                min={1}
+                value={extraQty}
+                onChange={(e) => setExtraQty(Math.max(1, parseInt(e.target.value || "1", 10)))}
+                className="h-9 w-20 rounded-md border px-2 text-sm"
+              />
+              <Button onClick={handleAddExtra} disabled={isLoading}>Add</Button>
+            </div>
+            {!!booking.bookingExtras?.length && (
+              <div className="text-xs text-muted-foreground space-y-1">
+                {booking.bookingExtras.map((line: any) => (
+                  <p key={line.id}>
+                    {line.extra?.name} x{line.quantity}: ${(line.lineTotal / 100).toFixed(2)}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       <div className="mb-8">
         <h2 className="font-semibold mb-4">{t("admin.bookings.detail.files")}</h2>
@@ -205,6 +327,24 @@ export function BookingDetailClient({
               </a>
             </div>
           )}
+          {booking.invoiceUrl && (
+            <div className="flex items-center gap-3">
+              <a
+                href={invoiceDownloadUrl || booking.invoiceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                📄 Invoice
+              </a>
+              <a
+                href={`mailto:${booking.customerEmail}?subject=${encodeURIComponent(`Invoice ${booking.bookingCode}`)}&body=${encodeURIComponent(`Hello ${booking.customerName},\n\nYour invoice is ready.\n\nDownload: ${invoiceDownloadUrl || booking.invoiceUrl}\n\nThank you.`)}`}
+                className="text-blue-600 hover:underline"
+              >
+                Send by Email
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
@@ -220,14 +360,20 @@ export function BookingDetailClient({
 
       <Separator className="my-6" />
 
-      {booking.status === "PENDING" && (
-        <div className="flex gap-4">
+      {(booking.status === "PENDING" || booking.status === "CONFIRMED") && (
+        <div className="flex gap-4 flex-wrap">
           <Button
             onClick={handleConfirm}
             disabled={isLoading}
             className="bg-green-600 hover:bg-green-700"
           >
             {isLoading ? "Processing..." : "Confirm Booking"}
+          </Button>
+          <Button
+            onClick={handleGenerateInvoice}
+            disabled={isLoading || !!booking.invoiceUrl}
+          >
+            {isLoading ? "Processing..." : booking.invoiceUrl ? "Invoice Created" : "Create Invoice + Receive Payment"}
           </Button>
           <Button
             onClick={handleDecline}

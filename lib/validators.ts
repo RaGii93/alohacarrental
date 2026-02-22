@@ -26,8 +26,16 @@ export const vehicleFormSchema = z.object({
   plateNumber: z.string().optional(),
   categoryId: z.string().min(1, "Please select a category"),
   dailyRate: z.number().min(1, "Daily rate must be greater than 0"),
-  status: z.enum(["ACTIVE", "MAINTENANCE", "INACTIVE"]),
+  status: z.enum(["ACTIVE", "ON_RENT", "MAINTENANCE", "INACTIVE"]),
   notes: z.string().optional(),
+});
+
+export const categoryFormSchema = z.object({
+  name: z.string().min(2, "Category name must be at least 2 characters"),
+  description: z.string().optional(),
+  dailyRate: z.number().min(1, "Daily rate must be greater than 0"),
+  sortOrder: z.number().int().min(0),
+  isActive: z.boolean(),
 });
 
 // Refine booking schema to ensure endDate > startDate
@@ -91,3 +99,4 @@ export type LoginFormInput = z.infer<typeof loginFormSchema>;
 export type BookingFormInput = z.infer<typeof bookingFormSchemaRefined>;
 export type CategoryBookingFormInput = z.infer<typeof categoryBookingFormSchemaRefined>;
 export type VehicleFormInput = z.infer<typeof vehicleFormSchema>;
+export type CategoryFormInput = z.infer<typeof categoryFormSchema>;
