@@ -4,7 +4,6 @@
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
-import { bookingFormSchemaRefined } from "@/lib/validators";
 import { uploadFile } from "@/lib/uploads";
 import type { Prisma } from "@prisma/client";
 
@@ -23,170 +22,6 @@ export async function cancelExpiredHolds() {
   });
 
   return result.count;
-}
-
-export async function createBookingAction(
-  formData: FormData,
-  locale: string
-) {
-  try {
-    // Cancel expired holds first
-    await cancelExpiredHolds();
-
-    // Check license (allow if ACTIVE or ROOT)
-    const session = await getSession();
-    if (!isLicenseActive() && session?.role !== "ROOT") {
-      return { success: false, error: "BOOKING_DISABLED" };
-    }
-
-    // Extract form fields
-    const customerName = formData.get("customerName") as string;
-    const customerEmail = formData.get("customerEmail") as string;
-    const customerPhone = formData.get("customerPhone") as string;
-    const vehicleId = formData.get("vehicleId") as string;
-    const startDate = new Date(formData.get("startDate") as string);
-    const endDate = new Date(formData.get("endDate") as string);
-    const pickupLocation = formData.get("pickupLocation") as string | null;
-    const dropoffLocation = formData.get("dropoffLocation") as string | null;
-    const notes = formData.get("notes") as string | null;
-    const driverLicenseFile = formData.get("driverLicense") as File | null;
-    const paymentProofFile = formData.get("paymentProof") as File | null;
-    // Extras: optional array of selected extras and total extras cost (in cents)
-    const extrasList = formData.getAll("extras") as string[];
-    const extrasTotal = Number(formData.get("extrasTotal") || 0);
-
-    // Validate with Zod
-    const validated = await bookingFormSchemaRefined.parseAsync({
-      customerName,
-      customerEmail,
-      customerPhone,
-      vehicleId,
-      startDate,
-      endDate,
-      pickupLocation: pickupLocation || undefined,
-      dropoffLocation: dropoffLocation || undefined,
-      notes: notes || undefined,
-    });
-
-    // Verify vehicle exists and is ACTIVE
-    const vehicle = await db.vehicle.findUnique({
-      where: { id: validated.vehicleId },
-    });
-
-    if (!vehicle || vehicle.status !== "ACTIVE") {
-      return { success: false, error: "VEHICLE_UNAVAILABLE" };
-    }
-
-    // Upload files
-    let driverLicenseUrl: string | undefined;
-    let paymentProofUrl: string | undefined;
-
-    if (driverLicenseFile && driverLicenseFile.size > 0) {
-      const uploadResult = await uploadFile(
-        driverLicenseFile,
-        `bookings/${validated.vehicleId}`
-      );
-      if (!uploadResult.success) {
-        return { success: false, error: uploadResult.error || "File upload failed" };
-      }
-      driverLicenseUrl = uploadResult.url;
-    }
-
-    if (paymentProofFile && paymentProofFile.size > 0) {
-      const uploadResult = await uploadFile(
-        paymentProofFile,
-        `bookings/${validated.vehicleId}`
-      );
-      if (!uploadResult.success) {
-        return { success: false, error: uploadResult.error || "File upload failed" };
-      }
-      paymentProofUrl = uploadResult.url;
-    }
-
-    // Calculate total amount (for now, using a simple formula - can be enhanced)
-    const days = Math.ceil(
-      (validated.endDate.getTime() - validated.startDate.getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    const totalAmount = vehicle.dailyRate * days + (isNaN(extrasTotal) ? 0 : extrasTotal);
-
-    // Database transaction with lock
-    let booking;
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      booking = await db.$transaction(async (tx: any) => {
-        // Lock the vehicle row
-        const lockedVehicle = await tx.$queryRaw`
-          SELECT id FROM "Vehicle" WHERE id = ${validated.vehicleId} FOR UPDATE
-        `;
-
-        // Re-check overlap count for this vehicle
-        const overlappingCount = await tx.booking.count({
-          where: {
-            vehicleId: validated.vehicleId,
-            startDate: {
-              lt: validated.endDate,
-            },
-            endDate: {
-              gt: validated.startDate,
-            },
-            status: {
-              in: ["PENDING", "CONFIRMED"],
-            },
-            holdExpiresAt: {
-              gt: new Date(),
-            },
-          },
-        });
-
-        if (overlappingCount > 0) {
-          throw new Error("VEHICLE_UNAVAILABLE");
-        }
-
-        // Create booking
-        return tx.booking.create({
-          data: {
-            vehicleId: validated.vehicleId,
-            customerName: validated.customerName,
-            customerEmail: validated.customerEmail,
-            customerPhone: validated.customerPhone,
-            startDate: validated.startDate,
-            endDate: validated.endDate,
-            pickupLocation: validated.pickupLocation,
-            dropoffLocation: validated.dropoffLocation,
-            totalAmount,
-            status: "PENDING",
-            holdExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
-            driverLicenseUrl,
-            paymentProofUrl,
-            notes: validated.notes,
-            // append extras info into notes for auditing (we don't have a dedicated extras column)
-            // if extras were provided, merge into notes JSON
-            ...(extrasList && extrasList.length > 0
-              ? { notes: `${validated.notes || ""}\nExtras: ${JSON.stringify(extrasList)}` }
-              : {}),
-          },
-        });
-      });
-    } catch (error: any) {
-      if (error.message === "VEHICLE_UNAVAILABLE") {
-        return { success: false, error: "VEHICLE_UNAVAILABLE" };
-      }
-      throw error;
-    }
-
-    return {
-      success: true,
-      bookingId: booking.id,
-      redirectUrl: `/${locale}/book/success/${booking.id}`,
-    } as const;
-  } catch (error: any) {
-    console.error("Booking creation error:", error);
-    return {
-      success: false,
-      error: error.message || "Failed to create booking",
-    };
-  }
 }
 
 export async function confirmBookingAction(bookingId: string, locale: string) {
@@ -313,25 +148,6 @@ export async function generateInvoiceAction(bookingId: string, locale: string) {
   }
 }
 
-export async function uploadPaymentProofAction(formData: FormData) {
-  try {
-    const bookingId = formData.get("bookingId") as string;
-    const paymentProofFile = formData.get("paymentProof") as File | null;
-
-    if (!bookingId) return { success: false, error: "Missing bookingId" };
-    if (!paymentProofFile || paymentProofFile.size === 0) return { success: false, error: "No file provided" };
-
-    const uploadResult = await uploadFile(paymentProofFile, `bookings/${bookingId}`);
-    if (!uploadResult.success) return { success: false, error: uploadResult.error || "Upload failed" };
-
-    await db.booking.update({ where: { id: bookingId }, data: { paymentProofUrl: uploadResult.url } });
-
-    return { success: true, bookingId };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to upload payment proof" };
-  }
-}
-
 export async function uploadDriverLicenseAction(formData: FormData) {
   try {
     const driverLicenseFile = formData.get("driverLicense") as File | null;
@@ -383,14 +199,25 @@ export async function createCategoryBookingAction(
     const driverLicenseNumber = formData.get("driverLicenseNumber") as string;
     const startDate = new Date(formData.get("startDate") as string);
     const endDate = new Date(formData.get("endDate") as string);
-    const pickupLocation = formData.get("pickupLocation") as string | null;
-    const dropoffLocation = formData.get("dropoffLocation") as string | null;
+    const pickupLocationId = (formData.get("pickupLocationId") as string | null) || null;
+    const dropoffLocationId = (formData.get("dropoffLocationId") as string | null) || null;
+    const pickupLocation = (formData.get("pickupLocation") as string | null) || null;
+    const dropoffLocation = (formData.get("dropoffLocation") as string | null) || null;
     const notes = formData.get("notes") as string | null;
     const driverLicenseUrl = formData.get("driverLicenseUrl") as string;
     const termsAccepted = formData.get("termsAccepted") === "true";
 
     // Basic validation
-    if (!categoryId || !customerName || !customerEmail || !customerPhone || !driverLicenseNumber || !driverLicenseUrl) {
+    if (
+      !categoryId ||
+      !customerName ||
+      !customerEmail ||
+      !customerPhone ||
+      !driverLicenseNumber ||
+      !driverLicenseUrl ||
+      !pickupLocationId ||
+      !dropoffLocationId
+    ) {
       return { success: false, error: "Missing required fields" };
     }
 
@@ -400,6 +227,24 @@ export async function createCategoryBookingAction(
 
     if (startDate >= endDate) {
       return { success: false, error: "Invalid date range" };
+    }
+
+    // Resolve locations by ID (if sent)
+    const [pickupLocationRecord, dropoffLocationRecord] = await Promise.all([
+      pickupLocationId
+        ? db.location.findUnique({ where: { id: pickupLocationId }, select: { id: true, name: true } })
+        : Promise.resolve(null),
+      dropoffLocationId
+        ? db.location.findUnique({ where: { id: dropoffLocationId }, select: { id: true, name: true } })
+        : Promise.resolve(null),
+    ]);
+
+    if (pickupLocationId && !pickupLocationRecord) {
+      return { success: false, error: "Invalid pickup location" };
+    }
+
+    if (dropoffLocationId && !dropoffLocationRecord) {
+      return { success: false, error: "Invalid dropoff location" };
     }
 
     // Verify category exists and is active
@@ -461,8 +306,10 @@ export async function createCategoryBookingAction(
             driverLicenseNumber,
             startDate,
             endDate,
-            pickupLocation,
-            dropoffLocation,
+            pickupLocationId: pickupLocationRecord?.id ?? null,
+            dropoffLocationId: dropoffLocationRecord?.id ?? null,
+            pickupLocation: pickupLocationRecord?.name ?? pickupLocation,
+            dropoffLocation: dropoffLocationRecord?.name ?? dropoffLocation,
             totalAmount,
             status: "PENDING",
             bookingCode,

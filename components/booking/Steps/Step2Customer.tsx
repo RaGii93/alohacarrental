@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload } from "lucide-react";
 import { uploadDriverLicenseAction } from "@/actions/booking";
@@ -16,13 +15,12 @@ import { BookingData } from "../BookingWizard";
 interface Step2CustomerProps {
   bookingData: BookingData;
   updateBookingData: (updates: Partial<BookingData>) => void;
-  locations: { id: string; name: string; code?: string | null; address?: string | null }[];
   onNext: () => void;
   onPrev: () => void;
   disabled: boolean;
 }
 
-export function Step2Customer({ bookingData, updateBookingData, locations, onNext, onPrev, disabled }: Step2CustomerProps) {
+export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, disabled }: Step2CustomerProps) {
   const t = useTranslations();
   const [isUploading, setIsUploading] = useState(false);
 
@@ -165,51 +163,6 @@ export function Step2Customer({ bookingData, updateBookingData, locations, onNex
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4">{t("booking.pickupLocation")}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label>{t("booking.pickupLocation")}</Label>
-            <Select
-              value={bookingData.pickupLocation}
-              onValueChange={(value) => updateBookingData({ pickupLocation: value })}
-              disabled={disabled}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("booking.selectLocation")} />
-              </SelectTrigger>
-              <SelectContent>
-                {locations.map((loc) => (
-                  <SelectItem key={loc.id} value={loc.name}>
-                    {loc.name}{loc.address ? ` — ${loc.address}` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>{t("booking.dropoffLocation")}</Label>
-            <Select
-              value={bookingData.dropoffLocation}
-              onValueChange={(value) => updateBookingData({ dropoffLocation: value })}
-              disabled={disabled}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("booking.selectLocation")} />
-              </SelectTrigger>
-              <SelectContent>
-                {locations.map((loc) => (
-                  <SelectItem key={loc.id} value={loc.name}>
-                    {loc.name}{loc.address ? ` — ${loc.address}` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
       </div>
 
       <div>

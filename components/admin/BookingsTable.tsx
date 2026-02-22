@@ -73,8 +73,8 @@ export function BookingsTable({
               <TableCell>{booking.vehicle?.name ?? "—"}</TableCell>
               <TableCell>
                 <div className="text-sm">
-                  {new Date(booking.startDate).toLocaleDateString()} -{" "}
-                  {new Date(booking.endDate).toLocaleDateString()}
+                  {new Date(booking.startDate).toLocaleString()} -{" "}
+                  {new Date(booking.endDate).toLocaleString()}
                 </div>
               </TableCell>
               <TableCell className="font-medium">

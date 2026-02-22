@@ -23,7 +23,7 @@ export default async function BookingDetailPage({
 
   const booking = await db.booking.findUnique({
     where: { id },
-    include: { vehicle: true },
+    include: { vehicle: true, pickupLocationRef: true, dropoffLocationRef: true },
   });
 
   if (!booking) {

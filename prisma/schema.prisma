@@ -45,11 +45,13 @@ model Vehicle {
 }
 
 model Location {
-  id        String   @id @default(cuid())
-  name      String
-  code      String?  @unique
-  address   String?
-  createdAt DateTime @default(now())
+  id             String    @id @default(cuid())
+  name           String
+  code           String?   @unique
+  address        String?
+  createdAt      DateTime  @default(now())
+  pickupBookings Booking[] @relation("PickupLocation")
+  dropoffBookings Booking[] @relation("DropoffLocation")
 }
 
 enum VehicleStatus {
@@ -86,6 +88,10 @@ model Booking {
   driverLicenseUrl    String?
   startDate           DateTime
   endDate             DateTime  // treated as exclusive end date for overlap logic
+  pickupLocationId    String?
+  pickupLocationRef   Location? @relation("PickupLocation", fields: [pickupLocationId], references: [id], onDelete: SetNull)
+  dropoffLocationId   String?
+  dropoffLocationRef  Location? @relation("DropoffLocation", fields: [dropoffLocationId], references: [id], onDelete: SetNull)
   pickupLocation      String?
   dropoffLocation     String?
   totalAmount         Int       // stored in cents
@@ -101,6 +107,8 @@ model Booking {
 
   @@index([vehicleId, startDate, endDate])
   @@index([categoryId, startDate, endDate])
+  @@index([pickupLocationId])
+  @@index([dropoffLocationId])
   @@index([status])
   @@index([bookingCode])
   @@index([createdAt])

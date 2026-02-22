@@ -66,6 +66,13 @@ export function BookingDetailClient({
     }
   };
 
+  const pickupMapUrl = booking?.pickupLocationRef?.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.pickupLocationRef.address)}`
+    : null;
+  const dropoffMapUrl = booking?.dropoffLocationRef?.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.dropoffLocationRef.address)}`
+    : null;
+
   return (
     <Card className="p-8">
       <div className="flex justify-between items-center mb-6">
@@ -112,18 +119,46 @@ export function BookingDetailClient({
           <dl className="space-y-2 text-sm">
             <div>
               <dt className="text-gray-600">Vehicle</dt>
-              <dd className="font-medium">{booking.vehicle.name}</dd>
+              <dd className="font-medium">{booking.vehicle?.name ?? "-"}</dd>
             </div>
             <div>
-              <dt className="text-gray-600">Start Date</dt>
+              <dt className="text-gray-600">Pickup Date & Time</dt>
               <dd className="font-medium">
-                {new Date(booking.startDate).toLocaleDateString()}
+                {new Date(booking.startDate).toLocaleString()}
               </dd>
             </div>
             <div>
-              <dt className="text-gray-600">End Date</dt>
+              <dt className="text-gray-600">Dropoff Date & Time</dt>
               <dd className="font-medium">
-                {new Date(booking.endDate).toLocaleDateString()}
+                {new Date(booking.endDate).toLocaleString()}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-600">Pickup Location</dt>
+              <dd className="font-medium">
+                {booking.pickupLocationRef?.name || booking.pickupLocation || "-"}
+                {pickupMapUrl && (
+                  <>
+                    {" "}
+                    <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      (map)
+                    </a>
+                  </>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-600">Dropoff Location</dt>
+              <dd className="font-medium">
+                {booking.dropoffLocationRef?.name || booking.dropoffLocation || "-"}
+                {dropoffMapUrl && (
+                  <>
+                    {" "}
+                    <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      (map)
+                    </a>
+                  </>
+                )}
               </dd>
             </div>
             <div>

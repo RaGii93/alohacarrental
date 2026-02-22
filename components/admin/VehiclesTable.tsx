@@ -20,8 +20,9 @@ interface Vehicle {
   id: string;
   name: string;
   plateNumber?: string;
-  categoryId: string;
-  category?: string;
+  categoryId?: string;
+  // category can be a plain string (legacy) or a relation object { id, name }
+  category?: string | { id?: string; name?: string } | null;
   dailyRate: number;
   status: string;
   notes?: string;
@@ -44,7 +45,7 @@ export function VehiclesTable({
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<Partial<Vehicle> | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -94,12 +95,12 @@ export function VehiclesTable({
 
   return (
     <div className="space-y-4">
-      <Button onClick={() => setSelectedVehicle({} as Vehicle)}>
+      <Button onClick={() => setSelectedVehicle({} as Partial<Vehicle>)}>
         + Add Vehicle
       </Button>
 
       <VehicleDialog
-        vehicle={selectedVehicle}
+        vehicle={selectedVehicle as any}
         categories={categories}
         locale={locale}
         onClose={() => setSelectedVehicle(null)}
@@ -122,7 +123,11 @@ export function VehiclesTable({
               <TableRow key={vehicle.id}>
                 <TableCell className="font-medium">{vehicle.name}</TableCell>
                 <TableCell>{vehicle.plateNumber || "-"}</TableCell>
-                <TableCell>{vehicle.category || "-"}</TableCell>
+                <TableCell>{
+                  typeof vehicle.category === "string"
+                    ? vehicle.category
+                    : vehicle.category?.name || "-"
+                }</TableCell>
                 <TableCell>
                   ${(vehicle.dailyRate / 100).toFixed(2)}
                 </TableCell>

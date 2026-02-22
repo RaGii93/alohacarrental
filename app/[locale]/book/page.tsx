@@ -9,7 +9,10 @@ export default async function BookingPage({
   const { locale } = await params;
 
   // Fetch predefined pickup/dropoff locations
-  const locations = await db.location.findMany({ select: { id: true, name: true, code: true, address: true } });
+  const locations = await db.location.findMany({
+    select: { id: true, name: true, code: true, address: true },
+    orderBy: { name: "asc" },
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

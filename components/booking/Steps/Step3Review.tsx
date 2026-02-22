@@ -29,6 +29,17 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
   const t = useTranslations();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const mergeDateAndTime = (date: Date | null, time: string): Date | null => {
+    if (!date) return null;
+    const [hours, minutes] = time.split(":").map((v) => Number(v));
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+    const next = new Date(date);
+    next.setHours(hours, minutes, 0, 0);
+    return next;
+  };
+
+  const pickupDateTime = mergeDateAndTime(bookingData.startDate, bookingData.pickupTime);
+  const dropoffDateTime = mergeDateAndTime(bookingData.endDate, bookingData.dropoffTime);
 
   const handleSubmit = async () => {
     if (!bookingData.termsAccepted) {
@@ -44,10 +55,15 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
       formData.append("customerEmail", bookingData.customerEmail);
       formData.append("customerPhone", bookingData.customerPhone);
       formData.append("driverLicenseNumber", bookingData.driverLicenseNumber);
-      formData.append("startDate", bookingData.startDate!.toISOString());
-      formData.append("endDate", bookingData.endDate!.toISOString());
-      formData.append("pickupLocation", bookingData.pickupLocation);
-      formData.append("dropoffLocation", bookingData.dropoffLocation);
+      if (!pickupDateTime || !dropoffDateTime || dropoffDateTime <= pickupDateTime) {
+        toast.error(t("booking.errors.endBeforeStart"));
+        setIsSubmitting(false);
+        return;
+      }
+      formData.append("startDate", pickupDateTime.toISOString());
+      formData.append("endDate", dropoffDateTime.toISOString());
+      formData.append("pickupLocationId", bookingData.pickupLocationId);
+      formData.append("dropoffLocationId", bookingData.dropoffLocationId);
       formData.append("driverLicenseUrl", bookingData.driverLicenseUrl);
       formData.append("notes", bookingData.notes);
       formData.append("termsAccepted", "true");
@@ -66,12 +82,18 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
     }
   };
 
-  const days = bookingData.startDate && bookingData.endDate ? calculateDays(bookingData.startDate, bookingData.endDate) : 1;
+  const days = pickupDateTime && dropoffDateTime ? calculateDays(pickupDateTime, dropoffDateTime) : 1;
   const selectedCategory = availability.find(cat => cat.categoryId === bookingData.categoryId);
   const categoryRate = selectedCategory?.dailyRate || 2500;
   const totalAmount = categoryRate * days;
-  const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocation);
-  const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocation);
+  const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocationId);
+  const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocationId);
+  const pickupLocationMapUrl = pickupLocation?.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupLocation.address)}`
+    : null;
+  const dropoffLocationMapUrl = dropoffLocation?.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dropoffLocation.address)}`
+    : null;
 
   return (
     <div className="space-y-6">
@@ -86,11 +108,11 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h4 className="font-medium mb-2">{t("booking.startDate")}</h4>
-                <p>{bookingData.startDate?.toLocaleDateString()}</p>
+                <p>{pickupDateTime?.toLocaleString()}</p>
               </div>
               <div>
                 <h4 className="font-medium mb-2">{t("booking.endDate")}</h4>
-                <p>{bookingData.endDate?.toLocaleDateString()}</p>
+                <p>{dropoffDateTime?.toLocaleString()}</p>
               </div>
             </div>
 
@@ -127,17 +149,37 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
         </CardContent>
       </Card>
 
-      {(bookingData.pickupLocation || bookingData.dropoffLocation) && (
+      {(bookingData.pickupLocationId || bookingData.dropoffLocationId) && (
         <Card>
           <CardHeader>
             <CardTitle>{t("booking.pickupLocation")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {bookingData.pickupLocation && (
-              <p><strong>{t("booking.pickupLocation")}:</strong> {pickupLocation?.name}{pickupLocation?.address ? ` — ${pickupLocation.address}` : ""}</p>
+            {bookingData.pickupLocationId && (
+              <p>
+                <strong>{t("booking.pickupLocation")}:</strong> {pickupLocation?.name}
+                {pickupLocationMapUrl && (
+                  <>
+                    {" "}
+                    <a href={pickupLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      (map)
+                    </a>
+                  </>
+                )}
+              </p>
             )}
-            {bookingData.dropoffLocation && (
-              <p><strong>{t("booking.dropoffLocation")}:</strong> {dropoffLocation?.name}{dropoffLocation?.address ? ` — ${dropoffLocation.address}` : ""}</p>
+            {bookingData.dropoffLocationId && (
+              <p>
+                <strong>{t("booking.dropoffLocation")}:</strong> {dropoffLocation?.name}
+                {dropoffLocationMapUrl && (
+                  <>
+                    {" "}
+                    <a href={dropoffLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      (map)
+                    </a>
+                  </>
+                )}
+              </p>
             )}
           </CardContent>
         </Card>

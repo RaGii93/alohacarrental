@@ -15,7 +15,7 @@ export default async function SuccessPage({
 
   const booking = await db.booking.findUnique({
     where: { bookingCode },
-    include: { vehicle: true },
+    include: { vehicle: true, pickupLocationRef: true, dropoffLocationRef: true },
   });
 
   if (!booking) {
@@ -25,6 +25,13 @@ export default async function SuccessPage({
       </div>
     );
   }
+
+  const pickupMapUrl = booking.pickupLocationRef?.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.pickupLocationRef.address)}`
+    : null;
+  const dropoffMapUrl = booking.dropoffLocationRef?.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.dropoffLocationRef.address)}`
+    : null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -58,13 +65,41 @@ export default async function SuccessPage({
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.startDate")}:</dt>
               <dd className="font-medium">
-                {new Date(booking.startDate).toLocaleDateString()}
+                {new Date(booking.startDate).toLocaleString()}
               </dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.endDate")}:</dt>
               <dd className="font-medium">
-                {new Date(booking.endDate).toLocaleDateString()}
+                {new Date(booking.endDate).toLocaleString()}
+              </dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-600">{t("booking.pickupLocation")}:</dt>
+              <dd className="font-medium">
+                {booking.pickupLocationRef?.name || booking.pickupLocation || "-"}
+                {pickupMapUrl && (
+                  <>
+                    {" "}
+                    <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      (map)
+                    </a>
+                  </>
+                )}
+              </dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-600">{t("booking.dropoffLocation")}:</dt>
+              <dd className="font-medium">
+                {booking.dropoffLocationRef?.name || booking.dropoffLocation || "-"}
+                {dropoffMapUrl && (
+                  <>
+                    {" "}
+                    <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      (map)
+                    </a>
+                  </>
+                )}
               </dd>
             </div>
             <div className="flex justify-between">

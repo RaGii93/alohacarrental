@@ -16,13 +16,15 @@ import { AvailabilityResult } from "@/actions/availability";
 export interface BookingData {
   startDate: Date | null;
   endDate: Date | null;
+  pickupTime: string;
+  dropoffTime: string;
   categoryId: string | null;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
   driverLicenseNumber: string;
-  pickupLocation: string;
-  dropoffLocation: string;
+  pickupLocationId: string;
+  dropoffLocationId: string;
   driverLicenseUrl: string;
   notes: string;
   termsAccepted: boolean;
@@ -35,13 +37,15 @@ export function BookingWizard({ locale, locations }: { locale: string; locations
   const [bookingData, setBookingData] = useState<BookingData>({
     startDate: null,
     endDate: null,
+    pickupTime: "10:00",
+    dropoffTime: "10:00",
     categoryId: null,
     customerName: "",
     customerEmail: "",
     customerPhone: "",
     driverLicenseNumber: "",
-    pickupLocation: "",
-    dropoffLocation: "",
+    pickupLocationId: "",
+    dropoffLocationId: "",
     driverLicenseUrl: "",
     notes: "",
     termsAccepted: false,
@@ -97,6 +101,7 @@ export function BookingWizard({ locale, locations }: { locale: string; locations
             disabled={!licenseActive}
             setAvailability={setAvailability}
             availability={availability}
+            locations={locations}
           />
         )}
 
@@ -104,7 +109,6 @@ export function BookingWizard({ locale, locations }: { locale: string; locations
           <Step2Customer
             bookingData={bookingData}
             updateBookingData={updateBookingData}
-            locations={locations}
             onNext={nextStep}
             onPrev={prevStep}
             disabled={!licenseActive}

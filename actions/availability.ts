@@ -37,73 +37,77 @@ export async function searchAvailabilityAction(
   }
 
   const results: AvailabilityResult[] = [];
+  const vehicleColumns = await db.$queryRaw<Array<{ column_name: string }>>`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'Vehicle'
+  `;
+  const bookingColumns = await db.$queryRaw<Array<{ column_name: string }>>`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'Booking'
+  `;
+
+  const hasVehicleCategoryId = vehicleColumns.some((column) => column.column_name === "categoryId");
+  const hasVehicleCategory = vehicleColumns.some((column) => column.column_name === "category");
+  const hasBookingCategoryId = bookingColumns.some((column) => column.column_name === "categoryId");
 
   for (const category of categories) {
-    // Count total active vehicles in this category. Try new schema (categoryId) first,
-    // fall back to legacy 'category' string column or raw SQL if client schema differs.
     let totalVehicles = 0;
-    try {
-      totalVehicles = await db.vehicle.count({
-        where: { categoryId: category.id, status: "ACTIVE" },
-      });
-    } catch (e) {
-      try {
-        // fallback to legacy string category field
-        totalVehicles = await db.vehicle.count({
-          where: { category: category.name, status: "ACTIVE" },
-        });
-      } catch (e2) {
-        // final fallback: raw query
-        const res: Array<{ count: number }> = await db.$queryRaw`
-          SELECT COUNT(*)::int as count FROM "Vehicle" WHERE "status" = 'ACTIVE' AND (
-            COALESCE("categoryId", '') = ${category.id} OR COALESCE("category", '') = ${category.name}
-          )
-        ` as any;
-        totalVehicles = res?.[0]?.count ?? 0;
-      }
+    if (hasVehicleCategoryId) {
+      const rows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(*)::int AS count
+        FROM "Vehicle"
+        WHERE "status" = 'ACTIVE' AND "categoryId" = ${category.id}
+      `;
+      totalVehicles = rows?.[0]?.count ?? 0;
+    } else if (hasVehicleCategory) {
+      const rows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(*)::int AS count
+        FROM "Vehicle"
+        WHERE "status" = 'ACTIVE' AND "category" = ${category.name}
+      `;
+      totalVehicles = rows?.[0]?.count ?? 0;
     }
 
-    // Count overlapping bookings for this category (prefer categoryId, else join via vehicle)
     let overlappingBookings = 0;
-    try {
-      overlappingBookings = await db.booking.count({
-        where: {
-          categoryId: category.id,
-          startDate: { lt: endDate },
-          endDate: { gt: startDate },
-          status: { in: ["PENDING", "CONFIRMED"] },
-          holdExpiresAt: { gt: new Date() },
-        },
-      });
-    } catch (err) {
-      try {
-        // fallback: count bookings where related vehicle has matching category string
-        overlappingBookings = await db.booking.count({
-          where: {
-            startDate: { lt: endDate },
-            endDate: { gt: startDate },
-            status: { in: ["PENDING", "CONFIRMED"] },
-            vehicle: {
-              category: category.name,
-              status: "ACTIVE",
-            },
-            holdExpiresAt: { gt: new Date() },
-          },
-        });
-      } catch (err2) {
-        // raw SQL fallback joining bookings and vehicles
-        const res2: Array<{ count: number }> = await db.$queryRaw`
-          SELECT COUNT(b.id)::int as count
-          FROM "Booking" b
-          LEFT JOIN "Vehicle" v ON v.id = b."vehicleId"
-          WHERE b."startDate" < ${endDate}
-            AND b."endDate" > ${startDate}
-            AND b.status IN ('PENDING','CONFIRMED')
-            AND b."holdExpiresAt" > now()
-            AND (COALESCE(v."categoryId", '') = ${category.id} OR COALESCE(v."category", '') = ${category.name})
-        ` as any;
-        overlappingBookings = res2?.[0]?.count ?? 0;
-      }
+    if (hasBookingCategoryId) {
+      const rows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(*)::int AS count
+        FROM "Booking"
+        WHERE "startDate" < ${endDate}
+          AND "endDate" > ${startDate}
+          AND "status" IN ('PENDING', 'CONFIRMED')
+          AND "holdExpiresAt" > now()
+          AND "categoryId" = ${category.id}
+      `;
+      overlappingBookings = rows?.[0]?.count ?? 0;
+    } else if (hasVehicleCategoryId) {
+      const rows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(b.id)::int AS count
+        FROM "Booking" b
+        JOIN "Vehicle" v ON v.id = b."vehicleId"
+        WHERE b."startDate" < ${endDate}
+          AND b."endDate" > ${startDate}
+          AND b."status" IN ('PENDING', 'CONFIRMED')
+          AND b."holdExpiresAt" > now()
+          AND v."status" = 'ACTIVE'
+          AND v."categoryId" = ${category.id}
+      `;
+      overlappingBookings = rows?.[0]?.count ?? 0;
+    } else if (hasVehicleCategory) {
+      const rows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(b.id)::int AS count
+        FROM "Booking" b
+        JOIN "Vehicle" v ON v.id = b."vehicleId"
+        WHERE b."startDate" < ${endDate}
+          AND b."endDate" > ${startDate}
+          AND b."status" IN ('PENDING', 'CONFIRMED')
+          AND b."holdExpiresAt" > now()
+          AND v."status" = 'ACTIVE'
+          AND v."category" = ${category.name}
+      `;
+      overlappingBookings = rows?.[0]?.count ?? 0;
     }
 
     const availableCount = Math.max(0, totalVehicles - overlappingBookings);
