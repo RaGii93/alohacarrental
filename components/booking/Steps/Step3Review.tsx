@@ -46,6 +46,10 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
       toast.error(t("booking.errors.termsNotAccepted"));
       return;
     }
+    if (!bookingData.birthDate || !bookingData.licenseExpiryDate) {
+      toast.error(t("booking.errors.birthLicenseRequired"));
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -54,7 +58,9 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
       formData.append("customerName", bookingData.customerName);
       formData.append("customerEmail", bookingData.customerEmail);
       formData.append("customerPhone", bookingData.customerPhone);
+      formData.append("birthDate", bookingData.birthDate.toISOString());
       formData.append("driverLicenseNumber", bookingData.driverLicenseNumber);
+      formData.append("licenseExpiryDate", bookingData.licenseExpiryDate.toISOString());
       if (!pickupDateTime || !dropoffDateTime || dropoffDateTime <= pickupDateTime) {
         toast.error(t("booking.errors.endBeforeStart"));
         setIsSubmitting(false);
@@ -144,7 +150,9 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
           <p><strong>{t("booking.customerName")}:</strong> {bookingData.customerName}</p>
           <p><strong>{t("booking.customerEmail")}:</strong> {bookingData.customerEmail}</p>
           <p><strong>{t("booking.customerPhone")}:</strong> {bookingData.customerPhone}</p>
+          <p><strong>{t("booking.birthDate")}:</strong> {bookingData.birthDate?.toLocaleDateString()}</p>
           <p><strong>{t("booking.driverLicenseNumber")}:</strong> {bookingData.driverLicenseNumber}</p>
+          <p><strong>{t("booking.licenseExpiryDate")}:</strong> {bookingData.licenseExpiryDate?.toLocaleDateString()}</p>
           <p><strong>{t("booking.driverLicense")}:</strong> ✓ {t("common.success").toLowerCase()}</p>
         </CardContent>
       </Card>
@@ -162,7 +170,7 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
                   <>
                     {" "}
                     <a href={pickupLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      (map)
+                      ({t("booking.map")})
                     </a>
                   </>
                 )}
@@ -175,7 +183,7 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
                   <>
                     {" "}
                     <a href={dropoffLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      (map)
+                      ({t("booking.map")})
                     </a>
                   </>
                 )}
@@ -233,7 +241,7 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={!bookingData.termsAccepted || isSubmitting || disabled}
+          disabled={!bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled}
         >
           {isSubmitting ? t("common.loading") : t("booking.confirmBooking")}
         </Button>

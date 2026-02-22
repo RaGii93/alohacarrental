@@ -34,21 +34,34 @@ export async function uploadFile(
   }
 
   try {
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!blobToken && !process.env.VERCEL) {
+      return {
+        success: false,
+        error: "Missing BLOB_READ_WRITE_TOKEN environment variable",
+      };
+    }
+
     const buffer = await file.arrayBuffer();
     const blob = new Blob([buffer], { type: file.type });
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const key = `${folderPath}/${Date.now()}-${safeName}`;
 
-    const result = await put(`${folderPath}/${file.name}`, blob, {
+    const result = await put(key, blob, {
       access: "private",
+      addRandomSuffix: true,
+      token: blobToken,
+      contentType: file.type,
     });
 
     return {
       success: true,
-      url: result.url,
+      url: (result as any).downloadUrl || result.url,
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       success: false,
-      error: "Failed to upload file",
+      error: error?.message || "Failed to upload file",
     };
   }
 }

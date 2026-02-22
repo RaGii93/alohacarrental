@@ -44,7 +44,9 @@ export const categoryBookingFormSchema = z.object({
   customerName: z.string().min(2, "Name must be at least 2 characters"),
   customerEmail: z.string().email("Invalid email address"),
   customerPhone: z.string().min(5, "Invalid phone number"),
+  birthDate: z.date(),
   driverLicenseNumber: z.string().min(1, "Driver license number is required"),
+  licenseExpiryDate: z.date(),
   startDate: z.date().refine((date) => date > new Date(), {
     message: "Start date must be in the future",
   }),
@@ -66,6 +68,22 @@ export const categoryBookingFormSchemaRefined = categoryBookingFormSchema.refine
   {
     message: "End date must be after start date",
     path: ["endDate"],
+  }
+).refine(
+  (data) => {
+    const today = new Date();
+    const threshold = new Date(today.getFullYear() - 21, today.getMonth(), today.getDate());
+    return data.birthDate <= threshold;
+  },
+  {
+    message: "Renter must be at least 21 years old",
+    path: ["birthDate"],
+  }
+).refine(
+  (data) => data.licenseExpiryDate > data.startDate,
+  {
+    message: "License must be valid for the rental period start date",
+    path: ["licenseExpiryDate"],
   }
 );
 

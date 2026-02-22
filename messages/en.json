@@ -86,10 +86,14 @@
     "customerName": "Full Name",
     "customerEmail": "Email Address",
     "customerPhone": "Phone Number",
+    "birthDate": "Birth Date",
     "driverLicenseNumber": "Driver License Number",
+    "licenseExpiryDate": "License Expiry Date",
     "selectVehicle": "Select Vehicle",
     "startDate": "Pickup Date",
     "endDate": "Return Date",
+    "pickupTime": "Pickup Time",
+    "dropoffTime": "Dropoff Time",
     "pickupLocation": "Pickup Location",
     "dropoffLocation": "Dropoff Location",
     "notes": "Special Notes",
@@ -119,6 +123,7 @@
     "termsRequired": "You must accept the terms and conditions",
     "confirmBooking": "Confirm Booking",
     "bookingCode": "Booking Code",
+    "map": "map",
     "bookingRequestReceived": "Booking request received",
     "nextSteps": "We will contact you shortly to confirm your booking.",
     "errors": {
@@ -136,7 +141,10 @@
       "fileSize": "File size must not exceed 8MB",
       "fileType": "Only JPG, PNG, and PDF files are allowed",
       "uploadFailed": "File upload failed",
-      "termsNotAccepted": "You must accept the terms and conditions"
+      "termsNotAccepted": "You must accept the terms and conditions",
+      "birthLicenseRequired": "Birth date and license expiry date are required",
+      "ageMinimum": "Renter must be at least 21 years old",
+      "licenseInvalid": "License must be valid at pickup date"
     },
     "success": {
       "title": "Booking Submitted!",

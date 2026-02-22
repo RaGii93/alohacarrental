@@ -230,7 +230,9 @@ async function main() {
     customerName: string;
     customerEmail: string;
     customerPhone: string;
+    birthDate: Date;
     driverLicenseNumber: string;
+    licenseExpiryDate: Date;
     startDate: Date;
     endDate: Date;
     pickupLocationCode: string;
@@ -244,7 +246,9 @@ async function main() {
       customerName: "Alex Carter",
       customerEmail: "alex.carter@example.com",
       customerPhone: "+1-555-1001",
+      birthDate: atHour(-9000, 0, 0),
       driverLicenseNumber: "DLA-1001",
+      licenseExpiryDate: atHour(500, 0, 0),
       startDate: atHour(2, 9, 0),
       endDate: atHour(5, 11, 0),
       pickupLocationCode: "AIRPORT",
@@ -258,7 +262,9 @@ async function main() {
       customerName: "Maria Nguyen",
       customerEmail: "maria.nguyen@example.com",
       customerPhone: "+1-555-1002",
+      birthDate: atHour(-11000, 0, 0),
       driverLicenseNumber: "DLB-1002",
+      licenseExpiryDate: atHour(700, 0, 0),
       startDate: atHour(3, 10, 30),
       endDate: atHour(6, 10, 30),
       pickupLocationCode: "DOWNTOWN",
@@ -272,7 +278,9 @@ async function main() {
       customerName: "Chris Lopez",
       customerEmail: "chris.lopez@example.com",
       customerPhone: "+1-555-1003",
+      birthDate: atHour(-10000, 0, 0),
       driverLicenseNumber: "DLC-1003",
+      licenseExpiryDate: atHour(650, 0, 0),
       startDate: atHour(4, 8, 0),
       endDate: atHour(8, 8, 0),
       pickupLocationCode: "STATION",
@@ -286,7 +294,9 @@ async function main() {
       customerName: "Jordan Bell",
       customerEmail: "jordan.bell@example.com",
       customerPhone: "+1-555-1004",
+      birthDate: atHour(-9500, 0, 0),
       driverLicenseNumber: "DLD-1004",
+      licenseExpiryDate: atHour(550, 0, 0),
       startDate: atHour(5, 7, 45),
       endDate: atHour(7, 18, 15),
       pickupLocationCode: "NORTH",
@@ -300,7 +310,9 @@ async function main() {
       customerName: "Taylor Brooks",
       customerEmail: "taylor.brooks@example.com",
       customerPhone: "+1-555-1005",
+      birthDate: atHour(-10500, 0, 0),
       driverLicenseNumber: "DLE-1005",
+      licenseExpiryDate: atHour(800, 0, 0),
       startDate: atHour(6, 12, 0),
       endDate: atHour(9, 14, 0),
       pickupLocationCode: "AIRPORT",
@@ -331,7 +343,9 @@ async function main() {
         customerName: booking.customerName,
         customerEmail: booking.customerEmail,
         customerPhone: booking.customerPhone,
+        birthDate: booking.birthDate,
         driverLicenseNumber: booking.driverLicenseNumber,
+        licenseExpiryDate: booking.licenseExpiryDate,
         driverLicenseUrl: "https://example.com/licenses/sample-license.pdf",
         startDate: booking.startDate,
         endDate: booking.endDate,
@@ -350,7 +364,9 @@ async function main() {
         customerName: booking.customerName,
         customerEmail: booking.customerEmail,
         customerPhone: booking.customerPhone,
+        birthDate: booking.birthDate,
         driverLicenseNumber: booking.driverLicenseNumber,
+        licenseExpiryDate: booking.licenseExpiryDate,
         driverLicenseUrl: "https://example.com/licenses/sample-license.pdf",
         startDate: booking.startDate,
         endDate: booking.endDate,

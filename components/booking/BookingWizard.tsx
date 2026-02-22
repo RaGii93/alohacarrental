@@ -22,7 +22,9 @@ export interface BookingData {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  birthDate: Date | null;
   driverLicenseNumber: string;
+  licenseExpiryDate: Date | null;
   pickupLocationId: string;
   dropoffLocationId: string;
   driverLicenseUrl: string;
@@ -43,7 +45,9 @@ export function BookingWizard({ locale, locations }: { locale: string; locations
     customerName: "",
     customerEmail: "",
     customerPhone: "",
+    birthDate: null,
     driverLicenseNumber: "",
+    licenseExpiryDate: null,
     pickupLocationId: "",
     dropoffLocationId: "",
     driverLicenseUrl: "",

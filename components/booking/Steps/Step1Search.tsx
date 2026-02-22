@@ -134,7 +134,7 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Pickup Time</label>
+            <label className="block text-sm font-medium mb-2">{t("booking.pickupTime")}</label>
             <Input
               type="time"
               value={bookingData.pickupTime}
@@ -143,7 +143,7 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Dropoff Time</label>
+            <label className="block text-sm font-medium mb-2">{t("booking.dropoffTime")}</label>
             <Input
               type="time"
               value={bookingData.dropoffTime}

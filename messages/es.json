@@ -86,10 +86,14 @@
     "customerName": "Nombre Completo",
     "customerEmail": "Correo Electrónico",
     "customerPhone": "Número de Teléfono",
+    "birthDate": "Fecha de Nacimiento",
     "driverLicenseNumber": "Número de Licencia de Conducir",
+    "licenseExpiryDate": "Fecha de Vencimiento de Licencia",
     "selectVehicle": "Seleccionar Vehículo",
     "startDate": "Fecha de Recogida",
     "endDate": "Fecha de Devolución",
+    "pickupTime": "Hora de Recogida",
+    "dropoffTime": "Hora de Devolución",
     "pickupLocation": "Ubicación de Recogida",
     "dropoffLocation": "Ubicación de Devolución",
     "notes": "Notas Especiales",
@@ -119,6 +123,7 @@
     "termsRequired": "Debes aceptar los términos y condiciones",
     "confirmBooking": "Confirmar Reserva",
     "bookingCode": "Código de Reserva",
+    "map": "mapa",
     "bookingRequestReceived": "Solicitud de reserva recibida",
     "nextSteps": "Nos pondremos en contacto pronto para confirmar tu reserva.",
     "errors": {
@@ -136,7 +141,10 @@
       "fileSize": "El tamaño del archivo no debe exceder 8MB",
       "fileType": "Solo se permiten archivos JPG, PNG y PDF",
       "uploadFailed": "Error al subir el archivo",
-      "termsNotAccepted": "Debes aceptar los términos y condiciones"
+      "termsNotAccepted": "Debes aceptar los términos y condiciones",
+      "birthLicenseRequired": "La fecha de nacimiento y vencimiento de licencia son obligatorias",
+      "ageMinimum": "El cliente debe tener al menos 21 años",
+      "licenseInvalid": "La licencia debe ser válida en la fecha de recogida"
     },
     "success": {
       "title": "¡Reserva Enviada!",

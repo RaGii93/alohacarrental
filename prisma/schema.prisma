@@ -84,7 +84,9 @@ model Booking {
   customerName        String
   customerEmail       String
   customerPhone       String
+  birthDate           DateTime?
   driverLicenseNumber String?
+  licenseExpiryDate   DateTime?
   driverLicenseUrl    String?
   startDate           DateTime
   endDate             DateTime  // treated as exclusive end date for overlap logic

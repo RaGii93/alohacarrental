@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { uploadFile } from "@/lib/uploads";
+import { categoryBookingFormSchemaRefined } from "@/lib/validators";
 import type { Prisma } from "@prisma/client";
 
 export async function cancelExpiredHolds() {
@@ -196,7 +197,9 @@ export async function createCategoryBookingAction(
     const customerName = formData.get("customerName") as string;
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
+    const birthDate = new Date(formData.get("birthDate") as string);
     const driverLicenseNumber = formData.get("driverLicenseNumber") as string;
+    const licenseExpiryDate = new Date(formData.get("licenseExpiryDate") as string);
     const startDate = new Date(formData.get("startDate") as string);
     const endDate = new Date(formData.get("endDate") as string);
     const pickupLocationId = (formData.get("pickupLocationId") as string | null) || null;
@@ -213,7 +216,9 @@ export async function createCategoryBookingAction(
       !customerName ||
       !customerEmail ||
       !customerPhone ||
+      !formData.get("birthDate") ||
       !driverLicenseNumber ||
+      !formData.get("licenseExpiryDate") ||
       !driverLicenseUrl ||
       !pickupLocationId ||
       !dropoffLocationId
@@ -228,6 +233,28 @@ export async function createCategoryBookingAction(
     if (startDate >= endDate) {
       return { success: false, error: "Invalid date range" };
     }
+    if (Number.isNaN(birthDate.getTime()) || Number.isNaN(licenseExpiryDate.getTime())) {
+      return { success: false, error: "Invalid birth date or license expiry date" };
+    }
+
+    const validated = await categoryBookingFormSchemaRefined.parseAsync({
+      categoryId,
+      customerName,
+      customerEmail,
+      customerPhone,
+      birthDate,
+      driverLicenseNumber,
+      licenseExpiryDate,
+      startDate,
+      endDate,
+      pickupLocationId: pickupLocationId || undefined,
+      dropoffLocationId: dropoffLocationId || undefined,
+      pickupLocation: pickupLocation || undefined,
+      dropoffLocation: dropoffLocation || undefined,
+      driverLicenseUrl,
+      termsAccepted,
+      notes: notes || undefined,
+    });
 
     // Resolve locations by ID (if sent)
     const [pickupLocationRecord, dropoffLocationRecord] = await Promise.all([
@@ -257,7 +284,7 @@ export async function createCategoryBookingAction(
     }
 
     // Calculate days and total
-    const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24));
     const totalAmount = category.dailyRate * Math.max(1, days);
 
 
@@ -272,8 +299,8 @@ export async function createCategoryBookingAction(
             status: "ACTIVE",
             bookings: {
               none: {
-                startDate: { lt: endDate },
-                endDate: { gt: startDate },
+                startDate: { lt: validated.endDate },
+                endDate: { gt: validated.startDate },
                 status: { in: ["PENDING", "CONFIRMED"] },
                 holdExpiresAt: { gt: new Date() },
               },
@@ -295,34 +322,73 @@ export async function createCategoryBookingAction(
           if (attempts > 10) throw new Error("Failed to generate unique booking code");
         } while (await tx.booking.findUnique({ where: { bookingCode } }));
 
-        // Create booking
-        return tx.booking.create({
-          data: {
-            categoryId,
-            vehicleId: availableVehicle.id,
-            customerName,
-            customerEmail,
-            customerPhone,
-            driverLicenseNumber,
-            startDate,
-            endDate,
-            pickupLocationId: pickupLocationRecord?.id ?? null,
-            dropoffLocationId: dropoffLocationRecord?.id ?? null,
-            pickupLocation: pickupLocationRecord?.name ?? pickupLocation,
-            dropoffLocation: dropoffLocationRecord?.name ?? dropoffLocation,
-            totalAmount,
-            status: "PENDING",
-            bookingCode,
-            holdExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
-            driverLicenseUrl,
-            termsAcceptedAt: new Date(),
-            notes,
-          },
-        });
+        const baseData = {
+          categoryId,
+          vehicleId: availableVehicle.id,
+          customerName: validated.customerName,
+          customerEmail: validated.customerEmail,
+          customerPhone: validated.customerPhone,
+          driverLicenseNumber: validated.driverLicenseNumber,
+          startDate: validated.startDate,
+          endDate: validated.endDate,
+          pickupLocationId: pickupLocationRecord?.id ?? null,
+          dropoffLocationId: dropoffLocationRecord?.id ?? null,
+          pickupLocation: pickupLocationRecord?.name ?? pickupLocation,
+          dropoffLocation: dropoffLocationRecord?.name ?? dropoffLocation,
+          totalAmount,
+          status: "PENDING" as const,
+          bookingCode,
+          holdExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+          driverLicenseUrl,
+          termsAcceptedAt: new Date(),
+          notes: validated.notes,
+        };
+
+        let created: any;
+        try {
+          created = await tx.booking.create({
+            data: {
+              ...baseData,
+              birthDate: validated.birthDate,
+              licenseExpiryDate: validated.licenseExpiryDate,
+            } as any,
+          });
+        } catch (createError: any) {
+          const message = String(createError?.message || "");
+          if (!message.includes("Unknown argument `birthDate`") && !message.includes("Unknown argument `licenseExpiryDate`")) {
+            throw createError;
+          }
+
+          // Fallback for stale Prisma client: create with known fields, then patch dates in SQL.
+          created = await tx.booking.create({ data: baseData as any });
+          try {
+            await tx.$executeRaw`
+              UPDATE "Booking"
+              SET "birthDate" = ${validated.birthDate}, "licenseExpiryDate" = ${validated.licenseExpiryDate}
+              WHERE id = ${created.id}
+            `;
+          } catch {
+            throw new Error("BOOKING_FIELDS_NOT_SAVED");
+          }
+        }
+
+        const persisted = await tx.$queryRaw<Array<{ birthDate: Date | null; licenseExpiryDate: Date | null }>>`
+          SELECT "birthDate", "licenseExpiryDate"
+          FROM "Booking"
+          WHERE id = ${created.id}
+          LIMIT 1
+        `;
+        if (!persisted[0]?.birthDate || !persisted[0]?.licenseExpiryDate) {
+          throw new Error("BOOKING_FIELDS_NOT_SAVED");
+        }
+        return created;
       });
     } catch (error: any) {
       if (error.message === "CATEGORY_UNAVAILABLE") {
         return { success: false, error: "CATEGORY_UNAVAILABLE" };
+      }
+      if (error.message === "BOOKING_FIELDS_NOT_SAVED") {
+        return { success: false, error: "Failed to persist birth date/license expiry date" };
       }
       throw error;
     }

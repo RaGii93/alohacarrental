@@ -86,10 +86,14 @@
     "customerName": "Volledige Naam",
     "customerEmail": "E-mailadres",
     "customerPhone": "Telefoonnummer",
+    "birthDate": "Geboortedatum",
     "driverLicenseNumber": "Rijbewijsnummer",
+    "licenseExpiryDate": "Vervaldatum Rijbewijs",
     "selectVehicle": "Voertuig Selecteren",
     "startDate": "Ophaaldatum",
     "endDate": "Retouurdatum",
+    "pickupTime": "Ophaaltijd",
+    "dropoffTime": "Inlevertijd",
     "pickupLocation": "Ophaallocatie",
     "dropoffLocation": "Retourlocatie",
     "notes": "Speciale Opmerkingen",
@@ -119,6 +123,7 @@
     "termsRequired": "Je moet akkoord gaan met de voorwaarden",
     "confirmBooking": "Reservering Bevestigen",
     "bookingCode": "Reserveringscode",
+    "map": "kaart",
     "bookingRequestReceived": "Reserveringsverzoek ontvangen",
     "nextSteps": "We nemen binnenkort contact met je op om je reservering te bevestigen.",
     "errors": {
@@ -136,7 +141,10 @@
       "fileSize": "Bestandsgrootte mag niet meer dan 8MB zijn",
       "fileType": "Alleen JPG-, PNG- en PDF-bestanden zijn toegestaan",
       "uploadFailed": "Bestand uploaden mislukt",
-      "termsNotAccepted": "Je moet akkoord gaan met de voorwaarden"
+      "termsNotAccepted": "Je moet akkoord gaan met de voorwaarden",
+      "birthLicenseRequired": "Geboortedatum en vervaldatum rijbewijs zijn verplicht",
+      "ageMinimum": "Huurder moet minimaal 21 jaar oud zijn",
+      "licenseInvalid": "Rijbewijs moet geldig zijn op de ophaaldatum"
     },
     "success": {
       "title": "Reservering Ingediend!",

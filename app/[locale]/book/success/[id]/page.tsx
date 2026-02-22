@@ -46,6 +46,10 @@ export default async function SuccessPage({
         <p className="text-lg text-gray-600 mb-6">
           {t("booking.success.message", { orderId: booking.bookingCode })}
         </p>
+        <div className="mb-6 rounded-lg border bg-gray-50 p-4">
+          <p className="text-sm text-gray-600">{t("booking.bookingCode")}</p>
+          <p className="text-xl font-semibold tracking-wide">{booking.bookingCode}</p>
+        </div>
 
         <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">
           <h2 className="font-semibold mb-4">{t("admin.bookings.detail.bookingInfo")}</h2>
@@ -57,6 +61,10 @@ export default async function SuccessPage({
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("common.email")}:</dt>
               <dd className="font-medium">{booking.customerEmail}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-600">{t("booking.birthDate")}:</dt>
+              <dd className="font-medium">{booking.birthDate ? new Date(booking.birthDate).toLocaleDateString() : "-"}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.selectVehicle")}:</dt>
@@ -82,7 +90,7 @@ export default async function SuccessPage({
                   <>
                     {" "}
                     <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      (map)
+                      ({t("booking.map")})
                     </a>
                   </>
                 )}
@@ -96,11 +104,15 @@ export default async function SuccessPage({
                   <>
                     {" "}
                     <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      (map)
+                      ({t("booking.map")})
                     </a>
                   </>
                 )}
               </dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-600">{t("booking.licenseExpiryDate")}:</dt>
+              <dd className="font-medium">{booking.licenseExpiryDate ? new Date(booking.licenseExpiryDate).toLocaleDateString() : "-"}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("admin.bookings.table.total")}:</dt>

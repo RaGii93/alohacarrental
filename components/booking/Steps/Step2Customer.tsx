@@ -23,6 +23,33 @@ interface Step2CustomerProps {
 export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, disabled }: Step2CustomerProps) {
   const t = useTranslations();
   const [isUploading, setIsUploading] = useState(false);
+  const formatDateInput = (value: Date | null) => {
+    if (!value) return "";
+    const year = value.getFullYear();
+    const month = `${value.getMonth() + 1}`.padStart(2, "0");
+    const day = `${value.getDate()}`.padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+  const parseDateInput = (value: string) => {
+    if (!value) return null;
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+  };
+  const isAtLeast21 = (() => {
+    if (!bookingData.birthDate) return false;
+    const today = new Date();
+    const threshold = new Date(today.getFullYear() - 21, today.getMonth(), today.getDate());
+    return bookingData.birthDate <= threshold;
+  })();
+  const isLicenseValid = (() => {
+    if (!bookingData.licenseExpiryDate || !bookingData.startDate) return false;
+    const start = new Date(bookingData.startDate);
+    start.setHours(0, 0, 0, 0);
+    const expiry = new Date(bookingData.licenseExpiryDate);
+    expiry.setHours(0, 0, 0, 0);
+    return expiry > start;
+  })();
 
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
@@ -64,7 +91,11 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
   const canContinue = bookingData.customerName &&
                      bookingData.customerEmail &&
                      bookingData.customerPhone &&
+                     bookingData.birthDate &&
                      bookingData.driverLicenseNumber &&
+                     bookingData.licenseExpiryDate &&
+                     isAtLeast21 &&
+                     isLicenseValid &&
                      bookingData.driverLicenseUrl;
 
   return (
@@ -116,6 +147,36 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               disabled={disabled}
               required
             />
+          </div>
+
+          <div>
+            <Label htmlFor="birthDate">{t("booking.birthDate")}</Label>
+            <Input
+              id="birthDate"
+              type="date"
+              value={formatDateInput(bookingData.birthDate)}
+              onChange={(e) => updateBookingData({ birthDate: parseDateInput(e.target.value) })}
+              disabled={disabled}
+              required
+            />
+            {bookingData.birthDate && !isAtLeast21 && (
+              <p className="text-xs text-red-600 mt-1">{t("booking.errors.ageMinimum")}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="licenseExpiryDate">{t("booking.licenseExpiryDate")}</Label>
+            <Input
+              id="licenseExpiryDate"
+              type="date"
+              value={formatDateInput(bookingData.licenseExpiryDate)}
+              onChange={(e) => updateBookingData({ licenseExpiryDate: parseDateInput(e.target.value) })}
+              disabled={disabled}
+              required
+            />
+            {bookingData.licenseExpiryDate && !isLicenseValid && (
+              <p className="text-xs text-red-600 mt-1">{t("booking.errors.licenseInvalid")}</p>
+            )}
           </div>
         </div>
       </div>

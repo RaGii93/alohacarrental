@@ -111,6 +111,10 @@ export function BookingDetailClient({
               <dt className="text-gray-600">Phone</dt>
               <dd className="font-medium">{booking.customerPhone}</dd>
             </div>
+            <div>
+              <dt className="text-gray-600">Birth Date</dt>
+              <dd className="font-medium">{booking.birthDate ? new Date(booking.birthDate).toLocaleDateString() : "-"}</dd>
+            </div>
           </dl>
         </div>
 
@@ -160,6 +164,10 @@ export function BookingDetailClient({
                   </>
                 )}
               </dd>
+            </div>
+            <div>
+              <dt className="text-gray-600">License Expiry Date</dt>
+              <dd className="font-medium">{booking.licenseExpiryDate ? new Date(booking.licenseExpiryDate).toLocaleDateString() : "-"}</dd>
             </div>
             <div>
               <dt className="text-gray-600">Total Amount</dt>
