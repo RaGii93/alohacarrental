@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "../lib/password";
-
-const prisma = new PrismaClient();
+import { hashPassword } from "../lib/password.ts";
+import { db as prisma } from "../lib/db.ts";
 
 async function main() {
   console.log("Seeding database...");
@@ -15,7 +13,7 @@ async function main() {
     const rootPasswordHash = await hashPassword("3dGe123$");
     const root = await prisma.adminUser.create({
       data: {
-        email: "root",
+        email: "root@endlessedget.com",
         passwordHash: rootPasswordHash,
         role: "ROOT",
       },
@@ -42,28 +40,83 @@ async function main() {
     console.log("✓ OWNER user created:", owner.email);
   }
 
+  // Create vehicle categories
+  const categoriesData = [
+    {
+      id: "cat_economy",
+      name: "Economy",
+      description: "Compact and fuel-efficient vehicles",
+      dailyRate: 2500, // $25.00 in cents
+      isActive: true,
+      sortOrder: 1,
+    },
+    {
+      id: "cat_suv",
+      name: "SUV",
+      description: "Spacious vehicles for families and adventures",
+      dailyRate: 4500, // $45.00 in cents
+      isActive: true,
+      sortOrder: 2,
+    },
+    {
+      id: "cat_pickup",
+      name: "Pickup",
+      description: "Versatile trucks for work and transport",
+      dailyRate: 4000, // $40.00 in cents
+      isActive: true,
+      sortOrder: 3,
+    },
+  ];
+
+  for (const cat of categoriesData) {
+    const existing = await prisma.vehicleCategory.findUnique({ where: { id: cat.id } });
+    if (!existing) {
+      const created = await prisma.vehicleCategory.create({ data: cat });
+      console.log("✓ Category created:", created.name);
+    }
+  }
+
   // Create sample vehicles
   const vehiclesData = [
     {
       name: "Kia Picanto #1",
       plateNumber: "ABC-1234",
-      category: "Economy",
-      dailyRate: 5000, // $50.00 in cents
+      categoryId: "cat_economy",
+      imageUrl: "https://via.placeholder.com/240x140?text=Kia+Picanto",
+      dailyRate: 2500, // $25.00 in cents
       status: "ACTIVE" as const,
     },
     {
       name: "Toyota Corolla #1",
       plateNumber: "XYZ-5678",
-      category: "Sedan",
-      dailyRate: 7500, // $75.00 in cents
+      categoryId: "cat_economy",
+      imageUrl: "https://via.placeholder.com/240x140?text=Toyota+Corolla",
+      dailyRate: 2500, // $25.00 in cents
       status: "ACTIVE" as const,
     },
     {
       name: "Honda Civic #1",
       plateNumber: "DEF-9012",
-      category: "Compact",
-      dailyRate: 6500, // $65.00 in cents
+      categoryId: "cat_economy",
+      imageUrl: "https://via.placeholder.com/240x140?text=Honda+Civic",
+      dailyRate: 2500, // $25.00 in cents
       status: "MAINTENANCE" as const,
+    },
+    {
+      name: "Toyota RAV4 #1",
+      plateNumber: "SUV-1234",
+      categoryId: "cat_suv",
+      imageUrl: "https://via.placeholder.com/240x140?text=Toyota+RAV4",
+      dailyRate: 4500, // $45.00 in cents
+      status: "ACTIVE" as const,
+    },
+    {
+      name: "Ford Ranger #1",
+      plateNumber: "PIC-5678",
+      categoryId: "cat_pickup",
+      imageUrl: "https://via.placeholder.com/240x140?text=Ford+Ranger",
+      dailyRate: 4000, // $40.00 in cents
+      status: "ACTIVE" as const,
     },
   ];
 
@@ -77,6 +130,21 @@ async function main() {
         data: vehicleData,
       });
       console.log("✓ Vehicle created:", vehicle.name);
+    }
+  }
+
+  // Create sample pickup/dropoff locations
+  const locationsData = [
+    { code: "AIRPORT", name: "Airport Terminal", address: "Airport Rd, City" },
+    { code: "DOWNTOWN", name: "Downtown Office", address: "123 Main St" },
+    { code: "STATION", name: "Train Station", address: "Station Ave" },
+  ];
+
+  for (const loc of locationsData) {
+    const existing = await prisma.location.findUnique({ where: { code: loc.code } });
+    if (!existing) {
+      const created = await prisma.location.create({ data: loc });
+      console.log("✓ Location created:", created.name);
     }
   }
 

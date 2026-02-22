@@ -8,6 +8,7 @@ export interface TenantConfig {
   address: string;
   currency: string;
   paymentInstructions: string;
+  termsPdfUrl: string;
 }
 
 export const defaultTenantConfig: TenantConfig = {
@@ -22,6 +23,7 @@ export const defaultTenantConfig: TenantConfig = {
   paymentInstructions:
     process.env.TENANT_PAYMENT_INSTRUCTIONS ||
     "Payment via bank transfer or credit card. Please reference your booking ID.",
+  termsPdfUrl: process.env.TENANT_TERMS_PDF_URL || "/terms.pdf",
 };
 
 export function getTenantConfig(): TenantConfig {

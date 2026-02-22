@@ -1,5 +1,4 @@
-import { useTranslations } from "next-intl";
-import { BookingForm } from "@/components/booking/BookingForm";
+import { BookingWizard } from "@/components/booking/BookingWizard";
 import { db } from "@/lib/db";
 
 export default async function BookingPage({
@@ -9,15 +8,12 @@ export default async function BookingPage({
 }) {
   const { locale } = await params;
 
-  // Fetch active vehicles
-  const vehicles = await db.vehicle.findMany({
-    where: { status: "ACTIVE" },
-    select: { id: true, name: true, dailyRate: true },
-  });
+  // Fetch predefined pickup/dropoff locations
+  const locations = await db.location.findMany({ select: { id: true, name: true, code: true, address: true } });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <BookingForm locale={locale} vehicles={vehicles} />
+      <BookingWizard locale={locale} locations={locations} />
     </div>
   );
 }

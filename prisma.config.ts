@@ -7,6 +7,10 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Use ts-node to run TypeScript seed file. Prisma attempts to spawn the seed
+    // path directly which causes EACCES when the file isn't executable. Using
+    // ts-node ensures the TS file runs correctly.
+    seed: "ts-node --transpile-only prisma/seed.ts",
   },
   datasource: {
     url: process.env["DATABASE_URL"]!,

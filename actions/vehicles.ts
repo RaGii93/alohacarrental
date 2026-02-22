@@ -23,7 +23,7 @@ export async function createVehicleAction(formData: any, locale: string) {
       data: {
         name: validated.name,
         plateNumber: validated.plateNumber,
-        category: validated.category,
+        categoryId: validated.categoryId,
         dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
         status: validated.status,
         notes: validated.notes,
@@ -67,7 +67,7 @@ export async function updateVehicleAction(
       data: {
         name: validated.name,
         plateNumber: validated.plateNumber,
-        category: validated.category,
+        categoryId: validated.categoryId,
         dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
         status: validated.status,
         notes: validated.notes,

@@ -10,11 +10,11 @@ export default async function SuccessPage({
 }: {
   params: Promise<{ locale: string; id: string }>;
 }) {
-  const { locale, id } = await params;
+  const { locale, id: bookingCode } = await params;
   const t = await getTranslations();
 
   const booking = await db.booking.findUnique({
-    where: { id },
+    where: { bookingCode },
     include: { vehicle: true },
   });
 
@@ -37,7 +37,7 @@ export default async function SuccessPage({
           {t("booking.success.title")}
         </h1>
         <p className="text-lg text-gray-600 mb-6">
-          {t("booking.success.message", { orderId: booking.id })}
+          {t("booking.success.message", { orderId: booking.bookingCode })}
         </p>
 
         <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">

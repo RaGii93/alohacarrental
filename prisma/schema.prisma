@@ -31,7 +31,9 @@ model Vehicle {
   id            String    @id @default(cuid())
   name          String
   plateNumber   String?   @unique
-  category      String?
+  imageUrl      String?
+  categoryId    String
+  category      VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   dailyRate     Int       // stored in cents
   status        VehicleStatus @default(ACTIVE)
   notes         String?
@@ -39,6 +41,15 @@ model Vehicle {
   bookings      Booking[]
 
   @@index([status])
+  @@index([categoryId])
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  name      String
+  code      String?  @unique
+  address   String?
+  createdAt DateTime @default(now())
 }
 
 enum VehicleStatus {
@@ -47,29 +58,51 @@ enum VehicleStatus {
   INACTIVE
 }
 
+model VehicleCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  dailyRate   Int       // stored in cents
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  vehicles    Vehicle[]
+  bookings    Booking[]
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
 model Booking {
   id                  String    @id @default(cuid())
-  vehicleId           String
-  vehicle             Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  categoryId          String
+  category            VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  vehicleId           String?
+  vehicle             Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   customerName        String
   customerEmail       String
   customerPhone       String
+  driverLicenseNumber String?
+  driverLicenseUrl    String?
   startDate           DateTime
   endDate             DateTime  // treated as exclusive end date for overlap logic
   pickupLocation      String?
   dropoffLocation     String?
   totalAmount         Int       // stored in cents
   status              BookingStatus @default(PENDING)
+  bookingCode         String    @unique
   holdExpiresAt       DateTime  @default(dbgenerated("now() + INTERVAL '2 hours'"))
   paymentProofUrl     String?
-  driverLicenseUrl    String?
+  termsAcceptedAt     DateTime?
   notes               String?
   invoiceUrl          String?
   createdAt           DateTime  @default(now())
   auditLogs           AuditLog[]
 
   @@index([vehicleId, startDate, endDate])
+  @@index([categoryId, startDate, endDate])
   @@index([status])
+  @@index([bookingCode])
   @@index([createdAt])
   adminUsers AdminUser[]
 }
