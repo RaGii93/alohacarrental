@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Upload } from "lucide-react";
 import { uploadDriverLicenseAction } from "@/actions/booking";
 import { BookingData } from "../BookingWizard";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface Step2CustomerProps {
   bookingData: BookingData;
@@ -23,19 +24,6 @@ interface Step2CustomerProps {
 export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, disabled }: Step2CustomerProps) {
   const t = useTranslations();
   const [isUploading, setIsUploading] = useState(false);
-  const formatDateInput = (value: Date | null) => {
-    if (!value) return "";
-    const year = value.getFullYear();
-    const month = `${value.getMonth() + 1}`.padStart(2, "0");
-    const day = `${value.getDate()}`.padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-  const parseDateInput = (value: string) => {
-    if (!value) return null;
-    const [year, month, day] = value.split("-").map(Number);
-    if (!year || !month || !day) return null;
-    return new Date(year, month - 1, day);
-  };
   const isAtLeast21 = (() => {
     if (!bookingData.birthDate) return false;
     const today = new Date();
@@ -151,13 +139,19 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
           <div>
             <Label htmlFor="birthDate">{t("booking.birthDate")}</Label>
-            <Input
+            <DatePicker
               id="birthDate"
-              type="date"
-              value={formatDateInput(bookingData.birthDate)}
-              onChange={(e) => updateBookingData({ birthDate: parseDateInput(e.target.value) })}
+              value={bookingData.birthDate}
+              onChange={(date) => updateBookingData({ birthDate: date })}
+              placeholder={t("booking.birthDate")}
               disabled={disabled}
-              required
+              fromYear={new Date().getFullYear() - 100}
+              toYear={new Date().getFullYear() - 21}
+              disabledDate={(date) => {
+                const now = new Date();
+                const minAdultDate = new Date(now.getFullYear() - 21, now.getMonth(), now.getDate());
+                return date > minAdultDate;
+              }}
             />
             {bookingData.birthDate && !isAtLeast21 && (
               <p className="text-xs text-red-600 mt-1">{t("booking.errors.ageMinimum")}</p>
@@ -166,13 +160,19 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
           <div>
             <Label htmlFor="licenseExpiryDate">{t("booking.licenseExpiryDate")}</Label>
-            <Input
+            <DatePicker
               id="licenseExpiryDate"
-              type="date"
-              value={formatDateInput(bookingData.licenseExpiryDate)}
-              onChange={(e) => updateBookingData({ licenseExpiryDate: parseDateInput(e.target.value) })}
+              value={bookingData.licenseExpiryDate}
+              onChange={(date) => updateBookingData({ licenseExpiryDate: date })}
+              placeholder={t("booking.licenseExpiryDate")}
               disabled={disabled}
-              required
+              fromYear={new Date().getFullYear()}
+              toYear={new Date().getFullYear() + 20}
+              disabledDate={(date) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return date <= today;
+              }}
             />
             {bookingData.licenseExpiryDate && !isLicenseValid && (
               <p className="text-xs text-red-600 mt-1">{t("booking.errors.licenseInvalid")}</p>

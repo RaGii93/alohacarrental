@@ -2,16 +2,13 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { searchAvailabilityAction, AvailabilityResult } from "@/actions/availability";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
@@ -73,68 +70,28 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">{t("booking.startDate")}</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <div className="w-full">
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !bookingData.startDate && "text-muted-foreground"
-                    )}
-                    disabled={disabled}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {bookingData.startDate ? format(bookingData.startDate, "PPP") : t("booking.selectDateRange")}
-                  </Button>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-50">
-                <Calendar
-                  mode="single"
-                  captionLayout="dropdown"
-                  fromYear={new Date().getFullYear()}
-                  toYear={new Date().getFullYear() + 3}
-                  selected={bookingData.startDate || undefined}
-                  onSelect={(date) => updateBookingData({ startDate: date || null })}
-                  disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <DatePicker
+              value={bookingData.startDate}
+              onChange={(date) => updateBookingData({ startDate: date })}
+              placeholder={t("booking.selectDateRange")}
+              disabled={disabled}
+              fromYear={new Date().getFullYear()}
+              toYear={new Date().getFullYear() + 3}
+              disabledDate={(date) => date < new Date() || date < new Date("1900-01-01")}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">{t("booking.endDate")}</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <div className="w-full">
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !bookingData.endDate && "text-muted-foreground"
-                    )}
-                    disabled={disabled}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {bookingData.endDate ? format(bookingData.endDate, "PPP") : t("booking.selectDateRange")}
-                  </Button>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-50">
-                <Calendar
-                  mode="single"
-                  captionLayout="dropdown"
-                  fromYear={new Date().getFullYear()}
-                  toYear={new Date().getFullYear() + 3}
-                  selected={bookingData.endDate || undefined}
-                  onSelect={(date) => updateBookingData({ endDate: date || null })}
-                  disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <DatePicker
+              value={bookingData.endDate}
+              onChange={(date) => updateBookingData({ endDate: date })}
+              placeholder={t("booking.selectDateRange")}
+              disabled={disabled}
+              fromYear={new Date().getFullYear()}
+              toYear={new Date().getFullYear() + 3}
+              disabledDate={(date) => date < new Date() || date < new Date("1900-01-01")}
+            />
           </div>
         </div>
 
