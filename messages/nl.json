@@ -79,6 +79,32 @@
       "title": "Klaar om Je Reis te Beginnen?",
       "subtitle": "Reserveer vandaag je perfecte voertuig en ervaar de vrijheid van de weg.",
       "button": "Nu Reserveren"
+    },
+    "reviews": {
+      "title": "Klantbeoordelingen",
+      "subtitle": "Nieuwste gepubliceerde reviews van geverifieerde reserveringen.",
+      "leaveButton": "Review Achterlaten",
+      "empty": "Er zijn nog geen reviews gepubliceerd.",
+      "form": {
+        "title": "Review Achterlaten",
+        "subtitle": "Voer je reserveringscode in om één review te plaatsen.",
+        "bookingCode": "Reserveringscode",
+        "bookingCodePlaceholder": "bijv. BK100001",
+        "rating": "Beoordeling",
+        "comment": "Opmerking",
+        "commentPlaceholder": "Vertel ons over je huurervaring",
+        "submit": "Review Versturen"
+      },
+      "errors": {
+        "codeRequired": "Reserveringscode is verplicht",
+        "commentShort": "Opmerking moet minimaal 5 tekens bevatten",
+        "bookingNotFound": "Reserveringscode niet gevonden",
+        "alreadyReviewed": "Er bestaat al een review voor deze reservering",
+        "submitFailed": "Review versturen mislukt"
+      },
+      "success": {
+        "pendingApproval": "Review verzonden. Deze wordt zichtbaar na goedkeuring door beheer."
+      }
     }
   },
   "booking": {
@@ -263,7 +289,8 @@
         "returns": "Innames",
         "financial": "Financieel",
         "fleet": "Vloot",
-        "vehicles": "Voertuigbeheer"
+        "vehicles": "Voertuigbeheer",
+        "reviews": "Reviews"
       },
       "deliveries": {
         "title": "Aankomende Leveringen (Volgende 7 Dagen)"
@@ -290,6 +317,10 @@
       "vehicles": {
         "manage": "Voertuigen Beheren",
         "pricing": "Prijzen"
+      },
+      "reviews": {
+        "title": "Review Moderatie",
+        "subtitle": "Toon of verberg klantreviews op de startpagina."
       }
     },
     "logout": "Afmelden"

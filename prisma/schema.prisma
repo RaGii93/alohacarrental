@@ -109,6 +109,7 @@ model Booking {
   createdAt           DateTime  @default(now())
   bookingExtras       BookingExtra[]
   bookingDiscount     BookingDiscount?
+  review              Review?
   auditLogs           AuditLog[]
 
   @@index([vehicleId, startDate, endDate])
@@ -119,6 +120,21 @@ model Booking {
   @@index([bookingCode])
   @@index([createdAt])
   adminUsers AdminUser[]
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  bookingId    String   @unique
+  booking      Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingCode  String
+  customerName String
+  rating       Int
+  comment      String
+  isVisible    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([isVisible, createdAt])
+  @@index([bookingCode])
 }
 
 enum BookingStatus {

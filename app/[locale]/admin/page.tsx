@@ -9,6 +9,7 @@ import { VehiclesTable } from "@/components/admin/VehiclesTable";
 import { CategoriesTable } from "@/components/admin/CategoriesTable";
 import { ExtrasTable } from "@/components/admin/ExtrasTable";
 import { DiscountCodesTable } from "@/components/admin/DiscountCodesTable";
+import { ReviewsTable } from "@/components/admin/ReviewsTable";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/actions/auth";
@@ -199,6 +200,10 @@ export default async function AdminDashboardPage({
     notes: vehicle.notes ?? undefined,
   }));
   const vehicleCategories = categories.map((category) => ({ id: category.id, name: category.name }));
+  const reviews = await db.review.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
 
   const currency = (amountCents: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
 
@@ -234,6 +239,7 @@ export default async function AdminDashboardPage({
           <TabsTrigger value="financial">{t("admin.dashboard.tabs.financial")}</TabsTrigger>
           <TabsTrigger value="fleet">{t("admin.dashboard.tabs.fleet")}</TabsTrigger>
           <TabsTrigger value="vehicles">{t("admin.dashboard.tabs.vehicles")}</TabsTrigger>
+          <TabsTrigger value="reviews">{t("admin.dashboard.tabs.reviews")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bookings" className="mt-6">
@@ -416,6 +422,12 @@ export default async function AdminDashboardPage({
               <DiscountCodesTable discountCodes={discountCodes as any} locale={locale} />
             </TabsContent>
           </Tabs>
+        </TabsContent>
+
+        <TabsContent value="reviews" className="mt-6 space-y-4">
+          <h2 className="text-xl font-semibold">{t("admin.dashboard.reviews.title")}</h2>
+          <p className="text-sm text-muted-foreground">{t("admin.dashboard.reviews.subtitle")}</p>
+          <ReviewsTable reviews={reviews as any[]} locale={locale} />
         </TabsContent>
       </Tabs>
     </div>

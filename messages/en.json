@@ -79,6 +79,32 @@
       "title": "Ready to Start Your Journey?",
       "subtitle": "Book your perfect vehicle today and experience the freedom of the road.",
       "button": "Book Now"
+    },
+    "reviews": {
+      "title": "Customer Reviews",
+      "subtitle": "Latest published reviews from verified bookings.",
+      "leaveButton": "Leave a Review",
+      "empty": "No reviews are published yet.",
+      "form": {
+        "title": "Leave a Review",
+        "subtitle": "Enter your booking code to submit one review.",
+        "bookingCode": "Booking Code",
+        "bookingCodePlaceholder": "e.g. BK100001",
+        "rating": "Rating",
+        "comment": "Comment",
+        "commentPlaceholder": "Tell us about your rental experience",
+        "submit": "Submit Review"
+      },
+      "errors": {
+        "codeRequired": "Booking code is required",
+        "commentShort": "Comment must be at least 5 characters",
+        "bookingNotFound": "Booking code not found",
+        "alreadyReviewed": "A review already exists for this booking",
+        "submitFailed": "Failed to submit review"
+      },
+      "success": {
+        "pendingApproval": "Review submitted. It will be visible after admin approval."
+      }
     }
   },
   "booking": {
@@ -293,7 +319,8 @@
         "returns": "Returns",
         "financial": "Financial",
         "fleet": "Fleet",
-        "vehicles": "Vehicle Management"
+        "vehicles": "Vehicle Management",
+        "reviews": "Reviews"
       },
       "deliveries": {
         "title": "Upcoming Deliveries (Next 7 Days)"
@@ -320,6 +347,10 @@
       "vehicles": {
         "manage": "Manage Vehicles",
         "pricing": "Pricing"
+      },
+      "reviews": {
+        "title": "Reviews Moderation",
+        "subtitle": "Show or hide customer reviews on the home page."
       }
     },
     "logout": "Logout"

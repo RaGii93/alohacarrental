@@ -416,6 +416,42 @@ async function main() {
   }
   console.log(`✓ Upserted ${bookingsData.length} bookings`);
 
+  const reviewsSeed = [
+    { bookingCode: "BK100001", rating: 5, comment: "Great car and smooth pickup process.", isVisible: true },
+    { bookingCode: "BK100002", rating: 4, comment: "Clean vehicle, quick support response.", isVisible: true },
+    { bookingCode: "BK100003", rating: 5, comment: "Very good experience, will book again.", isVisible: false },
+    { bookingCode: "BK100004", rating: 3, comment: "Service was okay, expected faster delivery.", isVisible: false },
+    { bookingCode: "BK100005", rating: 5, comment: "Excellent condition and friendly staff.", isVisible: true },
+  ];
+
+  for (const seedReview of reviewsSeed) {
+    const booking = await prisma.booking.findUnique({
+      where: { bookingCode: seedReview.bookingCode },
+      select: { id: true, bookingCode: true, customerName: true },
+    });
+    if (!booking) continue;
+
+    await prisma.review.upsert({
+      where: { bookingId: booking.id },
+      update: {
+        rating: seedReview.rating,
+        comment: seedReview.comment,
+        isVisible: seedReview.isVisible,
+        bookingCode: booking.bookingCode,
+        customerName: booking.customerName,
+      },
+      create: {
+        bookingId: booking.id,
+        bookingCode: booking.bookingCode,
+        customerName: booking.customerName,
+        rating: seedReview.rating,
+        comment: seedReview.comment,
+        isVisible: seedReview.isVisible,
+      },
+    });
+  }
+  console.log(`✓ Upserted ${reviewsSeed.length} reviews`);
+
   console.log("✅ Seeding completed");
 }
 

@@ -79,6 +79,32 @@
       "title": "¿Listo para Comenzar Tu Viaje?",
       "subtitle": "Reserva tu vehículo perfecto hoy y experimenta la libertad de la carretera.",
       "button": "Reservar Ahora"
+    },
+    "reviews": {
+      "title": "Reseñas de Clientes",
+      "subtitle": "Últimas reseñas publicadas de reservas verificadas.",
+      "leaveButton": "Dejar una Reseña",
+      "empty": "Todavía no hay reseñas publicadas.",
+      "form": {
+        "title": "Dejar una Reseña",
+        "subtitle": "Ingresa tu código de reserva para enviar una reseña.",
+        "bookingCode": "Código de Reserva",
+        "bookingCodePlaceholder": "ej. BK100001",
+        "rating": "Calificación",
+        "comment": "Comentario",
+        "commentPlaceholder": "Cuéntanos tu experiencia de alquiler",
+        "submit": "Enviar Reseña"
+      },
+      "errors": {
+        "codeRequired": "El código de reserva es obligatorio",
+        "commentShort": "El comentario debe tener al menos 5 caracteres",
+        "bookingNotFound": "Código de reserva no encontrado",
+        "alreadyReviewed": "Ya existe una reseña para esta reserva",
+        "submitFailed": "No se pudo enviar la reseña"
+      },
+      "success": {
+        "pendingApproval": "Reseña enviada. Será visible después de la aprobación del administrador."
+      }
     }
   },
   "booking": {
@@ -263,7 +289,8 @@
         "returns": "Devoluciones",
         "financial": "Finanzas",
         "fleet": "Flota",
-        "vehicles": "Gestión de Vehículos"
+        "vehicles": "Gestión de Vehículos",
+        "reviews": "Reseñas"
       },
       "deliveries": {
         "title": "Próximas Entregas (Siguientes 7 Días)"
@@ -290,6 +317,10 @@
       "vehicles": {
         "manage": "Gestionar Vehículos",
         "pricing": "Precios"
+      },
+      "reviews": {
+        "title": "Moderación de Reseñas",
+        "subtitle": "Mostrar u ocultar reseñas de clientes en la página principal."
       }
     },
     "logout": "Cerrar Sesión"
