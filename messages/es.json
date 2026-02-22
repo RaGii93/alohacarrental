@@ -102,6 +102,7 @@
     "submit": "Enviar Reserva",
     "select": "Seleccionar",
     "selected": "Seleccionado",
+    "back": "Atrás",
     "next": "Siguiente",
     "continue": "Continuar",
     "summary": "Resumen",
@@ -126,6 +127,18 @@
     "map": "mapa",
     "bookingRequestReceived": "Solicitud de reserva recibida",
     "nextSteps": "Nos pondremos en contacto pronto para confirmar tu reserva.",
+    "openOriginal": "Abrir archivo original",
+    "documentUnavailable": "No hay documento disponible",
+    "backToBooking": "Volver a reservar",
+    "reviewLookup": {
+      "cta": "Revisar reserva",
+      "title": "Revisa tu reserva",
+      "subtitle": "Ingresa tu código de reserva para ver los detalles.",
+      "placeholder": "Ingresa el código de reserva",
+      "submit": "Ver reserva",
+      "notFound": "No se encontró ninguna reserva para este código.",
+      "detailsTitle": "Detalles de la reserva"
+    },
     "errors": {
       "required": "Este campo es obligatorio",
       "email": "Ingresa una dirección de correo válida",

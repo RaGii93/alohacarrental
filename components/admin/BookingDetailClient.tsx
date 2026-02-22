@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { DocumentPreview } from "@/components/shared/DocumentPreview";
 import {
   confirmBookingAction,
   declineBookingAction,
@@ -22,6 +24,7 @@ export function BookingDetailClient({
   locale: string;
 }) {
   const router = useRouter();
+  const t = useTranslations();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -182,20 +185,14 @@ export function BookingDetailClient({
       <Separator className="my-6" />
 
       <div className="mb-8">
-        <h2 className="font-semibold mb-4">Uploaded Documents</h2>
+        <h2 className="font-semibold mb-4">{t("admin.bookings.detail.files")}</h2>
         <div className="space-y-2">
-          {booking.driverLicenseUrl && (
-            <div>
-              <a
-                href={booking.driverLicenseUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                📄 Driver's License
-              </a>
-            </div>
-          )}
+          <DocumentPreview
+            url={booking.driverLicenseUrl}
+            title={t("booking.driverLicense")}
+            openLabel={t("booking.openOriginal")}
+            emptyLabel={t("booking.documentUnavailable")}
+          />
           {booking.paymentProofUrl && (
             <div>
               <a

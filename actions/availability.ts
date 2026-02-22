@@ -11,6 +11,10 @@ export interface AvailabilityResult {
   totalForRange: number;
 }
 
+type InfoSchemaColumn = {
+  column_name: string;
+};
+
 export async function searchAvailabilityAction(
   startDate: Date,
   endDate: Date
@@ -37,20 +41,20 @@ export async function searchAvailabilityAction(
   }
 
   const results: AvailabilityResult[] = [];
-  const vehicleColumns = await db.$queryRaw<Array<{ column_name: string }>>`
+  const vehicleColumns: InfoSchemaColumn[] = await db.$queryRaw<InfoSchemaColumn[]>`
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'Vehicle'
   `;
-  const bookingColumns = await db.$queryRaw<Array<{ column_name: string }>>`
+  const bookingColumns: InfoSchemaColumn[] = await db.$queryRaw<InfoSchemaColumn[]>`
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'Booking'
   `;
 
-  const hasVehicleCategoryId = vehicleColumns.some((column) => column.column_name === "categoryId");
-  const hasVehicleCategory = vehicleColumns.some((column) => column.column_name === "category");
-  const hasBookingCategoryId = bookingColumns.some((column) => column.column_name === "categoryId");
+  const hasVehicleCategoryId = vehicleColumns.some((column: InfoSchemaColumn) => column.column_name === "categoryId");
+  const hasVehicleCategory = vehicleColumns.some((column: InfoSchemaColumn) => column.column_name === "category");
+  const hasBookingCategoryId = bookingColumns.some((column: InfoSchemaColumn) => column.column_name === "categoryId");
 
   for (const category of categories) {
     let totalVehicles = 0;

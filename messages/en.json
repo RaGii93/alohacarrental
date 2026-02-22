@@ -102,6 +102,7 @@
     "submit": "Submit Booking",
     "select": "Select",
     "selected": "Selected",
+    "back": "Back",
     "next": "Next",
     "continue": "Continue",
     "summary": "Summary",
@@ -126,6 +127,18 @@
     "map": "map",
     "bookingRequestReceived": "Booking request received",
     "nextSteps": "We will contact you shortly to confirm your booking.",
+    "openOriginal": "Open original file",
+    "documentUnavailable": "No document available",
+    "backToBooking": "Back to booking",
+    "reviewLookup": {
+      "cta": "Review booking",
+      "title": "Review your booking",
+      "subtitle": "Enter your booking code to view your booking details.",
+      "placeholder": "Enter booking code",
+      "submit": "View booking",
+      "notFound": "No booking found for this booking code.",
+      "detailsTitle": "Booking details"
+    },
     "errors": {
       "required": "This field is required",
       "email": "Enter a valid email address",

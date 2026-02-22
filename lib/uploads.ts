@@ -43,6 +43,12 @@ export async function uploadFile(
     }
 
     const buffer = await file.arrayBuffer();
+    if (!hasValidFileSignature(buffer, file.type)) {
+      return {
+        success: false,
+        error: "File appears corrupted or does not match its extension",
+      };
+    }
     const blob = new Blob([buffer], { type: file.type });
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const key = `${folderPath}/${Date.now()}-${safeName}`;
@@ -56,7 +62,7 @@ export async function uploadFile(
 
     return {
       success: true,
-      url: (result as any).downloadUrl || result.url,
+      url: result.url,
     };
   } catch (error: any) {
     return {
@@ -64,4 +70,25 @@ export async function uploadFile(
       error: error?.message || "Failed to upload file",
     };
   }
+}
+
+function hasValidFileSignature(buffer: ArrayBuffer, type: string): boolean {
+  const bytes = new Uint8Array(buffer);
+  if (bytes.length < 4) return false;
+
+  if (type === "image/png") {
+    const png = [0x89, 0x50, 0x4e, 0x47];
+    return png.every((b, i) => bytes[i] === b);
+  }
+
+  if (type === "image/jpeg" || type === "image/jpg") {
+    return bytes[0] === 0xff && bytes[1] === 0xd8;
+  }
+
+  if (type === "application/pdf") {
+    const pdf = [0x25, 0x50, 0x44, 0x46]; // %PDF
+    return pdf.every((b, i) => bytes[i] === b);
+  }
+
+  return false;
 }

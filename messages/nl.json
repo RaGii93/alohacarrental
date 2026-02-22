@@ -102,6 +102,7 @@
     "submit": "Reservering Indienen",
     "select": "Selecteren",
     "selected": "Geselecteerd",
+    "back": "Terug",
     "next": "Volgende",
     "continue": "Doorgaan",
     "summary": "Samenvatting",
@@ -126,6 +127,18 @@
     "map": "kaart",
     "bookingRequestReceived": "Reserveringsverzoek ontvangen",
     "nextSteps": "We nemen binnenkort contact met je op om je reservering te bevestigen.",
+    "openOriginal": "Open origineel bestand",
+    "documentUnavailable": "Geen document beschikbaar",
+    "backToBooking": "Terug naar reserveren",
+    "reviewLookup": {
+      "cta": "Reservering bekijken",
+      "title": "Bekijk je reservering",
+      "subtitle": "Voer je reserveringscode in om je reserveringsgegevens te bekijken.",
+      "placeholder": "Voer reserveringscode in",
+      "submit": "Bekijk reservering",
+      "notFound": "Geen reservering gevonden voor deze reserveringscode.",
+      "detailsTitle": "Reserveringsdetails"
+    },
     "errors": {
       "required": "Dit veld is verplicht",
       "email": "Voer een geldig e-mailadres in",

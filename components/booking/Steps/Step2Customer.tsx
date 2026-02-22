@@ -12,6 +12,7 @@ import { Upload } from "lucide-react";
 import { uploadDriverLicenseAction } from "@/actions/booking";
 import { BookingData } from "../BookingWizard";
 import { DatePicker } from "@/components/ui/date-picker";
+import { DocumentPreview } from "@/components/shared/DocumentPreview";
 
 interface Step2CustomerProps {
   bookingData: BookingData;
@@ -215,10 +216,18 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               </div>
 
               {bookingData.driverLicenseUrl && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800">
-                    ✓ {t("booking.driverLicense")} {t("common.success").toLowerCase()}
-                  </p>
+                <div className="space-y-3">
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      ✓ {t("booking.driverLicense")} {t("common.success").toLowerCase()}
+                    </p>
+                  </div>
+                  <DocumentPreview
+                    url={bookingData.driverLicenseUrl}
+                    title={t("booking.driverLicense")}
+                    openLabel={t("booking.openOriginal")}
+                    emptyLabel={t("booking.documentUnavailable")}
+                  />
                 </div>
               )}
             </div>
