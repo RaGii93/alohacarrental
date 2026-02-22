@@ -57,19 +57,21 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
             <label className="block text-sm font-medium mb-2">{t("booking.startDate")}</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !bookingData.startDate && "text-muted-foreground"
-                  )}
-                  disabled={disabled}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {bookingData.startDate ? format(bookingData.startDate, "PPP") : t("booking.selectDateRange")}
-                </Button>
+                <div className="w-full">
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !bookingData.startDate && "text-muted-foreground"
+                    )}
+                    disabled={disabled}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {bookingData.startDate ? format(bookingData.startDate, "PPP") : t("booking.selectDateRange")}
+                  </Button>
+                </div>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 z-50">
                 <Calendar
                   mode="single"
                   selected={bookingData.startDate || undefined}
@@ -85,19 +87,21 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
             <label className="block text-sm font-medium mb-2">{t("booking.endDate")}</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !bookingData.endDate && "text-muted-foreground"
-                  )}
-                  disabled={disabled}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {bookingData.endDate ? format(bookingData.endDate, "PPP") : t("booking.selectDateRange")}
-                </Button>
+                <div className="w-full">
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !bookingData.endDate && "text-muted-foreground"
+                    )}
+                    disabled={disabled}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {bookingData.endDate ? format(bookingData.endDate, "PPP") : t("booking.selectDateRange")}
+                  </Button>
+                </div>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 z-50">
                 <Calendar
                   mode="single"
                   selected={bookingData.endDate || undefined}

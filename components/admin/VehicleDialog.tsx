@@ -35,18 +35,25 @@ interface Vehicle {
   id?: string;
   name?: string;
   plateNumber?: string;
-  category?: string;
+  categoryId?: string;
   dailyRate?: number;
   status?: string;
   notes?: string;
 }
 
+interface CategoryOption {
+  id: string;
+  name: string;
+}
+
 export function VehicleDialog({
   vehicle,
+  categories,
   locale,
   onClose,
 }: {
   vehicle: Vehicle | null;
+  categories: CategoryOption[];
   locale: string;
   onClose: () => void;
 }) {
@@ -59,7 +66,7 @@ export function VehicleDialog({
     defaultValues: {
       name: vehicle?.name || "",
       plateNumber: vehicle?.plateNumber || "",
-      category: vehicle?.category || "",
+      categoryId: vehicle?.categoryId || "",
       dailyRate: vehicle?.dailyRate ? vehicle.dailyRate / 100 : 0,
       status: (vehicle?.status as "ACTIVE" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
       notes: vehicle?.notes || "",
@@ -72,7 +79,7 @@ export function VehicleDialog({
       form.reset({
         name: vehicle.name || "",
         plateNumber: vehicle.plateNumber || "",
-        category: vehicle.category || "",
+        categoryId: vehicle.categoryId || "",
         dailyRate: vehicle.dailyRate ? vehicle.dailyRate / 100 : 0,
         status: (vehicle?.status as "ACTIVE" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
         notes: vehicle.notes || "",
@@ -156,13 +163,24 @@ export function VehicleDialog({
 
             <FormField
               control={form.control}
-              name="category"
+              name="categoryId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="e.g., Economy" />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

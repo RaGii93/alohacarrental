@@ -170,7 +170,7 @@ export function BookingForm({ locale, vehicles, locations }: { locale: string; v
         toast.error(res.error || t("common.error"));
       } else {
         toast.success(t("booking.paymentUploaded") || "Uploaded");
-        router.push(res.redirectUrl || `/${locale}/book/success/${bookingId}`);
+        router.push(`/${locale}/book/success/${bookingId}`);
       }
     } catch (err: any) {
       toast.error(err?.message || t("common.error"));

@@ -20,6 +20,7 @@ interface Vehicle {
   id: string;
   name: string;
   plateNumber?: string;
+  categoryId: string;
   category?: string;
   dailyRate: number;
   status: string;
@@ -27,11 +28,18 @@ interface Vehicle {
   createdAt: Date;
 }
 
+interface CategoryOption {
+  id: string;
+  name: string;
+}
+
 export function VehiclesTable({
   vehicles,
+  categories,
   locale,
 }: {
   vehicles: Vehicle[];
+  categories: CategoryOption[];
   locale: string;
 }) {
   const router = useRouter();
@@ -92,6 +100,7 @@ export function VehiclesTable({
 
       <VehicleDialog
         vehicle={selectedVehicle}
+        categories={categories}
         locale={locale}
         onClose={() => setSelectedVehicle(null)}
       />

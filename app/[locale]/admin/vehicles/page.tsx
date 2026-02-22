@@ -22,21 +22,29 @@ export default async function VehiclesPage({
 
   // Fetch vehicles
   const vehicles = await db.vehicle.findMany({
+    include: {
+      category: true,
+    },
     orderBy: { createdAt: "desc" },
+  });
+  const categories = await db.vehicleCategory.findMany({
+    where: { isActive: true },
+    select: { id: true, name: true },
+    orderBy: { sortOrder: "asc" },
   });
 
   // Transform vehicles to match Vehicle type (null -> undefined)
   const transformedVehicles = vehicles.map((vehicle) => ({
     ...vehicle,
     plateNumber: vehicle.plateNumber ?? undefined,
-    category: vehicle.category ?? undefined,
+    category: vehicle.category?.name ?? undefined,
     notes: vehicle.notes ?? undefined,
   }));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold mb-8">Manage Vehicles</h1>
-      <VehiclesTable vehicles={transformedVehicles} locale={locale} />
+      <VehiclesTable vehicles={transformedVehicles} categories={categories} locale={locale} />
     </div>
   );
 }

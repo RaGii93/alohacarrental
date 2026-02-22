@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { ExternalLink } from "lucide-react";
 import { AvailabilityResult } from "@/actions/availability";
+import { createCategoryBookingAction } from "@/actions/booking";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
 import { getTermsPdfUrl } from "@/lib/terms";
 import { BookingData } from "../BookingWizard";
@@ -69,6 +70,8 @@ export function Step3Review({ bookingData, updateBookingData, locations, locale,
   const selectedCategory = availability.find(cat => cat.categoryId === bookingData.categoryId);
   const categoryRate = selectedCategory?.dailyRate || 2500;
   const totalAmount = categoryRate * days;
+  const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocation);
+  const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocation);
 
   return (
     <div className="space-y-6">

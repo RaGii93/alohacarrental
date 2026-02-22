@@ -53,7 +53,7 @@ export default async function SuccessPage({
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.selectVehicle")}:</dt>
-              <dd className="font-medium">{booking.vehicle.name}</dd>
+              <dd className="font-medium">{booking.vehicle?.name ?? "-"}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.startDate")}:</dt>
