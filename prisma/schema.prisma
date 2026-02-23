@@ -112,7 +112,7 @@ model Booking {
   totalAmount         Int       // stored in cents
   status              BookingStatus @default(PENDING)
   bookingCode         String    @unique
-  holdExpiresAt       DateTime  @default(dbgenerated("now() + INTERVAL '2 hours'"))
+  holdExpiresAt       DateTime  @default(dbgenerated("(now() + '02:00:00'::interval)"))
   paymentProofUrl     String?
   paymentReceivedAt   DateTime?
   termsAcceptedAt     DateTime?
@@ -132,6 +132,12 @@ model Booking {
   @@index([bookingCode])
   @@index([createdAt])
   adminUsers AdminUser[]
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
 }
 
 model Review {
