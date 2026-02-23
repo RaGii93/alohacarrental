@@ -16,7 +16,7 @@ export const tenantConfig: TenantConfig = {
   instagramUrl: process.env.TENANT_INSTAGRAM_URL || undefined,
   linkedinUrl: process.env.TENANT_LINKEDIN_URL || undefined,
   tiktokUrl: process.env.TENANT_TIKTOK_URL || undefined,
-  email: process.env.TENANT_EMAIL || "contact@edgerent.com",
+  email: process.env.TENANT_EMAIL || "rademier.streden@outlook.com",
   address: process.env.TENANT_ADDRESS || "123 Main St, City, State 12345",
   currency: process.env.TENANT_CURRENCY || "USD",
   paymentInstructions:
