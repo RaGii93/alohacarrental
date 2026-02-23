@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { categoryFormSchema } from "@/lib/validators";
+import { uploadFile } from "@/lib/uploads";
 
 async function assertAdmin() {
   const session = await getSession();
@@ -26,6 +27,10 @@ export async function createCategoryAction(formData: any, locale: string) {
       data: {
         name: validated.name,
         description: validated.description || null,
+        imageUrl: validated.imageUrl || null,
+        seats: validated.seats,
+        transmission: validated.transmission,
+        hasAC: validated.hasAC,
         dailyRate: Math.round(validated.dailyRate * 100),
         sortOrder: validated.sortOrder,
         isActive: validated.isActive,
@@ -54,6 +59,10 @@ export async function updateCategoryAction(categoryId: string, formData: any, lo
       data: {
         name: validated.name,
         description: validated.description || null,
+        imageUrl: validated.imageUrl || null,
+        seats: validated.seats,
+        transmission: validated.transmission,
+        hasAC: validated.hasAC,
         dailyRate: Math.round(validated.dailyRate * 100),
         sortOrder: validated.sortOrder,
         isActive: validated.isActive,
@@ -89,5 +98,29 @@ export async function archiveCategoryAction(categoryId: string, locale: string) 
     return { success: true, category: updated };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to archive category" };
+  }
+}
+
+export async function uploadCategoryImageAction(formData: FormData) {
+  try {
+    const auth = await assertAdmin();
+    if (!auth.ok) return { success: false, error: auth.error };
+
+    const file = formData.get("image") as File | null;
+    if (!file || file.size === 0) {
+      return { success: false, error: "No file provided" };
+    }
+    if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+      return { success: false, error: "Only JPG and PNG files are allowed" };
+    }
+
+    const upload = await uploadFile(file, "categories");
+    if (!upload.success || !upload.url) {
+      return { success: false, error: upload.error || "Failed to upload image" };
+    }
+
+    return { success: true, imageUrl: upload.url };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to upload image" };
   }
 }

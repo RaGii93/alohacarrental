@@ -33,6 +33,10 @@ export const vehicleFormSchema = z.object({
 export const categoryFormSchema = z.object({
   name: z.string().min(2, "Category name must be at least 2 characters"),
   description: z.string().optional(),
+  imageUrl: z.string().optional(),
+  seats: z.number().int().min(2, "Seats must be at least 2").max(12, "Seats must be 12 or less"),
+  transmission: z.enum(["AUTOMATIC", "MANUAL"]),
+  hasAC: z.boolean(),
   dailyRate: z.number().min(1, "Daily rate must be greater than 0"),
   sortOrder: z.number().int().min(0),
   isActive: z.boolean(),

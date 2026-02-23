@@ -34,6 +34,9 @@ model Vehicle {
   imageUrl      String?
   categoryId    String
   category      VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  seats         Int       @default(5)
+  transmission  TransmissionType @default(AUTOMATIC)
+  hasAC         Boolean   @default(true)
   dailyRate     Int       // stored in cents
   status        VehicleStatus @default(ACTIVE)
   notes         String?
@@ -61,10 +64,19 @@ enum VehicleStatus {
   INACTIVE
 }
 
+enum TransmissionType {
+  AUTOMATIC
+  MANUAL
+}
+
 model VehicleCategory {
   id          String    @id @default(cuid())
   name        String    @unique
   description String?
+  imageUrl    String?
+  seats       Int       @default(5)
+  transmission TransmissionType @default(AUTOMATIC)
+  hasAC       Boolean   @default(true)
   dailyRate   Int       // stored in cents
   isActive    Boolean   @default(true)
   sortOrder   Int       @default(0)

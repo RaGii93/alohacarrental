@@ -44,11 +44,15 @@ export default async function BookingPage({
 
   let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
-    extras = await (db as any).extra.findMany({
-      where: { isActive: true },
-      select: { id: true, name: true, pricingType: true, amount: true, description: true },
-      orderBy: { name: "asc" },
-    });
+    try {
+      extras = await (db as any).extra.findMany({
+        where: { isActive: true },
+        select: { id: true, name: true, pricingType: true, amount: true, description: true },
+        orderBy: { name: "asc" },
+      });
+    } catch {
+      extras = [];
+    }
   } else {
     try {
       extras = await db.$queryRaw<Array<any>>`
@@ -61,6 +65,19 @@ export default async function BookingPage({
       extras = [];
     }
   }
+  const categories = await db.vehicleCategory.findMany({
+    where: { isActive: true },
+    select: {
+      id: true,
+      name: true,
+      imageUrl: true,
+      dailyRate: true,
+      seats: true,
+      transmission: true,
+      hasAC: true,
+    },
+    orderBy: { sortOrder: "asc" },
+  });
 
   return (
     <>
@@ -77,7 +94,7 @@ export default async function BookingPage({
             <Button variant="outline">{t("booking.reviewLookup.cta")}</Button>
           </Link>
         </div>
-        <BookingWizard locale={locale} locations={locations} extras={extras} />
+        <BookingWizard locale={locale} locations={locations} extras={extras} categories={categories as any} />
       </div>
     </>
   );

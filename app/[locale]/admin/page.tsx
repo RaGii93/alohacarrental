@@ -202,7 +202,11 @@ export default async function AdminDashboardPage({
   const categoryNameMap = new Map(categories.map((category) => [category.id, category.name]));
   let extras: Array<any> = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
-    extras = await (db as any).extra.findMany({ orderBy: { createdAt: "desc" } });
+    try {
+      extras = await (db as any).extra.findMany({ orderBy: { createdAt: "desc" } });
+    } catch {
+      extras = [];
+    }
   } else {
     try {
       extras = await db.$queryRaw<Array<any>>`
@@ -217,7 +221,11 @@ export default async function AdminDashboardPage({
 
   let discountCodes: Array<any> = [];
   if ((db as any).discountCode && typeof (db as any).discountCode.findMany === "function") {
-    discountCodes = await (db as any).discountCode.findMany({ orderBy: { createdAt: "desc" } });
+    try {
+      discountCodes = await (db as any).discountCode.findMany({ orderBy: { createdAt: "desc" } });
+    } catch {
+      discountCodes = [];
+    }
   } else {
     try {
       discountCodes = await db.$queryRaw<Array<any>>`
@@ -464,8 +472,18 @@ export default async function AdminDashboardPage({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categories.map((category) => (
                   <Card key={category.id} className="p-4">
+                    {category.imageUrl ? (
+                      <img
+                        src={category.imageUrl.startsWith("/") ? category.imageUrl : getBlobProxyUrl(category.imageUrl) || category.imageUrl}
+                        alt={category.name}
+                        className="mb-3 h-32 w-full rounded-md border object-cover"
+                      />
+                    ) : null}
                     <p className="font-semibold">{category.name}</p>
                     <p className="text-sm text-muted-foreground">{category.description || "-"}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {category.seats} seats • {category.transmission === "MANUAL" ? "Manual" : "Automatic"} • {category.hasAC ? "A/C" : "No A/C"}
+                    </p>
                     <p className="mt-2 text-lg font-bold">{currency(category.dailyRate)}</p>
                   </Card>
                 ))}

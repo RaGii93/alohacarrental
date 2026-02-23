@@ -6,6 +6,10 @@ import { cancelExpiredHolds } from "./booking";
 export interface AvailabilityResult {
   categoryId: string;
   categoryName: string;
+  categoryImageUrl?: string | null;
+  seats?: number;
+  transmission?: "AUTOMATIC" | "MANUAL";
+  hasAC?: boolean;
   dailyRate: number;
   availableCount: number;
   totalForRange: number;
@@ -33,7 +37,7 @@ export async function searchAvailabilityAction(
   } else {
     // raw query fallback
     categories = await db.$queryRaw<Array<any>>`\
-      SELECT id, name, description, "dailyRate", "isActive", "sortOrder", "createdAt"\
+      SELECT id, name, description, "imageUrl", seats, transmission, "hasAC", "dailyRate", "isActive", "sortOrder", "createdAt"\
       FROM "VehicleCategory"\
       WHERE "isActive" = true\
       ORDER BY "sortOrder" ASC\
@@ -127,6 +131,10 @@ export async function searchAvailabilityAction(
     results.push({
       categoryId: category.id,
       categoryName: category.name,
+      categoryImageUrl: category.imageUrl ?? null,
+      seats: category.seats ?? 5,
+      transmission: category.transmission ?? "AUTOMATIC",
+      hasAC: category.hasAC ?? true,
       dailyRate: category.dailyRate,
       availableCount,
       totalForRange,

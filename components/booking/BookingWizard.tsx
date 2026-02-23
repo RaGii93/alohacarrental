@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { isLicenseActive } from "@/lib/license";
+import { getBlobProxyUrl } from "@/lib/blob";
+import { calculateDays, formatCurrency } from "@/lib/pricing";
 import { Step1Search } from "./Steps/Step1Search";
 import { Step2Customer } from "./Steps/Step2Customer";
 import { Step3Review } from "./Steps/Step3Review";
@@ -37,10 +39,20 @@ export function BookingWizard({
   locale,
   locations,
   extras,
+  categories,
 }: {
   locale: string;
   locations: { id: string; name: string; code?: string | null; address?: string | null }[];
   extras: { id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }[];
+  categories: Array<{
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+    dailyRate: number;
+    seats: number;
+    transmission: "AUTOMATIC" | "MANUAL";
+    hasAC: boolean;
+  }>;
 }) {
   const t = useTranslations();
   const [currentStep, setCurrentStep] = useState(1);
@@ -70,6 +82,28 @@ export function BookingWizard({
   const updateBookingData = (updates: Partial<BookingData>) => {
     setBookingData(prev => ({ ...prev, ...updates }));
   };
+  const mergeDateAndTime = (date: Date | null, time: string): Date | null => {
+    if (!date) return null;
+    const [hours, minutes] = time.split(":").map((v) => Number(v));
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+    const next = new Date(date);
+    next.setHours(hours, minutes, 0, 0);
+    return next;
+  };
+  const selectedCategory = categories.find((c) => c.id === bookingData.categoryId) || null;
+  const pickupDateTime = mergeDateAndTime(bookingData.startDate, bookingData.pickupTime);
+  const dropoffDateTime = mergeDateAndTime(bookingData.endDate, bookingData.dropoffTime);
+  const days =
+    pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime
+      ? calculateDays(pickupDateTime, dropoffDateTime)
+      : 1;
+  const baseAmount = selectedCategory ? selectedCategory.dailyRate * days : 0;
+  const extrasAmount = bookingData.selectedExtras.reduce((sum, item) => {
+    const extra = extras.find((row) => row.id === item.extraId);
+    if (!extra) return sum;
+    return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
+  }, 0);
+  const totalAmount = baseAmount + extrasAmount;
 
   const nextStep = () => setCurrentStep(prev => prev + 1);
   const prevStep = () => setCurrentStep(prev => prev - 1);
@@ -94,7 +128,7 @@ export function BookingWizard({
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       {!licenseActive && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
@@ -102,56 +136,83 @@ export function BookingWizard({
         </Alert>
       )}
 
-      <Card className="p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">{t("booking.title")}</h1>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <Card className="p-6">
+          <h1 className="text-2xl font-bold text-center mb-6">{t("booking.title")}</h1>
 
-        {renderStepIndicator()}
+          {renderStepIndicator()}
 
-        {currentStep === 1 && (
-          <Step1Search
-            bookingData={bookingData}
-            updateBookingData={updateBookingData}
-            onNext={nextStep}
-            disabled={!licenseActive}
-            setAvailability={setAvailability}
-            availability={availability}
-            locations={locations}
-          />
-        )}
+          {currentStep === 1 && (
+            <Step1Search
+              bookingData={bookingData}
+              updateBookingData={updateBookingData}
+              onNext={nextStep}
+              disabled={!licenseActive}
+              setAvailability={setAvailability}
+              availability={availability}
+              locations={locations}
+            />
+          )}
 
-        {currentStep === 2 && (
-          <Step2Customer
-            bookingData={bookingData}
-            updateBookingData={updateBookingData}
-            onNext={nextStep}
-            onPrev={prevStep}
-            disabled={!licenseActive}
-          />
-        )}
+          {currentStep === 2 && (
+            <Step2Customer
+              bookingData={bookingData}
+              updateBookingData={updateBookingData}
+              onNext={nextStep}
+              onPrev={prevStep}
+              disabled={!licenseActive}
+            />
+          )}
 
-        {currentStep === 3 && (
-          <Step3Review
-            bookingData={bookingData}
-            updateBookingData={updateBookingData}
-            locations={locations}
-            extras={extras}
-            locale={locale}
-            onPrev={prevStep}
-            disabled={!licenseActive}
-            availability={availability}
-          />
-        )}
+          {currentStep === 3 && (
+            <Step3Review
+              bookingData={bookingData}
+              updateBookingData={updateBookingData}
+              locations={locations}
+              extras={extras}
+              locale={locale}
+              onPrev={prevStep}
+              disabled={!licenseActive}
+              availability={availability}
+            />
+          )}
 
-        {currentStep === 4 && (
-          <div className="text-center py-8">
-            <h2 className="text-xl font-semibold mb-4">{t("booking.bookingRequestReceived")}</h2>
-            <p className="text-muted-foreground mb-6">{t("booking.nextSteps")}</p>
-            <Button onClick={() => window.location.href = `/${locale}`}>
-              {t("nav.home")}
-            </Button>
+          {currentStep === 4 && (
+            <div className="text-center py-8">
+              <h2 className="text-xl font-semibold mb-4">{t("booking.bookingRequestReceived")}</h2>
+              <p className="text-muted-foreground mb-6">{t("booking.nextSteps")}</p>
+              <Button onClick={() => window.location.href = `/${locale}`}>
+                {t("nav.home")}
+              </Button>
+            </div>
+          )}
+        </Card>
+
+        <Card className="h-fit p-4 lg:sticky lg:top-20">
+          <h3 className="mb-3 text-lg font-semibold">{t("booking.summary")}</h3>
+          {selectedCategory?.imageUrl ? (
+            <img
+              src={selectedCategory.imageUrl.startsWith("/") ? selectedCategory.imageUrl : getBlobProxyUrl(selectedCategory.imageUrl) || selectedCategory.imageUrl}
+              alt={selectedCategory.name}
+              className="mb-3 h-40 w-full rounded-md border object-cover"
+            />
+          ) : (
+            <div className="mb-3 flex h-40 items-center justify-center rounded-md border text-sm text-muted-foreground">
+              {t("booking.selectCategory")}
+            </div>
+          )}
+          <div className="space-y-2 text-sm">
+            <p className="font-medium">{selectedCategory?.name || "-"}</p>
+            <p className="text-muted-foreground">
+              {selectedCategory ? `${selectedCategory.seats} seats • ${selectedCategory.transmission === "MANUAL" ? "Manual" : "Automatic"} • ${selectedCategory.hasAC ? "A/C" : "No A/C"}` : "-"}
+            </p>
+            <div className="flex justify-between"><span>{t("booking.pricePerDay")}</span><span>{selectedCategory ? formatCurrency(selectedCategory.dailyRate) : "-"}</span></div>
+            <div className="flex justify-between"><span>{t("booking.days")}</span><span>{days}</span></div>
+            <div className="flex justify-between"><span>Extras</span><span>{formatCurrency(extrasAmount)}</span></div>
+            <div className="mt-2 border-t pt-2 flex justify-between font-semibold"><span>{t("booking.total")}</span><span>{formatCurrency(totalAmount)}</span></div>
           </div>
-        )}
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

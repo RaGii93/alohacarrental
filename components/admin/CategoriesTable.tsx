@@ -10,11 +10,16 @@ import { Badge } from "@/components/ui/badge";
 import { CategoryDialog } from "./CategoryDialog";
 import { archiveCategoryAction } from "@/actions/categories";
 import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
+import { getBlobProxyUrl } from "@/lib/blob";
 
 type Category = {
   id: string;
   name: string;
   description?: string | null;
+  imageUrl?: string | null;
+  seats?: number;
+  transmission?: "AUTOMATIC" | "MANUAL";
+  hasAC?: boolean;
   dailyRate: number;
   sortOrder: number;
   isActive: boolean;
@@ -116,7 +121,9 @@ export function CategoriesTable({
           <TableHeader>
             <TableRow>
               <TableHead><button type="button" onClick={() => toggleSort("name")}>Name{sortIndicator("name")}</button></TableHead>
+              <TableHead>Image</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Features</TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("dailyRate")}>Daily Rate{sortIndicator("dailyRate")}</button></TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("vehicles")}>Vehicles{sortIndicator("vehicles")}</button></TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("bookings")}>Bookings{sortIndicator("bookings")}</button></TableHead>
@@ -128,7 +135,21 @@ export function CategoriesTable({
             {pageRows.map((category) => (
               <TableRow key={category.id}>
                 <TableCell className="font-medium">{category.name}</TableCell>
+                <TableCell>
+                  {category.imageUrl ? (
+                    <img
+                      src={category.imageUrl.startsWith("/") ? category.imageUrl : getBlobProxyUrl(category.imageUrl) || category.imageUrl}
+                      alt={category.name}
+                      className="h-10 w-16 rounded border object-cover"
+                    />
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
                 <TableCell>{category.description || "-"}</TableCell>
+                <TableCell>
+                  {(category.seats ?? 5)} seats • {category.transmission === "MANUAL" ? "Manual" : "Automatic"} • {category.hasAC === false ? "No A/C" : "A/C"}
+                </TableCell>
                 <TableCell>${(category.dailyRate / 100).toFixed(2)}</TableCell>
                 <TableCell>{category._count?.vehicles ?? 0}</TableCell>
                 <TableCell>{category._count?.bookings ?? 0}</TableCell>

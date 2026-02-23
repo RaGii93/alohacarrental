@@ -12,6 +12,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { searchAvailabilityAction, AvailabilityResult } from "@/actions/availability";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
+import { getBlobProxyUrl } from "@/lib/blob";
 import { BookingData } from "../BookingWizard";
 
 interface Step1SearchProps {
@@ -195,6 +196,13 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
                   )}
                   onClick={() => isAvailable && handleCategorySelect(cat.categoryId)}
                 >
+                  {cat.categoryImageUrl ? (
+                    <img
+                      src={cat.categoryImageUrl.startsWith("/") ? cat.categoryImageUrl : getBlobProxyUrl(cat.categoryImageUrl) || cat.categoryImageUrl}
+                      alt={cat.categoryName}
+                      className="h-32 w-full rounded-t-lg object-cover"
+                    />
+                  ) : null}
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">{cat.categoryName}</CardTitle>
                     <CardDescription>
@@ -213,6 +221,9 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
                         <span className="text-sm text-muted-foreground">{t("booking.total")}:</span>
                         <span className="font-semibold">{formatCurrency(cat.totalForRange)}</span>
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        {(cat.seats ?? 5)} seats • {cat.transmission === "MANUAL" ? "Manual" : "Automatic"} • {cat.hasAC === false ? "No A/C" : "A/C"}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

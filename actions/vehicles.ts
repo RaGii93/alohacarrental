@@ -19,16 +19,31 @@ export async function createVehicleAction(formData: any, locale: string) {
 
     const validated = vehicleFormSchema.parse(formData);
 
-    const vehicle = await db.vehicle.create({
-      data: {
-        name: validated.name,
-        plateNumber: validated.plateNumber,
-        categoryId: validated.categoryId,
-        dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
-        status: validated.status,
-        notes: validated.notes,
-      },
-    });
+    let vehicle: any;
+    try {
+      vehicle = await db.vehicle.create({
+        data: {
+          name: validated.name,
+          plateNumber: validated.plateNumber,
+          categoryId: validated.categoryId,
+          dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
+          status: validated.status,
+          notes: validated.notes,
+        } as any,
+      });
+    } catch (e: any) {
+      const message = String(e?.message || "");
+      if (!message.includes("Unknown argument `categoryId`")) throw e;
+      const category = await db.vehicleCategory.findUnique({ where: { id: validated.categoryId }, select: { name: true } });
+      if (!category) return { success: false, error: "Invalid category" };
+      const generatedId = crypto.randomUUID().replaceAll("-", "");
+      const rows = await db.$queryRaw<Array<any>>`
+        INSERT INTO "Vehicle" (id, name, "plateNumber", category, "dailyRate", status, notes)
+        VALUES (${generatedId}, ${validated.name}, ${validated.plateNumber || null}, ${category.name}, ${Math.round(validated.dailyRate * 100)}, ${validated.status}::"VehicleStatus", ${validated.notes || null})
+        RETURNING *
+      `;
+      vehicle = rows[0];
+    }
 
     // Create audit log
     await db.auditLog.create({
@@ -73,17 +88,40 @@ export async function updateVehicleAction(
       return { success: false, error: "ON_RENT_VEHICLE_LOCKED" };
     }
 
-    const vehicle = await db.vehicle.update({
-      where: { id: vehicleId },
-      data: {
-        name: validated.name,
-        plateNumber: validated.plateNumber,
-        categoryId: validated.categoryId,
-        dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
-        status: validated.status,
-        notes: validated.notes,
-      },
-    });
+    let vehicle: any;
+    try {
+      vehicle = await db.vehicle.update({
+        where: { id: vehicleId },
+        data: {
+          name: validated.name,
+          plateNumber: validated.plateNumber,
+          categoryId: validated.categoryId,
+          dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
+          status: validated.status,
+          notes: validated.notes,
+        } as any,
+      });
+    } catch (e: any) {
+      const message = String(e?.message || "");
+      if (!message.includes("Unknown argument `categoryId`")) throw e;
+      const category = await db.vehicleCategory.findUnique({ where: { id: validated.categoryId }, select: { name: true } });
+      if (!category) return { success: false, error: "Invalid category" };
+      await db.$executeRaw`
+        UPDATE "Vehicle"
+        SET
+          name = ${validated.name},
+          "plateNumber" = ${validated.plateNumber || null},
+          category = ${category.name},
+          "dailyRate" = ${Math.round(validated.dailyRate * 100)},
+          status = ${validated.status}::"VehicleStatus",
+          notes = ${validated.notes || null}
+        WHERE id = ${vehicleId}
+      `;
+      const rows = await db.$queryRaw<Array<any>>`
+        SELECT * FROM "Vehicle" WHERE id = ${vehicleId} LIMIT 1
+      `;
+      vehicle = rows[0];
+    }
 
     // Create audit log
     await db.auditLog.create({
