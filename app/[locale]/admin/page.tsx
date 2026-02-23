@@ -16,6 +16,7 @@ import { logoutAction } from "@/actions/auth";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { formatDateTime } from "@/lib/datetime";
 import { FinancialFilters } from "@/components/admin/FinancialFilters";
+import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
 
 export default async function AdminDashboardPage({
   params,
@@ -388,7 +389,12 @@ export default async function AdminDashboardPage({
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <a href={getBlobProxyUrl(inv.invoiceUrl, { download: true }) || undefined} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View PDF</a>
-                    <a href={`mailto:${inv.customerEmail}?subject=${encodeURIComponent(`Billing Document ${inv.bookingCode}`)}&body=${encodeURIComponent(`Hello ${inv.customerName},\n\nYour billing document is attached/available at:\n${getBlobProxyUrl(inv.invoiceUrl, { download: true }) || inv.invoiceUrl}\n\nThank you.`)}`} className="text-blue-600 hover:underline">Email client</a>
+                    <SendBillingEmailButton
+                      bookingId={inv.id}
+                      locale={locale}
+                      label="Send by Email"
+                      className="h-auto p-0 text-blue-600 hover:text-blue-700 hover:underline"
+                    />
                   </div>
                 </div>
               ))}

@@ -9,6 +9,7 @@ import { categoryBookingFormSchemaRefined } from "@/lib/validators";
 import { bookingEmailHtml, sendEmail } from "@/lib/email";
 import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
+import { getBlobProxyUrl } from "@/lib/blob";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
@@ -322,6 +323,56 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
     return { success: true, booking: updated };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to send invoice" };
+  }
+}
+
+export async function sendBillingDocumentEmailAction(bookingId: string, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+
+    const booking = await db.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        bookingCode: true,
+        customerName: true,
+        customerEmail: true,
+        startDate: true,
+        endDate: true,
+        totalAmount: true,
+        invoiceUrl: true,
+      },
+    });
+
+    if (!booking) return { success: false, error: "Booking not found" };
+    if (!booking.invoiceUrl) return { success: false, error: "No billing document available" };
+
+    const billingDocumentUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true }) || booking.invoiceUrl;
+
+    const mailResult = await sendEmail({
+      to: booking.customerEmail,
+      subject: `Billing Document - ${booking.bookingCode}`,
+      html: bookingEmailHtml({
+        title: "Your billing document is ready",
+        customerName: booking.customerName,
+        bookingCode: booking.bookingCode,
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        totalAmountCents: booking.totalAmount,
+        invoiceUrl: billingDocumentUrl,
+        documentLabel: "Billing document",
+      }),
+    });
+
+    if (!mailResult.success) {
+      return { success: false, error: mailResult.error || "Failed to send billing document email" };
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to send billing document email" };
   }
 }
 

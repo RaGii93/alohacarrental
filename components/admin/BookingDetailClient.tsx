@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
+import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { formatDate, formatDateTime } from "@/lib/datetime";
 import {
@@ -351,12 +352,12 @@ export function BookingDetailClient({
               >
                 📄 Billing Document
               </a>
-              <a
-                href={`mailto:${booking.customerEmail}?subject=${encodeURIComponent(`Billing Document ${booking.bookingCode}`)}&body=${encodeURIComponent(`Hello ${booking.customerName},\n\nYour billing document is ready.\n\nDownload: ${invoiceDownloadUrl || booking.invoiceUrl}\n\nThank you.`)}`}
-                className="text-blue-600 hover:underline"
-              >
-                Send by Email
-              </a>
+              <SendBillingEmailButton
+                bookingId={booking.id}
+                locale={locale}
+                label="Send by Email"
+                className="h-auto p-0 text-blue-600 hover:text-blue-700 hover:underline"
+              />
             </div>
           )}
         </div>
