@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -16,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { VehicleDialog } from "./VehicleDialog";
 import { deleteVehicleAction, setVehicleStatusAction } from "@/actions/vehicles";
+import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
 
 interface Vehicle {
   id: string;
@@ -48,6 +50,58 @@ export function VehiclesTable({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Partial<Vehicle> | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [sortKey, setSortKey] = useState<"name" | "plateNumber" | "category" | "dailyRate" | "status">("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  const toggleSort = (key: typeof sortKey) => {
+    if (sortKey === key) {
+      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+      return;
+    }
+    setSortKey(key);
+    setSortDir("asc");
+  };
+
+  const sortIndicator = (key: typeof sortKey) => (sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "");
+
+  const sorted = useMemo(() => {
+    const rows = [...vehicles];
+    rows.sort((a, b) => {
+      const categoryA = typeof a.category === "string" ? a.category : a.category?.name || "";
+      const categoryB = typeof b.category === "string" ? b.category : b.category?.name || "";
+      const valA =
+        sortKey === "name"
+          ? (a.name || "").toLowerCase()
+          : sortKey === "plateNumber"
+            ? (a.plateNumber || "").toLowerCase()
+            : sortKey === "category"
+              ? categoryA.toLowerCase()
+              : sortKey === "dailyRate"
+                ? a.dailyRate
+                : (a.status || "").toLowerCase();
+      const valB =
+        sortKey === "name"
+          ? (b.name || "").toLowerCase()
+          : sortKey === "plateNumber"
+            ? (b.plateNumber || "").toLowerCase()
+            : sortKey === "category"
+              ? categoryB.toLowerCase()
+              : sortKey === "dailyRate"
+                ? b.dailyRate
+                : (b.status || "").toLowerCase();
+      if (valA < valB) return sortDir === "asc" ? -1 : 1;
+      if (valA > valB) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+    return rows;
+  }, [vehicles, sortKey, sortDir]);
+
+  const total = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -111,19 +165,29 @@ export function VehiclesTable({
       />
 
       <div className="overflow-x-auto">
+        <TablePaginationControls
+          page={currentPage}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+        />
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("admin.vehicles.table.name")}</TableHead>
-              <TableHead>{t("admin.vehicles.table.plate")}</TableHead>
-              <TableHead>{t("admin.vehicles.table.category")}</TableHead>
-              <TableHead>{t("admin.vehicles.table.rate")}</TableHead>
-              <TableHead>{t("admin.vehicles.table.status")}</TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("name")}>{t("admin.vehicles.table.name")}{sortIndicator("name")}</button></TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("plateNumber")}>{t("admin.vehicles.table.plate")}{sortIndicator("plateNumber")}</button></TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("category")}>{t("admin.vehicles.table.category")}{sortIndicator("category")}</button></TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("dailyRate")}>{t("admin.vehicles.table.rate")}{sortIndicator("dailyRate")}</button></TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("status")}>{t("admin.vehicles.table.status")}{sortIndicator("status")}</button></TableHead>
               <TableHead>{t("admin.vehicles.table.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicles.map((vehicle) => (
+            {pageRows.map((vehicle) => (
               <TableRow key={vehicle.id}>
                 <TableCell className="font-medium">{vehicle.name}</TableCell>
                 <TableCell>{vehicle.plateNumber || "-"}</TableCell>

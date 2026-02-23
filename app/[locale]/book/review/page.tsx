@@ -1,9 +1,33 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
+import { buildMetadata } from "@/lib/seo";
+import { getTenantConfig } from "@/lib/tenant";
+import { formatDateTime } from "@/lib/datetime";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const tenant = getTenantConfig();
+  const titleMap: Record<string, string> = {
+    en: `Review Your Booking | ${tenant.tenantName}`,
+    nl: `Bekijk Je Reservering | ${tenant.tenantName}`,
+    es: `Revisa Tu Reserva | ${tenant.tenantName}`,
+  };
+  return buildMetadata({
+    locale,
+    path: "/book/review",
+    title: titleMap[locale] || titleMap.en,
+    noIndex: true,
+  });
+}
 
 export default async function BookingReviewPage({
   params,
@@ -94,11 +118,11 @@ export default async function BookingReviewPage({
             </div>
             <div className="flex justify-between gap-6">
               <dt className="text-muted-foreground">{t("booking.startDate")}</dt>
-              <dd className="font-medium">{new Date(booking.startDate).toLocaleString()}</dd>
+              <dd className="font-medium">{formatDateTime(booking.startDate)}</dd>
             </div>
             <div className="flex justify-between gap-6">
               <dt className="text-muted-foreground">{t("booking.endDate")}</dt>
-              <dd className="font-medium">{new Date(booking.endDate).toLocaleString()}</dd>
+              <dd className="font-medium">{formatDateTime(booking.endDate)}</dd>
             </div>
             <div className="flex justify-between gap-6">
               <dt className="text-muted-foreground">{t("booking.pickupLocation")}</dt>

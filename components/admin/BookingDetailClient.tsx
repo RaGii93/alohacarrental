@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
 import { getBlobProxyUrl } from "@/lib/blob";
+import { formatDate, formatDateTime } from "@/lib/datetime";
 import {
   confirmBookingAction,
   declineBookingAction,
@@ -181,7 +182,7 @@ export function BookingDetailClient({
             </div>
             <div>
               <dt className="text-gray-600">Birth Date</dt>
-              <dd className="font-medium">{booking.birthDate ? new Date(booking.birthDate).toLocaleDateString() : "-"}</dd>
+              <dd className="font-medium">{booking.birthDate ? formatDate(booking.birthDate) : "-"}</dd>
             </div>
           </dl>
         </div>
@@ -196,13 +197,13 @@ export function BookingDetailClient({
             <div>
               <dt className="text-gray-600">Pickup Date & Time</dt>
               <dd className="font-medium">
-                {new Date(booking.startDate).toLocaleString()}
+                {formatDateTime(booking.startDate)}
               </dd>
             </div>
             <div>
               <dt className="text-gray-600">Dropoff Date & Time</dt>
               <dd className="font-medium">
-                {new Date(booking.endDate).toLocaleString()}
+                {formatDateTime(booking.endDate)}
               </dd>
             </div>
             <div>
@@ -235,7 +236,7 @@ export function BookingDetailClient({
             </div>
             <div>
               <dt className="text-gray-600">License Expiry Date</dt>
-              <dd className="font-medium">{booking.licenseExpiryDate ? new Date(booking.licenseExpiryDate).toLocaleDateString() : "-"}</dd>
+              <dd className="font-medium">{booking.licenseExpiryDate ? formatDate(booking.licenseExpiryDate) : "-"}</dd>
             </div>
             <div>
               <dt className="text-gray-600">Total Amount</dt>
@@ -245,7 +246,7 @@ export function BookingDetailClient({
             </div>
             <div>
               <dt className="text-gray-600">Payment Received</dt>
-              <dd className="font-medium">{booking.paymentReceivedAt ? new Date(booking.paymentReceivedAt).toLocaleString() : "No"}</dd>
+              <dd className="font-medium">{booking.paymentReceivedAt ? formatDateTime(booking.paymentReceivedAt) : "No"}</dd>
             </div>
           </dl>
         </div>

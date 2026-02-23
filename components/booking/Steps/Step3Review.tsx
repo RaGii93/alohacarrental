@@ -14,6 +14,7 @@ import { createCategoryBookingAction } from "@/actions/booking";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
 import { getTermsPdfUrl } from "@/lib/terms";
 import { BookingData } from "../BookingWizard";
+import { formatDate, formatDateTime } from "@/lib/datetime";
 
 interface Step3ReviewProps {
   bookingData: BookingData;
@@ -122,11 +123,11 @@ export function Step3Review({ bookingData, updateBookingData, locations, extras,
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h4 className="font-medium mb-2">{t("booking.startDate")}</h4>
-                <p>{pickupDateTime?.toLocaleString()}</p>
+                <p>{pickupDateTime ? formatDateTime(pickupDateTime) : "-"}</p>
               </div>
               <div>
                 <h4 className="font-medium mb-2">{t("booking.endDate")}</h4>
-                <p>{dropoffDateTime?.toLocaleString()}</p>
+                <p>{dropoffDateTime ? formatDateTime(dropoffDateTime) : "-"}</p>
               </div>
             </div>
 
@@ -165,9 +166,9 @@ export function Step3Review({ bookingData, updateBookingData, locations, extras,
           <p><strong>{t("booking.customerName")}:</strong> {bookingData.customerName}</p>
           <p><strong>{t("booking.customerEmail")}:</strong> {bookingData.customerEmail}</p>
           <p><strong>{t("booking.customerPhone")}:</strong> {bookingData.customerPhone}</p>
-          <p><strong>{t("booking.birthDate")}:</strong> {bookingData.birthDate?.toLocaleDateString()}</p>
+          <p><strong>{t("booking.birthDate")}:</strong> {bookingData.birthDate ? formatDate(bookingData.birthDate) : "-"}</p>
           <p><strong>{t("booking.driverLicenseNumber")}:</strong> {bookingData.driverLicenseNumber}</p>
-          <p><strong>{t("booking.licenseExpiryDate")}:</strong> {bookingData.licenseExpiryDate?.toLocaleDateString()}</p>
+          <p><strong>{t("booking.licenseExpiryDate")}:</strong> {bookingData.licenseExpiryDate ? formatDate(bookingData.licenseExpiryDate) : "-"}</p>
           <p><strong>{t("booking.driverLicense")}:</strong> ✓ {t("common.success").toLowerCase()}</p>
         </CardContent>
       </Card>

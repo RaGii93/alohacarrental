@@ -10,6 +10,8 @@ import { bookingEmailHtml, sendEmail } from "@/lib/email";
 import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 
+type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
+
 async function loadBookingAdjustments(bookingId: string) {
   let extras: Array<{ id: string; quantity: number; lineTotal: number; extraName: string }> = [];
   let discount: { id: string; percentage: number; amount: number; code: string } | null = null;
@@ -86,6 +88,7 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
     });
 
     try {
+      const rentalAgreement = await buildAndUploadBookingDocument(bookingId, "RENTAL_AGREEMENT");
       await sendEmail({
         to: booking.customerEmail,
         subject: `Booking Confirmed - ${booking.bookingCode}`,
@@ -97,6 +100,16 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
           endDate: booking.endDate,
           totalAmountCents: booking.totalAmount,
         }),
+        attachments:
+          rentalAgreement.success && rentalAgreement.pdfBuffer
+            ? [
+                {
+                  filename: rentalAgreement.filename,
+                  content: rentalAgreement.pdfBuffer,
+                  contentType: "application/pdf",
+                },
+              ]
+            : undefined,
       });
     } catch {}
 
@@ -169,7 +182,10 @@ export async function addBookingNoteAction(
   }
 }
 
-async function buildAndUploadInvoiceDocument(bookingId: string) {
+async function buildAndUploadBookingDocument(
+  bookingId: string,
+  documentType: BookingDocumentType
+) {
   const booking = await db.booking.findUnique({
     where: { id: bookingId },
     include: {
@@ -197,6 +213,7 @@ async function buildAndUploadInvoiceDocument(bookingId: string) {
   const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
 
   const invoiceBuffer = await generateInvoicePDF({
+    documentType,
     orderId: booking.id,
     bookingCode: booking.bookingCode,
     customerName: booking.customerName,
@@ -223,20 +240,33 @@ async function buildAndUploadInvoiceDocument(bookingId: string) {
   });
   const signature = invoiceBuffer.subarray(0, 4).toString("utf8");
   if (signature !== "%PDF" || invoiceBuffer.length < 500) {
-    return { success: false as const, error: "Generated invoice PDF is invalid or empty" };
+    return { success: false as const, error: "Generated PDF is invalid or empty" };
   }
 
+  const uploadFolder =
+    documentType === "RENTAL_AGREEMENT"
+      ? "rental-agreements"
+      : documentType === "SALES_RECEIPT"
+        ? "sales-receipts"
+        : "invoices";
+  const filenamePrefix =
+    documentType === "RENTAL_AGREEMENT"
+      ? "rental-agreement"
+      : documentType === "SALES_RECEIPT"
+        ? "sales-receipt"
+        : "invoice";
+  const filename = `${filenamePrefix}-${booking.bookingCode}.pdf`;
   const uploadResult = await uploadBuffer(
     invoiceBuffer,
-    "invoices",
-    `invoice-${booking.bookingCode}.pdf`,
+    uploadFolder,
+    filename,
     "application/pdf"
   );
   if (!uploadResult.success || !uploadResult.url) {
-    return { success: false as const, error: uploadResult.error || "Failed to upload invoice" };
+    return { success: false as const, error: uploadResult.error || "Failed to upload document" };
   }
 
-  return { success: true as const, booking, invoiceUrl: uploadResult.url };
+  return { success: true as const, booking, invoiceUrl: uploadResult.url, pdfBuffer: invoiceBuffer, filename };
 }
 
 export async function sendInvoiceEstimateAction(bookingId: string, locale: string) {
@@ -245,7 +275,7 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
 
-    const generated = await buildAndUploadInvoiceDocument(bookingId);
+    const generated = await buildAndUploadBookingDocument(bookingId, "INVOICE");
     if (!generated.success) return { success: false, error: generated.error };
 
     const updated = await db.$transaction(async (tx) => {
@@ -279,6 +309,13 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
           invoiceUrl: generated.invoiceUrl,
           documentLabel: "Invoice",
         }),
+        attachments: [
+          {
+            filename: generated.filename,
+            content: generated.pdfBuffer,
+            contentType: "application/pdf",
+          },
+        ],
       });
     } catch {}
 
@@ -294,7 +331,7 @@ export async function createSalesReceiptAction(bookingId: string, locale: string
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
 
-    const generated = await buildAndUploadInvoiceDocument(bookingId);
+    const generated = await buildAndUploadBookingDocument(bookingId, "SALES_RECEIPT");
     if (!generated.success) return { success: false, error: generated.error };
 
     const updated = await db.$transaction(async (tx) => {
@@ -348,6 +385,13 @@ export async function createSalesReceiptAction(bookingId: string, locale: string
           invoiceUrl: generated.invoiceUrl,
           documentLabel: "Sales receipt",
         }),
+        attachments: [
+          {
+            filename: generated.filename,
+            content: generated.pdfBuffer,
+            contentType: "application/pdf",
+          },
+        ],
       });
     } catch {}
 

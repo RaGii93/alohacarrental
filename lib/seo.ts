@@ -1,0 +1,88 @@
+import type { Metadata } from "next";
+import { routing } from "@/i18n/routing";
+import { getTenantConfig } from "@/lib/tenant";
+
+function defaultDescriptionByLocale(locale: string, tenantName: string): string {
+  if (locale === "nl") return `Reserveer huurauto's snel en veilig met ${tenantName}.`;
+  if (locale === "es") return `Reserva vehículos de alquiler de forma rápida y segura con ${tenantName}.`;
+  return `Book rental vehicles quickly and securely with ${tenantName}.`;
+}
+
+export function getBaseUrl(): string {
+  const envUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const host = envUrl ? (envUrl.startsWith("http") ? envUrl : `https://${envUrl}`) : "http://localhost:3000";
+  return host.replace(/\/+$/, "");
+}
+
+export function toLocalePath(locale: string, path: string): string {
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const normalizedPath = cleanPath === "/" ? "" : cleanPath;
+  return locale === routing.defaultLocale ? normalizedPath || "/" : `/${locale}${normalizedPath}`;
+}
+
+function languageAlternates(path: string): Record<string, string> {
+  return Object.fromEntries(
+    routing.locales.map((locale) => [locale, toLocalePath(locale, path)])
+  );
+}
+
+export function buildMetadata(input: {
+  locale: string;
+  path: string;
+  title: string;
+  description?: string;
+  noIndex?: boolean;
+}): Metadata {
+  const tenant = getTenantConfig();
+  const siteName = tenant.tenantName || "EdgeRent Lite";
+  const description =
+    input.description ||
+    defaultDescriptionByLocale(input.locale, siteName);
+  const canonical = toLocalePath(input.locale, input.path);
+  const absoluteUrl = `${getBaseUrl()}${canonical === "/" ? "" : canonical}`;
+  const logoUrl = tenant.logoUrl?.startsWith("http")
+    ? tenant.logoUrl
+    : `${getBaseUrl()}${tenant.logoUrl || "/logo.svg"}`;
+
+  return {
+    metadataBase: new URL(getBaseUrl()),
+    title: input.title,
+    description,
+    alternates: {
+      canonical,
+      languages: languageAlternates(input.path),
+    },
+    openGraph: {
+      title: input.title,
+      description,
+      url: absoluteUrl,
+      siteName,
+      type: "website",
+      locale: input.locale,
+      images: [{ url: logoUrl }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: input.title,
+      description,
+      images: [logoUrl],
+    },
+    robots: input.noIndex
+      ? {
+          index: false,
+          follow: false,
+          nocache: true,
+          googleBot: {
+            index: false,
+            follow: false,
+          },
+        }
+      : {
+          index: true,
+          follow: true,
+        },
+  };
+}

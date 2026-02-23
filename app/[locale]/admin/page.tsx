@@ -14,13 +14,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/actions/auth";
 import { getBlobProxyUrl } from "@/lib/blob";
+import { formatDateTime } from "@/lib/datetime";
+import { FinancialFilters } from "@/components/admin/FinancialFilters";
 
 export default async function AdminDashboardPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ start?: string; end?: string; tab?: string }>;
 }) {
   const { locale } = await params;
+  const { start, end, tab } = await searchParams;
   const t = await getTranslations();
   const tOr = (key: string, values: Record<string, any>, fallback: string) =>
     t.has(key as any) ? t(key as any, values as any) : fallback;
@@ -42,6 +47,32 @@ export default async function AdminDashboardPage({
   const sevenDays = new Date(now);
   sevenDays.setDate(sevenDays.getDate() + 7);
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const parseDateInput = (value: string | undefined, endOfDay: boolean) => {
+    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const parsed = new Date(`${value}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return null;
+    if (endOfDay) parsed.setHours(23, 59, 59, 999);
+    return parsed;
+  };
+  const toInputDate = (value: Date) => {
+    const y = value.getFullYear();
+    const m = String(value.getMonth() + 1).padStart(2, "0");
+    const d = String(value.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+  let financialStartDate = parseDateInput(start, false) || monthStart;
+  let financialEndDate = parseDateInput(end, true) || now;
+  if (financialStartDate > financialEndDate) {
+    const tmp = financialStartDate;
+    financialStartDate = new Date(financialEndDate);
+    financialEndDate = new Date(tmp);
+  }
+  const financialStartInput = toInputDate(financialStartDate);
+  const financialEndInput = toInputDate(financialEndDate);
+  const inFinancialRange = (value: Date | string) => {
+    const dt = new Date(value);
+    return dt >= financialStartDate && dt <= financialEndDate;
+  };
 
   // Fetch bookings by status
   const pending = await db.booking.findMany({
@@ -82,18 +113,35 @@ export default async function AdminDashboardPage({
 
   // Financial dashboard
   const [confirmedRevenueAgg, pendingPipelineAgg, monthRevenueAgg, paidRevenueAgg] = await Promise.all([
-    db.booking.aggregate({ where: { status: "CONFIRMED" }, _sum: { totalAmount: true } }),
-    db.booking.aggregate({ where: { status: "PENDING" }, _sum: { totalAmount: true } }),
-    db.booking.aggregate({ where: { status: "CONFIRMED", createdAt: { gte: monthStart } }, _sum: { totalAmount: true } }),
-    db.booking.aggregate({ where: { invoiceUrl: { not: null } }, _sum: { totalAmount: true } }),
+    db.booking.aggregate({
+      where: { status: "CONFIRMED", createdAt: { gte: financialStartDate, lte: financialEndDate } },
+      _sum: { totalAmount: true },
+    }),
+    db.booking.aggregate({
+      where: { status: "PENDING", createdAt: { gte: financialStartDate, lte: financialEndDate } },
+      _sum: { totalAmount: true },
+    }),
+    db.booking.aggregate({
+      where: { status: "CONFIRMED", createdAt: { gte: financialStartDate, lte: financialEndDate } },
+      _sum: { totalAmount: true },
+    }),
+    db.booking.aggregate({
+      where: { invoiceUrl: { not: null }, createdAt: { gte: financialStartDate, lte: financialEndDate } },
+      _sum: { totalAmount: true },
+    }),
   ]);
-  const confirmedCount = confirmed.length;
-  const paidConfirmedCount = confirmed.filter((b) => !!(b as any).invoiceUrl).length;
+  const confirmedInRange = confirmed.filter((b) => inFinancialRange(b.createdAt));
+  const pendingInRange = pending.filter((b) => inFinancialRange(b.createdAt));
+  const confirmedCount = confirmedInRange.length;
+  const paidConfirmedCount = confirmedInRange.filter((b) => !!(b as any).invoiceUrl).length;
   const unpaidConfirmedCount = confirmedCount - paidConfirmedCount;
   const avgConfirmedValue = confirmedCount > 0 ? Math.round((confirmedRevenueAgg._sum.totalAmount ?? 0) / confirmedCount) : 0;
-  const conversionRate = pending.length + confirmed.length > 0 ? Math.round((confirmed.length / (pending.length + confirmed.length)) * 100) : 0;
+  const conversionRate =
+    pendingInRange.length + confirmedInRange.length > 0
+      ? Math.round((confirmedInRange.length / (pendingInRange.length + confirmedInRange.length)) * 100)
+      : 0;
   const recentInvoices = await db.booking.findMany({
-    where: { invoiceUrl: { not: null } },
+    where: { invoiceUrl: { not: null }, createdAt: { gte: financialStartDate, lte: financialEndDate } },
     select: {
       id: true,
       bookingCode: true,
@@ -231,7 +279,14 @@ export default async function AdminDashboardPage({
         </form>
       </div>
 
-      <Tabs defaultValue="bookings" className="w-full">
+      <Tabs
+        defaultValue={
+          tab && ["bookings", "deliveries", "returns", "financial", "fleet", "vehicles", "reviews"].includes(tab)
+            ? tab
+            : "bookings"
+        }
+        className="w-full"
+      >
         <TabsList className="flex flex-wrap h-auto">
           <TabsTrigger value="bookings">{t("admin.dashboard.tabs.bookings")}</TabsTrigger>
           <TabsTrigger value="deliveries">{t("admin.dashboard.tabs.deliveries")}</TabsTrigger>
@@ -263,16 +318,20 @@ export default async function AdminDashboardPage({
 
         <TabsContent value="deliveries" className="mt-6">
           <h2 className="text-xl font-semibold mb-4">{t("admin.dashboard.deliveries.title")}</h2>
-          <BookingsTable bookings={deliveries} locale={locale} status="CONFIRMED" />
+          <BookingsTable bookings={deliveries} locale={locale} status="CONFIRMED" dateMode="pickup" />
         </TabsContent>
 
         <TabsContent value="returns" className="mt-6">
           <h2 className="text-xl font-semibold mb-4">{t("admin.dashboard.returns.title")}</h2>
-          <BookingsTable bookings={returns} locale={locale} status="CONFIRMED" />
+          <BookingsTable bookings={returns} locale={locale} status="CONFIRMED" dateMode="dropoff" />
         </TabsContent>
 
         <TabsContent value="financial" className="mt-6">
           <h2 className="text-xl font-semibold mb-4">{t("admin.dashboard.financial.title")}</h2>
+          <FinancialFilters initialStart={financialStartInput} initialEnd={financialEndInput} />
+          <p className="mb-4 text-xs text-muted-foreground">
+            Filter range: {formatDateTime(financialStartDate)} to {formatDateTime(financialEndDate)}
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="p-4">
               <p className="text-sm text-muted-foreground">{t("admin.dashboard.financial.confirmedRevenue")}</p>
@@ -316,7 +375,7 @@ export default async function AdminDashboardPage({
                   <div>
                     <p className="text-sm font-medium">{inv.bookingCode} · {inv.customerName}</p>
                     <p className="text-xs text-muted-foreground">
-                      {currency(inv.totalAmount)} · {new Date(inv.createdAt).toLocaleString()}
+                      {currency(inv.totalAmount)} · {formatDateTime(inv.createdAt)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 text-sm">

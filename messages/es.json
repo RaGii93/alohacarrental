@@ -4,7 +4,9 @@
     "booking": "Reservar un Vehículo",
     "admin": "Panel de Administración",
     "logout": "Cerrar Sesión",
-    "login": "Iniciar Sesión"
+    "login": "Iniciar Sesión",
+    "faq": "Preguntas frecuentes",
+    "fleetOverview": "Resumen de flota"
   },
   "common": {
     "name": "EdgeRent Lite",

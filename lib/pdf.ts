@@ -2,6 +2,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 import { TenantConfig } from "./tenant";
 
 export interface InvoiceData {
+  documentType?: "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
   orderId: string;
   bookingCode: string;
   customerName: string;
@@ -24,6 +25,20 @@ export interface InvoiceData {
 }
 
 export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
+  const documentType = data.documentType || "INVOICE";
+  const documentTitle =
+    documentType === "SALES_RECEIPT"
+      ? "SALES RECEIPT"
+      : documentType === "RENTAL_AGREEMENT"
+        ? "RENTAL AGREEMENT"
+        : "INVOICE";
+  const paymentStatusText =
+    documentType === "SALES_RECEIPT"
+      ? "PAYMENT STATUS: RECEIVED"
+      : documentType === "RENTAL_AGREEMENT"
+        ? "BOOKING STATUS: CONFIRMED"
+        : "PAYMENT STATUS: PENDING";
+
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]); // A4
   const { width, height } = page.getSize();
@@ -59,7 +74,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     size: 22,
     color: rgb(1, 1, 1),
   });
-  page.drawText("INVOICE", {
+  page.drawText(documentTitle, {
     x: margin,
     y: height - 82,
     size: 12,
@@ -225,7 +240,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     borderColor: rgb(0.77, 0.93, 0.8),
     borderWidth: 1,
   });
-  page.drawText("PAYMENT STATUS: RECEIVED", {
+  page.drawText(paymentStatusText, {
     x: margin + 10,
     y: ty - 16,
     size: 9.5,

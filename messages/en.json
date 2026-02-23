@@ -4,7 +4,9 @@
     "booking": "Book a Vehicle",
     "admin": "Admin Panel",
     "logout": "Logout",
-    "login": "Login"
+    "login": "Login",
+    "faq": "FAQ",
+    "fleetOverview": "Fleet Overview"
   },
   "common": {
     "name": "EdgeRent Lite",

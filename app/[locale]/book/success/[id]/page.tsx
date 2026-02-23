@@ -1,9 +1,33 @@
 import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 import { db } from "@/lib/db";
+import { buildMetadata } from "@/lib/seo";
+import { getTenantConfig } from "@/lib/tenant";
+import { formatDate, formatDateTime } from "@/lib/datetime";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const tenant = getTenantConfig();
+  const titleMap: Record<string, string> = {
+    en: `Booking Submitted | ${tenant.tenantName}`,
+    nl: `Reservering Verzonden | ${tenant.tenantName}`,
+    es: `Reserva Enviada | ${tenant.tenantName}`,
+  };
+  return buildMetadata({
+    locale,
+    path: "/book/success",
+    title: titleMap[locale] || titleMap.en,
+    noIndex: true,
+  });
+}
 
 export default async function SuccessPage({
   params,
@@ -64,7 +88,7 @@ export default async function SuccessPage({
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.birthDate")}:</dt>
-              <dd className="font-medium">{booking.birthDate ? new Date(booking.birthDate).toLocaleDateString() : "-"}</dd>
+              <dd className="font-medium">{booking.birthDate ? formatDate(booking.birthDate) : "-"}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.selectVehicle")}:</dt>
@@ -73,13 +97,13 @@ export default async function SuccessPage({
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.startDate")}:</dt>
               <dd className="font-medium">
-                {new Date(booking.startDate).toLocaleString()}
+                {formatDateTime(booking.startDate)}
               </dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.endDate")}:</dt>
               <dd className="font-medium">
-                {new Date(booking.endDate).toLocaleString()}
+                {formatDateTime(booking.endDate)}
               </dd>
             </div>
             <div className="flex justify-between">
@@ -112,7 +136,7 @@ export default async function SuccessPage({
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("booking.licenseExpiryDate")}:</dt>
-              <dd className="font-medium">{booking.licenseExpiryDate ? new Date(booking.licenseExpiryDate).toLocaleDateString() : "-"}</dd>
+              <dd className="font-medium">{booking.licenseExpiryDate ? formatDate(booking.licenseExpiryDate) : "-"}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">{t("admin.bookings.table.total")}:</dt>

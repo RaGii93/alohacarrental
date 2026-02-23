@@ -1,10 +1,16 @@
 import { getTenantConfig } from "@/lib/tenant";
+import { formatDateTime } from "@/lib/datetime";
 
 type SendEmailParams = {
   to: string | string[];
   subject: string;
   html: string;
   text?: string;
+  attachments?: Array<{
+    filename: string;
+    content: string | Buffer;
+    contentType?: string;
+  }>;
 };
 
 export async function sendEmail(params: SendEmailParams): Promise<{ success: boolean; error?: string }> {
@@ -26,6 +32,10 @@ export async function sendEmail(params: SendEmailParams): Promise<{ success: boo
         subject: params.subject,
         html: params.html,
         text: params.text,
+        attachments: params.attachments?.map((file) => ({
+          filename: file.filename,
+          content: typeof file.content === "string" ? file.content : file.content.toString("base64"),
+        })),
       }),
     });
 
@@ -53,8 +63,8 @@ export function bookingEmailHtml(input: {
   const tenant = getTenantConfig();
   const documentLabel = input.documentLabel || "Billing document";
   const amount = `${tenant.currency} ${(input.totalAmountCents / 100).toFixed(2)}`;
-  const pickup = input.startDate.toLocaleString();
-  const dropoff = input.endDate.toLocaleString();
+  const pickup = formatDateTime(input.startDate);
+  const dropoff = formatDateTime(input.endDate);
   const escapeHtml = (value: string) =>
     value
       .replaceAll("&", "&amp;")

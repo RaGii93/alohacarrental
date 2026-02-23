@@ -4,7 +4,9 @@
     "booking": "Voertuig Reserveren",
     "admin": "Beheerpaneel",
     "logout": "Afmelden",
-    "login": "Aanmelden"
+    "login": "Aanmelden",
+    "faq": "FAQ",
+    "fleetOverview": "Vlootoverzicht"
   },
   "common": {
     "name": "EdgeRent Lite",
