@@ -25,9 +25,20 @@ interface Step3ReviewProps {
   onPrev: () => void;
   disabled: boolean;
   availability: AvailabilityResult[];
+  taxPercentage: number;
 }
 
-export function Step3Review({ bookingData, updateBookingData, locations, extras, locale, onPrev, disabled, availability }: Step3ReviewProps) {
+export function Step3Review({
+  bookingData,
+  updateBookingData,
+  locations,
+  extras,
+  locale,
+  onPrev,
+  disabled,
+  availability,
+  taxPercentage,
+}: Step3ReviewProps) {
   const t = useTranslations();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,7 +111,9 @@ export function Step3Review({ bookingData, updateBookingData, locations, extras,
     if (!extra) return sum;
     return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
   }, 0);
-  const totalAmount = baseAmount + extrasAmount;
+  const subtotalAmount = baseAmount + extrasAmount;
+  const taxAmount = Math.round(subtotalAmount * (taxPercentage / 100));
+  const totalAmount = subtotalAmount + taxAmount;
   const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocationId);
   const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocationId);
   const pickupLocationMapUrl = pickupLocation?.address
@@ -145,10 +158,15 @@ export function Step3Review({ bookingData, updateBookingData, locations, extras,
 
             {extrasAmount > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Extras</h4>
+                <h4 className="font-medium mb-2">{t("booking.extras")}</h4>
                 <p>{formatCurrency(extrasAmount)}</p>
               </div>
             )}
+
+            <div>
+              <h4 className="font-medium mb-2">{t("booking.tax", { percentage: taxPercentage })}</h4>
+              <p>{formatCurrency(taxAmount)}</p>
+            </div>
 
             <div>
               <h4 className="font-medium mb-2">{t("booking.total")}</h4>
@@ -212,7 +230,7 @@ export function Step3Review({ bookingData, updateBookingData, locations, extras,
       {extras.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Extras</CardTitle>
+            <CardTitle>{t("booking.extras")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {extras.map((extra) => {

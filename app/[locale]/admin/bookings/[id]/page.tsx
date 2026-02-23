@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { BookingDetailClient } from "@/components/admin/BookingDetailClient";
+import { getTaxPercentage } from "@/lib/settings";
 
 export default async function BookingDetailPage({
   params,
@@ -25,6 +26,7 @@ export default async function BookingDetailPage({
     where: { id },
     include: {
       vehicle: true,
+      category: true,
       pickupLocationRef: true,
       dropoffLocationRef: true,
     },
@@ -130,6 +132,7 @@ export default async function BookingDetailPage({
       discountCodes = [];
     }
   }
+  const taxPercentage = await getTaxPercentage();
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -137,7 +140,13 @@ export default async function BookingDetailPage({
         <button className="text-blue-600 hover:underline mb-6">← Back</button>
       </Link>
 
-      <BookingDetailClient booking={bookingWithAdjustments} locale={locale} extras={extras} discountCodes={discountCodes} />
+      <BookingDetailClient
+        booking={bookingWithAdjustments}
+        locale={locale}
+        extras={extras}
+        discountCodes={discountCodes}
+        taxPercentage={taxPercentage}
+      />
     </div>
   );
 }

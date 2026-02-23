@@ -17,6 +17,8 @@ export interface InvoiceData {
   baseRentalAmount: number;
   extrasAmount: number;
   discountAmount: number;
+  taxAmount?: number;
+  taxPercentage?: number;
   totalAmount: number;
   discountCode?: string;
   extras?: Array<{ name: string; quantity: number; lineTotal: number }>;
@@ -54,6 +56,8 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
   const currency = (cents: number) =>
     `${data.tenantConfig.currency} ${(Math.max(0, cents) / 100).toFixed(2)}`;
+  const formatPercentage = (value: number) =>
+    Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
   const fmtDate = (d: Date) => d.toLocaleString();
   const rentalDays = Math.max(
     1,
@@ -226,6 +230,10 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     for (const extra of data.extras || []) {
       drawRow(`  ${extra.name} x${extra.quantity}`, currency(extra.lineTotal));
     }
+  }
+  if ((data.taxAmount || 0) > 0) {
+    const percentage = data.taxPercentage ?? 0;
+    drawRow(`Tax (${formatPercentage(percentage)}%)`, currency(data.taxAmount || 0));
   }
   drawRow("Total Amount", currency(data.totalAmount), true);
 

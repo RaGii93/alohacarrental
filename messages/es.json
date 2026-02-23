@@ -145,6 +145,8 @@
     "soldOut": "Agotado",
     "days": "Días",
     "pricePerDay": "Precio por día",
+    "extras": "Extras",
+    "tax": "Impuesto ({percentage}%)",
     "reviewBooking": "Revisar Reserva",
     "terms": "Términos y Condiciones",
     "viewTerms": "Ver Términos (PDF)",
@@ -185,7 +187,8 @@
       "termsNotAccepted": "Debes aceptar los términos y condiciones",
       "birthLicenseRequired": "La fecha de nacimiento y vencimiento de licencia son obligatorias",
       "ageMinimum": "El cliente debe tener al menos 21 años",
-      "licenseInvalid": "La licencia debe ser válida en la fecha de recogida"
+      "licenseInvalid": "La licencia debe ser válida en la fecha de recogida",
+      "minimumDuration": "La duración mínima de reserva es de {days} día(s)."
     },
     "success": {
       "title": "¡Reserva Enviada!",
@@ -292,7 +295,8 @@
         "financial": "Finanzas",
         "fleet": "Flota",
         "vehicles": "Gestión de Vehículos",
-        "reviews": "Reseñas"
+        "reviews": "Reseñas",
+        "settings": "Configuración"
       },
       "deliveries": {
         "title": "Próximas Entregas (Siguientes 7 Días)"
@@ -323,6 +327,21 @@
       "reviews": {
         "title": "Moderación de Reseñas",
         "subtitle": "Mostrar u ocultar reseñas de clientes en la página principal."
+      }
+    },
+    "settings": {
+      "title": "Configuración del Sistema",
+      "subtitle": "Se aplica a totales de reserva, PDFs de facturas y recibos de venta.",
+      "taxPercentage": "Porcentaje de Impuesto",
+      "minimumBookingDays": "Días Mínimos de Reserva",
+      "saving": "Guardando...",
+      "errors": {
+        "invalidTax": "Ingresa un porcentaje de impuesto válido entre 0 y 100.",
+        "invalidMinDays": "Ingresa una duración mínima de reserva válida entre 1 y 365 días.",
+        "updateFailed": "No se pudieron actualizar los ajustes."
+      },
+      "success": {
+        "updated": "Ajustes actualizados. Impuesto: {tax}%, Reserva mínima: {days} día(s)."
       }
     },
     "logout": "Cerrar Sesión"

@@ -10,6 +10,7 @@ import { bookingEmailHtml, sendEmail } from "@/lib/email";
 import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
+import { calculateTaxAmount, getMinBookingDays, getTaxPercentage } from "@/lib/settings";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
@@ -212,6 +213,10 @@ async function buildAndUploadBookingDocument(
   const baseRental = booking.category.dailyRate * rentalDays;
   const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
   const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
+  const subtotalBeforeTax = Math.max(0, baseRental - discountAmount + extrasTotal);
+  const taxAmount = Math.max(0, booking.totalAmount - subtotalBeforeTax);
+  const effectiveTaxPercentage =
+    subtotalBeforeTax > 0 ? Math.round((taxAmount * 10000) / subtotalBeforeTax) / 100 : 0;
 
   const invoiceBuffer = await generateInvoicePDF({
     documentType,
@@ -229,6 +234,8 @@ async function buildAndUploadBookingDocument(
     baseRentalAmount: baseRental,
     extrasAmount: extrasTotal,
     discountAmount,
+    taxAmount,
+    taxPercentage: effectiveTaxPercentage,
     totalAmount: booking.totalAmount,
     discountCode: bookingDiscount?.code,
     extras: adjustmentExtras.map((line) => ({
@@ -469,7 +476,10 @@ async function recomputeBookingTotals(bookingId: string) {
   const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
   const percentage = bookingDiscount?.percentage ?? 0;
   const discountAmount = Math.round((baseRental * percentage) / 100);
-  const totalAmount = Math.max(0, baseRental - discountAmount + extrasTotal);
+  const subtotalBeforeTax = Math.max(0, baseRental - discountAmount + extrasTotal);
+  const taxPercentage = await getTaxPercentage();
+  const taxAmount = calculateTaxAmount(subtotalBeforeTax, taxPercentage);
+  const totalAmount = subtotalBeforeTax + taxAmount;
 
   await db.booking.update({ where: { id: bookingId }, data: { totalAmount } });
   if (bookingDiscount) {
@@ -487,7 +497,7 @@ async function recomputeBookingTotals(bookingId: string) {
     }
   }
 
-  return { booking, baseRental, extrasTotal, discountAmount, totalAmount };
+  return { booking, baseRental, extrasTotal, discountAmount, taxAmount, totalAmount };
 }
 
 export async function applyDiscountCodeToBookingAction(bookingId: string, code: string, locale: string) {
@@ -717,6 +727,13 @@ export async function createCategoryBookingAction(
 
     // Calculate days and total
     const days = Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const minimumBookingDays = await getMinBookingDays();
+    if (days < minimumBookingDays) {
+      return {
+        success: false,
+        error: `Minimum booking duration is ${minimumBookingDays} day${minimumBookingDays > 1 ? "s" : ""}`,
+      };
+    }
     const baseTotal = category.dailyRate * Math.max(1, days);
     let extrasTotal = 0;
     let resolvedExtras: Array<{ extraId: string; quantity: number; lineTotal: number }> = [];
@@ -761,7 +778,10 @@ export async function createCategoryBookingAction(
       }
       extrasTotal = resolvedExtras.reduce((sum, line) => sum + line.lineTotal, 0);
     }
-    const totalAmount = baseTotal + extrasTotal;
+    const subtotalBeforeTax = baseTotal + extrasTotal;
+    const taxPercentage = await getTaxPercentage();
+    const taxAmount = calculateTaxAmount(subtotalBeforeTax, taxPercentage);
+    const totalAmount = subtotalBeforeTax + taxAmount;
 
 
     // Database transaction to allocate vehicle

@@ -39,8 +39,10 @@ Use this repo as a base and deploy a separate instance per client.
   - apply discount code
   - send invoice payment request
   - create sales receipt (payment received)
+  - update tax percentage in settings
+  - update minimum booking duration in settings
 - Dashboard tabs:
-  - bookings, deliveries, returns, financial, fleet, vehicle management, reviews
+  - bookings, deliveries, returns, financial, fleet, vehicle management, reviews, settings
 - Reviews moderation (show/hide on homepage)
 
 ### Billing Documents
@@ -55,6 +57,13 @@ Use this repo as a base and deploy a separate instance per client.
   - marks payment received
   - sets vehicle to `ON_RENT`
   - emails customer
+- Tax:
+  - configurable percentage in admin settings
+  - applied to booking totals
+  - shown in invoice/sales receipt PDFs
+- Minimum booking duration:
+  - configurable in admin settings
+  - enforced in availability search and booking creation
 
 ### File Handling
 
@@ -260,6 +269,8 @@ TENANT_ADDRESS="Kaya Example 100, Kralendijk, Bonaire"
 TENANT_CURRENCY="USD"
 TENANT_PAYMENT_INSTRUCTIONS="Please pay by bank transfer or card and include your booking code in the payment reference."
 TENANT_TERMS_PDF_URL="/terms.pdf"
+DEFAULT_TAX_PERCENTAGE=0
+DEFAULT_MIN_BOOKING_DAYS=1
 ```
 
 ### Notes
@@ -415,4 +426,3 @@ What is generated:
 - `lib/seo.ts` + `lib/structured-data.ts` - SEO/JSON-LD
 - `prisma/schema.prisma` - source of truth for DB
 - `prisma/seed.ts` - local/demo dataset
-

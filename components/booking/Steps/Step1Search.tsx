@@ -23,9 +23,19 @@ interface Step1SearchProps {
   setAvailability: (availability: AvailabilityResult[]) => void;
   availability: AvailabilityResult[];
   locations: { id: string; name: string; code?: string | null; address?: string | null }[];
+  minimumBookingDays: number;
 }
 
-export function Step1Search({ bookingData, updateBookingData, onNext, disabled, setAvailability, availability, locations }: Step1SearchProps) {
+export function Step1Search({
+  bookingData,
+  updateBookingData,
+  onNext,
+  disabled,
+  setAvailability,
+  availability,
+  locations,
+  minimumBookingDays,
+}: Step1SearchProps) {
   const t = useTranslations();
   const [isSearching, setIsSearching] = useState(false);
 
@@ -41,9 +51,14 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
   const pickupDateTime = mergeDateAndTime(bookingData.startDate, bookingData.pickupTime);
   const dropoffDateTime = mergeDateAndTime(bookingData.endDate, bookingData.dropoffTime);
   const hasValidRange = !!pickupDateTime && !!dropoffDateTime && dropoffDateTime > pickupDateTime;
+  const selectedDays = hasValidRange && pickupDateTime && dropoffDateTime
+    ? calculateDays(pickupDateTime, dropoffDateTime)
+    : 0;
+  const meetsMinimumDuration = !hasValidRange || selectedDays >= minimumBookingDays;
 
   const handleSearch = async () => {
     if (!pickupDateTime || !dropoffDateTime || dropoffDateTime <= pickupDateTime) return;
+    if (calculateDays(pickupDateTime, dropoffDateTime) < minimumBookingDays) return;
 
     setIsSearching(true);
     try {
@@ -61,7 +76,7 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
   };
 
   const hasLocations = !!bookingData.pickupLocationId && !!bookingData.dropoffLocationId;
-  const canContinue = bookingData.categoryId && availability.length > 0 && hasValidRange && hasLocations;
+  const canContinue = bookingData.categoryId && availability.length > 0 && hasValidRange && hasLocations && meetsMinimumDuration;
 
   return (
     <div className="space-y-6">
@@ -162,6 +177,11 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
         {!hasValidRange && bookingData.startDate && bookingData.endDate && (
           <p className="text-sm text-red-600 mt-3">{t("booking.errors.endBeforeStart")}</p>
         )}
+        {hasValidRange && !meetsMinimumDuration && (
+          <p className="text-sm text-red-600 mt-2">
+            {t("booking.errors.minimumDuration", { days: minimumBookingDays })}
+          </p>
+        )}
         {!hasLocations && (
           <p className="text-sm text-red-600 mt-2">{t("booking.selectLocation")}</p>
         )}
@@ -169,7 +189,7 @@ export function Step1Search({ bookingData, updateBookingData, onNext, disabled, 
         <div className="mt-4">
           <Button
             onClick={handleSearch}
-            disabled={!hasValidRange || isSearching || disabled}
+            disabled={!hasValidRange || !meetsMinimumDuration || isSearching || disabled}
             className="w-full"
           >
             {isSearching ? t("common.loading") : t("booking.searchAvailability")}

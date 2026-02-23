@@ -17,6 +17,8 @@ import { getBlobProxyUrl } from "@/lib/blob";
 import { formatDateTime } from "@/lib/datetime";
 import { FinancialFilters } from "@/components/admin/FinancialFilters";
 import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
+import { TaxSettingsCard } from "@/components/admin/TaxSettingsCard";
+import { getMinBookingDays, getTaxPercentage } from "@/lib/settings";
 
 export default async function AdminDashboardPage({
   params,
@@ -261,6 +263,10 @@ export default async function AdminDashboardPage({
     orderBy: { createdAt: "desc" },
     take: 100,
   });
+  const [taxPercentage, minimumBookingDays] = await Promise.all([
+    getTaxPercentage(),
+    getMinBookingDays(),
+  ]);
 
   const currency = (amountCents: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
 
@@ -290,7 +296,7 @@ export default async function AdminDashboardPage({
 
       <Tabs
         defaultValue={
-          tab && ["bookings", "deliveries", "returns", "financial", "fleet", "vehicles", "reviews"].includes(tab)
+          tab && ["bookings", "deliveries", "returns", "financial", "fleet", "vehicles", "reviews", "settings"].includes(tab)
             ? tab
             : "bookings"
         }
@@ -304,6 +310,7 @@ export default async function AdminDashboardPage({
           <TabsTrigger value="fleet">{t("admin.dashboard.tabs.fleet")}</TabsTrigger>
           <TabsTrigger value="vehicles">{t("admin.dashboard.tabs.vehicles")}</TabsTrigger>
           <TabsTrigger value="reviews">{t("admin.dashboard.tabs.reviews")}</TabsTrigger>
+          <TabsTrigger value="settings">{t("admin.dashboard.tabs.settings")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bookings" className="mt-6">
@@ -511,6 +518,14 @@ export default async function AdminDashboardPage({
           <h2 className="text-xl font-semibold">{t("admin.dashboard.reviews.title")}</h2>
           <p className="text-sm text-muted-foreground">{t("admin.dashboard.reviews.subtitle")}</p>
           <ReviewsTable reviews={reviews as any[]} locale={locale} />
+        </TabsContent>
+
+        <TabsContent value="settings" className="mt-6">
+          <TaxSettingsCard
+            locale={locale}
+            initialTaxPercentage={taxPercentage}
+            initialMinimumBookingDays={minimumBookingDays}
+          />
         </TabsContent>
       </Tabs>
     </div>

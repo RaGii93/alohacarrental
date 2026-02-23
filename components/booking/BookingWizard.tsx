@@ -40,6 +40,8 @@ export function BookingWizard({
   locations,
   extras,
   categories,
+  taxPercentage,
+  minimumBookingDays,
 }: {
   locale: string;
   locations: { id: string; name: string; code?: string | null; address?: string | null }[];
@@ -53,6 +55,8 @@ export function BookingWizard({
     transmission: "AUTOMATIC" | "MANUAL";
     hasAC: boolean;
   }>;
+  taxPercentage: number;
+  minimumBookingDays: number;
 }) {
   const t = useTranslations();
   const [currentStep, setCurrentStep] = useState(1);
@@ -103,7 +107,9 @@ export function BookingWizard({
     if (!extra) return sum;
     return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
   }, 0);
-  const totalAmount = baseAmount + extrasAmount;
+  const subtotalAmount = baseAmount + extrasAmount;
+  const taxAmount = Math.round(subtotalAmount * (taxPercentage / 100));
+  const totalAmount = subtotalAmount + taxAmount;
 
   const nextStep = () => setCurrentStep(prev => prev + 1);
   const prevStep = () => setCurrentStep(prev => prev - 1);
@@ -151,6 +157,7 @@ export function BookingWizard({
               setAvailability={setAvailability}
               availability={availability}
               locations={locations}
+              minimumBookingDays={minimumBookingDays}
             />
           )}
 
@@ -174,6 +181,7 @@ export function BookingWizard({
               onPrev={prevStep}
               disabled={!licenseActive}
               availability={availability}
+              taxPercentage={taxPercentage}
             />
           )}
 
@@ -208,7 +216,8 @@ export function BookingWizard({
             </p>
             <div className="flex justify-between"><span>{t("booking.pricePerDay")}</span><span>{selectedCategory ? formatCurrency(selectedCategory.dailyRate) : "-"}</span></div>
             <div className="flex justify-between"><span>{t("booking.days")}</span><span>{days}</span></div>
-            <div className="flex justify-between"><span>Extras</span><span>{formatCurrency(extrasAmount)}</span></div>
+            <div className="flex justify-between"><span>{t("booking.extras")}</span><span>{formatCurrency(extrasAmount)}</span></div>
+            <div className="flex justify-between"><span>{t("booking.tax", { percentage: taxPercentage })}</span><span>{formatCurrency(taxAmount)}</span></div>
             <div className="mt-2 border-t pt-2 flex justify-between font-semibold"><span>{t("booking.total")}</span><span>{formatCurrency(totalAmount)}</span></div>
           </div>
         </Card>

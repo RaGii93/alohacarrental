@@ -145,6 +145,8 @@
     "soldOut": "Sold out",
     "days": "Days",
     "pricePerDay": "Price per day",
+    "extras": "Extras",
+    "tax": "Tax ({percentage}%)",
     "reviewBooking": "Review Booking",
     "terms": "Terms & Conditions",
     "viewTerms": "View Terms (PDF)",
@@ -185,7 +187,8 @@
       "termsNotAccepted": "You must accept the terms and conditions",
       "birthLicenseRequired": "Birth date and license expiry date are required",
       "ageMinimum": "Renter must be at least 21 years old",
-      "licenseInvalid": "License must be valid at pickup date"
+      "licenseInvalid": "License must be valid at pickup date",
+      "minimumDuration": "Minimum booking duration is {days} day(s)."
     },
     "success": {
       "title": "Booking Submitted!",
@@ -322,7 +325,8 @@
         "financial": "Financial",
         "fleet": "Fleet",
         "vehicles": "Vehicle Management",
-        "reviews": "Reviews"
+        "reviews": "Reviews",
+        "settings": "Settings"
       },
       "deliveries": {
         "title": "Upcoming Deliveries (Next 7 Days)"
@@ -353,6 +357,21 @@
       "reviews": {
         "title": "Reviews Moderation",
         "subtitle": "Show or hide customer reviews on the home page."
+      }
+    },
+    "settings": {
+      "title": "System Settings",
+      "subtitle": "Applies to booking totals, invoice PDFs, and sales receipts.",
+      "taxPercentage": "Tax Percentage",
+      "minimumBookingDays": "Minimum Booking Days",
+      "saving": "Saving...",
+      "errors": {
+        "invalidTax": "Enter a valid tax percentage between 0 and 100.",
+        "invalidMinDays": "Enter a valid minimum booking duration between 1 and 365 days.",
+        "updateFailed": "Failed to update settings."
+      },
+      "success": {
+        "updated": "Settings updated. Tax: {tax}%, Minimum booking: {days} day(s)."
       }
     },
     "logout": "Logout"

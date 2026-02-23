@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { cancelExpiredHolds } from "./booking";
+import { getMinBookingDays } from "@/lib/settings";
 
 export interface AvailabilityResult {
   categoryId: string;
@@ -23,6 +24,10 @@ export async function searchAvailabilityAction(
   startDate: Date,
   endDate: Date
 ): Promise<AvailabilityResult[]> {
+  const minDays = await getMinBookingDays();
+  const days = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  if (days < minDays) return [];
+
   // Cancel expired holds first
   await cancelExpiredHolds();
 
@@ -125,8 +130,7 @@ export async function searchAvailabilityAction(
     }
 
     const availableCount = Math.max(0, totalVehicles - overlappingBookings);
-    const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const totalForRange = category.dailyRate * Math.max(1, days);
+    const totalForRange = category.dailyRate * days;
 
     results.push({
       categoryId: category.id,

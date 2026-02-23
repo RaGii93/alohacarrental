@@ -28,11 +28,13 @@ export function BookingDetailClient({
   locale,
   extras,
   discountCodes,
+  taxPercentage,
 }: {
   booking: any;
   locale: string;
   extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }>;
   discountCodes: Array<{ id: string; code: string; percentage: number }>;
+  taxPercentage: number;
 }) {
   const router = useRouter();
   const t = useTranslations();
@@ -41,6 +43,15 @@ export function BookingDetailClient({
   const [extraId, setExtraId] = useState("");
   const [extraQty, setExtraQty] = useState(1);
   const invoiceDownloadUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true });
+  const rentalDays = Math.max(
+    1,
+    Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24))
+  );
+  const baseAmount = (booking.category?.dailyRate || 0) * rentalDays;
+  const extrasAmount = (booking.bookingExtras || []).reduce((sum: number, line: any) => sum + (line?.lineTotal || 0), 0);
+  const discountAmount = booking.bookingDiscount?.amount || 0;
+  const subtotalBeforeTax = Math.max(0, baseAmount - discountAmount + extrasAmount);
+  const taxAmount = Math.max(0, booking.totalAmount - subtotalBeforeTax);
 
   const handleConfirm = async () => {
     setIsLoading(true);
@@ -240,7 +251,19 @@ export function BookingDetailClient({
               <dd className="font-medium">{booking.licenseExpiryDate ? formatDate(booking.licenseExpiryDate) : "-"}</dd>
             </div>
             <div>
-              <dt className="text-gray-600">Total Amount</dt>
+              <dt className="text-gray-600">Subtotal</dt>
+              <dd className="font-medium">
+                ${(subtotalBeforeTax / 100).toFixed(2)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-600">Tax ({taxPercentage}%)</dt>
+              <dd className="font-medium">
+                ${(taxAmount / 100).toFixed(2)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-600">Total Amount (Incl. Tax)</dt>
               <dd className="font-medium">
                 ${(booking.totalAmount / 100).toFixed(2)}
               </dd>

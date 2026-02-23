@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { getBookingJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
+import { getMinBookingDays, getTaxPercentage } from "@/lib/settings";
 
 export async function generateMetadata({
   params,
@@ -35,6 +36,10 @@ export default async function BookingPage({
   const { locale } = await params;
   const t = await getTranslations();
   const jsonLd = getBookingJsonLd(locale);
+  const [taxPercentage, minimumBookingDays] = await Promise.all([
+    getTaxPercentage(),
+    getMinBookingDays(),
+  ]);
 
   // Fetch predefined pickup/dropoff locations
   const locations = await db.location.findMany({
@@ -94,7 +99,14 @@ export default async function BookingPage({
             <Button variant="outline">{t("booking.reviewLookup.cta")}</Button>
           </Link>
         </div>
-        <BookingWizard locale={locale} locations={locations} extras={extras} categories={categories as any} />
+        <BookingWizard
+          locale={locale}
+          locations={locations}
+          extras={extras}
+          categories={categories as any}
+          taxPercentage={taxPercentage}
+          minimumBookingDays={minimumBookingDays}
+        />
       </div>
     </>
   );

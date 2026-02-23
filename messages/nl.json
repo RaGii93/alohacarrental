@@ -145,6 +145,8 @@
     "soldOut": "Uitverkocht",
     "days": "Dagen",
     "pricePerDay": "Prijs per dag",
+    "extras": "Extra's",
+    "tax": "Belasting ({percentage}%)",
     "reviewBooking": "Reservering Beoordelen",
     "terms": "Algemene Voorwaarden",
     "viewTerms": "Voorwaarden Bekijken (PDF)",
@@ -185,7 +187,8 @@
       "termsNotAccepted": "Je moet akkoord gaan met de voorwaarden",
       "birthLicenseRequired": "Geboortedatum en vervaldatum rijbewijs zijn verplicht",
       "ageMinimum": "Huurder moet minimaal 21 jaar oud zijn",
-      "licenseInvalid": "Rijbewijs moet geldig zijn op de ophaaldatum"
+      "licenseInvalid": "Rijbewijs moet geldig zijn op de ophaaldatum",
+      "minimumDuration": "Minimale reserveringsduur is {days} dag(en)."
     },
     "success": {
       "title": "Reservering Ingediend!",
@@ -292,7 +295,8 @@
         "financial": "Financieel",
         "fleet": "Vloot",
         "vehicles": "Voertuigbeheer",
-        "reviews": "Reviews"
+        "reviews": "Reviews",
+        "settings": "Instellingen"
       },
       "deliveries": {
         "title": "Aankomende Leveringen (Volgende 7 Dagen)"
@@ -323,6 +327,21 @@
       "reviews": {
         "title": "Review Moderatie",
         "subtitle": "Toon of verberg klantreviews op de startpagina."
+      }
+    },
+    "settings": {
+      "title": "Systeeminstellingen",
+      "subtitle": "Van toepassing op reserveringstotalen, factuur-pdf's en verkoopbewijzen.",
+      "taxPercentage": "Belastingpercentage",
+      "minimumBookingDays": "Minimale reserveringsduur (dagen)",
+      "saving": "Opslaan...",
+      "errors": {
+        "invalidTax": "Voer een geldig belastingpercentage in tussen 0 en 100.",
+        "invalidMinDays": "Voer een geldige minimale reserveringsduur in tussen 1 en 365 dagen.",
+        "updateFailed": "Instellingen bijwerken mislukt."
+      },
+      "success": {
+        "updated": "Instellingen bijgewerkt. Belasting: {tax}%, Minimale reservering: {days} dag(en)."
       }
     },
     "logout": "Afmelden"
