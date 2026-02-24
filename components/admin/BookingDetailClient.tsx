@@ -21,6 +21,8 @@ import {
   createSalesReceiptAction,
   applyDiscountCodeToBookingAction,
   addExtraToBookingAction,
+  markBookingDeliveredAction,
+  markBookingReturnedAction,
 } from "@/actions/booking";
 
 export function BookingDetailClient({
@@ -95,14 +97,54 @@ export function BookingDetailClient({
   };
 
   const handleCreateSalesReceipt = async () => {
+    const deliverNow = window.confirm(
+      "Is the car going out right now?\n\nOK = Yes, mark as delivered now.\nCancel = No, payment only for now."
+    );
+    const proceed = window.confirm(
+      deliverNow
+        ? "Create sales receipt and mark this booking as delivered now?"
+        : "Create sales receipt now and keep booking as NOT delivered yet?"
+    );
+    if (!proceed) return;
+
     setIsLoading(true);
-    const result = await createSalesReceiptAction(booking.id, locale);
+    const result = await createSalesReceiptAction(booking.id, locale, deliverNow);
     setIsLoading(false);
     if (result.success) {
-      toast.success("Sales receipt created. Payment marked as received and vehicle set ON_RENT.");
+      toast.success(
+        deliverNow
+          ? "Sales receipt created. Payment received and booking marked delivered."
+          : "Sales receipt created. Payment received. Delivery can be marked later."
+      );
       router.refresh();
     } else {
       toast.error(result.error || "Error creating sales receipt");
+    }
+  };
+
+  const handleMarkDelivered = async () => {
+    if (!window.confirm("Mark this booking as delivered now?")) return;
+    setIsLoading(true);
+    const result = await markBookingDeliveredAction(booking.id, locale);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Booking marked as delivered.");
+      router.refresh();
+    } else {
+      toast.error(result.error || "Failed to mark as delivered");
+    }
+  };
+
+  const handleMarkReturned = async () => {
+    if (!window.confirm("Mark this booking as returned now?")) return;
+    setIsLoading(true);
+    const result = await markBookingReturnedAction(booking.id, locale);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Booking marked as returned.");
+      router.refresh();
+    } else {
+      toast.error(result.error || "Failed to mark as returned");
     }
   };
 
@@ -272,6 +314,14 @@ export function BookingDetailClient({
               <dt className="text-gray-600">Payment Received</dt>
               <dd className="font-medium">{booking.paymentReceivedAt ? formatDateTime(booking.paymentReceivedAt) : "No"}</dd>
             </div>
+            <div>
+              <dt className="text-gray-600">Delivered</dt>
+              <dd className="font-medium">{booking.deliveredAt ? formatDateTime(booking.deliveredAt) : "No"}</dd>
+            </div>
+            <div>
+              <dt className="text-gray-600">Returned</dt>
+              <dd className="font-medium">{booking.returnedAt ? formatDateTime(booking.returnedAt) : "No"}</dd>
+            </div>
           </dl>
         </div>
       </div>
@@ -400,13 +450,15 @@ export function BookingDetailClient({
 
       {(booking.status === "PENDING" || booking.status === "CONFIRMED") && (
         <div className="flex gap-4 flex-wrap">
-          <Button
-            onClick={handleConfirm}
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            {isLoading ? "Processing..." : "Confirm Booking"}
-          </Button>
+          {booking.status === "PENDING" && (
+            <Button
+              onClick={handleConfirm}
+              disabled={isLoading}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isLoading ? "Processing..." : "Confirm Booking"}
+            </Button>
+          )}
           <Button
             onClick={handleSendInvoiceEstimate}
             disabled={isLoading}
@@ -420,6 +472,24 @@ export function BookingDetailClient({
           >
             {isLoading ? "Processing..." : "Create Sales Receipt (Payment Received)"}
           </Button>
+          {booking.paymentReceivedAt && !booking.deliveredAt && (
+            <Button
+              onClick={handleMarkDelivered}
+              disabled={isLoading}
+              className="bg-indigo-600 hover:bg-indigo-700"
+            >
+              {isLoading ? "Processing..." : "Mark Delivered"}
+            </Button>
+          )}
+          {booking.deliveredAt && !booking.returnedAt && (
+            <Button
+              onClick={handleMarkReturned}
+              disabled={isLoading}
+              className="bg-slate-700 hover:bg-slate-800"
+            >
+              {isLoading ? "Processing..." : "Mark Returned"}
+            </Button>
+          )}
           <Button
             onClick={handleDecline}
             disabled={isLoading}

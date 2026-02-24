@@ -11,8 +11,30 @@ import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { calculateTaxAmount, getMinBookingDays, getTaxPercentage } from "@/lib/settings";
+import { logAdminAction } from "@/lib/audit";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
+
+async function ensureBookingOperationalColumns(client: typeof db = db) {
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "Booking"
+    ADD COLUMN IF NOT EXISTS "deliveredAt" TIMESTAMP NULL
+  `);
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "Booking"
+    ADD COLUMN IF NOT EXISTS "returnedAt" TIMESTAMP NULL
+  `);
+}
+
+async function getBookingOperationalState(client: typeof db, bookingId: string) {
+  const rows = await client.$queryRaw<Array<{ deliveredAt: Date | null; returnedAt: Date | null }>>`
+    SELECT "deliveredAt", "returnedAt"
+    FROM "Booking"
+    WHERE id = ${bookingId}
+    LIMIT 1
+  `;
+  return rows[0] || { deliveredAt: null, returnedAt: null };
+}
 
 async function loadBookingAdjustments(bookingId: string) {
   let extras: Array<{ id: string; quantity: number; lineTotal: number; extraName: string }> = [];
@@ -74,6 +96,23 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
     if (!isLicenseActive() && session.role !== "ROOT") {
       return { success: false, error: "BOOKING_DISABLED" };
     }
+
+    const existing = await db.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        status: true,
+        customerEmail: true,
+        customerName: true,
+        bookingCode: true,
+        startDate: true,
+        endDate: true,
+        totalAmount: true,
+      },
+    });
+    if (!existing) return { success: false, error: "Booking not found" };
+    if (existing.status === "CONFIRMED") return { success: false, error: "BOOKING_ALREADY_CONFIRMED" };
+    if (existing.status !== "PENDING") return { success: false, error: "BOOKING_NOT_CONFIRMABLE" };
 
     const booking = await db.booking.update({
       where: { id: bookingId },
@@ -176,6 +215,11 @@ export async function addBookingNoteAction(
       data: {
         notes: note,
       },
+    });
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "BOOKING_NOTE_UPDATED",
+      bookingId,
     });
 
     return { success: true, booking };
@@ -376,6 +420,11 @@ export async function sendBillingDocumentEmailAction(bookingId: string, locale: 
     if (!mailResult.success) {
       return { success: false, error: mailResult.error || "Failed to send billing document email" };
     }
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "BILLING_DOCUMENT_EMAIL_SENT",
+      bookingId,
+    });
 
     return { success: true };
   } catch (error: any) {
@@ -383,11 +432,16 @@ export async function sendBillingDocumentEmailAction(bookingId: string, locale: 
   }
 }
 
-export async function createSalesReceiptAction(bookingId: string, locale: string) {
+export async function createSalesReceiptAction(
+  bookingId: string,
+  locale: string,
+  markDeliveredNow = false
+) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    await ensureBookingOperationalColumns();
 
     const generated = await buildAndUploadBookingDocument(bookingId, "SALES_RECEIPT");
     if (!generated.success) return { success: false, error: generated.error };
@@ -399,30 +453,40 @@ export async function createSalesReceiptAction(bookingId: string, locale: string
         WHERE table_schema = 'public' AND table_name = 'Booking'
       `;
       const hasPaymentReceivedAt = bookingCols.some((c) => c.column_name === "paymentReceivedAt");
+      const now = new Date();
 
       const updatedBooking = await tx.booking.update({
         where: { id: bookingId },
         data: {
           status: "CONFIRMED",
           invoiceUrl: generated.invoiceUrl,
-          ...(hasPaymentReceivedAt ? ({ paymentReceivedAt: new Date() } as any) : {}),
+          ...(hasPaymentReceivedAt ? ({ paymentReceivedAt: now } as any) : {}),
         } as any,
       });
       if (hasPaymentReceivedAt) {
         try {
           await tx.$executeRaw`
-            UPDATE "Booking" SET "paymentReceivedAt" = ${new Date()} WHERE id = ${bookingId}
+            UPDATE "Booking" SET "paymentReceivedAt" = COALESCE("paymentReceivedAt", ${now}) WHERE id = ${bookingId}
           `;
         } catch {}
       }
-      await tx.vehicle.update({
-        where: { id: generated.booking.vehicleId! },
-        data: { status: "ON_RENT" },
-      });
+      if (markDeliveredNow) {
+        await tx.$executeRaw`
+          UPDATE "Booking"
+          SET "deliveredAt" = COALESCE("deliveredAt", ${now})
+          WHERE id = ${bookingId}
+        `;
+        await tx.vehicle.update({
+          where: { id: generated.booking.vehicleId! },
+          data: { status: "ON_RENT" },
+        });
+      }
       await tx.auditLog.create({
         data: {
           adminUserId: session.adminUserId,
-          action: "SALES_RECEIPT_CREATED_PAYMENT_RECEIVED",
+          action: markDeliveredNow
+            ? "SALES_RECEIPT_CREATED_PAYMENT_RECEIVED_DELIVERED"
+            : "SALES_RECEIPT_CREATED_PAYMENT_RECEIVED",
           bookingId,
         },
       });
@@ -456,6 +520,107 @@ export async function createSalesReceiptAction(bookingId: string, locale: string
     return { success: true, booking: updated };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to create sales receipt" };
+  }
+}
+
+export async function markBookingDeliveredAction(bookingId: string, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    await ensureBookingOperationalColumns();
+
+    const booking = await db.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        status: true,
+        vehicleId: true,
+        paymentReceivedAt: true,
+      },
+    });
+    if (!booking) return { success: false, error: "Booking not found" };
+    if (booking.status !== "CONFIRMED") return { success: false, error: "BOOKING_NOT_DELIVERABLE" };
+    if (!booking.paymentReceivedAt) return { success: false, error: "PAYMENT_REQUIRED_BEFORE_DELIVERY" };
+
+    const operational = await getBookingOperationalState(db, bookingId);
+    if (operational.deliveredAt) return { success: false, error: "BOOKING_ALREADY_DELIVERED" };
+
+    await db.$transaction(async (tx) => {
+      const now = new Date();
+      await tx.$executeRaw`
+        UPDATE "Booking"
+        SET "deliveredAt" = ${now}
+        WHERE id = ${bookingId}
+      `;
+      if (booking.vehicleId) {
+        await tx.vehicle.update({
+          where: { id: booking.vehicleId },
+          data: { status: "ON_RENT" },
+        });
+      }
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "BOOKING_MARKED_DELIVERED",
+          bookingId,
+        },
+      });
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to mark booking as delivered" };
+  }
+}
+
+export async function markBookingReturnedAction(bookingId: string, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    await ensureBookingOperationalColumns();
+
+    const booking = await db.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        status: true,
+        vehicleId: true,
+      },
+    });
+    if (!booking) return { success: false, error: "Booking not found" };
+    if (booking.status !== "CONFIRMED") return { success: false, error: "BOOKING_NOT_RETURNABLE" };
+
+    const operational = await getBookingOperationalState(db, bookingId);
+    if (!operational.deliveredAt) return { success: false, error: "BOOKING_NOT_DELIVERED" };
+    if (operational.returnedAt) return { success: false, error: "BOOKING_ALREADY_RETURNED" };
+
+    await db.$transaction(async (tx) => {
+      const now = new Date();
+      await tx.$executeRaw`
+        UPDATE "Booking"
+        SET "returnedAt" = ${now}
+        WHERE id = ${bookingId}
+      `;
+      if (booking.vehicleId) {
+        await tx.vehicle.update({
+          where: { id: booking.vehicleId },
+          data: { status: "ACTIVE" },
+        });
+      }
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "BOOKING_MARKED_RETURNED",
+          bookingId,
+        },
+      });
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to mark booking as returned" };
   }
 }
 
@@ -535,6 +700,11 @@ export async function applyDiscountCodeToBookingAction(bookingId: string, code: 
     await recomputeBookingTotals(bookingId);
     const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
     if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Discount applied but invoice update failed" };
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "BOOKING_DISCOUNT_APPLIED",
+      bookingId,
+    });
 
     return { success: true };
   } catch (error: any) {
@@ -569,6 +739,11 @@ export async function addExtraToBookingAction(bookingId: string, extraId: string
     await recomputeBookingTotals(bookingId);
     const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
     if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Extra added but invoice update failed" };
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "BOOKING_EXTRA_ADDED",
+      bookingId,
+    });
 
     return { success: true };
   } catch (error: any) {

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime, formatDateTimeRange } from "@/lib/datetime";
-import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
+import { markBookingDeliveredAction, markBookingReturnedAction } from "@/actions/booking";
 
 interface Booking {
   id: string;
@@ -30,6 +32,9 @@ interface Booking {
   totalAmount: number;
   status: string;
   createdAt: Date;
+  paymentReceivedAt?: Date | null;
+  deliveredAt?: Date | null;
+  returnedAt?: Date | null;
 }
 
 export function BookingsTable({
@@ -37,15 +42,16 @@ export function BookingsTable({
   locale,
   status,
   dateMode = "range",
+  actionMode = "none",
 }: {
   bookings: Booking[];
   locale: string;
   status:  string;
   dateMode?: "range" | "pickup" | "dropoff";
+  actionMode?: "none" | "deliveries" | "returns";
 }) {
   const t = useTranslations();
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const router = useRouter();
   const [sortKey, setSortKey] = useState<"customerName" | "vehicle" | "startDate" | "totalAmount" | "status">("startDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -92,10 +98,7 @@ export function BookingsTable({
     return rows;
   }, [bookings, sortKey, sortDir]);
 
-  const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const pageRows = sorted;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -110,18 +113,30 @@ export function BookingsTable({
     }
   };
 
+  const markDelivered = async (bookingId: string) => {
+    if (!window.confirm("Mark this booking as delivered now?")) return;
+    const result = await markBookingDeliveredAction(bookingId, locale);
+    if (!result.success) {
+      toast.error(result.error || "Failed to mark as delivered");
+      return;
+    }
+    toast.success("Booking marked as delivered.");
+    router.refresh();
+  };
+
+  const markReturned = async (bookingId: string) => {
+    if (!window.confirm("Mark this booking as returned now?")) return;
+    const result = await markBookingReturnedAction(bookingId, locale);
+    if (!result.success) {
+      toast.error(result.error || "Failed to mark as returned");
+      return;
+    }
+    toast.success("Booking marked as returned.");
+    router.refresh();
+  };
+
   return (
     <div className="mt-6 overflow-x-auto">
-      <TablePaginationControls
-        page={currentPage}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
       <Table>
         <TableHeader>
           <TableRow>
@@ -169,11 +184,43 @@ export function BookingsTable({
                 </Badge>
               </TableCell>
               <TableCell>
-                <Link href={`/${locale}/admin/bookings/${booking.id}`}>
-                  <Button size="sm" variant="outline">
-                    {t("admin.bookings.actions.view")}
-                  </Button>
-                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link href={`/${locale}/admin/bookings/${booking.id}`}>
+                    <Button size="sm" variant="outline">
+                      {t("admin.bookings.actions.view")}
+                    </Button>
+                  </Link>
+                  {actionMode === "deliveries" && (
+                    booking.deliveredAt ? (
+                      <span className="text-xs text-muted-foreground">Delivered</span>
+                    ) : booking.paymentReceivedAt ? (
+                      <Button
+                        size="sm"
+                        className="bg-indigo-600 hover:bg-indigo-700"
+                        onClick={() => markDelivered(booking.id)}
+                      >
+                        Mark Delivered
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-amber-700">Awaiting payment</span>
+                    )
+                  )}
+                  {actionMode === "returns" && (
+                    booking.returnedAt ? (
+                      <span className="text-xs text-muted-foreground">Returned</span>
+                    ) : booking.deliveredAt ? (
+                      <Button
+                        size="sm"
+                        className="bg-slate-700 hover:bg-slate-800"
+                        onClick={() => markReturned(booking.id)}
+                      >
+                        Mark Returned
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Not delivered</span>
+                    )
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}

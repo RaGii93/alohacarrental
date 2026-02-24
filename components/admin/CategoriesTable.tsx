@@ -9,7 +9,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { CategoryDialog } from "./CategoryDialog";
 import { archiveCategoryAction } from "@/actions/categories";
-import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
 import { getBlobProxyUrl } from "@/lib/blob";
 
 type Category = {
@@ -36,8 +35,6 @@ export function CategoriesTable({
   const router = useRouter();
   const [selected, setSelected] = useState<Partial<Category> | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState<"name" | "dailyRate" | "vehicles" | "bookings" | "status">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -82,10 +79,7 @@ export function CategoriesTable({
     return rows;
   }, [categories, sortKey, sortDir]);
 
-  const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const pageRows = sorted;
 
   const handleArchive = async (categoryId: string) => {
     if (!window.confirm("Archive this category?")) return;
@@ -107,16 +101,6 @@ export function CategoriesTable({
       <CategoryDialog category={selected as any} locale={locale} onClose={() => setSelected(null)} />
 
       <div className="overflow-x-auto">
-        <TablePaginationControls
-          page={currentPage}
-          pageSize={pageSize}
-          total={total}
-          onPageChange={setPage}
-          onPageSizeChange={(size) => {
-            setPageSize(size);
-            setPage(1);
-          }}
-        />
         <Table>
           <TableHeader>
             <TableRow>

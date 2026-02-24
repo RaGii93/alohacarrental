@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { setReviewVisibilityAction } from "@/actions/reviews";
-import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
 import { formatDate } from "@/lib/datetime";
 
 function stars(rating: number) {
@@ -18,8 +17,6 @@ function stars(rating: number) {
 export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: string }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState<"bookingCode" | "customerName" | "rating" | "status" | "createdAt">("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -64,10 +61,7 @@ export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: stri
     return rows;
   }, [reviews, sortKey, sortDir]);
 
-  const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const pageRows = sorted;
 
   const onToggle = async (reviewId: string, isVisible: boolean) => {
     setBusyId(reviewId);
@@ -83,16 +77,6 @@ export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: stri
 
   return (
     <div className="space-y-3">
-      <TablePaginationControls
-        page={currentPage}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
       <Table>
         <TableHeader>
           <TableRow>

@@ -7,6 +7,7 @@ import {
   setMinBookingDays,
   setTaxPercentage,
 } from "@/lib/settings";
+import { logAdminAction } from "@/lib/audit";
 
 export async function getTaxSettingsAction() {
   try {
@@ -26,6 +27,10 @@ export async function updateTaxPercentageAction(taxPercentage: number, _locale: 
     }
 
     const value = await setTaxPercentage(taxPercentage);
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "SETTINGS_TAX_UPDATED",
+    });
     return { success: true as const, taxPercentage: value };
   } catch (error: any) {
     return { success: false as const, error: error?.message || "Failed to update tax percentage" };
@@ -53,6 +58,10 @@ export async function updateMinimumBookingDaysAction(minimumBookingDays: number,
     }
 
     const value = await setMinBookingDays(minimumBookingDays);
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "SETTINGS_MIN_BOOKING_DAYS_UPDATED",
+    });
     return { success: true as const, minimumBookingDays: value };
   } catch (error: any) {
     return { success: false as const, error: error?.message || "Failed to update minimum booking days" };

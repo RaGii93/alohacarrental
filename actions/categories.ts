@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { categoryFormSchema } from "@/lib/validators";
 import { uploadFile } from "@/lib/uploads";
+import { logAdminAction } from "@/lib/audit";
 
 async function assertAdmin() {
   const session = await getSession();
@@ -118,6 +119,10 @@ export async function uploadCategoryImageAction(formData: FormData) {
     if (!upload.success || !upload.url) {
       return { success: false, error: upload.error || "Failed to upload image" };
     }
+    await logAdminAction({
+      adminUserId: auth.session.adminUserId,
+      action: "CATEGORY_IMAGE_UPLOADED",
+    });
 
     return { success: true, imageUrl: upload.url };
   } catch (error: any) {

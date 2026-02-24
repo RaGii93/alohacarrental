@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { comparePassword } from "@/lib/password";
 import { loginFormSchema } from "@/lib/validators";
-import { createSession, setSessionCookie, destroySession } from "@/lib/session";
+import { createSession, setSessionCookie, destroySession, getSession } from "@/lib/session";
+import { logAdminAction } from "@/lib/audit";
 
 export async function loginAction(email: string, password: string, locale: string) {
   try {
@@ -29,6 +30,10 @@ export async function loginAction(email: string, password: string, locale: strin
     });
 
     await setSessionCookie(sessionToken);
+    await logAdminAction({
+      adminUserId: user.id,
+      action: "ADMIN_LOGGED_IN",
+    });
 
     return { success: true };
   } catch (error: any) {
@@ -37,6 +42,13 @@ export async function loginAction(email: string, password: string, locale: strin
 }
 
 export async function logoutAction(locale: string) {
+  const session = await getSession();
+  if (session?.adminUserId) {
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "ADMIN_LOGGED_OUT",
+    });
+  }
   await destroySession();
   redirect(`/${locale}`);
 }

@@ -9,14 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { archiveExtraAction } from "@/actions/extras";
 import { ExtraDialog } from "./ExtraDialog";
-import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
 
 export function ExtrasTable({ extras, locale }: { extras: any[]; locale: string }) {
   const router = useRouter();
   const [selected, setSelected] = useState<any | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState<"name" | "pricingType" | "amount" | "status">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -57,10 +54,7 @@ export function ExtrasTable({ extras, locale }: { extras: any[]; locale: string 
     return rows;
   }, [extras, sortKey, sortDir]);
 
-  const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const pageRows = sorted;
 
   const handleArchive = async (id: string) => {
     setBusyId(id);
@@ -78,16 +72,6 @@ export function ExtrasTable({ extras, locale }: { extras: any[]; locale: string 
     <div className="space-y-4">
       <Button onClick={() => setSelected({})}>+ Add Extra</Button>
       <ExtraDialog extra={selected} locale={locale} onClose={() => setSelected(null)} />
-      <TablePaginationControls
-        page={currentPage}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
       <Table>
         <TableHeader>
           <TableRow>

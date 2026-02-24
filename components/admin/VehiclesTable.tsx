@@ -17,7 +17,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { VehicleDialog } from "./VehicleDialog";
 import { deleteVehicleAction, setVehicleStatusAction } from "@/actions/vehicles";
-import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
 
 interface Vehicle {
   id: string;
@@ -50,8 +49,6 @@ export function VehiclesTable({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Partial<Vehicle> | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState<"name" | "plateNumber" | "category" | "dailyRate" | "status">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -98,10 +95,7 @@ export function VehiclesTable({
     return rows;
   }, [vehicles, sortKey, sortDir]);
 
-  const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const pageRows = sorted;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -165,16 +159,6 @@ export function VehiclesTable({
       />
 
       <div className="overflow-x-auto">
-        <TablePaginationControls
-          page={currentPage}
-          pageSize={pageSize}
-          total={total}
-          onPageChange={setPage}
-          onPageSizeChange={(size) => {
-            setPageSize(size);
-            setPage(1);
-          }}
-        />
         <Table>
           <TableHeader>
             <TableRow>

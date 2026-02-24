@@ -9,15 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { deactivateDiscountCodeAction } from "@/actions/discounts";
 import { DiscountCodeDialog } from "./DiscountCodeDialog";
-import { TablePaginationControls } from "@/components/admin/TablePaginationControls";
 import { formatDate } from "@/lib/datetime";
 
 export function DiscountCodesTable({ discountCodes, locale }: { discountCodes: any[]; locale: string }) {
   const router = useRouter();
   const [selected, setSelected] = useState<any | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState<"code" | "percentage" | "uses" | "expiresAt" | "status">("code");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -62,10 +59,7 @@ export function DiscountCodesTable({ discountCodes, locale }: { discountCodes: a
     return rows;
   }, [discountCodes, sortKey, sortDir]);
 
-  const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const pageRows = sorted;
 
   const handleDeactivate = async (id: string) => {
     setBusyId(id);
@@ -83,16 +77,6 @@ export function DiscountCodesTable({ discountCodes, locale }: { discountCodes: a
     <div className="space-y-4">
       <Button onClick={() => setSelected({})}>+ Add Discount Code</Button>
       <DiscountCodeDialog discount={selected} locale={locale} onClose={() => setSelected(null)} />
-      <TablePaginationControls
-        page={currentPage}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
       <Table>
         <TableHeader>
           <TableRow>

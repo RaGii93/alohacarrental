@@ -19,16 +19,85 @@ import { FinancialFilters } from "@/components/admin/FinancialFilters";
 import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
 import { TaxSettingsCard } from "@/components/admin/TaxSettingsCard";
 import { getMinBookingDays, getTaxPercentage } from "@/lib/settings";
+import Link from "next/link";
+
+const DEFAULT_ADMIN_PAGE_SIZE = 20;
+const ADMIN_PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
+
+function toPositiveInt(value: string | undefined, fallback = 1) {
+  const parsed = Number.parseInt(String(value || ""), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function toPageSize(value: string | undefined) {
+  const parsed = Number.parseInt(String(value || ""), 10);
+  if (!Number.isFinite(parsed)) return DEFAULT_ADMIN_PAGE_SIZE;
+  return (ADMIN_PAGE_SIZE_OPTIONS as readonly number[]).includes(parsed) ? parsed : DEFAULT_ADMIN_PAGE_SIZE;
+}
 
 export default async function AdminDashboardPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ start?: string; end?: string; tab?: string }>;
+  searchParams: Promise<{
+    start?: string;
+    end?: string;
+    tab?: string;
+    bookings_status?: string;
+    pending_page?: string;
+    confirmed_page?: string;
+    declined_page?: string;
+    deliveries_page?: string;
+    returns_page?: string;
+    logs_page?: string;
+    page_size?: string;
+    vehicles_subtab?: string;
+    vehicles_page?: string;
+    categories_page?: string;
+    extras_page?: string;
+    discounts_page?: string;
+    reviews_page?: string;
+  }>;
 }) {
   const { locale } = await params;
-  const { start, end, tab } = await searchParams;
+  const {
+    start,
+    end,
+    tab,
+    bookings_status,
+    pending_page,
+    confirmed_page,
+    declined_page,
+    deliveries_page,
+    returns_page,
+    logs_page,
+    page_size,
+    vehicles_subtab,
+    vehicles_page,
+    categories_page,
+    extras_page,
+    discounts_page,
+    reviews_page,
+  } = await searchParams;
+  const activeBookingsStatus =
+    bookings_status === "confirmed" || bookings_status === "declined" ? bookings_status : "pending";
+  const pendingPage = toPositiveInt(pending_page);
+  const confirmedPage = toPositiveInt(confirmed_page);
+  const declinedPage = toPositiveInt(declined_page);
+  const deliveriesPage = toPositiveInt(deliveries_page);
+  const returnsPage = toPositiveInt(returns_page);
+  const logsPage = toPositiveInt(logs_page);
+  const pageSize = toPageSize(page_size);
+  const activeVehiclesSubtab =
+    vehicles_subtab && ["manage", "pricing", "categories", "extras", "discounts"].includes(vehicles_subtab)
+      ? vehicles_subtab
+      : "manage";
+  const vehiclesPage = toPositiveInt(vehicles_page);
+  const categoriesPage = toPositiveInt(categories_page);
+  const extrasPage = toPositiveInt(extras_page);
+  const discountsPage = toPositiveInt(discounts_page);
+  const reviewsPage = toPositiveInt(reviews_page);
   const t = await getTranslations();
   const tOr = (key: string, values: Record<string, any>, fallback: string) =>
     t.has(key as any) ? t(key as any, values as any) : fallback;
@@ -72,47 +141,199 @@ export default async function AdminDashboardPage({
   }
   const financialStartInput = toInputDate(financialStartDate);
   const financialEndInput = toInputDate(financialEndDate);
-  const inFinancialRange = (value: Date | string) => {
-    const dt = new Date(value);
-    return dt >= financialStartDate && dt <= financialEndDate;
+  const buildAdminHref = (updates: Record<string, string | number | null | undefined>) => {
+    const qp = new URLSearchParams();
+    if (start) qp.set("start", start);
+    if (end) qp.set("end", end);
+    if (tab) qp.set("tab", tab);
+    if (bookings_status) qp.set("bookings_status", bookings_status);
+    if (pending_page) qp.set("pending_page", pending_page);
+    if (confirmed_page) qp.set("confirmed_page", confirmed_page);
+    if (declined_page) qp.set("declined_page", declined_page);
+    if (deliveries_page) qp.set("deliveries_page", deliveries_page);
+    if (returns_page) qp.set("returns_page", returns_page);
+    if (logs_page) qp.set("logs_page", logs_page);
+    if (page_size) qp.set("page_size", page_size);
+    if (vehicles_subtab) qp.set("vehicles_subtab", vehicles_subtab);
+    if (vehicles_page) qp.set("vehicles_page", vehicles_page);
+    if (categories_page) qp.set("categories_page", categories_page);
+    if (extras_page) qp.set("extras_page", extras_page);
+    if (discounts_page) qp.set("discounts_page", discounts_page);
+    if (reviews_page) qp.set("reviews_page", reviews_page);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === "") {
+        qp.delete(key);
+      } else {
+        qp.set(key, String(value));
+      }
+    });
+    return `/${locale}/admin?${qp.toString()}`;
+  };
+  const renderPagination = (
+    page: number,
+    total: number,
+    pageParam: string,
+    extraUpdates: Record<string, string | number | null | undefined> = {}
+  ) => {
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const safePage = Math.min(page, totalPages);
+    const startRow = total === 0 ? 0 : (safePage - 1) * pageSize + 1;
+    const endRow = Math.min(total, safePage * pageSize);
+
+    return (
+      <div className="mb-3 flex flex-col gap-2 text-sm md:flex-row md:items-center md:justify-between">
+        <div className="text-muted-foreground">
+          Showing {startRow}-{endRow} of {total}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">Rows:</span>
+          {ADMIN_PAGE_SIZE_OPTIONS.map((size) => (
+            <Link
+              key={size}
+              className={`inline-flex h-8 items-center rounded-md border px-2 text-xs ${
+                pageSize === size ? "bg-accent font-medium" : "hover:bg-accent"
+              }`}
+              href={buildAdminHref({ ...extraUpdates, page_size: size, [pageParam]: 1 })}
+            >
+              {size}
+            </Link>
+          ))}
+          {safePage > 1 ? (
+            <Link
+              className="inline-flex h-8 items-center rounded-md border px-3 text-sm hover:bg-accent"
+              href={buildAdminHref({ ...extraUpdates, [pageParam]: safePage - 1 })}
+            >
+              Prev
+            </Link>
+          ) : (
+            <span className="inline-flex h-8 items-center rounded-md border px-3 text-sm text-muted-foreground">
+              Prev
+            </span>
+          )}
+          <span className="px-2 text-muted-foreground">
+            {safePage}/{totalPages}
+          </span>
+          {safePage < totalPages ? (
+            <Link
+              className="inline-flex h-8 items-center rounded-md border px-3 text-sm hover:bg-accent"
+              href={buildAdminHref({ ...extraUpdates, [pageParam]: safePage + 1 })}
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="inline-flex h-8 items-center rounded-md border px-3 text-sm text-muted-foreground">
+              Next
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+  const withOperationalState = async <T extends { id: string; paymentReceivedAt?: Date | null }>(
+    rows: T[]
+  ) => {
+    if (rows.length === 0) {
+      return rows.map((row) => ({ ...row, deliveredAt: null, returnedAt: null }));
+    }
+    const ids = rows.map((row) => row.id);
+    try {
+      const opRows = await db.$queryRawUnsafe<
+        Array<{
+          id: string;
+          paymentReceivedAt: Date | null;
+          deliveredAt: Date | null;
+          returnedAt: Date | null;
+        }>
+      >(
+        `SELECT id, "paymentReceivedAt", "deliveredAt", "returnedAt"
+         FROM "Booking"
+         WHERE id IN (${ids.map((_, i) => `$${i + 1}`).join(",")})`,
+        ...ids
+      );
+      const opMap = new Map(opRows.map((row) => [row.id, row]));
+      return rows.map((row) => {
+        const op = opMap.get(row.id);
+        return {
+          ...row,
+          paymentReceivedAt: op?.paymentReceivedAt ?? row.paymentReceivedAt ?? null,
+          deliveredAt: op?.deliveredAt ?? null,
+          returnedAt: op?.returnedAt ?? null,
+        };
+      });
+    } catch {
+      return rows.map((row) => ({
+        ...row,
+        paymentReceivedAt: row.paymentReceivedAt ?? null,
+        deliveredAt: null,
+        returnedAt: null,
+      }));
+    }
   };
 
-  // Fetch bookings by status
-  const pending = await db.booking.findMany({
-    where: { status: "PENDING" },
-    include: { vehicle: true, category: true },
-    orderBy: { createdAt: "desc" },
-  });
+  // Fetch bookings by status (server-side paginated)
+  const [
+    pendingTotal,
+    confirmedTotal,
+    declinedTotal,
+    pending,
+    confirmed,
+    declined,
+  ] = await Promise.all([
+    db.booking.count({ where: { status: "PENDING" } }),
+    db.booking.count({ where: { status: "CONFIRMED" } }),
+    db.booking.count({ where: { status: "DECLINED" } }),
+    db.booking.findMany({
+      where: { status: "PENDING" },
+      include: { vehicle: true, category: true },
+      orderBy: { createdAt: "desc" },
+      skip: (pendingPage - 1) * pageSize,
+      take: pageSize,
+    }),
+    db.booking.findMany({
+      where: { status: "CONFIRMED" },
+      include: { vehicle: true, category: true },
+      orderBy: { createdAt: "desc" },
+      skip: (confirmedPage - 1) * pageSize,
+      take: pageSize,
+    }),
+    db.booking.findMany({
+      where: { status: "DECLINED" },
+      include: { vehicle: true, category: true },
+      orderBy: { createdAt: "desc" },
+      skip: (declinedPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
 
-  const confirmed = await db.booking.findMany({
-    where: { status: "CONFIRMED" },
-    include: { vehicle: true, category: true },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const declined = await db.booking.findMany({
-    where: { status: "DECLINED" },
-    include: { vehicle: true, category: true },
-    orderBy: { createdAt: "desc" },
-  });
-
-  // Operational dashboards
-  const deliveries = await db.booking.findMany({
-    where: {
-      status: "CONFIRMED",
-      startDate: { gte: now, lte: sevenDays },
-    },
-    include: { vehicle: true, category: true, pickupLocationRef: true },
-    orderBy: { startDate: "asc" },
-  });
-  const returns = await db.booking.findMany({
-    where: {
-      status: "CONFIRMED",
-      endDate: { gte: now, lte: sevenDays },
-    },
-    include: { vehicle: true, category: true, dropoffLocationRef: true },
-    orderBy: { endDate: "asc" },
-  });
+  // Operational dashboards (server-side paginated)
+  const deliveriesWhere = {
+    status: "CONFIRMED" as const,
+    startDate: { gte: now, lte: sevenDays },
+  };
+  const returnsWhere = {
+    status: "CONFIRMED" as const,
+    endDate: { gte: now, lte: sevenDays },
+  };
+  const [deliveriesTotal, returnsTotal, deliveriesRaw, returnsRaw] = await Promise.all([
+    db.booking.count({ where: deliveriesWhere }),
+    db.booking.count({ where: returnsWhere }),
+    db.booking.findMany({
+      where: deliveriesWhere,
+      include: { vehicle: true, category: true, pickupLocationRef: true },
+      orderBy: { startDate: "asc" },
+      skip: (deliveriesPage - 1) * pageSize,
+      take: pageSize,
+    }),
+    db.booking.findMany({
+      where: returnsWhere,
+      include: { vehicle: true, category: true, dropoffLocationRef: true },
+      orderBy: { endDate: "asc" },
+      skip: (returnsPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
+  const deliveries = await withOperationalState(deliveriesRaw as any);
+  const returns = await withOperationalState(returnsRaw as any);
 
   // Financial dashboard
   const [confirmedRevenueAgg, pendingPipelineAgg, monthRevenueAgg, paidRevenueAgg] = await Promise.all([
@@ -133,15 +354,26 @@ export default async function AdminDashboardPage({
       _sum: { totalAmount: true },
     }),
   ]);
-  const confirmedInRange = confirmed.filter((b) => inFinancialRange(b.createdAt));
-  const pendingInRange = pending.filter((b) => inFinancialRange(b.createdAt));
-  const confirmedCount = confirmedInRange.length;
-  const paidConfirmedCount = confirmedInRange.filter((b) => !!(b as any).invoiceUrl).length;
+  const [confirmedCount, pendingCount, paidConfirmedCount] = await Promise.all([
+    db.booking.count({
+      where: { status: "CONFIRMED", createdAt: { gte: financialStartDate, lte: financialEndDate } },
+    }),
+    db.booking.count({
+      where: { status: "PENDING", createdAt: { gte: financialStartDate, lte: financialEndDate } },
+    }),
+    db.booking.count({
+      where: {
+        status: "CONFIRMED",
+        invoiceUrl: { not: null },
+        createdAt: { gte: financialStartDate, lte: financialEndDate },
+      },
+    }),
+  ]);
   const unpaidConfirmedCount = confirmedCount - paidConfirmedCount;
   const avgConfirmedValue = confirmedCount > 0 ? Math.round((confirmedRevenueAgg._sum.totalAmount ?? 0) / confirmedCount) : 0;
   const conversionRate =
-    pendingInRange.length + confirmedInRange.length > 0
-      ? Math.round((confirmedInRange.length / (pendingInRange.length + confirmedInRange.length)) * 100)
+    pendingCount + confirmedCount > 0
+      ? Math.round((confirmedCount / (pendingCount + confirmedCount)) * 100)
       : 0;
   const recentInvoices = await db.booking.findMany({
     where: { invoiceUrl: { not: null }, createdAt: { gte: financialStartDate, lte: financialEndDate } },
@@ -194,64 +426,118 @@ export default async function AdminDashboardPage({
     where: { isActive: true },
     orderBy: { sortOrder: "asc" },
   });
-  const allCategoryRows = await db.vehicleCategory.findMany({
-    include: {
-      _count: {
-        select: { vehicles: true, bookings: true },
+  const [categoriesTotal, allCategoryRows] = await Promise.all([
+    db.vehicleCategory.count(),
+    db.vehicleCategory.findMany({
+      include: {
+        _count: {
+          select: { vehicles: true, bookings: true },
+        },
       },
-    },
-    orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }],
-  });
+      orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }],
+      skip: (categoriesPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
   const categoryNameMap = new Map(categories.map((category) => [category.id, category.name]));
+  let extrasTotal = 0;
   let extras: Array<any> = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
     try {
-      extras = await (db as any).extra.findMany({ orderBy: { createdAt: "desc" } });
+      const [total, rows] = await Promise.all([
+        (db as any).extra.count(),
+        (db as any).extra.findMany({
+          orderBy: { createdAt: "desc" },
+          skip: (extrasPage - 1) * pageSize,
+          take: pageSize,
+        }),
+      ]);
+      extrasTotal = total;
+      extras = rows;
     } catch {
+      extrasTotal = 0;
       extras = [];
     }
   } else {
     try {
-      extras = await db.$queryRaw<Array<any>>`
-        SELECT id, name, description, "pricingType", amount, "isActive", "createdAt"
-        FROM "Extra"
-        ORDER BY "createdAt" DESC
+      const countRows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(*)::int AS count FROM "Extra"
       `;
+      extrasTotal = countRows?.[0]?.count ?? 0;
+      extras = await db.$queryRawUnsafe<Array<any>>(
+        `SELECT id, name, description, "pricingType", amount, "isActive", "createdAt"
+         FROM "Extra"
+         ORDER BY "createdAt" DESC
+         LIMIT $1 OFFSET $2`,
+        pageSize,
+        (extrasPage - 1) * pageSize
+      );
     } catch {
+      extrasTotal = 0;
       extras = [];
     }
   }
 
+  let discountCodesTotal = 0;
   let discountCodes: Array<any> = [];
   if ((db as any).discountCode && typeof (db as any).discountCode.findMany === "function") {
     try {
-      discountCodes = await (db as any).discountCode.findMany({ orderBy: { createdAt: "desc" } });
+      const [total, rows] = await Promise.all([
+        (db as any).discountCode.count(),
+        (db as any).discountCode.findMany({
+          orderBy: { createdAt: "desc" },
+          skip: (discountsPage - 1) * pageSize,
+          take: pageSize,
+        }),
+      ]);
+      discountCodesTotal = total;
+      discountCodes = rows;
     } catch {
+      discountCodesTotal = 0;
       discountCodes = [];
     }
   } else {
     try {
-      discountCodes = await db.$queryRaw<Array<any>>`
-        SELECT id, code, description, percentage, "isActive", "maxUses", "usedCount", "expiresAt", "createdAt"
-        FROM "DiscountCode"
-        ORDER BY "createdAt" DESC
+      const countRows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(*)::int AS count FROM "DiscountCode"
       `;
+      discountCodesTotal = countRows?.[0]?.count ?? 0;
+      discountCodes = await db.$queryRawUnsafe<Array<any>>(
+        `SELECT id, code, description, percentage, "isActive", "maxUses", "usedCount", "expiresAt", "createdAt"
+         FROM "DiscountCode"
+         ORDER BY "createdAt" DESC
+         LIMIT $1 OFFSET $2`,
+        pageSize,
+        (discountsPage - 1) * pageSize
+      );
     } catch {
+      discountCodesTotal = 0;
       discountCodes = [];
     }
   }
   const utilizationPct = totalVehicles > 0 ? Math.round((onRentVehicles / totalVehicles) * 100) : 0;
-  const returnsToday = returns.filter((booking) => {
-    const d = new Date(booking.endDate);
-    return d.toDateString() === now.toDateString();
-  }).length;
+  const dayStart = new Date(now);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(now);
+  dayEnd.setHours(23, 59, 59, 999);
+  const returnsToday = await db.booking.count({
+    where: {
+      status: "CONFIRMED",
+      endDate: { gte: dayStart, lte: dayEnd },
+    },
+  });
   const topDemand = [...expectedDemandByCategory].sort((a, b) => b._count._all - a._count._all).slice(0, 3);
 
-  // Vehicle management tab data
-  const vehicleRows = await db.vehicle.findMany({
-    include: { category: true },
-    orderBy: { createdAt: "desc" },
-  });
+  // Vehicle management tab data (server-side paginated)
+  const [vehiclesTotal, vehicleRows] = await Promise.all([
+    db.vehicle.count(),
+    db.vehicle.findMany({
+      include: { category: true },
+      orderBy: { createdAt: "desc" },
+      skip: (vehiclesPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
   const transformedVehicles = vehicleRows.map((vehicle) => ({
     ...vehicle,
     plateNumber: vehicle.plateNumber ?? undefined,
@@ -259,10 +545,35 @@ export default async function AdminDashboardPage({
     notes: vehicle.notes ?? undefined,
   }));
   const vehicleCategories = categories.map((category) => ({ id: category.id, name: category.name }));
-  const reviews = await db.review.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
+  const [reviewsTotal, reviews] = await Promise.all([
+    db.review.count(),
+    db.review.findMany({
+      orderBy: { createdAt: "desc" },
+      skip: (reviewsPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
+  const [auditLogsTotal, auditLogs] = await Promise.all([
+    db.auditLog.count(),
+    db.auditLog.findMany({
+      include: {
+        adminUser: {
+          select: {
+            email: true,
+            role: true,
+          },
+        },
+        booking: {
+          select: {
+            bookingCode: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (logsPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
   const [taxPercentage, minimumBookingDays] = await Promise.all([
     getTaxPercentage(),
     getMinBookingDays(),
@@ -296,7 +607,7 @@ export default async function AdminDashboardPage({
 
       <Tabs
         defaultValue={
-          tab && ["bookings", "deliveries", "returns", "financial", "fleet", "vehicles", "reviews", "settings"].includes(tab)
+          tab && ["bookings", "deliveries", "returns", "financial", "fleet", "vehicles", "reviews", "settings", "logs"].includes(tab)
             ? tab
             : "bookings"
         }
@@ -311,22 +622,35 @@ export default async function AdminDashboardPage({
           <TabsTrigger value="vehicles">{t("admin.dashboard.tabs.vehicles")}</TabsTrigger>
           <TabsTrigger value="reviews">{t("admin.dashboard.tabs.reviews")}</TabsTrigger>
           <TabsTrigger value="settings">{t("admin.dashboard.tabs.settings")}</TabsTrigger>
+          <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bookings" className="mt-6">
-          <Tabs defaultValue="pending">
+          <Tabs defaultValue={activeBookingsStatus}>
             <TabsList>
-              <TabsTrigger value="pending">{t("admin.tabs.pending")} ({pending.length})</TabsTrigger>
-              <TabsTrigger value="confirmed">{t("admin.tabs.confirmed")} ({confirmed.length})</TabsTrigger>
-              <TabsTrigger value="declined">{t("admin.tabs.declined")} ({declined.length})</TabsTrigger>
+              <TabsTrigger value="pending">{t("admin.tabs.pending")} ({pendingTotal})</TabsTrigger>
+              <TabsTrigger value="confirmed">{t("admin.tabs.confirmed")} ({confirmedTotal})</TabsTrigger>
+              <TabsTrigger value="declined">{t("admin.tabs.declined")} ({declinedTotal})</TabsTrigger>
             </TabsList>
             <TabsContent value="pending">
+              {renderPagination(pendingPage, pendingTotal, "pending_page", {
+                tab: "bookings",
+                bookings_status: "pending",
+              })}
               <BookingsTable bookings={pending} locale={locale} status="PENDING" />
             </TabsContent>
             <TabsContent value="confirmed">
+              {renderPagination(confirmedPage, confirmedTotal, "confirmed_page", {
+                tab: "bookings",
+                bookings_status: "confirmed",
+              })}
               <BookingsTable bookings={confirmed} locale={locale} status="CONFIRMED" />
             </TabsContent>
             <TabsContent value="declined">
+              {renderPagination(declinedPage, declinedTotal, "declined_page", {
+                tab: "bookings",
+                bookings_status: "declined",
+              })}
               <BookingsTable bookings={declined} locale={locale} status="DECLINED" />
             </TabsContent>
           </Tabs>
@@ -334,12 +658,14 @@ export default async function AdminDashboardPage({
 
         <TabsContent value="deliveries" className="mt-6">
           <h2 className="text-xl font-semibold mb-4">{t("admin.dashboard.deliveries.title")}</h2>
-          <BookingsTable bookings={deliveries} locale={locale} status="CONFIRMED" dateMode="pickup" />
+          {renderPagination(deliveriesPage, deliveriesTotal, "deliveries_page", { tab: "deliveries" })}
+          <BookingsTable bookings={deliveries as any} locale={locale} status="CONFIRMED" dateMode="pickup" actionMode="deliveries" />
         </TabsContent>
 
         <TabsContent value="returns" className="mt-6">
           <h2 className="text-xl font-semibold mb-4">{t("admin.dashboard.returns.title")}</h2>
-          <BookingsTable bookings={returns} locale={locale} status="CONFIRMED" dateMode="dropoff" />
+          {renderPagination(returnsPage, returnsTotal, "returns_page", { tab: "returns" })}
+          <BookingsTable bookings={returns as any} locale={locale} status="CONFIRMED" dateMode="dropoff" actionMode="returns" />
         </TabsContent>
 
         <TabsContent value="financial" className="mt-6">
@@ -470,7 +796,7 @@ export default async function AdminDashboardPage({
         </TabsContent>
 
         <TabsContent value="vehicles" className="mt-6">
-          <Tabs defaultValue="manage">
+          <Tabs defaultValue={activeVehiclesSubtab}>
             <TabsList>
               <TabsTrigger value="manage">{t("admin.dashboard.vehicles.manage")}</TabsTrigger>
               <TabsTrigger value="pricing">{t("admin.dashboard.vehicles.pricing")}</TabsTrigger>
@@ -479,6 +805,10 @@ export default async function AdminDashboardPage({
               <TabsTrigger value="discounts">Discounts</TabsTrigger>
             </TabsList>
             <TabsContent value="manage" className="mt-4">
+              {renderPagination(vehiclesPage, vehiclesTotal, "vehicles_page", {
+                tab: "vehicles",
+                vehicles_subtab: "manage",
+              })}
               <VehiclesTable vehicles={transformedVehicles} categories={vehicleCategories} locale={locale} />
             </TabsContent>
             <TabsContent value="pricing" className="mt-4">
@@ -503,12 +833,24 @@ export default async function AdminDashboardPage({
               </div>
             </TabsContent>
             <TabsContent value="categories" className="mt-4">
+              {renderPagination(categoriesPage, categoriesTotal, "categories_page", {
+                tab: "vehicles",
+                vehicles_subtab: "categories",
+              })}
               <CategoriesTable categories={allCategoryRows as any} locale={locale} />
             </TabsContent>
             <TabsContent value="extras" className="mt-4">
+              {renderPagination(extrasPage, extrasTotal, "extras_page", {
+                tab: "vehicles",
+                vehicles_subtab: "extras",
+              })}
               <ExtrasTable extras={extras as any} locale={locale} />
             </TabsContent>
             <TabsContent value="discounts" className="mt-4">
+              {renderPagination(discountsPage, discountCodesTotal, "discounts_page", {
+                tab: "vehicles",
+                vehicles_subtab: "discounts",
+              })}
               <DiscountCodesTable discountCodes={discountCodes as any} locale={locale} />
             </TabsContent>
           </Tabs>
@@ -517,6 +859,7 @@ export default async function AdminDashboardPage({
         <TabsContent value="reviews" className="mt-6 space-y-4">
           <h2 className="text-xl font-semibold">{t("admin.dashboard.reviews.title")}</h2>
           <p className="text-sm text-muted-foreground">{t("admin.dashboard.reviews.subtitle")}</p>
+          {renderPagination(reviewsPage, reviewsTotal, "reviews_page", { tab: "reviews" })}
           <ReviewsTable reviews={reviews as any[]} locale={locale} />
         </TabsContent>
 
@@ -526,6 +869,33 @@ export default async function AdminDashboardPage({
             initialTaxPercentage={taxPercentage}
             initialMinimumBookingDays={minimumBookingDays}
           />
+        </TabsContent>
+
+        <TabsContent value="logs" className="mt-6">
+          <h2 className="text-xl font-semibold mb-4">Admin Audit Logs</h2>
+          {renderPagination(logsPage, auditLogsTotal, "logs_page", { tab: "logs" })}
+          <Card className="p-4">
+            {auditLogs.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No audit logs found.</p>
+            ) : (
+              <div className="space-y-2">
+                {auditLogs.map((entry) => (
+                  <div key={entry.id} className="rounded-md border p-3 text-sm">
+                    <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                      <p className="font-medium">
+                        {entry.action}
+                        {entry.booking?.bookingCode ? ` · ${entry.booking.bookingCode}` : ""}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{formatDateTime(entry.createdAt)}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {entry.adminUser.email} ({entry.adminUser.role})
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

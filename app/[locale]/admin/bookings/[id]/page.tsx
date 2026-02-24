@@ -92,6 +92,21 @@ export default async function BookingDetailPage({
         }
       : null,
   };
+  let operational: { deliveredAt: Date | null; returnedAt: Date | null } = {
+    deliveredAt: null,
+    returnedAt: null,
+  };
+  try {
+    const rows = await db.$queryRaw<Array<{ deliveredAt: Date | null; returnedAt: Date | null }>>`
+      SELECT "deliveredAt", "returnedAt"
+      FROM "Booking"
+      WHERE id = ${id}
+      LIMIT 1
+    `;
+    if (rows[0]) operational = rows[0];
+  } catch {
+    operational = { deliveredAt: null, returnedAt: null };
+  }
 
   let extras: any[] = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
@@ -141,7 +156,7 @@ export default async function BookingDetailPage({
       </Link>
 
       <BookingDetailClient
-        booking={bookingWithAdjustments}
+        booking={{ ...bookingWithAdjustments, ...operational }}
         locale={locale}
         extras={extras}
         discountCodes={discountCodes}
