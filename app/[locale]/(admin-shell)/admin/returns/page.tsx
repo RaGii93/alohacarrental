@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { BookingsTable } from "@/components/admin/BookingsTable";
-import { ADMIN_PAGE_SIZE_OPTIONS, requireLicensedAdmin, toPageSize, toPositiveInt } from "@/app/[locale]/admin/_lib";
+import { ADMIN_PAGE_SIZE_OPTIONS, requireAdminSection, toPageSize, toPositiveInt } from "@/app/[locale]/admin/_lib";
 import Link from "next/link";
 
 export default async function AdminReturnsPage({
@@ -14,7 +14,7 @@ export default async function AdminReturnsPage({
   const { locale } = await params;
   const { returns_page, page_size } = await searchParams;
   const t = await getTranslations();
-  await requireLicensedAdmin(locale);
+  await requireAdminSection(locale, "returns");
   const now = new Date();
   const sevenDays = new Date(now);
   sevenDays.setDate(sevenDays.getDate() + 7);

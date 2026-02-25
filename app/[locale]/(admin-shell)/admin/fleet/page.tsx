@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { FleetDashboard } from "@/components/admin/FleetDashboard";
-import { requireLicensedAdmin } from "@/app/[locale]/admin/_lib";
+import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 
 export default async function AdminFleetPage({
   params,
@@ -10,7 +10,7 @@ export default async function AdminFleetPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations();
-  await requireLicensedAdmin(locale);
+  await requireAdminSection(locale, "fleet");
   const now = new Date();
   const sevenDays = new Date(now);
   sevenDays.setDate(sevenDays.getDate() + 7);

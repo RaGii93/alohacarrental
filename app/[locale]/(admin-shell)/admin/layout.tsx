@@ -43,7 +43,7 @@ export default async function AdminLayout({
     <SidebarProvider>
       <AppSidebar userEmail={admin.email} role={admin.role} licenseActive={licenseActive} />
       <SidebarInset>
-        <header className="sticky top-16 z-10 flex min-h-12 flex-wrap items-center justify-between gap-2 border-b bg-background/90 px-4 py-2 backdrop-blur">
+        <header className="sticky top-16 z-10 flex min-h-12 flex-wrap items-center justify-between gap-2 border-b bg-white px-4 py-2">
           <div className="flex min-w-0 items-center gap-2">
             <SidebarTrigger />
             <div className="min-w-0">

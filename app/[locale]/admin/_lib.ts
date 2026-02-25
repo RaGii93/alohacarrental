@@ -24,3 +24,19 @@ export async function requireLicensedAdmin(locale: string) {
   }
   return { admin, licenseActive };
 }
+
+const STAFF_ALLOWED_SECTIONS = new Set(["bookings", "deliveries", "returns", "fleet"]);
+
+export function canAccessAdminSection(role: string, section: string) {
+  if (role === "ROOT" || role === "OWNER") return true;
+  if (role === "STAFF") return STAFF_ALLOWED_SECTIONS.has(section);
+  return false;
+}
+
+export async function requireAdminSection(locale: string, section: string) {
+  const auth = await requireLicensedAdmin(locale);
+  if (!canAccessAdminSection(auth.admin.role, section)) {
+    redirect(`/${locale}/admin/bookings`);
+  }
+  return auth;
+}

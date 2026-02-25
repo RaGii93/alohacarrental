@@ -20,6 +20,7 @@ import {
   Tag,
   Truck,
   Undo2,
+  Users,
   XCircle,
 } from "lucide-react";
 import {
@@ -37,7 +38,9 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-export function AppSidebar(_: {
+export function AppSidebar({
+  role,
+}: {
   userEmail: string;
   role: string;
   licenseActive: boolean;
@@ -59,12 +62,17 @@ export function AppSidebar(_: {
     { key: "bookings", label: tOr("admin.dashboard.tabs.bookings", "Bookings"), icon: ClipboardList },
     { key: "deliveries", label: tOr("admin.dashboard.tabs.deliveries", "Deliveries"), icon: Truck },
     { key: "returns", label: tOr("admin.dashboard.tabs.returns", "Returns"), icon: Undo2 },
-    { key: "financial", label: tOr("admin.dashboard.tabs.financial", "Financial"), icon: DollarSign },
     { key: "fleet", label: tOr("admin.dashboard.tabs.fleet", "Fleet"), icon: CarFront },
-    { key: "vehicles", label: tOr("admin.dashboard.tabs.vehicles", "Vehicle Management"), icon: Car },
-    { key: "reviews", label: tOr("admin.dashboard.tabs.reviews", "Reviews"), icon: Star },
-    { key: "settings", label: tOr("admin.dashboard.tabs.settings", "Settings"), icon: Settings },
-    { key: "logs", label: "Logs", icon: FileText },
+    ...(role === "ROOT" || role === "OWNER"
+      ? [
+          { key: "financial", label: tOr("admin.dashboard.tabs.financial", "Financial"), icon: DollarSign },
+          { key: "vehicles", label: tOr("admin.dashboard.tabs.vehicles", "Vehicle Management"), icon: Car },
+          { key: "reviews", label: tOr("admin.dashboard.tabs.reviews", "Reviews"), icon: Star },
+          { key: "settings", label: tOr("admin.dashboard.tabs.settings", "Settings"), icon: Settings },
+          { key: "logs", label: "Logs", icon: FileText },
+          { key: "users", label: tOr("admin.dashboard.tabs.users", "Users"), icon: Users },
+        ]
+      : []),
   ] as const;
 
   return (

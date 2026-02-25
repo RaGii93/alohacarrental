@@ -296,7 +296,8 @@
         "fleet": "Vloot",
         "vehicles": "Voertuigbeheer",
         "reviews": "Reviews",
-        "settings": "Instellingen"
+        "settings": "Instellingen",
+        "users": "Gebruikers"
       },
       "deliveries": {
         "title": "Aankomende Leveringen (Volgende 7 Dagen)"
@@ -327,6 +328,27 @@
       "reviews": {
         "title": "Review Moderatie",
         "subtitle": "Toon of verberg klantreviews op de startpagina."
+      }
+    },
+    "users": {
+      "title": "Gebruikersbeheer",
+      "add": "Gebruiker Toevoegen",
+      "edit": "Gebruiker Bewerken",
+      "email": "E-mailadres",
+      "role": "Rol",
+      "password": "Wachtwoord",
+      "passwordOptional": "Wachtwoord (optioneel)",
+      "createdAt": "Aangemaakt",
+      "actions": "Acties",
+      "created": "Gebruiker aangemaakt",
+      "updated": "Gebruiker bijgewerkt",
+      "deleted": "Gebruiker verwijderd",
+      "protected": "Beveiligd",
+      "rootProtected": "ROOT-gebruiker kan niet worden aangepast of verwijderd",
+      "deleteConfirm": "Deze gebruiker verwijderen?",
+      "empty": "Geen gebruikers gevonden",
+      "errors": {
+        "delete": "Gebruiker verwijderen mislukt"
       }
     },
     "settings": {

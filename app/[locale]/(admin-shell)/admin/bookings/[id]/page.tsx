@@ -1,10 +1,8 @@
-import { requireAdmin } from "@/lib/auth-guards";
-import { isLicenseActive } from "@/lib/license";
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { BookingDetailClient } from "@/components/admin/BookingDetailClient";
 import { getTaxPercentage } from "@/lib/settings";
+import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 
 export default async function BookingDetailPage({
   params,
@@ -12,15 +10,7 @@ export default async function BookingDetailPage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
-
-  // Check admin access
-  const admin = await requireAdmin(locale);
-
-  // Check license
-  const licenseActive = isLicenseActive();
-  if (!licenseActive && admin.role !== "ROOT") {
-    redirect(`/${locale}/admin/billing-required`);
-  }
+  await requireAdminSection(locale, "bookings");
 
   const booking = await db.booking.findUnique({
     where: { id },

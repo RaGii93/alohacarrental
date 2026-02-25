@@ -296,7 +296,8 @@
         "fleet": "Flota",
         "vehicles": "Gestión de Vehículos",
         "reviews": "Reseñas",
-        "settings": "Configuración"
+        "settings": "Configuración",
+        "users": "Usuarios"
       },
       "deliveries": {
         "title": "Próximas Entregas (Siguientes 7 Días)"
@@ -327,6 +328,27 @@
       "reviews": {
         "title": "Moderación de Reseñas",
         "subtitle": "Mostrar u ocultar reseñas de clientes en la página principal."
+      }
+    },
+    "users": {
+      "title": "Gestión de Usuarios",
+      "add": "Agregar Usuario",
+      "edit": "Editar Usuario",
+      "email": "Correo Electrónico",
+      "role": "Rol",
+      "password": "Contraseña",
+      "passwordOptional": "Contraseña (opcional)",
+      "createdAt": "Creado",
+      "actions": "Acciones",
+      "created": "Usuario creado",
+      "updated": "Usuario actualizado",
+      "deleted": "Usuario eliminado",
+      "protected": "Protegido",
+      "rootProtected": "El usuario ROOT no puede modificarse ni eliminarse",
+      "deleteConfirm": "¿Eliminar este usuario?",
+      "empty": "No se encontraron usuarios",
+      "errors": {
+        "delete": "Error al eliminar usuario"
       }
     },
     "settings": {

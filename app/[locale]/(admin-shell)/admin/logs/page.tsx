@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/datetime";
-import { ADMIN_PAGE_SIZE_OPTIONS, requireLicensedAdmin, toPageSize, toPositiveInt } from "@/app/[locale]/admin/_lib";
+import { ADMIN_PAGE_SIZE_OPTIONS, requireAdminSection, toPageSize, toPositiveInt } from "@/app/[locale]/admin/_lib";
 
 export default async function AdminLogsPage({
   params,
@@ -15,7 +15,7 @@ export default async function AdminLogsPage({
   const { locale } = await params;
   const { logs_page, page_size } = await searchParams;
   const t = await getTranslations();
-  await requireLicensedAdmin(locale);
+  await requireAdminSection(locale, "logs");
   const pageSize = toPageSize(page_size);
   const page = toPositiveInt(logs_page);
   const [total, rows] = await Promise.all([

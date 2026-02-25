@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Link } from "@/i18n/navigation";
@@ -7,10 +8,22 @@ import { CalendarCheck, CarFront, CircleHelp, House } from "lucide-react";
 
 export function Header() {
   const t = useTranslations();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="border-b bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap gap-3 justify-between items-center">
+    <header
+      className={`sticky top-0 z-50 border-b transition-colors ${
+        scrolled ? "bg-white" : "bg-transparent"
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="text-2xl font-bold hover:opacity-80 transition-opacity">
           EdgeRent Lite
         </Link>

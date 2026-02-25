@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { BookingsTable } from "@/components/admin/BookingsTable";
 import {
   ADMIN_PAGE_SIZE_OPTIONS,
-  requireLicensedAdmin,
+  requireAdminSection,
   toPageSize,
   toPositiveInt,
 } from "@/app/[locale]/admin/_lib";
@@ -27,7 +27,7 @@ export default async function AdminBookingsPage({
   const t = await getTranslations();
   const tOr = (key: string, values: Record<string, any>, fallback: string) =>
     t.has(key as any) ? t(key as any, values as any) : fallback;
-  await requireLicensedAdmin(locale);
+  await requireAdminSection(locale, "bookings");
   const activeStatus =
     bookings_status === "confirmed" || bookings_status === "declined" ? bookings_status : "pending";
   const pageSize = toPageSize(page_size);

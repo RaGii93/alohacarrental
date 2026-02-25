@@ -7,7 +7,7 @@ import { CategoriesTable } from "@/components/admin/CategoriesTable";
 import { ExtrasTable } from "@/components/admin/ExtrasTable";
 import { DiscountCodesTable } from "@/components/admin/DiscountCodesTable";
 import { getBlobProxyUrl } from "@/lib/blob";
-import { ADMIN_PAGE_SIZE_OPTIONS, requireLicensedAdmin, toPageSize, toPositiveInt } from "@/app/[locale]/admin/_lib";
+import { ADMIN_PAGE_SIZE_OPTIONS, requireAdminSection, toPageSize, toPositiveInt } from "@/app/[locale]/admin/_lib";
 
 export default async function VehiclesPage({
   params,
@@ -26,7 +26,7 @@ export default async function VehiclesPage({
   const { locale } = await params;
   const { vehicles_subtab, vehicles_page, categories_page, extras_page, discounts_page, page_size } = await searchParams;
   const t = await getTranslations();
-  await requireLicensedAdmin(locale);
+  await requireAdminSection(locale, "vehicles");
   const activeSubtab = vehicles_subtab && ["manage", "pricing", "categories", "extras", "discounts"].includes(vehicles_subtab) ? vehicles_subtab : "manage";
   const pageSize = toPageSize(page_size);
   const vehiclesPage = toPositiveInt(vehicles_page);

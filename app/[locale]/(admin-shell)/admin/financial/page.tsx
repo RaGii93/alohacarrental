@@ -5,7 +5,7 @@ import { FinancialFilters } from "@/components/admin/FinancialFilters";
 import { formatDateTime } from "@/lib/datetime";
 import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
 import { getBlobProxyUrl } from "@/lib/blob";
-import { requireLicensedAdmin } from "@/app/[locale]/admin/_lib";
+import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 
 export default async function AdminFinancialPage({
   params,
@@ -17,7 +17,7 @@ export default async function AdminFinancialPage({
   const { locale } = await params;
   const { start, end } = await searchParams;
   const t = await getTranslations();
-  await requireLicensedAdmin(locale);
+  await requireAdminSection(locale, "financial");
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const parseDateInput = (value: string | undefined, endOfDay: boolean) => {

@@ -326,7 +326,8 @@
         "fleet": "Fleet",
         "vehicles": "Vehicle Management",
         "reviews": "Reviews",
-        "settings": "Settings"
+        "settings": "Settings",
+        "users": "Users"
       },
       "deliveries": {
         "title": "Upcoming Deliveries (Next 7 Days)"
@@ -357,6 +358,27 @@
       "reviews": {
         "title": "Reviews Moderation",
         "subtitle": "Show or hide customer reviews on the home page."
+      }
+    },
+    "users": {
+      "title": "User Management",
+      "add": "Add User",
+      "edit": "Edit User",
+      "email": "Email",
+      "role": "Role",
+      "password": "Password",
+      "passwordOptional": "Password (optional)",
+      "createdAt": "Created",
+      "actions": "Actions",
+      "created": "User created",
+      "updated": "User updated",
+      "deleted": "User deleted",
+      "protected": "Protected",
+      "rootProtected": "ROOT user cannot be modified or deleted",
+      "deleteConfirm": "Delete this user?",
+      "empty": "No users found",
+      "errors": {
+        "delete": "Failed to delete user"
       }
     },
     "settings": {

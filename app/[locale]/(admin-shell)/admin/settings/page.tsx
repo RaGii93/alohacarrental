@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { TaxSettingsCard } from "@/components/admin/TaxSettingsCard";
 import { getMinBookingDays, getTaxPercentage } from "@/lib/settings";
-import { requireLicensedAdmin } from "@/app/[locale]/admin/_lib";
+import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 
 export default async function AdminSettingsPage({
   params,
@@ -10,7 +10,7 @@ export default async function AdminSettingsPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations();
-  await requireLicensedAdmin(locale);
+  await requireAdminSection(locale, "settings");
   const [taxPercentage, minimumBookingDays] = await Promise.all([
     getTaxPercentage(),
     getMinBookingDays(),
