@@ -50,12 +50,20 @@ export default async function AdminLayout({
               <p className="truncate text-sm font-medium">
                 {t("admin.dashboard.header.welcome", { user: admin.email })}
               </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {t("admin.dashboard.header.role", { role: admin.role })} |{" "}
-                {licenseActive
-                  ? t("admin.dashboard.header.licenseActive")
-                  : t("admin.dashboard.header.licenseSuspended")}
-              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                  {t("admin.dashboard.header.role", { role: admin.role })}
+                </span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                    licenseActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {licenseActive
+                    ? t("admin.dashboard.header.licenseActive")
+                    : t("admin.dashboard.header.licenseSuspended")}
+                </span>
+              </div>
             </div>
           </div>
           <form action={logoutAction.bind(null, locale)}>
