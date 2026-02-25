@@ -7,6 +7,7 @@ import { createDiscountCodeAction, updateDiscountCodeAction } from "@/actions/di
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Save, TicketPercent, X } from "lucide-react";
 
 export function DiscountCodeDialog({
   discount,
@@ -51,7 +52,10 @@ export function DiscountCodeDialog({
     <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) onClose(); }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{discount?.id ? "Edit Discount Code" : "Add Discount Code"}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <TicketPercent className="h-5 w-5" />
+            {discount?.id ? "Edit Discount Code" : "Add Discount Code"}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="Code" />
@@ -64,8 +68,8 @@ export function DiscountCodeDialog({
             Active
           </label>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSave} disabled={busy}>{busy ? "Saving..." : "Save"}</Button>
+            <Button variant="outline" onClick={onClose}><X className="h-4 w-4" />Cancel</Button>
+            <Button onClick={handleSave} disabled={busy}><Save className="h-4 w-4" />{busy ? "Saving..." : "Save"}</Button>
           </div>
         </div>
       </DialogContent>

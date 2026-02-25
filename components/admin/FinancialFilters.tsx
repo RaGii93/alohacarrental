@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
+import { CalendarDays, Filter, RotateCcw } from "lucide-react";
 
 type FinancialFiltersProps = {
   initialStart: string;
@@ -57,7 +58,8 @@ export function FinancialFilters({ initialStart, initialEnd }: FinancialFiltersP
   return (
     <div className="mb-4 flex flex-wrap items-end justify-end gap-3">
       <div className="w-full sm:w-[220px]">
-        <label htmlFor="financial-start" className="mb-1 block text-xs text-muted-foreground">
+        <label htmlFor="financial-start" className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CalendarDays className="h-3.5 w-3.5" />
           Start Date
         </label>
         <DatePicker
@@ -70,7 +72,8 @@ export function FinancialFilters({ initialStart, initialEnd }: FinancialFiltersP
         />
       </div>
       <div className="w-full sm:w-[220px]">
-        <label htmlFor="financial-end" className="mb-1 block text-xs text-muted-foreground">
+        <label htmlFor="financial-end" className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CalendarDays className="h-3.5 w-3.5" />
           End Date
         </label>
         <DatePicker
@@ -84,9 +87,11 @@ export function FinancialFilters({ initialStart, initialEnd }: FinancialFiltersP
       </div>
       <div className="flex items-end gap-2">
         <Button type="button" variant="outline" className="h-9" onClick={applyFilters}>
+          <Filter className="h-4 w-4" />
           Apply Filter
         </Button>
         <Button type="button" variant="ghost" className="h-9" onClick={resetFilters}>
+          <RotateCcw className="h-4 w-4" />
           Reset
         </Button>
       </div>

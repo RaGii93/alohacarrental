@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, AirVent, Gauge, Home, Settings2, Sofa } from "lucide-react";
 import { isLicenseActive } from "@/lib/license";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
@@ -190,6 +190,7 @@ export function BookingWizard({
               <h2 className="text-xl font-semibold mb-4">{t("booking.bookingRequestReceived")}</h2>
               <p className="text-muted-foreground mb-6">{t("booking.nextSteps")}</p>
               <Button onClick={() => window.location.href = `/${locale}`}>
+                <Home className="h-4 w-4" />
                 {t("nav.home")}
               </Button>
             </div>
@@ -211,9 +212,16 @@ export function BookingWizard({
           )}
           <div className="space-y-2 text-sm">
             <p className="font-medium">{selectedCategory?.name || "-"}</p>
-            <p className="text-muted-foreground">
-              {selectedCategory ? `${selectedCategory.seats} seats • ${selectedCategory.transmission === "MANUAL" ? "Manual" : "Automatic"} • ${selectedCategory.hasAC ? "A/C" : "No A/C"}` : "-"}
-            </p>
+            {selectedCategory ? (
+              <div className="space-y-1 text-muted-foreground">
+                <p className="flex items-center gap-1.5"><Sofa className="h-3.5 w-3.5" />{selectedCategory.seats} seats</p>
+                <p className="flex items-center gap-1.5"><Settings2 className="h-3.5 w-3.5" />{selectedCategory.transmission === "MANUAL" ? "Manual" : "Automatic"}</p>
+                <p className="flex items-center gap-1.5"><AirVent className="h-3.5 w-3.5" />{selectedCategory.hasAC ? "A/C" : "No A/C"}</p>
+                <p className="flex items-center gap-1.5"><Gauge className="h-3.5 w-3.5" />Standard performance</p>
+              </div>
+            ) : (
+              <p className="text-muted-foreground">-</p>
+            )}
             <div className="flex justify-between"><span>{t("booking.pricePerDay")}</span><span>{selectedCategory ? formatCurrency(selectedCategory.dailyRate) : "-"}</span></div>
             <div className="flex justify-between"><span>{t("booking.days")}</span><span>{days}</span></div>
             <div className="flex justify-between"><span>{t("booking.extras")}</span><span>{formatCurrency(extrasAmount)}</span></div>

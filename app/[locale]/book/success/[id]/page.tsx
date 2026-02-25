@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { buildMetadata } from "@/lib/seo";
 import { getTenantConfig } from "@/lib/tenant";
 import { formatDate, formatDateTime } from "@/lib/datetime";
+import { CarFront, Home, MapPin } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -114,7 +115,7 @@ export default async function SuccessPage({
                   <>
                     {" "}
                     <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      ({t("booking.map")})
+                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
                 )}
@@ -128,7 +129,7 @@ export default async function SuccessPage({
                   <>
                     {" "}
                     <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      ({t("booking.map")})
+                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
                 )}
@@ -151,10 +152,16 @@ export default async function SuccessPage({
 
         <div className="flex gap-4 justify-center">
           <Link href={`/${locale}`}>
-            <Button variant="outline">{t("nav.home")}</Button>
+            <Button variant="outline">
+              <Home className="h-4 w-4" />
+              {t("nav.home")}
+            </Button>
           </Link>
           <Link href={`/${locale}/book`}>
-            <Button>{t("nav.booking")}</Button>
+            <Button>
+              <CarFront className="h-4 w-4" />
+              {t("nav.booking")}
+            </Button>
           </Link>
         </div>
       </Card>

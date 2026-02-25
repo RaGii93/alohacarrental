@@ -8,6 +8,7 @@ import { DocumentPreview } from "@/components/shared/DocumentPreview";
 import { buildMetadata } from "@/lib/seo";
 import { getTenantConfig } from "@/lib/tenant";
 import { formatDateTime } from "@/lib/datetime";
+import { ArrowLeft, MapPin, Search } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -77,7 +78,10 @@ export default async function BookingReviewPage({
             placeholder={t("booking.reviewLookup.placeholder")}
             className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
           />
-          <Button type="submit">{t("booking.reviewLookup.submit")}</Button>
+          <Button type="submit">
+            <Search className="h-4 w-4" />
+            {t("booking.reviewLookup.submit")}
+          </Button>
         </form>
       </Card>
 
@@ -132,7 +136,7 @@ export default async function BookingReviewPage({
                   <>
                     {" "}
                     <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      ({t("booking.map")})
+                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
                 )}
@@ -146,7 +150,7 @@ export default async function BookingReviewPage({
                   <>
                     {" "}
                     <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      ({t("booking.map")})
+                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
                 )}
@@ -173,7 +177,10 @@ export default async function BookingReviewPage({
 
       <div>
         <Link href={`/${locale}/book`}>
-          <Button variant="outline">{t("booking.backToBooking")}</Button>
+          <Button variant="outline">
+            <ArrowLeft className="h-4 w-4" />
+            {t("booking.backToBooking")}
+          </Button>
         </Link>
       </div>
     </div>

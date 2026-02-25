@@ -7,6 +7,7 @@ import { createExtraAction, updateExtraAction } from "@/actions/extras";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PackagePlus, Save, X } from "lucide-react";
 
 export function ExtraDialog({
   extra,
@@ -57,7 +58,10 @@ export function ExtraDialog({
     <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) onClose(); }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{extra?.id ? "Edit Extra" : "Add Extra"}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <PackagePlus className="h-5 w-5" />
+            {extra?.id ? "Edit Extra" : "Add Extra"}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
@@ -72,8 +76,8 @@ export function ExtraDialog({
             Active
           </label>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSave} disabled={busy}>{busy ? "Saving..." : "Save"}</Button>
+            <Button variant="outline" onClick={onClose}><X className="h-4 w-4" />Cancel</Button>
+            <Button onClick={handleSave} disabled={busy}><Save className="h-4 w-4" />{busy ? "Saving..." : "Save"}</Button>
           </div>
         </div>
       </DialogContent>

@@ -19,6 +19,7 @@ type DatePickerProps = {
   fromYear?: number;
   toYear?: number;
   disabledDate?: (date: Date) => boolean;
+  hideIcon?: boolean;
 };
 
 export function DatePicker({
@@ -31,6 +32,7 @@ export function DatePicker({
   fromYear,
   toYear,
   disabledDate,
+  hideIcon = true,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -46,7 +48,7 @@ export function DatePicker({
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          {!hideIcon && <CalendarIcon className="mr-2 h-4 w-4" />}
           {value ? format(value, "PPP") : placeholder}
         </Button>
       </PopoverTrigger>

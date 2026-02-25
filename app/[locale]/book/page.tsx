@@ -8,6 +8,7 @@ import { buildMetadata } from "@/lib/seo";
 import { getBookingJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
 import { getMinBookingDays, getTaxPercentage } from "@/lib/settings";
+import { SearchCode } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -96,7 +97,10 @@ export default async function BookingPage({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-4 flex justify-end">
           <Link href={`/${locale}/book/review`}>
-            <Button variant="outline">{t("booking.reviewLookup.cta")}</Button>
+            <Button variant="outline">
+              <SearchCode className="h-4 w-4" />
+              {t("booking.reviewLookup.cta")}
+            </Button>
           </Link>
         </div>
         <BookingWizard

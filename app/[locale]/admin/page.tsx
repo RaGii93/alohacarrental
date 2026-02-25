@@ -18,8 +18,29 @@ import { formatDateTime } from "@/lib/datetime";
 import { FinancialFilters } from "@/components/admin/FinancialFilters";
 import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
 import { TaxSettingsCard } from "@/components/admin/TaxSettingsCard";
+import { FleetDashboard } from "@/components/admin/FleetDashboard";
 import { getMinBookingDays, getTaxPercentage } from "@/lib/settings";
 import Link from "next/link";
+import {
+  Car,
+  CarFront,
+  CheckCircle2,
+  CirclePlus,
+  ClipboardList,
+  Clock3,
+  DollarSign,
+  FileText,
+  Grid2X2,
+  ListChecks,
+  LogOut,
+  Percent,
+  Settings,
+  Star,
+  Tag,
+  Truck,
+  Undo2,
+  XCircle,
+} from "lucide-react";
 
 const DEFAULT_ADMIN_PAGE_SIZE = 20;
 const ADMIN_PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
@@ -391,32 +412,33 @@ export default async function AdminDashboardPage({
   });
 
   // Fleet dashboard
-  const [totalVehicles, activeVehicles, maintenanceVehicles, inactiveVehicles] = await Promise.all([
+  const [totalVehicles, activeVehicles] = await Promise.all([
     db.vehicle.count(),
     db.vehicle.count({ where: { status: "ACTIVE" } }),
-    db.vehicle.count({ where: { status: "MAINTENANCE" } }),
-    db.vehicle.count({ where: { status: "INACTIVE" } }),
   ]);
-  let onRentVehicles = 0;
+  let onRentNow = 0;
   try {
-    const rows = await db.$queryRaw<Array<{ count: number }>>`
-      SELECT COUNT(*)::int AS count
-      FROM "Vehicle"
-      WHERE "status" = 'ON_RENT'
-    `;
-    onRentVehicles = rows?.[0]?.count ?? 0;
+    onRentNow = await db.vehicle.count({ where: { status: "ON_RENT" } as any });
   } catch {
-    // Backward-compatible fallback when ON_RENT enum is not yet available.
-    onRentVehicles = 0;
+    // Fallback for older schemas/enums: infer from active bookings.
+    onRentNow = await db.booking.count({
+      where: {
+        OR: [
+          {
+            status: "CONFIRMED",
+            startDate: { lte: now },
+            endDate: { gt: now },
+          },
+          {
+            status: "PENDING",
+            startDate: { lte: now },
+            endDate: { gt: now },
+            holdExpiresAt: { gt: now },
+          },
+        ],
+      },
+    });
   }
-  const onRentNow = await db.booking.count({
-    where: {
-      status: { in: ["PENDING", "CONFIRMED"] },
-      startDate: { lte: now },
-      endDate: { gt: now },
-      holdExpiresAt: { gt: now },
-    },
-  });
   const expectedDemandByCategory = await db.booking.groupBy({
     by: ["categoryId"],
     where: { status: { in: ["PENDING", "CONFIRMED"] }, startDate: { gte: now, lte: sevenDays } },
@@ -515,7 +537,6 @@ export default async function AdminDashboardPage({
       discountCodes = [];
     }
   }
-  const utilizationPct = totalVehicles > 0 ? Math.round((onRentVehicles / totalVehicles) * 100) : 0;
   const dayStart = new Date(now);
   dayStart.setHours(0, 0, 0, 0);
   const dayEnd = new Date(now);
@@ -527,6 +548,86 @@ export default async function AdminDashboardPage({
     },
   });
   const topDemand = [...expectedDemandByCategory].sort((a, b) => b._count._all - a._count._all).slice(0, 3);
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const previousNow = new Date(now.getTime() - weekMs);
+  const previousWeekStart = new Date(previousNow.getTime() - weekMs);
+  const previousDayStart = new Date(dayStart.getTime() - weekMs);
+  const previousDayEnd = new Date(dayEnd.getTime() - weekMs);
+  const [
+    activeVehiclesPrev,
+    onRentNowPrev,
+    returnsTodayPrev,
+    expectedDemandPreviousWeek,
+    deliveriesTotalPrev,
+    returnsTotalPrev,
+    overdueReturns,
+    overdueReturnsPrev,
+  ] = await Promise.all([
+    db.vehicle.count({ where: { status: "ACTIVE", createdAt: { lte: previousNow } } }),
+    db.booking.count({
+      where: {
+        OR: [
+          {
+            status: "CONFIRMED",
+            startDate: { lte: previousNow },
+            endDate: { gt: previousNow },
+          },
+          {
+            status: "PENDING",
+            startDate: { lte: previousNow },
+            endDate: { gt: previousNow },
+            holdExpiresAt: { gt: previousNow },
+          },
+        ],
+      },
+    }),
+    db.booking.count({
+      where: {
+        status: "CONFIRMED",
+        endDate: { gte: previousDayStart, lte: previousDayEnd },
+      },
+    }),
+    db.booking.groupBy({
+      by: ["categoryId"],
+      where: { status: { in: ["PENDING", "CONFIRMED"] }, startDate: { gte: previousWeekStart, lte: previousNow } },
+      _count: { _all: true },
+    }),
+    db.booking.count({
+      where: {
+        status: "CONFIRMED",
+        startDate: { gte: previousNow, lte: now },
+      },
+    }),
+    db.booking.count({
+      where: {
+        status: "CONFIRMED",
+        endDate: { gte: previousNow, lte: now },
+      },
+    }),
+    db.booking.count({
+      where: {
+        status: "CONFIRMED",
+        endDate: { lt: now },
+      },
+    }),
+    db.booking.count({
+      where: {
+        status: "CONFIRMED",
+        endDate: { lt: previousNow },
+      },
+    }),
+  ]);
+  const topDemandPrev = [...expectedDemandPreviousWeek].sort((a, b) => b._count._all - a._count._all).slice(0, 1);
+  const topDemandCurrentCount = topDemand[0]?._count._all ?? 0;
+  const topDemandPrevCount = topDemandPrev[0]?._count._all ?? 0;
+  const expectedDemandTotal = expectedDemandByCategory.reduce((sum, row) => sum + row._count._all, 0);
+  const expectedDemandPrevTotal = expectedDemandPreviousWeek.reduce((sum, row) => sum + row._count._all, 0);
+  const demandByCategory = expectedDemandByCategory
+    .map((row) => ({
+      label: categoryNameMap.get(row.categoryId) || row.categoryId,
+      count: row._count._all,
+    }))
+    .sort((a, b) => b.count - a.count);
 
   // Vehicle management tab data (server-side paginated)
   const [vehiclesTotal, vehicleRows] = await Promise.all([
@@ -580,6 +681,8 @@ export default async function AdminDashboardPage({
   ]);
 
   const currency = (amountCents: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
+  const utilizationPct = totalVehicles > 0 ? Math.round((onRentNow / totalVehicles) * 100) : 0;
+  const utilizationPrevPct = activeVehiclesPrev > 0 ? Math.round((onRentNowPrev / activeVehiclesPrev) * 100) : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -599,7 +702,8 @@ export default async function AdminDashboardPage({
           </div>
         </div>
         <form action={logoutAction.bind(null, locale)}>
-          <Button type="submit" variant="outline">
+          <Button type="submit" variant="outline" className="inline-flex items-center gap-1.5">
+            <LogOut className="h-4 w-4" />
             {t("nav.logout")}
           </Button>
         </form>
@@ -614,23 +718,23 @@ export default async function AdminDashboardPage({
         className="w-full"
       >
         <TabsList className="flex flex-wrap h-auto">
-          <TabsTrigger value="bookings">{t("admin.dashboard.tabs.bookings")}</TabsTrigger>
-          <TabsTrigger value="deliveries">{t("admin.dashboard.tabs.deliveries")}</TabsTrigger>
-          <TabsTrigger value="returns">{t("admin.dashboard.tabs.returns")}</TabsTrigger>
-          <TabsTrigger value="financial">{t("admin.dashboard.tabs.financial")}</TabsTrigger>
-          <TabsTrigger value="fleet">{t("admin.dashboard.tabs.fleet")}</TabsTrigger>
-          <TabsTrigger value="vehicles">{t("admin.dashboard.tabs.vehicles")}</TabsTrigger>
-          <TabsTrigger value="reviews">{t("admin.dashboard.tabs.reviews")}</TabsTrigger>
-          <TabsTrigger value="settings">{t("admin.dashboard.tabs.settings")}</TabsTrigger>
-          <TabsTrigger value="logs">Logs</TabsTrigger>
+          <TabsTrigger value="bookings"><ClipboardList className="h-4 w-4" />{t("admin.dashboard.tabs.bookings")}</TabsTrigger>
+          <TabsTrigger value="deliveries"><Truck className="h-4 w-4" />{t("admin.dashboard.tabs.deliveries")}</TabsTrigger>
+          <TabsTrigger value="returns"><Undo2 className="h-4 w-4" />{t("admin.dashboard.tabs.returns")}</TabsTrigger>
+          <TabsTrigger value="financial"><DollarSign className="h-4 w-4" />{t("admin.dashboard.tabs.financial")}</TabsTrigger>
+          <TabsTrigger value="fleet"><CarFront className="h-4 w-4" />{t("admin.dashboard.tabs.fleet")}</TabsTrigger>
+          <TabsTrigger value="vehicles"><Car className="h-4 w-4" />{t("admin.dashboard.tabs.vehicles")}</TabsTrigger>
+          <TabsTrigger value="reviews"><Star className="h-4 w-4" />{t("admin.dashboard.tabs.reviews")}</TabsTrigger>
+          <TabsTrigger value="settings"><Settings className="h-4 w-4" />{t("admin.dashboard.tabs.settings")}</TabsTrigger>
+          <TabsTrigger value="logs"><FileText className="h-4 w-4" />Logs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bookings" className="mt-6">
           <Tabs defaultValue={activeBookingsStatus}>
             <TabsList>
-              <TabsTrigger value="pending">{t("admin.tabs.pending")} ({pendingTotal})</TabsTrigger>
-              <TabsTrigger value="confirmed">{t("admin.tabs.confirmed")} ({confirmedTotal})</TabsTrigger>
-              <TabsTrigger value="declined">{t("admin.tabs.declined")} ({declinedTotal})</TabsTrigger>
+              <TabsTrigger value="pending"><Clock3 className="h-4 w-4" />{t("admin.tabs.pending")} ({pendingTotal})</TabsTrigger>
+              <TabsTrigger value="confirmed"><CheckCircle2 className="h-4 w-4" />{t("admin.tabs.confirmed")} ({confirmedTotal})</TabsTrigger>
+              <TabsTrigger value="declined"><XCircle className="h-4 w-4" />{t("admin.tabs.declined")} ({declinedTotal})</TabsTrigger>
             </TabsList>
             <TabsContent value="pending">
               {renderPagination(pendingPage, pendingTotal, "pending_page", {
@@ -737,72 +841,38 @@ export default async function AdminDashboardPage({
 
         <TabsContent value="fleet" className="mt-6 space-y-6">
           <h2 className="text-xl font-semibold">{t("admin.dashboard.fleet.title")}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <Card className="p-4">
-              <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.totalVehicles")}</p>
-              <p className="text-2xl font-bold">{totalVehicles}</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.activeVehicles")}</p>
-              <p className="text-2xl font-bold">{activeVehicles}</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-sm text-muted-foreground">On Rent Vehicles</p>
-              <p className="text-2xl font-bold">{onRentVehicles}</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.maintenanceVehicles")}</p>
-              <p className="text-2xl font-bold">{maintenanceVehicles}</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.inactiveVehicles")}</p>
-              <p className="text-2xl font-bold">{inactiveVehicles}</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.onRentNow")}</p>
-              <p className="text-2xl font-bold">{onRentNow}</p>
-            </Card>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="p-4 bg-gradient-to-br from-sky-50 to-white">
-              <p className="text-sm text-muted-foreground">Fleet Utilization</p>
-              <p className="text-2xl font-bold">{utilizationPct}%</p>
-            </Card>
-            <Card className="p-4 bg-gradient-to-br from-orange-50 to-white">
-              <p className="text-sm text-muted-foreground">Returns Due Today</p>
-              <p className="text-2xl font-bold">{returnsToday}</p>
-            </Card>
-            <Card className="p-4 bg-gradient-to-br from-indigo-50 to-white">
-              <p className="text-sm text-muted-foreground">Top Demand Category</p>
-              <p className="text-lg font-bold">
-                {topDemand[0] ? `${categoryNameMap.get(topDemand[0].categoryId) || topDemand[0].categoryId} (${topDemand[0]._count._all})` : "-"}
-              </p>
-            </Card>
-          </div>
-          <Card className="p-4">
-            <p className="font-semibold mb-2">{t("admin.dashboard.fleet.expectedDemand")}</p>
-            <div className="space-y-1">
-              {expectedDemandByCategory.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("admin.dashboard.fleet.noExpectedDemand")}</p>
-              ) : (
-                expectedDemandByCategory.map((row) => (
-                  <p key={row.categoryId} className="text-sm">
-                    {categoryNameMap.get(row.categoryId) || row.categoryId}: {row._count._all}
-                  </p>
-                ))
-              )}
-            </div>
-          </Card>
+          <FleetDashboard
+            activeVehicles={activeVehicles}
+            activeVehiclesPrev={activeVehiclesPrev}
+            onRentNow={onRentNow}
+            onRentNowPrev={onRentNowPrev}
+            utilizationPct={utilizationPct}
+            utilizationPrevPct={utilizationPrevPct}
+            pickups7d={deliveriesTotal}
+            pickups7dPrev={deliveriesTotalPrev}
+            returns7d={returnsTotal}
+            returns7dPrev={returnsTotalPrev}
+            returnsToday={returnsToday}
+            returnsTodayPrev={returnsTodayPrev}
+            overdueReturns={overdueReturns}
+            overdueReturnsPrev={overdueReturnsPrev}
+            expectedDemandTotal={expectedDemandTotal}
+            expectedDemandPrevTotal={expectedDemandPrevTotal}
+            topDemandLabel={topDemand[0] ? `${categoryNameMap.get(topDemand[0].categoryId) || topDemand[0].categoryId} (${topDemand[0]._count._all})` : "-"}
+            topDemandCurrentCount={topDemandCurrentCount}
+            topDemandPrevCount={topDemandPrevCount}
+            demandByCategory={demandByCategory}
+          />
         </TabsContent>
 
         <TabsContent value="vehicles" className="mt-6">
           <Tabs defaultValue={activeVehiclesSubtab}>
             <TabsList>
-              <TabsTrigger value="manage">{t("admin.dashboard.vehicles.manage")}</TabsTrigger>
-              <TabsTrigger value="pricing">{t("admin.dashboard.vehicles.pricing")}</TabsTrigger>
-              <TabsTrigger value="categories">Categories</TabsTrigger>
-              <TabsTrigger value="extras">Extras</TabsTrigger>
-              <TabsTrigger value="discounts">Discounts</TabsTrigger>
+              <TabsTrigger value="manage"><ListChecks className="h-4 w-4" />{t("admin.dashboard.vehicles.manage")}</TabsTrigger>
+              <TabsTrigger value="pricing"><Tag className="h-4 w-4" />{t("admin.dashboard.vehicles.pricing")}</TabsTrigger>
+              <TabsTrigger value="categories"><Grid2X2 className="h-4 w-4" />Categories</TabsTrigger>
+              <TabsTrigger value="extras"><CirclePlus className="h-4 w-4" />Extras</TabsTrigger>
+              <TabsTrigger value="discounts"><Percent className="h-4 w-4" />Discounts</TabsTrigger>
             </TabsList>
             <TabsContent value="manage" className="mt-4">
               {renderPagination(vehiclesPage, vehiclesTotal, "vehicles_page", {

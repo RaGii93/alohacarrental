@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft, Home } from "lucide-react";
 
 export default function BillingRequiredPage({
   params,
@@ -16,7 +17,11 @@ export default function BillingRequiredPage({
           Your license has been suspended. Please contact support to resume access.
         </p>
         <Link href="/">
-          <Button variant="outline">Back to Home</Button>
+          <Button variant="outline">
+            <ArrowLeft className="h-4 w-4" />
+            <Home className="h-4 w-4" />
+            Back to Home
+          </Button>
         </Link>
       </div>
     </div>

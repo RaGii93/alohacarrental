@@ -8,7 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  FileBadge2,
+  Mail,
+  Phone,
+  Upload,
+  User,
+  ClipboardPenLine,
+} from "lucide-react";
 import { BookingData } from "../BookingWizard";
 import { DatePicker } from "@/components/ui/date-picker";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
@@ -97,7 +107,10 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="customerName">{t("booking.customerName")}</Label>
+            <Label htmlFor="customerName" className="mb-2 flex items-center gap-2">
+              <User className="h-4 w-4 text-muted-foreground" />
+              {t("booking.customerName")}
+            </Label>
             <Input
               id="customerName"
               value={bookingData.customerName}
@@ -108,7 +121,10 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           </div>
 
           <div>
-            <Label htmlFor="customerEmail">{t("booking.customerEmail")}</Label>
+            <Label htmlFor="customerEmail" className="mb-2 flex items-center gap-2">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              {t("booking.customerEmail")}
+            </Label>
             <Input
               id="customerEmail"
               type="email"
@@ -120,7 +136,10 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           </div>
 
           <div>
-            <Label htmlFor="customerPhone">{t("booking.customerPhone")}</Label>
+            <Label htmlFor="customerPhone" className="mb-2 flex items-center gap-2">
+              <Phone className="h-4 w-4 text-muted-foreground" />
+              {t("booking.customerPhone")}
+            </Label>
             <Input
               id="customerPhone"
               value={bookingData.customerPhone}
@@ -131,7 +150,10 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           </div>
 
           <div>
-            <Label htmlFor="driverLicenseNumber">{t("booking.driverLicenseNumber")}</Label>
+            <Label htmlFor="driverLicenseNumber" className="mb-2 flex items-center gap-2">
+              <FileBadge2 className="h-4 w-4 text-muted-foreground" />
+              {t("booking.driverLicenseNumber")}
+            </Label>
             <Input
               id="driverLicenseNumber"
               value={bookingData.driverLicenseNumber}
@@ -142,12 +164,16 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           </div>
 
           <div>
-            <Label htmlFor="birthDate">{t("booking.birthDate")}</Label>
+            <Label htmlFor="birthDate" className="mb-2 flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              {t("booking.birthDate")}
+            </Label>
             <DatePicker
               id="birthDate"
               value={bookingData.birthDate}
               onChange={(date) => updateBookingData({ birthDate: date })}
               placeholder={t("booking.birthDate")}
+              hideIcon
               disabled={disabled}
               fromYear={new Date().getFullYear() - 100}
               toYear={new Date().getFullYear() - 21}
@@ -163,12 +189,16 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           </div>
 
           <div>
-            <Label htmlFor="licenseExpiryDate">{t("booking.licenseExpiryDate")}</Label>
+            <Label htmlFor="licenseExpiryDate" className="mb-2 flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              {t("booking.licenseExpiryDate")}
+            </Label>
             <DatePicker
               id="licenseExpiryDate"
               value={bookingData.licenseExpiryDate}
               onChange={(date) => updateBookingData({ licenseExpiryDate: date })}
               placeholder={t("booking.licenseExpiryDate")}
+              hideIcon
               disabled={disabled}
               fromYear={new Date().getFullYear()}
               toYear={new Date().getFullYear() + 20}
@@ -239,7 +269,10 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
       </div>
 
       <div>
-        <Label htmlFor="notes">{t("booking.notes")}</Label>
+        <Label htmlFor="notes" className="mb-2 flex items-center gap-2">
+          <ClipboardPenLine className="h-4 w-4 text-muted-foreground" />
+          {t("booking.notes")}
+        </Label>
         <Textarea
           id="notes"
           value={bookingData.notes}
@@ -251,9 +284,11 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
       <div className="flex justify-between pt-4">
         <Button variant="outline" onClick={onPrev}>
+          <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
         <Button onClick={onNext} disabled={!canContinue || disabled}>
+          <ArrowRight className="h-4 w-4" />
           {t("booking.continue")}
         </Button>
       </div>

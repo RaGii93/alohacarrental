@@ -14,6 +14,17 @@ import { searchAvailabilityAction, AvailabilityResult } from "@/actions/availabi
 import { calculateDays, formatCurrency } from "@/lib/pricing";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { BookingData } from "../BookingWizard";
+import {
+  AirVent,
+  CalendarDays,
+  Clock3,
+  Gauge,
+  MapPin,
+  Search,
+  Settings2,
+  Sofa,
+  ArrowRight,
+} from "lucide-react";
 
 interface Step1SearchProps {
   bookingData: BookingData;
@@ -85,11 +96,15 @@ export function Step1Search({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">{t("booking.startDate")}</label>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              {t("booking.startDate")}
+            </label>
             <DatePicker
               value={bookingData.startDate}
               onChange={(date) => updateBookingData({ startDate: date })}
               placeholder={t("booking.selectDateRange")}
+              hideIcon
               disabled={disabled}
               fromYear={new Date().getFullYear()}
               toYear={new Date().getFullYear() + 3}
@@ -98,11 +113,15 @@ export function Step1Search({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">{t("booking.endDate")}</label>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              {t("booking.endDate")}
+            </label>
             <DatePicker
               value={bookingData.endDate}
               onChange={(date) => updateBookingData({ endDate: date })}
               placeholder={t("booking.selectDateRange")}
+              hideIcon
               disabled={disabled}
               fromYear={new Date().getFullYear()}
               toYear={new Date().getFullYear() + 3}
@@ -113,7 +132,10 @@ export function Step1Search({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <label className="block text-sm font-medium mb-2">{t("booking.pickupTime")}</label>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+              <Clock3 className="h-4 w-4 text-muted-foreground" />
+              {t("booking.pickupTime")}
+            </label>
             <Input
               type="time"
               value={bookingData.pickupTime}
@@ -122,7 +144,10 @@ export function Step1Search({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">{t("booking.dropoffTime")}</label>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
+              <Clock3 className="h-4 w-4 text-muted-foreground" />
+              {t("booking.dropoffTime")}
+            </label>
             <Input
               type="time"
               value={bookingData.dropoffTime}
@@ -134,7 +159,10 @@ export function Step1Search({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <Label>{t("booking.pickupLocation")}</Label>
+            <Label className="mb-2 flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              {t("booking.pickupLocation")}
+            </Label>
             <Select
               value={bookingData.pickupLocationId}
               onValueChange={(value) => updateBookingData({ pickupLocationId: value })}
@@ -154,7 +182,10 @@ export function Step1Search({
           </div>
 
           <div>
-            <Label>{t("booking.dropoffLocation")}</Label>
+            <Label className="mb-2 flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              {t("booking.dropoffLocation")}
+            </Label>
             <Select
               value={bookingData.dropoffLocationId}
               onValueChange={(value) => updateBookingData({ dropoffLocationId: value })}
@@ -192,6 +223,7 @@ export function Step1Search({
             disabled={!hasValidRange || !meetsMinimumDuration || isSearching || disabled}
             className="w-full"
           >
+            <Search className="h-4 w-4" />
             {isSearching ? t("common.loading") : t("booking.searchAvailability")}
           </Button>
         </div>
@@ -241,9 +273,24 @@ export function Step1Search({
                         <span className="text-sm text-muted-foreground">{t("booking.total")}:</span>
                         <span className="font-semibold">{formatCurrency(cat.totalForRange)}</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {(cat.seats ?? 5)} seats • {cat.transmission === "MANUAL" ? "Manual" : "Automatic"} • {cat.hasAC === false ? "No A/C" : "A/C"}
-                      </p>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <p className="flex items-center gap-1.5">
+                          <Sofa className="h-3.5 w-3.5" />
+                          {(cat.seats ?? 5)} seats
+                        </p>
+                        <p className="flex items-center gap-1.5">
+                          <Settings2 className="h-3.5 w-3.5" />
+                          {cat.transmission === "MANUAL" ? "Manual" : "Automatic"}
+                        </p>
+                        <p className="flex items-center gap-1.5">
+                          <AirVent className="h-3.5 w-3.5" />
+                          {cat.hasAC === false ? "No A/C" : "A/C"}
+                        </p>
+                        <p className="flex items-center gap-1.5">
+                          <Gauge className="h-3.5 w-3.5" />
+                          Standard performance
+                        </p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -258,6 +305,7 @@ export function Step1Search({
           onClick={onNext}
           disabled={!canContinue || disabled}
         >
+          <ArrowRight className="h-4 w-4" />
           {t("booking.continue")}
         </Button>
       </div>

@@ -8,7 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ExternalLink } from "lucide-react";
+import {
+  ArrowLeft,
+  Banknote,
+  CalendarDays,
+  CheckCircle2,
+  ClipboardList,
+  ExternalLink,
+  FileText,
+  HandCoins,
+  Mail,
+  MapPin,
+  Phone,
+  Receipt,
+  User,
+} from "lucide-react";
 import { AvailabilityResult } from "@/actions/availability";
 import { createCategoryBookingAction } from "@/actions/booking";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
@@ -135,11 +149,17 @@ export function Step3Review({
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h4 className="font-medium mb-2">{t("booking.startDate")}</h4>
+                <h4 className="mb-2 flex items-center gap-2 font-medium">
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  {t("booking.startDate")}
+                </h4>
                 <p>{pickupDateTime ? formatDateTime(pickupDateTime) : "-"}</p>
               </div>
               <div>
-                <h4 className="font-medium mb-2">{t("booking.endDate")}</h4>
+                <h4 className="mb-2 flex items-center gap-2 font-medium">
+                  <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  {t("booking.endDate")}
+                </h4>
                 <p>{dropoffDateTime ? formatDateTime(dropoffDateTime) : "-"}</p>
               </div>
             </div>
@@ -147,29 +167,44 @@ export function Step3Review({
             <Separator />
 
             <div>
-              <h4 className="font-medium mb-2">{t("booking.category")}</h4>
+              <h4 className="mb-2 flex items-center gap-2 font-medium">
+                <ClipboardList className="h-4 w-4 text-muted-foreground" />
+                {t("booking.category")}
+              </h4>
               <p>{selectedCategory?.categoryName || "Unknown"}</p>
             </div>
 
             <div>
-              <h4 className="font-medium mb-2">{t("booking.pricePerDay")}</h4>
+              <h4 className="mb-2 flex items-center gap-2 font-medium">
+                <Banknote className="h-4 w-4 text-muted-foreground" />
+                {t("booking.pricePerDay")}
+              </h4>
               <p>{formatCurrency(categoryRate)}</p>
             </div>
 
             {extrasAmount > 0 && (
               <div>
-                <h4 className="font-medium mb-2">{t("booking.extras")}</h4>
+                <h4 className="mb-2 flex items-center gap-2 font-medium">
+                  <Receipt className="h-4 w-4 text-muted-foreground" />
+                  {t("booking.extras")}
+                </h4>
                 <p>{formatCurrency(extrasAmount)}</p>
               </div>
             )}
 
             <div>
-              <h4 className="font-medium mb-2">{t("booking.tax", { percentage: taxPercentage })}</h4>
+              <h4 className="mb-2 flex items-center gap-2 font-medium">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                {t("booking.tax", { percentage: taxPercentage })}
+              </h4>
               <p>{formatCurrency(taxAmount)}</p>
             </div>
 
             <div>
-              <h4 className="font-medium mb-2">{t("booking.total")}</h4>
+              <h4 className="mb-2 flex items-center gap-2 font-medium">
+                <HandCoins className="h-4 w-4 text-muted-foreground" />
+                {t("booking.total")}
+              </h4>
               <p className="text-lg font-semibold">{formatCurrency(totalAmount)}</p>
             </div>
           </CardContent>
@@ -181,13 +216,13 @@ export function Step3Review({
           <CardTitle>{t("booking.customerName")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p><strong>{t("booking.customerName")}:</strong> {bookingData.customerName}</p>
-          <p><strong>{t("booking.customerEmail")}:</strong> {bookingData.customerEmail}</p>
-          <p><strong>{t("booking.customerPhone")}:</strong> {bookingData.customerPhone}</p>
+          <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /><strong>{t("booking.customerName")}:</strong> {bookingData.customerName}</p>
+          <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /><strong>{t("booking.customerEmail")}:</strong> {bookingData.customerEmail}</p>
+          <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /><strong>{t("booking.customerPhone")}:</strong> {bookingData.customerPhone}</p>
           <p><strong>{t("booking.birthDate")}:</strong> {bookingData.birthDate ? formatDate(bookingData.birthDate) : "-"}</p>
           <p><strong>{t("booking.driverLicenseNumber")}:</strong> {bookingData.driverLicenseNumber}</p>
           <p><strong>{t("booking.licenseExpiryDate")}:</strong> {bookingData.licenseExpiryDate ? formatDate(bookingData.licenseExpiryDate) : "-"}</p>
-          <p><strong>{t("booking.driverLicense")}:</strong> ✓ {t("common.success").toLowerCase()}</p>
+          <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /><strong>{t("booking.driverLicense")}:</strong> {t("common.success").toLowerCase()}</p>
         </CardContent>
       </Card>
 
@@ -204,7 +239,7 @@ export function Step3Review({
                   <>
                     {" "}
                     <a href={pickupLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      ({t("booking.map")})
+                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
                 )}
@@ -217,7 +252,7 @@ export function Step3Review({
                   <>
                     {" "}
                     <a href={dropoffLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      ({t("booking.map")})
+                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
                 )}
@@ -326,12 +361,14 @@ export function Step3Review({
 
       <div className="flex justify-between pt-4">
         <Button variant="outline" onClick={onPrev}>
+          <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
         <Button
           onClick={handleSubmit}
           disabled={!bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled}
         >
+          <CheckCircle2 className="h-4 w-4" />
           {isSubmitting ? t("common.loading") : t("booking.confirmBooking")}
         </Button>
       </div>

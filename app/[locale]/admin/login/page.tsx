@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { loginFormSchema } from "@/lib/validators";
 import { loginAction } from "@/actions/auth";
+import { Lock, LogIn, Mail } from "lucide-react";
 
 export default function AdminLoginPage({
   params,
@@ -76,7 +77,10 @@ export default function AdminLoginPage({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("admin.login.email")}</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    {t("admin.login.email")}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -95,7 +99,10 @@ export default function AdminLoginPage({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("admin.login.password")}</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                    {t("admin.login.password")}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -114,6 +121,7 @@ export default function AdminLoginPage({
               disabled={isSubmitting}
               className="w-full"
             >
+              <LogIn className="h-4 w-4" />
               {isSubmitting ? t("common.loading") : t("admin.login.submit")}
             </Button>
           </form>
