@@ -26,6 +26,7 @@ export async function loginAction(email: string, password: string, locale: strin
 
     const sessionToken = await createSession({
       adminUserId: user.id,
+      email: user.email,
       role: user.role,
     });
 

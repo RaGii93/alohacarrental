@@ -151,7 +151,7 @@ export default async function BookingDetailPage({
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link href={`/${locale}/admin`}>
+      <Link href={`/${locale}/admin/bookings`}>
         <button className="text-blue-600 hover:underline mb-6">← Back</button>
       </Link>
 

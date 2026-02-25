@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "./session";
 
-export async function requireAdmin(locale: string): Promise<{ userId: string; role: string }> {
+export async function requireAdmin(locale: string): Promise<{ userId: string; email: string; role: string }> {
   const session = await getSession();
 
   if (!session) {
@@ -10,6 +10,7 @@ export async function requireAdmin(locale: string): Promise<{ userId: string; ro
 
   return {
     userId: session.adminUserId,
+    email: session.email,
     role: session.role,
   };
 }
