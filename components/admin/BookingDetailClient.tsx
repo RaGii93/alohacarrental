@@ -19,6 +19,7 @@ import {
   declineBookingAction,
   sendInvoiceEstimateAction,
   createSalesReceiptAction,
+  receiveInvoicePaymentAction,
   applyDiscountCodeToBookingAction,
   addExtraToBookingAction,
   markBookingDeliveredAction,
@@ -90,6 +91,9 @@ export function BookingDetailClient({
     setIsLoading(false);
     if (result.success) {
       toast.success("Invoice sent to client for payment.");
+      if ((result as any).quickBooksWarning) {
+        toast.warning(`QuickBooks: ${(result as any).quickBooksWarning}`);
+      }
       router.refresh();
     } else {
       toast.error(result.error || "Error sending invoice");
@@ -116,9 +120,28 @@ export function BookingDetailClient({
           ? "Sales receipt created. Payment received and booking marked delivered."
           : "Sales receipt created. Payment received. Delivery can be marked later."
       );
+      if ((result as any).quickBooksWarning) {
+        toast.warning(`QuickBooks: ${(result as any).quickBooksWarning}`);
+      }
       router.refresh();
     } else {
       toast.error(result.error || "Error creating sales receipt");
+    }
+  };
+
+  const handleReceivePaymentWithoutReceipt = async () => {
+    if (!window.confirm("Mark invoice payment as received without creating a sales receipt?")) return;
+    setIsLoading(true);
+    const result = await receiveInvoicePaymentAction(booking.id, locale);
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Invoice payment received. No sales receipt created.");
+      if ((result as any).quickBooksWarning) {
+        toast.warning(`QuickBooks: ${(result as any).quickBooksWarning}`);
+      }
+      router.refresh();
+    } else {
+      toast.error(result.error || "Error marking payment received");
     }
   };
 
@@ -472,6 +495,15 @@ export function BookingDetailClient({
           >
             {isLoading ? "Processing..." : "Create Sales Receipt (Payment Received)"}
           </Button>
+          {!!booking.invoiceUrl && !booking.paymentReceivedAt && (
+            <Button
+              onClick={handleReceivePaymentWithoutReceipt}
+              disabled={isLoading}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {isLoading ? "Processing..." : "Receive Invoice Payment (No Sales Receipt)"}
+            </Button>
+          )}
           {booking.paymentReceivedAt && !booking.deliveredAt && (
             <Button
               onClick={handleMarkDelivered}

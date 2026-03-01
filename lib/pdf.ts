@@ -26,6 +26,37 @@ export interface InvoiceData {
   tenantConfig: TenantConfig;
 }
 
+function resolveLogoUrl(rawUrl: string | undefined) {
+  const logoUrl = String(rawUrl || "").trim();
+  if (!logoUrl) return "";
+  if (logoUrl.startsWith("http://") || logoUrl.startsWith("https://")) return logoUrl;
+  if (!logoUrl.startsWith("/")) return "";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "";
+  if (!baseUrl) return "";
+  return `${baseUrl.replace(/\/$/, "")}${logoUrl}`;
+}
+
+async function loadLogoImageForPdf(pdfDoc: PDFDocument, logoUrl: string) {
+  if (!logoUrl) return null;
+  try {
+    const response = await fetch(logoUrl);
+    if (!response.ok) return null;
+    const contentType = (response.headers.get("content-type") || "").toLowerCase();
+    const bytes = await response.arrayBuffer();
+    const isPng = contentType.includes("png") || logoUrl.toLowerCase().endsWith(".png");
+    const isJpg =
+      contentType.includes("jpeg") ||
+      contentType.includes("jpg") ||
+      logoUrl.toLowerCase().endsWith(".jpg") ||
+      logoUrl.toLowerCase().endsWith(".jpeg");
+    if (isPng) return await pdfDoc.embedPng(bytes);
+    if (isJpg) return await pdfDoc.embedJpg(bytes);
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
   const documentType = data.documentType || "INVOICE";
   const documentTitle =
@@ -72,12 +103,26 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     height: 120,
     color: blue,
   });
-  page.drawText(data.tenantConfig.tenantName, {
-    x: margin,
-    y: height - 55,
-    size: 22,
-    color: rgb(1, 1, 1),
-  });
+  const resolvedLogoUrl = resolveLogoUrl(data.tenantConfig.logoUrl);
+  const embeddedLogo = await loadLogoImageForPdf(pdfDoc, resolvedLogoUrl);
+  if (embeddedLogo) {
+    const logoMaxHeight = 52;
+    const logoScale = logoMaxHeight / embeddedLogo.height;
+    const logoWidth = embeddedLogo.width * logoScale;
+    page.drawImage(embeddedLogo, {
+      x: margin,
+      y: height - 84,
+      width: logoWidth,
+      height: logoMaxHeight,
+    });
+  } else {
+    page.drawText(data.tenantConfig.logoUrl || "LOGO", {
+      x: margin,
+      y: height - 55,
+      size: 14,
+      color: rgb(1, 1, 1),
+    });
+  }
   page.drawText(documentTitle, {
     x: margin,
     y: height - 82,

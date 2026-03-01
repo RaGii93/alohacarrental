@@ -12,6 +12,11 @@ import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { calculateTaxAmount, getMinBookingDays, getTaxPercentage } from "@/lib/settings";
 import { logAdminAction } from "@/lib/audit";
+import {
+  receiveQuickBooksInvoicePayment,
+  syncQuickBooksInvoice,
+  syncQuickBooksSalesReceipt,
+} from "@/lib/quickbooks";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
@@ -66,6 +71,28 @@ async function loadBookingAdjustments(bookingId: string) {
   }
 
   return { extras, discount };
+}
+
+function toQuickBooksPayload(generated: {
+  booking: {
+    bookingCode: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    startDate: Date;
+    endDate: Date;
+  };
+  totalAmount: number;
+}) {
+  return {
+    bookingCode: generated.booking.bookingCode,
+    customerName: generated.booking.customerName,
+    customerEmail: generated.booking.customerEmail,
+    customerPhone: generated.booking.customerPhone,
+    totalAmountCents: generated.totalAmount,
+    startDate: generated.booking.startDate,
+    endDate: generated.booking.endDate,
+  };
 }
 
 export async function cancelExpiredHolds() {
@@ -318,7 +345,18 @@ async function buildAndUploadBookingDocument(
     return { success: false as const, error: uploadResult.error || "Failed to upload document" };
   }
 
-  return { success: true as const, booking, invoiceUrl: uploadResult.url, pdfBuffer: invoiceBuffer, filename };
+  return {
+    success: true as const,
+    booking,
+    invoiceUrl: uploadResult.url,
+    pdfBuffer: invoiceBuffer,
+    filename,
+    baseRentalAmount: baseRental,
+    extrasAmount: extrasTotal,
+    discountAmount,
+    taxAmount,
+    totalAmount: booking.totalAmount,
+  };
 }
 
 export async function sendInvoiceEstimateAction(bookingId: string, locale: string) {
@@ -347,6 +385,23 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
       return updatedBooking;
     });
 
+    let quickBooksWarning: string | undefined;
+    const qbInvoiceResult = await syncQuickBooksInvoice(toQuickBooksPayload(generated));
+    if (!qbInvoiceResult.success) {
+      quickBooksWarning = qbInvoiceResult.error || "QuickBooks invoice sync failed";
+      await logAdminAction({
+        adminUserId: session.adminUserId,
+        action: "QUICKBOOKS_INVOICE_SYNC_FAILED",
+        bookingId,
+      });
+    } else if (!qbInvoiceResult.skipped) {
+      await logAdminAction({
+        adminUserId: session.adminUserId,
+        action: "QUICKBOOKS_INVOICE_UPSERTED",
+        bookingId,
+      });
+    }
+
     try {
       await sendEmail({
         to: updated.customerEmail,
@@ -371,7 +426,7 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
       });
     } catch {}
 
-    return { success: true, booking: updated };
+    return { success: true, booking: updated, quickBooksWarning };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to send invoice" };
   }
@@ -493,6 +548,23 @@ export async function createSalesReceiptAction(
       return updatedBooking;
     });
 
+    let quickBooksWarning: string | undefined;
+    const qbSalesReceiptResult = await syncQuickBooksSalesReceipt(toQuickBooksPayload(generated));
+    if (!qbSalesReceiptResult.success) {
+      quickBooksWarning = qbSalesReceiptResult.error || "QuickBooks sales receipt sync failed";
+      await logAdminAction({
+        adminUserId: session.adminUserId,
+        action: "QUICKBOOKS_SALES_RECEIPT_SYNC_FAILED",
+        bookingId,
+      });
+    } else if (!qbSalesReceiptResult.skipped) {
+      await logAdminAction({
+        adminUserId: session.adminUserId,
+        action: "QUICKBOOKS_SALES_RECEIPT_UPSERTED",
+        bookingId,
+      });
+    }
+
     try {
       await sendEmail({
         to: updated.customerEmail,
@@ -517,9 +589,96 @@ export async function createSalesReceiptAction(
       });
     } catch {}
 
-    return { success: true, booking: updated };
+    return { success: true, booking: updated, quickBooksWarning };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to create sales receipt" };
+  }
+}
+
+export async function receiveInvoicePaymentAction(bookingId: string, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+
+    const booking = await db.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        category: true,
+      },
+    });
+    if (!booking) return { success: false, error: "Booking not found" };
+    if (booking.status === "DECLINED" || booking.status === "CANCELLED") {
+      return { success: false, error: "Cannot receive payment for declined/cancelled booking" };
+    }
+    if (!booking.invoiceUrl) return { success: false, error: "INVOICE_REQUIRED" };
+    if (booking.paymentReceivedAt) return { success: true, booking };
+
+    const updated = await db.$transaction(async (tx) => {
+      const now = new Date();
+      const updatedBooking = await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          status: "CONFIRMED",
+          paymentReceivedAt: now,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "INVOICE_PAYMENT_RECEIVED_NO_SALES_RECEIPT",
+          bookingId,
+        },
+      });
+      return updatedBooking;
+    });
+
+    let quickBooksWarning: string | undefined;
+    const qbPaymentResult = await receiveQuickBooksInvoicePayment({
+      bookingCode: booking.bookingCode,
+      customerName: booking.customerName,
+      customerEmail: booking.customerEmail,
+      customerPhone: booking.customerPhone,
+      totalAmountCents: booking.totalAmount,
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      note: "Invoice paid without sales receipt generation",
+    });
+    if (!qbPaymentResult.success) {
+      quickBooksWarning = qbPaymentResult.error || "QuickBooks invoice payment sync failed";
+      await logAdminAction({
+        adminUserId: session.adminUserId,
+        action: "QUICKBOOKS_INVOICE_PAYMENT_SYNC_FAILED",
+        bookingId,
+      });
+    } else if (!qbPaymentResult.skipped) {
+      await logAdminAction({
+        adminUserId: session.adminUserId,
+        action: "QUICKBOOKS_INVOICE_PAYMENT_UPSERTED",
+        bookingId,
+      });
+    }
+
+    try {
+      await sendEmail({
+        to: updated.customerEmail,
+        subject: `Payment Received - ${updated.bookingCode}`,
+        html: bookingEmailHtml({
+          title: "Payment received for your invoice",
+          customerName: updated.customerName,
+          bookingCode: updated.bookingCode,
+          startDate: updated.startDate,
+          endDate: updated.endDate,
+          totalAmountCents: updated.totalAmount,
+          invoiceUrl: updated.invoiceUrl,
+          documentLabel: "Invoice",
+        }),
+      });
+    } catch {}
+
+    return { success: true, booking: updated, quickBooksWarning };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to mark invoice payment as received" };
   }
 }
 

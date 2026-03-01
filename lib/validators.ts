@@ -42,6 +42,17 @@ export const categoryFormSchema = z.object({
   isActive: z.boolean(),
 });
 
+export const locationFormSchema = z.object({
+  name: z.string().min(2, "Location name must be at least 2 characters"),
+  code: z
+    .string()
+    .trim()
+    .max(20, "Location code must be 20 characters or less")
+    .optional()
+    .or(z.literal("")),
+  address: z.string().max(255, "Address must be 255 characters or less").optional().or(z.literal("")),
+});
+
 // Refine booking schema to ensure endDate > startDate
 export const bookingFormSchemaRefined = bookingFormSchema.refine(
   (data) => data.endDate > data.startDate,
@@ -104,3 +115,4 @@ export type BookingFormInput = z.infer<typeof bookingFormSchemaRefined>;
 export type CategoryBookingFormInput = z.infer<typeof categoryBookingFormSchemaRefined>;
 export type VehicleFormInput = z.infer<typeof vehicleFormSchema>;
 export type CategoryFormInput = z.infer<typeof categoryFormSchema>;
+export type LocationFormInput = z.infer<typeof locationFormSchema>;

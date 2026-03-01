@@ -327,6 +327,7 @@
         "vehicles": "Vehicle Management",
         "reviews": "Reviews",
         "settings": "Settings",
+        "locations": "Locations",
         "users": "Users"
       },
       "deliveries": {
@@ -379,6 +380,24 @@
       "empty": "No users found",
       "errors": {
         "delete": "Failed to delete user"
+      }
+    },
+    "locations": {
+      "title": "Location Management",
+      "add": "Add Location",
+      "edit": "Edit Location",
+      "name": "Name",
+      "code": "Code",
+      "address": "Address",
+      "bookings": "Bookings",
+      "actions": "Actions",
+      "created": "Location created",
+      "updated": "Location updated",
+      "deleted": "Location deleted",
+      "deleteConfirm": "Delete this location?",
+      "empty": "No locations found",
+      "errors": {
+        "delete": "Failed to delete location"
       }
     },
     "settings": {

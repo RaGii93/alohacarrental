@@ -297,6 +297,7 @@
         "vehicles": "Gestión de Vehículos",
         "reviews": "Reseñas",
         "settings": "Configuración",
+        "locations": "Ubicaciones",
         "users": "Usuarios"
       },
       "deliveries": {
@@ -349,6 +350,24 @@
       "empty": "No se encontraron usuarios",
       "errors": {
         "delete": "Error al eliminar usuario"
+      }
+    },
+    "locations": {
+      "title": "Gestión de Ubicaciones",
+      "add": "Agregar Ubicación",
+      "edit": "Editar Ubicación",
+      "name": "Nombre",
+      "code": "Código",
+      "address": "Dirección",
+      "bookings": "Reservas",
+      "actions": "Acciones",
+      "created": "Ubicación creada",
+      "updated": "Ubicación actualizada",
+      "deleted": "Ubicación eliminada",
+      "deleteConfirm": "¿Eliminar esta ubicación?",
+      "empty": "No se encontraron ubicaciones",
+      "errors": {
+        "delete": "Error al eliminar ubicación"
       }
     },
     "settings": {

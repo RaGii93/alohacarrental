@@ -1,0 +1,370 @@
+type QuickBooksCustomerInput = {
+  bookingCode: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string | null;
+};
+
+type QuickBooksInvoiceInput = QuickBooksCustomerInput & {
+  totalAmountCents: number;
+  startDate: Date;
+  endDate: Date;
+  note?: string;
+};
+
+type QuickBooksSalesReceiptInput = QuickBooksInvoiceInput;
+
+type QuickBooksPaymentInput = QuickBooksInvoiceInput;
+
+type QueryResponse<T = any> = {
+  QueryResponse?: {
+    Customer?: T[];
+    Invoice?: T[];
+    SalesReceipt?: T[];
+    Payment?: T[];
+  };
+  Fault?: any;
+};
+
+function parseBool(value: string | undefined, fallback = false) {
+  if (!value) return fallback;
+  return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
+}
+
+function formatDateOnly(value: Date) {
+  return value.toISOString().slice(0, 10);
+}
+
+function escapeQueryValue(value: string) {
+  return value.replaceAll("\\", "\\\\").replaceAll("'", "\\'");
+}
+
+function amountToMajor(cents: number) {
+  return Math.round(Math.max(0, cents)) / 100;
+}
+
+const QUICKBOOKS_ONLINE_API_BASE = "https://quickbooks.api.intuit.com";
+
+function getQuickBooksConfig() {
+  const enabled = parseBool(process.env.QUICKBOOKS_ENABLED, false);
+  return {
+    enabled,
+    realmId: process.env.QUICKBOOKS_REALM_ID || "",
+    accessToken: process.env.QUICKBOOKS_ACCESS_TOKEN || "",
+    clientId: process.env.QUICKBOOKS_CLIENT_ID || "",
+    clientSecret: process.env.QUICKBOOKS_CLIENT_SECRET || "",
+    refreshToken: process.env.QUICKBOOKS_REFRESH_TOKEN || "",
+    minorVersion: process.env.QUICKBOOKS_MINOR_VERSION || "75",
+    itemId: process.env.QUICKBOOKS_ITEM_ID || "",
+    itemName: process.env.QUICKBOOKS_ITEM_NAME || "Vehicle Rental",
+  };
+}
+
+export function isQuickBooksEnabled() {
+  return getQuickBooksConfig().enabled;
+}
+
+function hasRequiredQuickBooksConfig() {
+  const cfg = getQuickBooksConfig();
+  if (!cfg.enabled) return false;
+  const hasToken = Boolean(cfg.accessToken);
+  const hasRefreshFlow = Boolean(cfg.clientId && cfg.clientSecret && cfg.refreshToken);
+  return Boolean(cfg.realmId && cfg.itemId && (hasToken || hasRefreshFlow));
+}
+
+async function resolveAccessToken() {
+  const cfg = getQuickBooksConfig();
+  if (cfg.clientId && cfg.clientSecret && cfg.refreshToken) {
+    const basic = Buffer.from(`${cfg.clientId}:${cfg.clientSecret}`).toString("base64");
+    const body = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: cfg.refreshToken,
+    });
+    const response = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${basic}`,
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: body.toString(),
+      cache: "no-store",
+    });
+    const text = await response.text();
+    let json: any = null;
+    try {
+      json = text ? JSON.parse(text) : null;
+    } catch {
+      json = null;
+    }
+    if (!response.ok || !json?.access_token) {
+      const message =
+        json?.error_description || json?.error || text || `QuickBooks OAuth refresh failed (${response.status})`;
+      throw new Error(message);
+    }
+    return String(json.access_token);
+  }
+  if (!cfg.accessToken) throw new Error("Missing QuickBooks access token");
+  return cfg.accessToken;
+}
+
+async function qbRequest(path: string, method: "GET" | "POST", body?: unknown, contentType = "application/json") {
+  const cfg = getQuickBooksConfig();
+  const accessToken = await resolveAccessToken();
+  const url = `${QUICKBOOKS_ONLINE_API_BASE}${path}${path.includes("?") ? "&" : "?"}minorversion=${encodeURIComponent(cfg.minorVersion)}`;
+  const response = await fetch(url, {
+    method,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json",
+      "Content-Type": contentType,
+    },
+    body: body === undefined ? undefined : contentType === "application/json" ? JSON.stringify(body) : String(body),
+    cache: "no-store",
+  });
+
+  const text = await response.text();
+  let json: any = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = null;
+  }
+
+  if (!response.ok) {
+    const message =
+      json?.Fault?.Error?.[0]?.Detail ||
+      json?.Fault?.Error?.[0]?.Message ||
+      text ||
+      `QuickBooks API error ${response.status}`;
+    throw new Error(message);
+  }
+
+  return json;
+}
+
+async function qbQuery<T = any>(query: string) {
+  const cfg = getQuickBooksConfig();
+  const path = `/v3/company/${encodeURIComponent(cfg.realmId)}/query`;
+  return (await qbRequest(path, "POST", query, "text/plain")) as QueryResponse<T>;
+}
+
+async function qbCreateOrUpdate(resource: "customer" | "invoice" | "salesreceipt" | "payment", payload: any) {
+  const cfg = getQuickBooksConfig();
+  const path = `/v3/company/${encodeURIComponent(cfg.realmId)}/${resource}`;
+  return await qbRequest(path, "POST", payload, "application/json");
+}
+
+async function upsertCustomer(input: QuickBooksCustomerInput) {
+  const safeEmail = escapeQueryValue(input.customerEmail.trim().toLowerCase());
+  const customerQuery = await qbQuery<any>(
+    `select * from Customer where PrimaryEmailAddr = '${safeEmail}' maxresults 1`
+  );
+  const existing = customerQuery?.QueryResponse?.Customer?.[0];
+
+  const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
+  const payloadBase = {
+    DisplayName: displayName,
+    PrimaryEmailAddr: { Address: input.customerEmail.trim().toLowerCase() },
+    ...(input.customerPhone ? { PrimaryPhone: { FreeFormNumber: input.customerPhone } } : {}),
+  };
+
+  if (existing?.Id && existing?.SyncToken !== undefined) {
+    const updated = await qbCreateOrUpdate("customer", {
+      Id: existing.Id,
+      SyncToken: existing.SyncToken,
+      sparse: true,
+      ...payloadBase,
+    });
+    return updated?.Customer || existing;
+  }
+
+  const created = await qbCreateOrUpdate("customer", payloadBase);
+  return created?.Customer;
+}
+
+async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
+  const cfg = getQuickBooksConfig();
+  const safeDocNumber = escapeQueryValue(input.bookingCode);
+  const existingQuery = await qbQuery<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
+  const existing = existingQuery?.QueryResponse?.Invoice?.[0];
+  const totalAmount = amountToMajor(input.totalAmountCents);
+
+  const payloadBase = {
+    DocNumber: input.bookingCode,
+    TxnDate: formatDateOnly(new Date()),
+    DueDate: formatDateOnly(input.startDate),
+    PrivateNote: input.note || `Booking ${input.bookingCode}`,
+    CustomerRef: { value: customerRefId },
+    BillEmail: { Address: input.customerEmail.trim().toLowerCase() },
+    Line: [
+      {
+        Amount: totalAmount,
+        DetailType: "SalesItemLineDetail",
+        Description: `Rental booking ${input.bookingCode} (${formatDateOnly(input.startDate)} to ${formatDateOnly(
+          input.endDate
+        )})`,
+        SalesItemLineDetail: {
+          ItemRef: { value: cfg.itemId, name: cfg.itemName },
+          Qty: 1,
+          UnitPrice: totalAmount,
+        },
+      },
+    ],
+  };
+
+  if (existing?.Id && existing?.SyncToken !== undefined) {
+    const updated = await qbCreateOrUpdate("invoice", {
+      Id: existing.Id,
+      SyncToken: existing.SyncToken,
+      sparse: true,
+      ...payloadBase,
+    });
+    return updated?.Invoice || existing;
+  }
+
+  const created = await qbCreateOrUpdate("invoice", payloadBase);
+  return created?.Invoice;
+}
+
+async function upsertSalesReceipt(input: QuickBooksSalesReceiptInput, customerRefId: string) {
+  const cfg = getQuickBooksConfig();
+  const docNumber = `SR-${input.bookingCode}`;
+  const safeDocNumber = escapeQueryValue(docNumber);
+  const existingQuery = await qbQuery<any>(
+    `select * from SalesReceipt where DocNumber = '${safeDocNumber}' maxresults 1`
+  );
+  const existing = existingQuery?.QueryResponse?.SalesReceipt?.[0];
+  const totalAmount = amountToMajor(input.totalAmountCents);
+
+  const payloadBase = {
+    DocNumber: docNumber,
+    TxnDate: formatDateOnly(new Date()),
+    PrivateNote: input.note || `Sales receipt for booking ${input.bookingCode}`,
+    CustomerRef: { value: customerRefId },
+    BillEmail: { Address: input.customerEmail.trim().toLowerCase() },
+    Line: [
+      {
+        Amount: totalAmount,
+        DetailType: "SalesItemLineDetail",
+        Description: `Rental booking ${input.bookingCode} (${formatDateOnly(input.startDate)} to ${formatDateOnly(
+          input.endDate
+        )})`,
+        SalesItemLineDetail: {
+          ItemRef: { value: cfg.itemId, name: cfg.itemName },
+          Qty: 1,
+          UnitPrice: totalAmount,
+        },
+      },
+    ],
+  };
+
+  if (existing?.Id && existing?.SyncToken !== undefined) {
+    const updated = await qbCreateOrUpdate("salesreceipt", {
+      Id: existing.Id,
+      SyncToken: existing.SyncToken,
+      sparse: true,
+      ...payloadBase,
+    });
+    return updated?.SalesReceipt || existing;
+  }
+
+  const created = await qbCreateOrUpdate("salesreceipt", payloadBase);
+  return created?.SalesReceipt;
+}
+
+async function upsertInvoicePayment(input: QuickBooksPaymentInput, customerRefId: string, invoiceId: string) {
+  const paymentRefNum = `PAY-${input.bookingCode}`;
+  const safeRef = escapeQueryValue(paymentRefNum);
+  const existingQuery = await qbQuery<any>(`select * from Payment where PaymentRefNum = '${safeRef}' maxresults 1`);
+  const existing = existingQuery?.QueryResponse?.Payment?.[0];
+  const totalAmount = amountToMajor(input.totalAmountCents);
+
+  const payloadBase = {
+    TxnDate: formatDateOnly(new Date()),
+    PaymentRefNum: paymentRefNum,
+    PrivateNote: `Payment for booking ${input.bookingCode}`,
+    TotalAmt: totalAmount,
+    CustomerRef: { value: customerRefId },
+    Line: [
+      {
+        Amount: totalAmount,
+        LinkedTxn: [{ TxnId: invoiceId, TxnType: "Invoice" }],
+      },
+    ],
+  };
+
+  if (existing?.Id && existing?.SyncToken !== undefined) {
+    const updated = await qbCreateOrUpdate("payment", {
+      Id: existing.Id,
+      SyncToken: existing.SyncToken,
+      sparse: true,
+      ...payloadBase,
+    });
+    return updated?.Payment || existing;
+  }
+
+  const created = await qbCreateOrUpdate("payment", payloadBase);
+  return created?.Payment;
+}
+
+export async function syncQuickBooksInvoice(input: QuickBooksInvoiceInput) {
+  if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
+  if (!hasRequiredQuickBooksConfig()) {
+    return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
+  }
+  try {
+    const customer = await upsertCustomer(input);
+    if (!customer?.Id) throw new Error("QuickBooks customer upsert failed");
+    const invoice = await upsertInvoice(input, customer.Id);
+    if (!invoice?.Id) throw new Error("QuickBooks invoice upsert failed");
+    return { success: true as const, skipped: false as const, customerId: customer.Id, invoiceId: invoice.Id };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "QuickBooks invoice sync failed" };
+  }
+}
+
+export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptInput) {
+  if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
+  if (!hasRequiredQuickBooksConfig()) {
+    return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
+  }
+  try {
+    const customer = await upsertCustomer(input);
+    if (!customer?.Id) throw new Error("QuickBooks customer upsert failed");
+    const salesReceipt = await upsertSalesReceipt(input, customer.Id);
+    if (!salesReceipt?.Id) throw new Error("QuickBooks sales receipt upsert failed");
+    return {
+      success: true as const,
+      skipped: false as const,
+      customerId: customer.Id,
+      salesReceiptId: salesReceipt.Id,
+    };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "QuickBooks sales receipt sync failed" };
+  }
+}
+
+export async function receiveQuickBooksInvoicePayment(input: QuickBooksPaymentInput) {
+  if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
+  if (!hasRequiredQuickBooksConfig()) {
+    return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
+  }
+  try {
+    const customer = await upsertCustomer(input);
+    if (!customer?.Id) throw new Error("QuickBooks customer upsert failed");
+    const invoice = await upsertInvoice(input, customer.Id);
+    if (!invoice?.Id) throw new Error("QuickBooks invoice upsert failed before payment");
+    const payment = await upsertInvoicePayment(input, customer.Id, invoice.Id);
+    if (!payment?.Id) throw new Error("QuickBooks payment upsert failed");
+    return {
+      success: true as const,
+      skipped: false as const,
+      customerId: customer.Id,
+      invoiceId: invoice.Id,
+      paymentId: payment.Id,
+    };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "QuickBooks payment sync failed" };
+  }
+}

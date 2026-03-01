@@ -297,6 +297,7 @@
         "vehicles": "Voertuigbeheer",
         "reviews": "Reviews",
         "settings": "Instellingen",
+        "locations": "Locaties",
         "users": "Gebruikers"
       },
       "deliveries": {
@@ -349,6 +350,24 @@
       "empty": "Geen gebruikers gevonden",
       "errors": {
         "delete": "Gebruiker verwijderen mislukt"
+      }
+    },
+    "locations": {
+      "title": "Locatiebeheer",
+      "add": "Locatie Toevoegen",
+      "edit": "Locatie Bewerken",
+      "name": "Naam",
+      "code": "Code",
+      "address": "Adres",
+      "bookings": "Reserveringen",
+      "actions": "Acties",
+      "created": "Locatie aangemaakt",
+      "updated": "Locatie bijgewerkt",
+      "deleted": "Locatie verwijderd",
+      "deleteConfirm": "Deze locatie verwijderen?",
+      "empty": "Geen locaties gevonden",
+      "errors": {
+        "delete": "Locatie verwijderen mislukt"
       }
     },
     "settings": {

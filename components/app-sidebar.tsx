@@ -14,6 +14,7 @@ import {
   DollarSign,
   FileText,
   Grid2X2,
+  MapPin,
   Percent,
   Settings,
   Star,
@@ -69,6 +70,7 @@ export function AppSidebar({
           { key: "vehicles", label: tOr("admin.dashboard.tabs.vehicles", "Vehicle Management"), icon: Car },
           { key: "reviews", label: tOr("admin.dashboard.tabs.reviews", "Reviews"), icon: Star },
           { key: "settings", label: tOr("admin.dashboard.tabs.settings", "Settings"), icon: Settings },
+          { key: "locations", label: tOr("admin.dashboard.tabs.locations", "Locations"), icon: MapPin },
           { key: "logs", label: "Logs", icon: FileText },
           { key: "users", label: tOr("admin.dashboard.tabs.users", "Users"), icon: Users },
         ]

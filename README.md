@@ -39,6 +39,7 @@ Use this repo as a base and deploy a separate instance per client.
   - apply discount code
   - send invoice payment request
   - create sales receipt (payment received)
+  - receive invoice payment (without sales receipt)
   - update tax percentage in settings
   - update minimum booking duration in settings
 - Dashboard tabs:
@@ -52,11 +53,17 @@ Use this repo as a base and deploy a separate instance per client.
   - emails customer
   - does **not** mark payment received
   - does **not** change vehicle status
+  - upserts QuickBooks customer + invoice when enabled
 - Sales receipt:
   - generates PDF
   - marks payment received
   - sets vehicle to `ON_RENT`
   - emails customer
+  - upserts QuickBooks customer + sales receipt when enabled
+- Receive invoice payment (without sales receipt):
+  - marks payment as received
+  - keeps the billing document as invoice
+  - upserts QuickBooks customer + invoice + payment when enabled
 - Tax:
   - configurable percentage in admin settings
   - applied to booking totals
@@ -249,6 +256,7 @@ SESSION_SECRET=long-random-secret
 RESEND_API_KEY=re_...
 RESEND_FROM="EdgeRent <EdgeRent@endlessedgetechnology.com>"
 NEXT_PUBLIC_APP_URL=https://your-domain.com
+QUICKBOOKS_ENABLED=false
 ```
 
 ## Recommended / supported
@@ -271,12 +279,30 @@ TENANT_PAYMENT_INSTRUCTIONS="Please pay by bank transfer or card and include you
 TENANT_TERMS_PDF_URL="/terms.pdf"
 DEFAULT_TAX_PERCENTAGE=0
 DEFAULT_MIN_BOOKING_DAYS=1
+QUICKBOOKS_REALM_ID=
+QUICKBOOKS_ACCESS_TOKEN=
+QUICKBOOKS_CLIENT_ID=
+QUICKBOOKS_CLIENT_SECRET=
+QUICKBOOKS_REFRESH_TOKEN=
+QUICKBOOKS_REDIRECT_URI=
+QUICKBOOKS_OAUTH_STATE=
+QUICKBOOKS_MINOR_VERSION=75
+QUICKBOOKS_ITEM_ID=
+QUICKBOOKS_ITEM_NAME="Vehicle Rental"
 ```
 
 ### Notes
 
 - `TENANT_*` drives branding, email content, metadata, and JSON-LD
 - `NEXT_PUBLIC_APP_URL` should match production canonical domain
+- Use `QUICKBOOKS_ENABLED=true` only when QuickBooks credentials + item ID are set
+- QuickBooks integration is QuickBooks Online API only
+- Prefer OAuth refresh flow (`QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`, `QUICKBOOKS_REFRESH_TOKEN`) over static access token
+- OAuth helper endpoints in this app:
+  - `GET /api/quickbooks/connect` (admin ROOT/OWNER only)
+  - `GET /api/quickbooks/callback` (admin ROOT/OWNER only)
+  - Set `QUICKBOOKS_REDIRECT_URI` to your callback URL, e.g. `https://your-domain.com/api/quickbooks/callback`
+  - Optionally set `QUICKBOOKS_OAUTH_STATE` and use same value in Intuit app config
 
 ---
 
