@@ -22,6 +22,7 @@ type QueryResponse<T = any> = {
     Invoice?: T[];
     SalesReceipt?: T[];
     Payment?: T[];
+    Item?: T[];
   };
   Fault?: any;
 };
@@ -366,5 +367,71 @@ export async function receiveQuickBooksInvoicePayment(input: QuickBooksPaymentIn
     };
   } catch (error: any) {
     return { success: false as const, error: error?.message || "QuickBooks payment sync failed" };
+  }
+}
+
+export async function getQuickBooksHealth() {
+  if (!isQuickBooksEnabled()) {
+    return { success: false as const, error: "QuickBooks is disabled" };
+  }
+  if (!hasRequiredQuickBooksConfig()) {
+    return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
+  }
+
+  try {
+    const cfg = getQuickBooksConfig();
+    const token = await resolveAccessToken();
+    const companyInfoResponse = await qbRequest(
+      `/v3/company/${encodeURIComponent(cfg.realmId)}/companyinfo/${encodeURIComponent(cfg.realmId)}`,
+      "GET"
+    );
+    const companyInfo = companyInfoResponse?.CompanyInfo || null;
+
+    let itemCheck:
+      | {
+          configuredItemId: string;
+          exists: boolean;
+          itemId?: string;
+          itemName?: string;
+          itemActive?: boolean;
+        }
+      | null = null;
+    if (cfg.itemId) {
+      const safeId = escapeQueryValue(cfg.itemId);
+      const itemQuery = await qbQuery<any>(`select Id, Name, Active from Item where Id = '${safeId}' maxresults 1`);
+      const item = itemQuery?.QueryResponse?.Item?.[0];
+      itemCheck = {
+        configuredItemId: cfg.itemId,
+        exists: Boolean(item?.Id),
+        ...(item?.Id
+          ? {
+              itemId: String(item.Id),
+              itemName: String(item.Name || ""),
+              itemActive: Boolean(item.Active),
+            }
+          : {}),
+      };
+    }
+
+    return {
+      success: true as const,
+      quickbooks: {
+        enabled: true,
+        realmId: cfg.realmId,
+        minorVersion: cfg.minorVersion,
+        authMode: cfg.clientId && cfg.clientSecret && cfg.refreshToken ? "oauth_refresh_token" : "static_access_token",
+        hasAccessToken: Boolean(token),
+        company: companyInfo
+          ? {
+              companyName: companyInfo.CompanyName || null,
+              legalName: companyInfo.LegalName || null,
+              country: companyInfo.Country || null,
+            }
+          : null,
+        itemCheck,
+      },
+    };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "QuickBooks health check failed" };
   }
 }
