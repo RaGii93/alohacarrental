@@ -302,6 +302,7 @@ QUICKBOOKS_ITEM_NAME="Vehicle Rental"
   - `GET /api/quickbooks/connect` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/callback` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/health` (admin ROOT/OWNER only)
+  - `GET /api/quickbooks/items` (admin ROOT/OWNER only)
   - Set `QUICKBOOKS_REDIRECT_URI` to your callback URL, e.g. `https://your-domain.com/api/quickbooks/callback`
   - Optionally set `QUICKBOOKS_OAUTH_STATE` and use same value in Intuit app config
 

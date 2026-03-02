@@ -435,3 +435,34 @@ export async function getQuickBooksHealth() {
     return { success: false as const, error: error?.message || "QuickBooks health check failed" };
   }
 }
+
+export async function listQuickBooksItems(options?: { limit?: number; activeOnly?: boolean }) {
+  if (!isQuickBooksEnabled()) {
+    return { success: false as const, error: "QuickBooks is disabled" };
+  }
+  if (!hasRequiredQuickBooksConfig()) {
+    return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
+  }
+
+  try {
+    const limit = Math.max(1, Math.min(1000, Number(options?.limit || 100)));
+    const activeOnly = options?.activeOnly !== false;
+    const where = activeOnly ? " where Active = true" : "";
+    const query = `select Id, Name, Type, Active from Item${where} maxresults ${limit}`;
+    const result = await qbQuery<any>(query);
+    const items = (result?.QueryResponse?.Item || []).map((item) => ({
+      id: String(item.Id || ""),
+      name: String(item.Name || ""),
+      type: String(item.Type || ""),
+      active: Boolean(item.Active),
+    }));
+
+    return {
+      success: true as const,
+      count: items.length,
+      items,
+    };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "QuickBooks item list failed" };
+  }
+}
