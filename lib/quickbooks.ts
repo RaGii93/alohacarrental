@@ -346,6 +346,15 @@ async function upsertCustomer(input: QuickBooksCustomerInput) {
               .toLowerCase() === normalizedEmail
         );
       if (matched?.Id) return matched;
+
+      // Name collisions can be caused by non-customer name list entities (vendor/employee).
+      // In that case, create a deterministic alternate display name so billing can continue.
+      const fallbackPayload = {
+        ...payloadBase,
+        DisplayName: `${displayName} (${input.bookingCode})`,
+      };
+      const fallbackCreated = await qbCreateOrUpdate("customer", fallbackPayload);
+      if (fallbackCreated?.Customer?.Id) return fallbackCreated.Customer;
     }
     throw error;
   }
