@@ -68,6 +68,11 @@ function normalizeQuickBooksError(error: any) {
   return hint ? `${raw}. ${hint}` : raw;
 }
 
+function isDuplicateNameError(error: any) {
+  const message = String(error?.message || "").toLowerCase();
+  return message.includes("name supplied already exists") || message.includes("6240");
+}
+
 function parseBool(value: string | undefined, fallback = false) {
   if (!value) return fallback;
   return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
@@ -278,6 +283,19 @@ async function resolveItemRef() {
       name: String(item.Name || rentalName),
     };
   } catch (error: any) {
+    if (isDuplicateNameError(error)) {
+      const allItems = await qbQuerySafe<any>("select * from Item maxresults 1000");
+      const items = allItems?.QueryResponse?.Item || [];
+      const matched =
+        items.find((item: any) => String(item?.Name || "").trim().toLowerCase() === rentalName.toLowerCase() && item?.Active) ||
+        items.find((item: any) => String(item?.Name || "").trim().toLowerCase() === rentalName.toLowerCase());
+      if (matched?.Id) {
+        return {
+          value: String(matched.Id),
+          name: String(matched.Name || rentalName),
+        };
+      }
+    }
     throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks item");
   }
 }
@@ -310,8 +328,27 @@ async function upsertCustomer(input: QuickBooksCustomerInput) {
     return updated?.Customer || existing;
   }
 
-  const created = await qbCreateOrUpdate("customer", payloadBase);
-  return created?.Customer;
+  try {
+    const created = await qbCreateOrUpdate("customer", payloadBase);
+    return created?.Customer;
+  } catch (error: any) {
+    if (isDuplicateNameError(error)) {
+      const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
+      const customers = allCustomers?.QueryResponse?.Customer || [];
+      const normalizedName = displayName.toLowerCase();
+      const normalizedEmail = input.customerEmail.trim().toLowerCase();
+      const matched =
+        customers.find((customer: any) => String(customer?.DisplayName || "").trim().toLowerCase() === normalizedName) ||
+        customers.find(
+          (customer: any) =>
+            String(customer?.PrimaryEmailAddr?.Address || "")
+              .trim()
+              .toLowerCase() === normalizedEmail
+        );
+      if (matched?.Id) return matched;
+    }
+    throw error;
+  }
 }
 
 async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
