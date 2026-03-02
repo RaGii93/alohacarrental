@@ -23,6 +23,7 @@ type QueryResponse<T = any> = {
     SalesReceipt?: T[];
     Payment?: T[];
     Item?: T[];
+    Account?: T[];
   };
   Fault?: any;
 };
@@ -87,7 +88,7 @@ function amountToMajor(cents: number) {
 const QUICKBOOKS_PRODUCTION_API_BASE = "https://quickbooks.api.intuit.com";
 const QUICKBOOKS_SANDBOX_API_BASE = "https://sandbox-quickbooks.api.intuit.com";
 const QUICKBOOKS_DEFAULT_MINOR_VERSION = "75";
-const QUICKBOOKS_DEFAULT_ITEM_NAME = "Vehicle Rental";
+const QUICKBOOKS_DEFAULT_ITEM_NAME = "Rental";
 
 function resolveQuickBooksApiBase(environment: string) {
   return environment === "sandbox" ? QUICKBOOKS_SANDBOX_API_BASE : QUICKBOOKS_PRODUCTION_API_BASE;
@@ -123,7 +124,7 @@ export function isQuickBooksEnabled() {
 function hasRequiredQuickBooksConfig() {
   const cfg = getQuickBooksConfig();
   if (!cfg.enabled) return false;
-  return Boolean(cfg.realmId && cfg.itemId && cfg.clientId && cfg.clientSecret && cfg.refreshToken);
+  return Boolean(cfg.realmId && cfg.clientId && cfg.clientSecret && cfg.refreshToken);
 }
 
 async function resolveAccessToken() {
@@ -225,10 +226,72 @@ async function qbCreateOrUpdate(resource: "customer" | "invoice" | "salesreceipt
   return await qbRequest(path, "POST", payload, "application/json");
 }
 
+async function resolveItemRef() {
+  const cfg = getQuickBooksConfig();
+  if (cfg.itemId) {
+    try {
+      const itemResponse = await qbRequest(
+        `/v3/company/${encodeURIComponent(cfg.realmId)}/item/${encodeURIComponent(cfg.itemId)}`,
+        "GET"
+      );
+      const item = itemResponse?.Item;
+      if (item?.Id) {
+        return {
+          value: String(item.Id),
+          name: String(item.Name || QUICKBOOKS_DEFAULT_ITEM_NAME),
+        };
+      }
+    } catch {
+      // Fall through to lookup/create by name.
+    }
+  }
+
+  const rentalName = QUICKBOOKS_DEFAULT_ITEM_NAME;
+  const safeRentalName = escapeQueryValue(rentalName);
+  const byNameQuery = await qbQuerySafe<any>(`select * from Item where Name = '${safeRentalName}' maxresults 1`);
+  const existing = byNameQuery?.QueryResponse?.Item?.[0];
+  if (existing?.Id) {
+    return {
+      value: String(existing.Id),
+      name: String(existing.Name || rentalName),
+    };
+  }
+
+  const accountQuery = await qbQuerySafe<any>(
+    "select * from Account where AccountType = 'Income' and Active = true maxresults 1"
+  );
+  const incomeAccount = accountQuery?.QueryResponse?.Account?.[0];
+  const createPayload: any = {
+    Name: rentalName,
+    Type: "Service",
+  };
+  if (incomeAccount?.Id) {
+    createPayload.IncomeAccountRef = { value: String(incomeAccount.Id) };
+  }
+
+  try {
+    const created = await qbRequest(`/v3/company/${encodeURIComponent(cfg.realmId)}/item`, "POST", createPayload);
+    const item = created?.Item;
+    if (!item?.Id) throw new Error("QuickBooks item creation failed");
+    return {
+      value: String(item.Id),
+      name: String(item.Name || rentalName),
+    };
+  } catch (error: any) {
+    throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks item");
+  }
+}
+
+function buildRentalLineDescription(bookingCode: string, startDate: Date, endDate: Date) {
+  return `Rental period: ${formatDateOnly(startDate)} to ${formatDateOnly(endDate)} | Booking: ${bookingCode}`;
+}
+
 async function upsertCustomer(input: QuickBooksCustomerInput) {
   const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
   const safeDisplayName = escapeQueryValue(displayName);
-  const customerQuery = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeDisplayName}' maxresults 1`);
+  const customerQuery = await qbQuerySafe<any>(
+    `select * from Customer where DisplayName = '${safeDisplayName}' maxresults 1`
+  );
   const existing = customerQuery?.QueryResponse?.Customer?.[0];
 
   const payloadBase = {
@@ -252,7 +315,7 @@ async function upsertCustomer(input: QuickBooksCustomerInput) {
 }
 
 async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
-  const cfg = getQuickBooksConfig();
+  const itemRef = await resolveItemRef();
   const safeDocNumber = escapeQueryValue(input.bookingCode);
   const existingQuery = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
   const existing = existingQuery?.QueryResponse?.Invoice?.[0];
@@ -269,11 +332,9 @@ async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: strin
       {
         Amount: totalAmount,
         DetailType: "SalesItemLineDetail",
-        Description: `Rental booking ${input.bookingCode} (${formatDateOnly(input.startDate)} to ${formatDateOnly(
-          input.endDate
-        )})`,
+        Description: buildRentalLineDescription(input.bookingCode, input.startDate, input.endDate),
         SalesItemLineDetail: {
-          ItemRef: { value: cfg.itemId, name: cfg.itemName },
+          ItemRef: itemRef,
           Qty: 1,
           UnitPrice: totalAmount,
         },
@@ -296,7 +357,7 @@ async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: strin
 }
 
 async function upsertSalesReceipt(input: QuickBooksSalesReceiptInput, customerRefId: string) {
-  const cfg = getQuickBooksConfig();
+  const itemRef = await resolveItemRef();
   const docNumber = `SR-${input.bookingCode}`;
   const safeDocNumber = escapeQueryValue(docNumber);
   const existingQuery = await qbQuerySafe<any>(
@@ -315,11 +376,9 @@ async function upsertSalesReceipt(input: QuickBooksSalesReceiptInput, customerRe
       {
         Amount: totalAmount,
         DetailType: "SalesItemLineDetail",
-        Description: `Rental booking ${input.bookingCode} (${formatDateOnly(input.startDate)} to ${formatDateOnly(
-          input.endDate
-        )})`,
+        Description: buildRentalLineDescription(input.bookingCode, input.startDate, input.endDate),
         SalesItemLineDetail: {
-          ItemRef: { value: cfg.itemId, name: cfg.itemName },
+          ItemRef: itemRef,
           Qty: 1,
           UnitPrice: totalAmount,
         },
