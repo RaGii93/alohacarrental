@@ -450,20 +450,29 @@ export async function getQuickBooksHealth() {
         }
       | null = null;
     if (cfg.itemId) {
-      const safeId = escapeQueryValue(cfg.itemId);
-      const itemQuery = await qbQuery<any>(`select * from Item where Id = '${safeId}' maxresults 1`);
-      const item = itemQuery?.QueryResponse?.Item?.[0];
-      itemCheck = {
-        configuredItemId: cfg.itemId,
-        exists: Boolean(item?.Id),
-        ...(item?.Id
-          ? {
-              itemId: String(item.Id),
-              itemName: String(item.Name || ""),
-              itemActive: Boolean(item.Active),
-            }
-          : {}),
-      };
+      try {
+        const itemResponse = await qbRequest(
+          `/v3/company/${encodeURIComponent(cfg.realmId)}/item/${encodeURIComponent(cfg.itemId)}`,
+          "GET"
+        );
+        const item = itemResponse?.Item || null;
+        itemCheck = {
+          configuredItemId: cfg.itemId,
+          exists: Boolean(item?.Id),
+          ...(item?.Id
+            ? {
+                itemId: String(item.Id),
+                itemName: String(item.Name || ""),
+                itemActive: Boolean(item.Active),
+              }
+            : {}),
+        };
+      } catch {
+        itemCheck = {
+          configuredItemId: cfg.itemId,
+          exists: false,
+        };
+      }
     }
 
     return {
