@@ -7,6 +7,12 @@ const QUICKBOOKS_STATE_PREFIX = "edge-rent-qbo-oauth-state";
 const QB_STATE_COOKIE = "qb_oauth_state";
 const QB_PKCE_COOKIE = "qb_oauth_pkce";
 
+function mask(value: string, visible = 6) {
+  if (!value) return "";
+  if (value.length <= visible * 2) return `${value.slice(0, 2)}...${value.slice(-2)}`;
+  return `${value.slice(0, visible)}...${value.slice(-visible)}`;
+}
+
 export async function GET(request: Request) {
   const session = await getSession();
   if (!session || (session.role !== "ROOT" && session.role !== "OWNER")) {
@@ -36,6 +42,16 @@ export async function GET(request: Request) {
   const cookieStore = await cookies();
   const expectedStateFromCookie = cookieStore.get(QB_STATE_COOKIE)?.value || "";
   const codeVerifier = cookieStore.get(QB_PKCE_COOKIE)?.value || "";
+  console.info("[QBO][callback] received oauth callback", {
+    hasCode: Boolean(code),
+    hasRealmId: Boolean(realmId),
+    stateMasked: mask(state),
+    cookieStateMasked: mask(expectedStateFromCookie),
+    stateMatchesCookie: Boolean(expectedStateFromCookie && state === expectedStateFromCookie),
+    statePrefixValid: state.startsWith(`${QUICKBOOKS_STATE_PREFIX}:`),
+    hasCodeVerifierCookie: Boolean(codeVerifier),
+    codeVerifierLength: codeVerifier.length,
+  });
 
   if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.json(
@@ -94,6 +110,13 @@ export async function GET(request: Request) {
   }
 
   if (!response.ok || !json?.refresh_token) {
+    console.error("[QBO][callback] token exchange failed", {
+      status: response.status,
+      hasCodeVerifierCookie: Boolean(codeVerifier),
+      stateMatchesCookie: Boolean(expectedStateFromCookie && state === expectedStateFromCookie),
+      error: json?.error || null,
+      errorDescription: json?.error_description || null,
+    });
     return NextResponse.json(
       {
         success: false,
@@ -107,6 +130,12 @@ export async function GET(request: Request) {
     );
   }
 
+  console.info("[QBO][callback] token exchange succeeded", {
+    realmId,
+    hasRefreshToken: Boolean(json.refresh_token),
+    refreshTokenMasked: mask(String(json.refresh_token || "")),
+    accessTokenExpiresIn: json.expires_in || null,
+  });
   const result = NextResponse.json({
     success: true,
     quickbooks: {

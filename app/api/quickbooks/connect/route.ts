@@ -9,6 +9,12 @@ const QUICKBOOKS_STATE_PREFIX = "edge-rent-qbo-oauth-state";
 const QB_STATE_COOKIE = "qb_oauth_state";
 const QB_PKCE_COOKIE = "qb_oauth_pkce";
 
+function mask(value: string, visible = 6) {
+  if (!value) return "";
+  if (value.length <= visible * 2) return `${value.slice(0, 2)}...${value.slice(-2)}`;
+  return `${value.slice(0, visible)}...${value.slice(-visible)}`;
+}
+
 function toBase64Url(buffer: Buffer) {
   return buffer
     .toString("base64")
@@ -54,6 +60,14 @@ export async function GET(request: Request) {
   params.set("code_challenge_method", "S256");
 
   const authorizeUrl = `${QUICKBOOKS_AUTHORIZE_URL}?${params.toString()}`;
+  console.info("[QBO][connect] generated oauth params", {
+    hasClientId: Boolean(clientId),
+    redirectUri,
+    stateMasked: mask(state),
+    codeVerifierLength: codeVerifier.length,
+    codeChallengeLength: codeChallenge.length,
+    usesPkce: true,
+  });
   const debugPayload = {
     success: true,
     quickbooks: {
