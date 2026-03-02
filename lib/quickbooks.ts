@@ -451,7 +451,7 @@ export async function getQuickBooksHealth() {
       | null = null;
     if (cfg.itemId) {
       const safeId = escapeQueryValue(cfg.itemId);
-      const itemQuery = await qbQuery<any>(`select Id, Name, Active from Item where Id = '${safeId}' maxresults 1`);
+      const itemQuery = await qbQuery<any>(`select * from Item where Id = '${safeId}' maxresults 1`);
       const item = itemQuery?.QueryResponse?.Item?.[0];
       itemCheck = {
         configuredItemId: cfg.itemId,
@@ -524,7 +524,7 @@ export async function listQuickBooksItems(options?: { limit?: number; activeOnly
     const limit = Math.max(1, Math.min(1000, Number(options?.limit || 100)));
     const activeOnly = options?.activeOnly !== false;
     const where = activeOnly ? " where Active = true" : "";
-    const query = `select Id, Name, Type, Active from Item${where} maxresults ${limit}`;
+    const query = `select * from Item${where} maxresults ${limit}`;
     const result = await qbQuery<any>(query);
     const items = (result?.QueryResponse?.Item || []).map((item) => ({
       id: String(item.Id || ""),
