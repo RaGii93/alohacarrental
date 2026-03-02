@@ -93,8 +93,8 @@ function amountToMajor(cents: number) {
 const QUICKBOOKS_PRODUCTION_API_BASE = "https://quickbooks.api.intuit.com";
 const QUICKBOOKS_SANDBOX_API_BASE = "https://sandbox-quickbooks.api.intuit.com";
 const QUICKBOOKS_DEFAULT_MINOR_VERSION = "75";
-const QUICKBOOKS_DEFAULT_ITEM_NAME = "Rental";
-const QUICKBOOKS_FALLBACK_ITEM_NAME = "Rental Service";
+const QUICKBOOKS_DEFAULT_ITEM_NAME = "Vehicle Rental";
+const QUICKBOOKS_FALLBACK_ITEM_NAME = "Vehicle Rental Service";
 
 function isSalesLineUsableItem(item: any) {
   const type = String(item?.Type || "").toLowerCase();
@@ -337,8 +337,14 @@ async function findItemByName(name: string) {
   return byNameQuery?.QueryResponse?.Item?.[0] || null;
 }
 
+async function listAllItemsSafe() {
+  const allItems = await qbQuerySafe<any>("select * from Item maxresults 1000");
+  return allItems?.QueryResponse?.Item || [];
+}
+
 async function ensureItemRef() {
   const cfg = getQuickBooksConfig();
+  let lastItemError = "";
   if (cfg.itemId) {
     try {
       const item = await fetchEntityById("item", cfg.itemId);
@@ -388,6 +394,7 @@ async function ensureItemRef() {
       }
     }
   } catch (error: any) {
+    lastItemError = normalizeQuickBooksError(error) || String(error?.message || "");
     if (!isDuplicateNameError(error)) {
       throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks item");
     }
@@ -428,14 +435,14 @@ async function ensureItemRef() {
       }
     }
   } catch (error: any) {
+    lastItemError = normalizeQuickBooksError(error) || String(error?.message || "");
     if (!isDuplicateNameError(error)) {
       throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks fallback item");
     }
   }
 
   // Final fallback by broad list (for sandbox query oddities)
-  const allItems = await qbQuerySafe<any>("select * from Item maxresults 1000");
-  const items = allItems?.QueryResponse?.Item || [];
+  const items = await listAllItemsSafe();
   const matched =
     items.find(
       (item: any) =>
@@ -461,7 +468,11 @@ async function ensureItemRef() {
     };
   }
 
-  throw new Error("Failed to resolve/create QuickBooks item");
+  throw new Error(
+    `Failed to resolve/create QuickBooks item. Expected usable item named "${QUICKBOOKS_DEFAULT_ITEM_NAME}" (or fallback "${QUICKBOOKS_FALLBACK_ITEM_NAME}"). ${
+      lastItemError ? `Last QuickBooks error: ${lastItemError}` : ""
+    }`.trim()
+  );
 }
 
 function buildRentalLineDescription(bookingCode: string, startDate: Date, endDate: Date) {
