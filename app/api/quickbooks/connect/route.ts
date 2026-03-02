@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 
 const QUICKBOOKS_AUTHORIZE_URL = "https://appcenter.intuit.com/connect/oauth2";
 const QUICKBOOKS_SCOPE = "com.intuit.quickbooks.accounting";
+const QUICKBOOKS_STATE_PREFIX = "edge-rent-qbo-oauth-state";
 const QB_STATE_COOKIE = "qb_oauth_state";
 const QB_PKCE_COOKIE = "qb_oauth_pkce";
 
@@ -24,7 +25,6 @@ export async function GET(request: Request) {
 
   const clientId = process.env.QUICKBOOKS_CLIENT_ID || "";
   const redirectUri = process.env.QUICKBOOKS_REDIRECT_URI || "";
-  const statePrefix = process.env.QUICKBOOKS_OAUTH_STATE || "";
 
   if (!clientId || !redirectUri) {
     return NextResponse.json(
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
   }
 
   const nonce = randomUUID();
-  const state = statePrefix ? `${statePrefix}:${nonce}` : nonce;
+  const state = `${QUICKBOOKS_STATE_PREFIX}:${nonce}`;
   const codeVerifier = toBase64Url(randomBytes(64));
   const codeChallenge = toBase64Url(createHash("sha256").update(codeVerifier).digest());
 
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
       scope: QUICKBOOKS_SCOPE,
       hasClientId: Boolean(clientId),
       state: state || null,
-      statePrefix: statePrefix || null,
+      statePrefix: QUICKBOOKS_STATE_PREFIX,
       usesPkce: true,
     },
   };

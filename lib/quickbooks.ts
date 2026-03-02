@@ -84,20 +84,28 @@ function amountToMajor(cents: number) {
   return Math.round(Math.max(0, cents)) / 100;
 }
 
-const QUICKBOOKS_ONLINE_API_BASE = "https://quickbooks.api.intuit.com";
+const QUICKBOOKS_PRODUCTION_API_BASE = "https://quickbooks.api.intuit.com";
+const QUICKBOOKS_SANDBOX_API_BASE = "https://sandbox-quickbooks.api.intuit.com";
+const QUICKBOOKS_DEFAULT_MINOR_VERSION = "75";
+const QUICKBOOKS_DEFAULT_ITEM_NAME = "Vehicle Rental";
+
+function resolveQuickBooksApiBase(environment: string) {
+  return environment === "sandbox" ? QUICKBOOKS_SANDBOX_API_BASE : QUICKBOOKS_PRODUCTION_API_BASE;
+}
 
 function getQuickBooksConfig() {
   const enabled = parseBool(process.env.QUICKBOOKS_ENABLED, false);
+  const environment = (process.env.QUICKBOOKS_ENVIRONMENT || "production").trim().toLowerCase();
   return {
     enabled,
+    environment: environment === "sandbox" ? "sandbox" : "production",
     realmId: process.env.QUICKBOOKS_REALM_ID || "",
-    accessToken: process.env.QUICKBOOKS_ACCESS_TOKEN || "",
     clientId: process.env.QUICKBOOKS_CLIENT_ID || "",
     clientSecret: process.env.QUICKBOOKS_CLIENT_SECRET || "",
     refreshToken: process.env.QUICKBOOKS_REFRESH_TOKEN || "",
-    minorVersion: process.env.QUICKBOOKS_MINOR_VERSION || "75",
+    minorVersion: QUICKBOOKS_DEFAULT_MINOR_VERSION,
     itemId: process.env.QUICKBOOKS_ITEM_ID || "",
-    itemName: process.env.QUICKBOOKS_ITEM_NAME || "Vehicle Rental",
+    itemName: QUICKBOOKS_DEFAULT_ITEM_NAME,
   };
 }
 
@@ -115,52 +123,47 @@ export function isQuickBooksEnabled() {
 function hasRequiredQuickBooksConfig() {
   const cfg = getQuickBooksConfig();
   if (!cfg.enabled) return false;
-  const hasToken = Boolean(cfg.accessToken);
-  const hasRefreshFlow = Boolean(cfg.clientId && cfg.clientSecret && cfg.refreshToken);
-  return Boolean(cfg.realmId && cfg.itemId && (hasToken || hasRefreshFlow));
+  return Boolean(cfg.realmId && cfg.itemId && cfg.clientId && cfg.clientSecret && cfg.refreshToken);
 }
 
 async function resolveAccessToken() {
   const cfg = getQuickBooksConfig();
-  if (cfg.clientId && cfg.clientSecret && cfg.refreshToken) {
-    const basic = Buffer.from(`${cfg.clientId}:${cfg.clientSecret}`).toString("base64");
-    const body = new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: cfg.refreshToken,
-    });
-    const response = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${basic}`,
-        Accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: body.toString(),
-      cache: "no-store",
-    });
-    const text = await response.text();
-    let json: any = null;
-    try {
-      json = text ? JSON.parse(text) : null;
-    } catch {
-      json = null;
-    }
-    if (!response.ok || !json?.access_token) {
-      const message = normalizeQuickBooksError(
-        new Error(json?.error_description || json?.error || text || `QuickBooks OAuth refresh failed (${response.status})`)
-      );
-      throw new Error(message);
-    }
-    return String(json.access_token);
+  const basic = Buffer.from(`${cfg.clientId}:${cfg.clientSecret}`).toString("base64");
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token: cfg.refreshToken,
+  });
+  const response = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${basic}`,
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: body.toString(),
+    cache: "no-store",
+  });
+  const text = await response.text();
+  let json: any = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = null;
   }
-  if (!cfg.accessToken) throw new Error("Missing QuickBooks access token");
-  return cfg.accessToken;
+  if (!response.ok || !json?.access_token) {
+    const message = normalizeQuickBooksError(
+      new Error(json?.error_description || json?.error || text || `QuickBooks OAuth refresh failed (${response.status})`)
+    );
+    throw new Error(message);
+  }
+  return String(json.access_token);
 }
 
 async function qbRequest(path: string, method: "GET" | "POST", body?: unknown, contentType = "application/json") {
   const cfg = getQuickBooksConfig();
   const accessToken = await resolveAccessToken();
-  const url = `${QUICKBOOKS_ONLINE_API_BASE}${path}${path.includes("?") ? "&" : "?"}minorversion=${encodeURIComponent(cfg.minorVersion)}`;
+  const apiBase = resolveQuickBooksApiBase(cfg.environment);
+  const url = `${apiBase}${path}${path.includes("?") ? "&" : "?"}minorversion=${encodeURIComponent(cfg.minorVersion)}`;
   const response = await fetch(url, {
     method,
     headers: {
@@ -430,6 +433,7 @@ export async function getQuickBooksHealth() {
   try {
     const cfg = getQuickBooksConfig();
     const token = await resolveAccessToken();
+    const apiBase = resolveQuickBooksApiBase(cfg.environment);
     const companyInfoResponse = await qbRequest(
       `/v3/company/${encodeURIComponent(cfg.realmId)}/companyinfo/${encodeURIComponent(cfg.realmId)}`,
       "GET"
@@ -468,7 +472,7 @@ export async function getQuickBooksHealth() {
         enabled: true,
         realmId: cfg.realmId,
         minorVersion: cfg.minorVersion,
-        authMode: cfg.clientId && cfg.clientSecret && cfg.refreshToken ? "oauth_refresh_token" : "static_access_token",
+        authMode: "oauth_refresh_token",
         hasAccessToken: Boolean(token),
         company: companyInfo
           ? {
@@ -478,6 +482,8 @@ export async function getQuickBooksHealth() {
             }
           : null,
         itemCheck,
+        environment: cfg.environment,
+        apiBase,
       },
     };
   } catch (error: any) {
@@ -499,11 +505,10 @@ export function getQuickBooksRuntimePreview() {
     clientSecretMasked: maskValue(cfg.clientSecret, 4),
     hasRefreshToken: Boolean(cfg.refreshToken),
     refreshTokenMasked: maskValue(cfg.refreshToken, 6),
-    hasAccessToken: Boolean(cfg.accessToken),
-    accessTokenMasked: maskValue(cfg.accessToken, 6),
     redirectUri: process.env.QUICKBOOKS_REDIRECT_URI || "",
-    oauthStateSet: Boolean(process.env.QUICKBOOKS_OAUTH_STATE),
     minorVersion: cfg.minorVersion,
+    environment: cfg.environment,
+    apiBase: resolveQuickBooksApiBase(cfg.environment),
   };
 }
 

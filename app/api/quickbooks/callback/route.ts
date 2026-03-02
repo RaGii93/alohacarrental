@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getSession } from "@/lib/session";
 
 const QUICKBOOKS_TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer";
+const QUICKBOOKS_STATE_PREFIX = "edge-rent-qbo-oauth-state";
 const QB_STATE_COOKIE = "qb_oauth_state";
 const QB_PKCE_COOKIE = "qb_oauth_pkce";
 
@@ -32,7 +33,6 @@ export async function GET(request: Request) {
   const clientId = process.env.QUICKBOOKS_CLIENT_ID || "";
   const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET || "";
   const redirectUri = process.env.QUICKBOOKS_REDIRECT_URI || "";
-  const expectedState = process.env.QUICKBOOKS_OAUTH_STATE || "";
   const cookieStore = await cookies();
   const expectedStateFromCookie = cookieStore.get(QB_STATE_COOKIE)?.value || "";
   const codeVerifier = cookieStore.get(QB_PKCE_COOKIE)?.value || "";
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
   if (!expectedStateFromCookie || state !== expectedStateFromCookie) {
     return NextResponse.json({ success: false, error: "Invalid OAuth state (nonce mismatch)" }, { status: 400 });
   }
-  if (expectedState && !state.startsWith(`${expectedState}:`)) {
+  if (!state.startsWith(`${QUICKBOOKS_STATE_PREFIX}:`)) {
     return NextResponse.json({ success: false, error: "Invalid OAuth state prefix" }, { status: 400 });
   }
 

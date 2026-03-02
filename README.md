@@ -257,6 +257,7 @@ RESEND_API_KEY=re_...
 RESEND_FROM="EdgeRent <EdgeRent@endlessedgetechnology.com>"
 NEXT_PUBLIC_APP_URL=https://your-domain.com
 QUICKBOOKS_ENABLED=false
+QUICKBOOKS_ENVIRONMENT=production
 ```
 
 ## Recommended / supported
@@ -280,15 +281,11 @@ TENANT_TERMS_PDF_URL="/terms.pdf"
 DEFAULT_TAX_PERCENTAGE=0
 DEFAULT_MIN_BOOKING_DAYS=1
 QUICKBOOKS_REALM_ID=
-QUICKBOOKS_ACCESS_TOKEN=
 QUICKBOOKS_CLIENT_ID=
 QUICKBOOKS_CLIENT_SECRET=
 QUICKBOOKS_REFRESH_TOKEN=
 QUICKBOOKS_REDIRECT_URI=
-QUICKBOOKS_OAUTH_STATE=
-QUICKBOOKS_MINOR_VERSION=75
 QUICKBOOKS_ITEM_ID=
-QUICKBOOKS_ITEM_NAME="Vehicle Rental"
 ```
 
 ### Notes
@@ -297,7 +294,8 @@ QUICKBOOKS_ITEM_NAME="Vehicle Rental"
 - `NEXT_PUBLIC_APP_URL` should match production canonical domain
 - Use `QUICKBOOKS_ENABLED=true` only when QuickBooks credentials + item ID are set
 - QuickBooks integration is QuickBooks Online API only
-- Prefer OAuth refresh flow (`QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`, `QUICKBOOKS_REFRESH_TOKEN`) over static access token
+- Set `QUICKBOOKS_ENVIRONMENT=sandbox` when connecting to an Intuit Sandbox company (`production` for live QBO companies)
+- Integration uses OAuth refresh flow only (`QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`, `QUICKBOOKS_REFRESH_TOKEN`)
 - OAuth helper endpoints in this app:
   - `GET /api/quickbooks/connect` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/callback` (admin ROOT/OWNER only)
@@ -305,8 +303,7 @@ QUICKBOOKS_ITEM_NAME="Vehicle Rental"
   - `GET /api/quickbooks/items` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/env-check` (admin ROOT/OWNER only; masked runtime env preview)
   - Set `QUICKBOOKS_REDIRECT_URI` to your callback URL, e.g. `https://your-domain.com/api/quickbooks/callback`
-  - Optionally set `QUICKBOOKS_OAUTH_STATE` and use same value in Intuit app config
-  - OAuth hardening implemented: per-request state nonce + PKCE (`S256`) on connect/callback
+  - OAuth hardening implemented: fixed state prefix + per-request nonce + PKCE (`S256`) on connect/callback
 
 ---
 
