@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getSession } from "@/lib/session";
 
 const QUICKBOOKS_TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer";
+const QB_STATE_COOKIE = "qb_oauth_state";
+const QB_PKCE_COOKIE = "qb_oauth_pkce";
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -30,6 +33,9 @@ export async function GET(request: Request) {
   const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET || "";
   const redirectUri = process.env.QUICKBOOKS_REDIRECT_URI || "";
   const expectedState = process.env.QUICKBOOKS_OAUTH_STATE || "";
+  const cookieStore = await cookies();
+  const expectedStateFromCookie = cookieStore.get(QB_STATE_COOKIE)?.value || "";
+  const codeVerifier = cookieStore.get(QB_PKCE_COOKIE)?.value || "";
 
   if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.json(
@@ -41,8 +47,11 @@ export async function GET(request: Request) {
     );
   }
 
-  if (expectedState && state !== expectedState) {
-    return NextResponse.json({ success: false, error: "Invalid OAuth state" }, { status: 400 });
+  if (!expectedStateFromCookie || state !== expectedStateFromCookie) {
+    return NextResponse.json({ success: false, error: "Invalid OAuth state (nonce mismatch)" }, { status: 400 });
+  }
+  if (expectedState && !state.startsWith(`${expectedState}:`)) {
+    return NextResponse.json({ success: false, error: "Invalid OAuth state prefix" }, { status: 400 });
   }
 
   if (!code || !realmId) {
@@ -61,6 +70,9 @@ export async function GET(request: Request) {
     code,
     redirect_uri: redirectUri,
   });
+  if (codeVerifier) {
+    body.set("code_verifier", codeVerifier);
+  }
 
   const response = await fetch(QUICKBOOKS_TOKEN_URL, {
     method: "POST",
@@ -95,7 +107,7 @@ export async function GET(request: Request) {
     );
   }
 
-  return NextResponse.json({
+  const result = NextResponse.json({
     success: true,
     quickbooks: {
       realmId,
@@ -112,4 +124,7 @@ export async function GET(request: Request) {
     message:
       "OAuth connected. Save QUICKBOOKS_REALM_ID and QUICKBOOKS_REFRESH_TOKEN to your .env and restart the app.",
   });
+  result.cookies.set(QB_STATE_COOKIE, "", { maxAge: 0, path: "/api/quickbooks/callback" });
+  result.cookies.set(QB_PKCE_COOKIE, "", { maxAge: 0, path: "/api/quickbooks/callback" });
+  return result;
 }

@@ -1,8 +1,20 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createHash, randomBytes, randomUUID } from "crypto";
 import { getSession } from "@/lib/session";
 
 const QUICKBOOKS_AUTHORIZE_URL = "https://appcenter.intuit.com/connect/oauth2";
 const QUICKBOOKS_SCOPE = "com.intuit.quickbooks.accounting";
+const QB_STATE_COOKIE = "qb_oauth_state";
+const QB_PKCE_COOKIE = "qb_oauth_pkce";
+
+function toBase64Url(buffer: Buffer) {
+  return buffer
+    .toString("base64")
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
+}
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -12,7 +24,7 @@ export async function GET(request: Request) {
 
   const clientId = process.env.QUICKBOOKS_CLIENT_ID || "";
   const redirectUri = process.env.QUICKBOOKS_REDIRECT_URI || "";
-  const state = process.env.QUICKBOOKS_OAUTH_STATE || "";
+  const statePrefix = process.env.QUICKBOOKS_OAUTH_STATE || "";
 
   if (!clientId || !redirectUri) {
     return NextResponse.json(
@@ -24,6 +36,11 @@ export async function GET(request: Request) {
     );
   }
 
+  const nonce = randomUUID();
+  const state = statePrefix ? `${statePrefix}:${nonce}` : nonce;
+  const codeVerifier = toBase64Url(randomBytes(64));
+  const codeChallenge = toBase64Url(createHash("sha256").update(codeVerifier).digest());
+
   const params = new URLSearchParams({
     client_id: clientId,
     response_type: "code",
@@ -33,6 +50,8 @@ export async function GET(request: Request) {
   });
   params.set("access_type", "offline");
   params.set("prompt", "consent");
+  params.set("code_challenge", codeChallenge);
+  params.set("code_challenge_method", "S256");
 
   const authorizeUrl = `${QUICKBOOKS_AUTHORIZE_URL}?${params.toString()}`;
   const debugPayload = {
@@ -43,6 +62,8 @@ export async function GET(request: Request) {
       scope: QUICKBOOKS_SCOPE,
       hasClientId: Boolean(clientId),
       state: state || null,
+      statePrefix: statePrefix || null,
+      usesPkce: true,
     },
   };
 
@@ -54,5 +75,20 @@ export async function GET(request: Request) {
     return NextResponse.json(debugPayload);
   }
 
-  return NextResponse.redirect(authorizeUrl);
+  const response = NextResponse.redirect(authorizeUrl);
+  response.cookies.set(QB_STATE_COOKIE, state, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/api/quickbooks/callback",
+    maxAge: 60 * 10,
+  });
+  response.cookies.set(QB_PKCE_COOKIE, codeVerifier, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/api/quickbooks/callback",
+    maxAge: 60 * 10,
+  });
+  return response;
 }

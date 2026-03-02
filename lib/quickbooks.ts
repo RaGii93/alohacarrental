@@ -27,6 +27,46 @@ type QueryResponse<T = any> = {
   Fault?: any;
 };
 
+function parseQuickBooksFaultPayload(payload: any) {
+  const fault = payload?.Fault || payload?.fault || null;
+  const firstError = fault?.Error?.[0] || fault?.error?.[0] || null;
+  const code = String(firstError?.code || firstError?.Code || "").trim();
+  const message = String(firstError?.Detail || firstError?.Message || firstError?.message || "").trim();
+  return { code, message };
+}
+
+function buildQuickBooksHint(code: string, message: string) {
+  const joined = `${code} ${message}`.toLowerCase();
+  if (joined.includes("3100") || joined.includes("applicationauthorizationfailed")) {
+    return "Authorization mismatch: verify CLIENT_ID/CLIENT_SECRET/REALM_ID/REFRESH_TOKEN belong to the same Intuit app + same sandbox company.";
+  }
+  if (joined.includes("invalid_grant")) {
+    return "Refresh token is invalid/expired/revoked. Reconnect OAuth and save the newest refresh token.";
+  }
+  return undefined;
+}
+
+function normalizeQuickBooksError(error: any) {
+  const raw = String(error?.message || "QuickBooks request failed");
+  let parsed: any = null;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    parsed = null;
+  }
+
+  if (parsed) {
+    const { code, message } = parseQuickBooksFaultPayload(parsed);
+    if (code || message) {
+      const hint = buildQuickBooksHint(code, message);
+      return hint ? `${code || "QBO_ERROR"}: ${message}. ${hint}` : `${code || "QBO_ERROR"}: ${message}`;
+    }
+  }
+
+  const hint = buildQuickBooksHint("", raw);
+  return hint ? `${raw}. ${hint}` : raw;
+}
+
 function parseBool(value: string | undefined, fallback = false) {
   if (!value) return fallback;
   return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
@@ -106,8 +146,9 @@ async function resolveAccessToken() {
       json = null;
     }
     if (!response.ok || !json?.access_token) {
-      const message =
-        json?.error_description || json?.error || text || `QuickBooks OAuth refresh failed (${response.status})`;
+      const message = normalizeQuickBooksError(
+        new Error(json?.error_description || json?.error || text || `QuickBooks OAuth refresh failed (${response.status})`)
+      );
       throw new Error(message);
     }
     return String(json.access_token);
@@ -140,11 +181,12 @@ async function qbRequest(path: string, method: "GET" | "POST", body?: unknown, c
   }
 
   if (!response.ok) {
-    const message =
+    const faultMessage =
       json?.Fault?.Error?.[0]?.Detail ||
       json?.Fault?.Error?.[0]?.Message ||
       text ||
       `QuickBooks API error ${response.status}`;
+    const message = normalizeQuickBooksError(new Error(faultMessage));
     throw new Error(message);
   }
 
@@ -328,7 +370,7 @@ export async function syncQuickBooksInvoice(input: QuickBooksInvoiceInput) {
     if (!invoice?.Id) throw new Error("QuickBooks invoice upsert failed");
     return { success: true as const, skipped: false as const, customerId: customer.Id, invoiceId: invoice.Id };
   } catch (error: any) {
-    return { success: false as const, error: error?.message || "QuickBooks invoice sync failed" };
+    return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks invoice sync failed" };
   }
 }
 
@@ -349,7 +391,7 @@ export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptIn
       salesReceiptId: salesReceipt.Id,
     };
   } catch (error: any) {
-    return { success: false as const, error: error?.message || "QuickBooks sales receipt sync failed" };
+    return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks sales receipt sync failed" };
   }
 }
 
@@ -373,7 +415,7 @@ export async function receiveQuickBooksInvoicePayment(input: QuickBooksPaymentIn
       paymentId: payment.Id,
     };
   } catch (error: any) {
-    return { success: false as const, error: error?.message || "QuickBooks payment sync failed" };
+    return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks payment sync failed" };
   }
 }
 
@@ -439,7 +481,7 @@ export async function getQuickBooksHealth() {
       },
     };
   } catch (error: any) {
-    return { success: false as const, error: error?.message || "QuickBooks health check failed" };
+    return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks health check failed" };
   }
 }
 
@@ -492,6 +534,6 @@ export async function listQuickBooksItems(options?: { limit?: number; activeOnly
       items,
     };
   } catch (error: any) {
-    return { success: false as const, error: error?.message || "QuickBooks item list failed" };
+    return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks item list failed" };
   }
 }
