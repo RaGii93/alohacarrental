@@ -303,6 +303,7 @@ QUICKBOOKS_ITEM_NAME="Vehicle Rental"
   - `GET /api/quickbooks/callback` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/health` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/items` (admin ROOT/OWNER only)
+  - `GET /api/quickbooks/env-check` (admin ROOT/OWNER only; masked runtime env preview)
   - Set `QUICKBOOKS_REDIRECT_URI` to your callback URL, e.g. `https://your-domain.com/api/quickbooks/callback`
   - Optionally set `QUICKBOOKS_OAUTH_STATE` and use same value in Intuit app config
 

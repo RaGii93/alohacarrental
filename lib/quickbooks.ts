@@ -61,6 +61,13 @@ function getQuickBooksConfig() {
   };
 }
 
+function maskValue(value: string, visible = 4) {
+  const normalized = String(value || "");
+  if (!normalized) return "";
+  if (normalized.length <= visible * 2) return `${normalized.slice(0, 1)}***${normalized.slice(-1)}`;
+  return `${normalized.slice(0, visible)}...${normalized.slice(-visible)}`;
+}
+
 export function isQuickBooksEnabled() {
   return getQuickBooksConfig().enabled;
 }
@@ -434,6 +441,28 @@ export async function getQuickBooksHealth() {
   } catch (error: any) {
     return { success: false as const, error: error?.message || "QuickBooks health check failed" };
   }
+}
+
+export function getQuickBooksRuntimePreview() {
+  const cfg = getQuickBooksConfig();
+  return {
+    enabled: cfg.enabled,
+    realmId: cfg.realmId,
+    realmIdMasked: maskValue(cfg.realmId, 4),
+    itemId: cfg.itemId,
+    itemIdMasked: maskValue(cfg.itemId, 2),
+    hasClientId: Boolean(cfg.clientId),
+    clientIdMasked: maskValue(cfg.clientId, 6),
+    hasClientSecret: Boolean(cfg.clientSecret),
+    clientSecretMasked: maskValue(cfg.clientSecret, 4),
+    hasRefreshToken: Boolean(cfg.refreshToken),
+    refreshTokenMasked: maskValue(cfg.refreshToken, 6),
+    hasAccessToken: Boolean(cfg.accessToken),
+    accessTokenMasked: maskValue(cfg.accessToken, 6),
+    redirectUri: process.env.QUICKBOOKS_REDIRECT_URI || "",
+    oauthStateSet: Boolean(process.env.QUICKBOOKS_OAUTH_STATE),
+    minorVersion: cfg.minorVersion,
+  };
 }
 
 export async function listQuickBooksItems(options?: { limit?: number; activeOnly?: boolean }) {
