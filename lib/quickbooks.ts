@@ -395,17 +395,15 @@ async function ensureItemRef() {
     }
   } catch (error: any) {
     lastItemError = normalizeQuickBooksError(error) || String(error?.message || "");
-    if (!isDuplicateNameError(error)) {
-      throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks item");
-    }
-
-    const afterDuplicate = await findItemByName(rentalName);
-    if (afterDuplicate?.Id && isSalesLineUsableItem(afterDuplicate)) {
-      const fetched = (await fetchEntityById("item", String(afterDuplicate.Id))) || afterDuplicate;
-      return {
-        value: String(fetched.Id),
-        name: String(fetched.Name || rentalName),
-      };
+    if (isDuplicateNameError(error)) {
+      const afterDuplicate = await findItemByName(rentalName);
+      if (afterDuplicate?.Id && isSalesLineUsableItem(afterDuplicate)) {
+        const fetched = (await fetchEntityById("item", String(afterDuplicate.Id))) || afterDuplicate;
+        return {
+          value: String(fetched.Id),
+          name: String(fetched.Name || rentalName),
+        };
+      }
     }
   }
 
@@ -436,9 +434,7 @@ async function ensureItemRef() {
     }
   } catch (error: any) {
     lastItemError = normalizeQuickBooksError(error) || String(error?.message || "");
-    if (!isDuplicateNameError(error)) {
-      throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks fallback item");
-    }
+    // Continue to broad fallback below.
   }
 
   // Final fallback by broad list (for sandbox query oddities)
@@ -465,6 +461,16 @@ async function ensureItemRef() {
     return {
       value: String(fetched.Id),
       name: String(fetched.Name || rentalName),
+    };
+  }
+
+  // Last-resort fallback: use any active sales-usable item in the realm.
+  const anyActiveUsable = items.find((item: any) => isSalesLineUsableItem(item) && item?.Active) || items.find((item: any) => isSalesLineUsableItem(item));
+  if (anyActiveUsable?.Id) {
+    const fetched = (await fetchEntityById("item", String(anyActiveUsable.Id))) || anyActiveUsable;
+    return {
+      value: String(fetched.Id),
+      name: String(fetched.Name || QUICKBOOKS_DEFAULT_ITEM_NAME),
     };
   }
 
