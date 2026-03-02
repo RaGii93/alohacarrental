@@ -255,6 +255,23 @@ async function findCustomerByEmail(email: string) {
   return result?.QueryResponse?.Customer?.[0] || null;
 }
 
+async function findAnyCustomerMatch(displayName: string, email: string) {
+  const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
+  const customers = allCustomers?.QueryResponse?.Customer || [];
+  const normalizedName = displayName.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
+  return (
+    customers.find((customer: any) => String(customer?.DisplayName || "").trim().toLowerCase() === normalizedName) ||
+    customers.find(
+      (customer: any) =>
+        String(customer?.PrimaryEmailAddr?.Address || "")
+          .trim()
+          .toLowerCase() === normalizedEmail
+    ) ||
+    null
+  );
+}
+
 async function ensureCustomer(input: QuickBooksCustomerInput) {
   const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
   const normalizedEmail = input.customerEmail.trim().toLowerCase();
@@ -289,16 +306,27 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   }
 
   // Global name list conflicts can still occur even when no customer matches.
-  const fallbackPayload = {
-    ...payloadBase,
-    DisplayName: `${displayName} (${input.bookingCode})`,
-  };
-  const fallbackCreated = await attemptCreate(fallbackPayload);
-  if (fallbackCreated?.Id) return fallbackCreated;
+  const fallbackNames = [
+    `${displayName} (${input.bookingCode})`,
+    `${displayName} (${input.bookingCode}-${Date.now().toString().slice(-6)})`,
+  ];
+  for (const fallbackName of fallbackNames) {
+    try {
+      const fallbackCreated = await attemptCreate({
+        ...payloadBase,
+        DisplayName: fallbackName,
+      });
+      if (fallbackCreated?.Id) return fallbackCreated;
+    } catch (error: any) {
+      if (!isDuplicateNameError(error)) throw error;
+    }
+  }
 
-  // Final re-fetch by email in case concurrent creation happened.
-  const reFetched = await findCustomerByEmail(normalizedEmail);
-  if (reFetched?.Id) return (await fetchEntityById("customer", String(reFetched.Id))) || reFetched;
+  // Final re-fetch by email/name in case concurrent creation happened.
+  const reFetchedByEmail = await findCustomerByEmail(normalizedEmail);
+  if (reFetchedByEmail?.Id) return (await fetchEntityById("customer", String(reFetchedByEmail.Id))) || reFetchedByEmail;
+  const reFetchedAny = await findAnyCustomerMatch(displayName, normalizedEmail);
+  if (reFetchedAny?.Id) return (await fetchEntityById("customer", String(reFetchedAny.Id))) || reFetchedAny;
 
   throw new Error("QuickBooks customer ensure failed");
 }
@@ -440,6 +468,18 @@ function buildRentalLineDescription(bookingCode: string, startDate: Date, endDat
   return `Rental period: ${formatDateOnly(startDate)} to ${formatDateOnly(endDate)} | Booking: ${bookingCode}`;
 }
 
+async function findInvoiceByDocNumber(docNumber: string) {
+  const safeDocNumber = escapeQueryValue(docNumber);
+  const result = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
+  return result?.QueryResponse?.Invoice?.[0] || null;
+}
+
+async function findSalesReceiptByDocNumber(docNumber: string) {
+  const safeDocNumber = escapeQueryValue(docNumber);
+  const result = await qbQuerySafe<any>(`select * from SalesReceipt where DocNumber = '${safeDocNumber}' maxresults 1`);
+  return result?.QueryResponse?.SalesReceipt?.[0] || null;
+}
+
 async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
   const safeDocNumber = escapeQueryValue(input.bookingCode);
   const existingQuery = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
@@ -551,6 +591,15 @@ export async function syncQuickBooksInvoice(input: QuickBooksInvoiceInput) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
+    const existingInvoice = await findInvoiceByDocNumber(input.bookingCode);
+    if (existingInvoice?.Id) {
+      return {
+        success: true as const,
+        skipped: false as const,
+        customerId: String(existingInvoice?.CustomerRef?.value || ""),
+        invoiceId: String(existingInvoice.Id),
+      };
+    }
     const customer = await ensureCustomer(input);
     if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
     const invoice = await ensureInvoice(input, customer.Id);
@@ -567,6 +616,16 @@ export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptIn
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
+    const docNumber = `SR-${input.bookingCode}`;
+    const existingSalesReceipt = await findSalesReceiptByDocNumber(docNumber);
+    if (existingSalesReceipt?.Id) {
+      return {
+        success: true as const,
+        skipped: false as const,
+        customerId: String(existingSalesReceipt?.CustomerRef?.value || ""),
+        salesReceiptId: String(existingSalesReceipt.Id),
+      };
+    }
     const customer = await ensureCustomer(input);
     if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
     const salesReceipt = await ensureSalesReceipt(input, customer.Id);
@@ -588,16 +647,23 @@ export async function receiveQuickBooksInvoicePayment(input: QuickBooksPaymentIn
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const customer = await ensureCustomer(input);
-    if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
-    const invoice = await ensureInvoice(input, customer.Id);
+    const existingInvoice = await findInvoiceByDocNumber(input.bookingCode);
+    const customerIdFromInvoice = String(existingInvoice?.CustomerRef?.value || "");
+    let customerId = customerIdFromInvoice;
+    let invoice = existingInvoice;
+    if (!invoice?.Id) {
+      const customer = await ensureCustomer(input);
+      if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
+      customerId = String(customer.Id);
+      invoice = await ensureInvoice(input, customer.Id);
+    }
     if (!invoice?.Id) throw new Error("QuickBooks invoice ensure failed before payment");
-    const payment = await upsertInvoicePayment(input, customer.Id, invoice.Id);
+    const payment = await upsertInvoicePayment(input, customerId, invoice.Id);
     if (!payment?.Id) throw new Error("QuickBooks payment upsert failed");
     return {
       success: true as const,
       skipped: false as const,
-      customerId: customer.Id,
+      customerId,
       invoiceId: invoice.Id,
       paymentId: payment.Id,
     };
