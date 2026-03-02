@@ -94,6 +94,12 @@ const QUICKBOOKS_PRODUCTION_API_BASE = "https://quickbooks.api.intuit.com";
 const QUICKBOOKS_SANDBOX_API_BASE = "https://sandbox-quickbooks.api.intuit.com";
 const QUICKBOOKS_DEFAULT_MINOR_VERSION = "75";
 const QUICKBOOKS_DEFAULT_ITEM_NAME = "Rental";
+const QUICKBOOKS_FALLBACK_ITEM_NAME = "Rental Service";
+
+function isSalesLineUsableItem(item: any) {
+  const type = String(item?.Type || "").toLowerCase();
+  return ["service", "inventory", "noninventory", "othercharge"].includes(type);
+}
 
 function resolveQuickBooksApiBase(environment: string) {
   return environment === "sandbox" ? QUICKBOOKS_SANDBOX_API_BASE : QUICKBOOKS_PRODUCTION_API_BASE;
@@ -231,16 +237,84 @@ async function qbCreateOrUpdate(resource: "customer" | "invoice" | "salesreceipt
   return await qbRequest(path, "POST", payload, "application/json");
 }
 
-async function resolveItemRef() {
+async function fetchEntityById(resource: "customer" | "item", id: string) {
+  const cfg = getQuickBooksConfig();
+  const response = await qbRequest(`/v3/company/${encodeURIComponent(cfg.realmId)}/${resource}/${encodeURIComponent(id)}`, "GET");
+  return response?.[resource === "customer" ? "Customer" : "Item"] || null;
+}
+
+async function findCustomerByDisplayName(displayName: string) {
+  const safeDisplayName = escapeQueryValue(displayName);
+  const result = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeDisplayName}' maxresults 1`);
+  return result?.QueryResponse?.Customer?.[0] || null;
+}
+
+async function findCustomerByEmail(email: string) {
+  const safeEmail = escapeQueryValue(email.trim().toLowerCase());
+  const result = await qbQuerySafe<any>(`select * from Customer where PrimaryEmailAddr = '${safeEmail}' maxresults 1`);
+  return result?.QueryResponse?.Customer?.[0] || null;
+}
+
+async function ensureCustomer(input: QuickBooksCustomerInput) {
+  const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
+  const normalizedEmail = input.customerEmail.trim().toLowerCase();
+  const existingByName = await findCustomerByDisplayName(displayName);
+  if (existingByName?.Id) {
+    return (await fetchEntityById("customer", String(existingByName.Id))) || existingByName;
+  }
+
+  const existingByEmail = await findCustomerByEmail(normalizedEmail);
+  if (existingByEmail?.Id) {
+    return (await fetchEntityById("customer", String(existingByEmail.Id))) || existingByEmail;
+  }
+
+  const payloadBase = {
+    DisplayName: displayName,
+    PrimaryEmailAddr: { Address: normalizedEmail },
+    ...(input.customerPhone ? { PrimaryPhone: { FreeFormNumber: input.customerPhone } } : {}),
+  };
+
+  const attemptCreate = async (payload: any) => {
+    const created = await qbCreateOrUpdate("customer", payload);
+    const createdId = created?.Customer?.Id;
+    if (!createdId) return null;
+    return (await fetchEntityById("customer", String(createdId))) || created.Customer;
+  };
+
+  try {
+    const created = await attemptCreate(payloadBase);
+    if (created?.Id) return created;
+  } catch (error: any) {
+    if (!isDuplicateNameError(error)) throw error;
+  }
+
+  // Global name list conflicts can still occur even when no customer matches.
+  const fallbackPayload = {
+    ...payloadBase,
+    DisplayName: `${displayName} (${input.bookingCode})`,
+  };
+  const fallbackCreated = await attemptCreate(fallbackPayload);
+  if (fallbackCreated?.Id) return fallbackCreated;
+
+  // Final re-fetch by email in case concurrent creation happened.
+  const reFetched = await findCustomerByEmail(normalizedEmail);
+  if (reFetched?.Id) return (await fetchEntityById("customer", String(reFetched.Id))) || reFetched;
+
+  throw new Error("QuickBooks customer ensure failed");
+}
+
+async function findItemByName(name: string) {
+  const safeName = escapeQueryValue(name);
+  const byNameQuery = await qbQuerySafe<any>(`select * from Item where Name = '${safeName}' maxresults 1`);
+  return byNameQuery?.QueryResponse?.Item?.[0] || null;
+}
+
+async function ensureItemRef() {
   const cfg = getQuickBooksConfig();
   if (cfg.itemId) {
     try {
-      const itemResponse = await qbRequest(
-        `/v3/company/${encodeURIComponent(cfg.realmId)}/item/${encodeURIComponent(cfg.itemId)}`,
-        "GET"
-      );
-      const item = itemResponse?.Item;
-      if (item?.Id) {
+      const item = await fetchEntityById("item", cfg.itemId);
+      if (item?.Id && isSalesLineUsableItem(item)) {
         return {
           value: String(item.Id),
           name: String(item.Name || QUICKBOOKS_DEFAULT_ITEM_NAME),
@@ -252,13 +326,12 @@ async function resolveItemRef() {
   }
 
   const rentalName = QUICKBOOKS_DEFAULT_ITEM_NAME;
-  const safeRentalName = escapeQueryValue(rentalName);
-  const byNameQuery = await qbQuerySafe<any>(`select * from Item where Name = '${safeRentalName}' maxresults 1`);
-  const existing = byNameQuery?.QueryResponse?.Item?.[0];
-  if (existing?.Id) {
+  const existing = await findItemByName(rentalName);
+  if (existing?.Id && isSalesLineUsableItem(existing)) {
+    const fetched = (await fetchEntityById("item", String(existing.Id))) || existing;
     return {
-      value: String(existing.Id),
-      name: String(existing.Name || rentalName),
+      value: String(fetched.Id),
+      name: String(fetched.Name || rentalName),
     };
   }
 
@@ -276,95 +349,104 @@ async function resolveItemRef() {
 
   try {
     const created = await qbRequest(`/v3/company/${encodeURIComponent(cfg.realmId)}/item`, "POST", createPayload);
-    const item = created?.Item;
-    if (!item?.Id) throw new Error("QuickBooks item creation failed");
-    return {
-      value: String(item.Id),
-      name: String(item.Name || rentalName),
-    };
-  } catch (error: any) {
-    if (isDuplicateNameError(error)) {
-      const allItems = await qbQuerySafe<any>("select * from Item maxresults 1000");
-      const items = allItems?.QueryResponse?.Item || [];
-      const matched =
-        items.find((item: any) => String(item?.Name || "").trim().toLowerCase() === rentalName.toLowerCase() && item?.Active) ||
-        items.find((item: any) => String(item?.Name || "").trim().toLowerCase() === rentalName.toLowerCase());
-      if (matched?.Id) {
+    const createdId = created?.Item?.Id;
+    if (createdId) {
+      const fetched = (await fetchEntityById("item", String(createdId))) || created.Item;
+      if (isSalesLineUsableItem(fetched)) {
         return {
-          value: String(matched.Id),
-          name: String(matched.Name || rentalName),
+          value: String(fetched.Id),
+          name: String(fetched.Name || rentalName),
         };
       }
     }
-    throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks item");
+  } catch (error: any) {
+    if (!isDuplicateNameError(error)) {
+      throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks item");
+    }
+
+    const afterDuplicate = await findItemByName(rentalName);
+    if (afterDuplicate?.Id && isSalesLineUsableItem(afterDuplicate)) {
+      const fetched = (await fetchEntityById("item", String(afterDuplicate.Id))) || afterDuplicate;
+      return {
+        value: String(fetched.Id),
+        name: String(fetched.Name || rentalName),
+      };
+    }
   }
+
+  // "Rental" may already exist as a Category. Use a service-specific fallback name.
+  const fallbackName = QUICKBOOKS_FALLBACK_ITEM_NAME;
+  const fallbackExisting = await findItemByName(fallbackName);
+  if (fallbackExisting?.Id && isSalesLineUsableItem(fallbackExisting)) {
+    const fetched = (await fetchEntityById("item", String(fallbackExisting.Id))) || fallbackExisting;
+    return {
+      value: String(fetched.Id),
+      name: String(fetched.Name || fallbackName),
+    };
+  }
+  try {
+    const createdFallback = await qbRequest(`/v3/company/${encodeURIComponent(cfg.realmId)}/item`, "POST", {
+      ...createPayload,
+      Name: fallbackName,
+    });
+    const createdId = createdFallback?.Item?.Id;
+    if (createdId) {
+      const fetched = (await fetchEntityById("item", String(createdId))) || createdFallback.Item;
+      if (isSalesLineUsableItem(fetched)) {
+        return {
+          value: String(fetched.Id),
+          name: String(fetched.Name || fallbackName),
+        };
+      }
+    }
+  } catch (error: any) {
+    if (!isDuplicateNameError(error)) {
+      throw new Error(normalizeQuickBooksError(error) || "Failed to resolve/create QuickBooks fallback item");
+    }
+  }
+
+  // Final fallback by broad list (for sandbox query oddities)
+  const allItems = await qbQuerySafe<any>("select * from Item maxresults 1000");
+  const items = allItems?.QueryResponse?.Item || [];
+  const matched =
+    items.find(
+      (item: any) =>
+        isSalesLineUsableItem(item) &&
+        item?.Active &&
+        String(item?.Name || "").trim().toLowerCase() === fallbackName.toLowerCase()
+    ) ||
+    items.find(
+      (item: any) => isSalesLineUsableItem(item) && String(item?.Name || "").trim().toLowerCase() === fallbackName.toLowerCase()
+    ) ||
+    items.find(
+      (item: any) =>
+        isSalesLineUsableItem(item) &&
+        item?.Active &&
+        String(item?.Name || "").trim().toLowerCase() === rentalName.toLowerCase()
+    ) ||
+    items.find((item: any) => isSalesLineUsableItem(item) && String(item?.Name || "").trim().toLowerCase() === rentalName.toLowerCase());
+  if (matched?.Id) {
+    const fetched = (await fetchEntityById("item", String(matched.Id))) || matched;
+    return {
+      value: String(fetched.Id),
+      name: String(fetched.Name || rentalName),
+    };
+  }
+
+  throw new Error("Failed to resolve/create QuickBooks item");
 }
 
 function buildRentalLineDescription(bookingCode: string, startDate: Date, endDate: Date) {
   return `Rental period: ${formatDateOnly(startDate)} to ${formatDateOnly(endDate)} | Booking: ${bookingCode}`;
 }
 
-async function upsertCustomer(input: QuickBooksCustomerInput) {
-  const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
-  const safeDisplayName = escapeQueryValue(displayName);
-  const customerQuery = await qbQuerySafe<any>(
-    `select * from Customer where DisplayName = '${safeDisplayName}' maxresults 1`
-  );
-  const existing = customerQuery?.QueryResponse?.Customer?.[0];
-
-  const payloadBase = {
-    DisplayName: displayName,
-    PrimaryEmailAddr: { Address: input.customerEmail.trim().toLowerCase() },
-    ...(input.customerPhone ? { PrimaryPhone: { FreeFormNumber: input.customerPhone } } : {}),
-  };
-
-  if (existing?.Id && existing?.SyncToken !== undefined) {
-    const updated = await qbCreateOrUpdate("customer", {
-      Id: existing.Id,
-      SyncToken: existing.SyncToken,
-      sparse: true,
-      ...payloadBase,
-    });
-    return updated?.Customer || existing;
-  }
-
-  try {
-    const created = await qbCreateOrUpdate("customer", payloadBase);
-    return created?.Customer;
-  } catch (error: any) {
-    if (isDuplicateNameError(error)) {
-      const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
-      const customers = allCustomers?.QueryResponse?.Customer || [];
-      const normalizedName = displayName.toLowerCase();
-      const normalizedEmail = input.customerEmail.trim().toLowerCase();
-      const matched =
-        customers.find((customer: any) => String(customer?.DisplayName || "").trim().toLowerCase() === normalizedName) ||
-        customers.find(
-          (customer: any) =>
-            String(customer?.PrimaryEmailAddr?.Address || "")
-              .trim()
-              .toLowerCase() === normalizedEmail
-        );
-      if (matched?.Id) return matched;
-
-      // Name collisions can be caused by non-customer name list entities (vendor/employee).
-      // In that case, create a deterministic alternate display name so billing can continue.
-      const fallbackPayload = {
-        ...payloadBase,
-        DisplayName: `${displayName} (${input.bookingCode})`,
-      };
-      const fallbackCreated = await qbCreateOrUpdate("customer", fallbackPayload);
-      if (fallbackCreated?.Customer?.Id) return fallbackCreated.Customer;
-    }
-    throw error;
-  }
-}
-
-async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
-  const itemRef = await resolveItemRef();
+async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
   const safeDocNumber = escapeQueryValue(input.bookingCode);
   const existingQuery = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
   const existing = existingQuery?.QueryResponse?.Invoice?.[0];
+  if (existing?.Id) return existing;
+
+  const itemRef = await ensureItemRef();
   const totalAmount = amountToMajor(input.totalAmountCents);
 
   const payloadBase = {
@@ -388,28 +470,20 @@ async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: strin
     ],
   };
 
-  if (existing?.Id && existing?.SyncToken !== undefined) {
-    const updated = await qbCreateOrUpdate("invoice", {
-      Id: existing.Id,
-      SyncToken: existing.SyncToken,
-      sparse: true,
-      ...payloadBase,
-    });
-    return updated?.Invoice || existing;
-  }
-
   const created = await qbCreateOrUpdate("invoice", payloadBase);
   return created?.Invoice;
 }
 
-async function upsertSalesReceipt(input: QuickBooksSalesReceiptInput, customerRefId: string) {
-  const itemRef = await resolveItemRef();
+async function ensureSalesReceipt(input: QuickBooksSalesReceiptInput, customerRefId: string) {
   const docNumber = `SR-${input.bookingCode}`;
   const safeDocNumber = escapeQueryValue(docNumber);
   const existingQuery = await qbQuerySafe<any>(
     `select * from SalesReceipt where DocNumber = '${safeDocNumber}' maxresults 1`
   );
   const existing = existingQuery?.QueryResponse?.SalesReceipt?.[0];
+  if (existing?.Id) return existing;
+
+  const itemRef = await ensureItemRef();
   const totalAmount = amountToMajor(input.totalAmountCents);
 
   const payloadBase = {
@@ -431,16 +505,6 @@ async function upsertSalesReceipt(input: QuickBooksSalesReceiptInput, customerRe
       },
     ],
   };
-
-  if (existing?.Id && existing?.SyncToken !== undefined) {
-    const updated = await qbCreateOrUpdate("salesreceipt", {
-      Id: existing.Id,
-      SyncToken: existing.SyncToken,
-      sparse: true,
-      ...payloadBase,
-    });
-    return updated?.SalesReceipt || existing;
-  }
 
   const created = await qbCreateOrUpdate("salesreceipt", payloadBase);
   return created?.SalesReceipt;
@@ -487,10 +551,10 @@ export async function syncQuickBooksInvoice(input: QuickBooksInvoiceInput) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const customer = await upsertCustomer(input);
-    if (!customer?.Id) throw new Error("QuickBooks customer upsert failed");
-    const invoice = await upsertInvoice(input, customer.Id);
-    if (!invoice?.Id) throw new Error("QuickBooks invoice upsert failed");
+    const customer = await ensureCustomer(input);
+    if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
+    const invoice = await ensureInvoice(input, customer.Id);
+    if (!invoice?.Id) throw new Error("QuickBooks invoice ensure failed");
     return { success: true as const, skipped: false as const, customerId: customer.Id, invoiceId: invoice.Id };
   } catch (error: any) {
     return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks invoice sync failed" };
@@ -503,10 +567,10 @@ export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptIn
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const customer = await upsertCustomer(input);
-    if (!customer?.Id) throw new Error("QuickBooks customer upsert failed");
-    const salesReceipt = await upsertSalesReceipt(input, customer.Id);
-    if (!salesReceipt?.Id) throw new Error("QuickBooks sales receipt upsert failed");
+    const customer = await ensureCustomer(input);
+    if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
+    const salesReceipt = await ensureSalesReceipt(input, customer.Id);
+    if (!salesReceipt?.Id) throw new Error("QuickBooks sales receipt ensure failed");
     return {
       success: true as const,
       skipped: false as const,
@@ -524,10 +588,10 @@ export async function receiveQuickBooksInvoicePayment(input: QuickBooksPaymentIn
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const customer = await upsertCustomer(input);
-    if (!customer?.Id) throw new Error("QuickBooks customer upsert failed");
-    const invoice = await upsertInvoice(input, customer.Id);
-    if (!invoice?.Id) throw new Error("QuickBooks invoice upsert failed before payment");
+    const customer = await ensureCustomer(input);
+    if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
+    const invoice = await ensureInvoice(input, customer.Id);
+    if (!invoice?.Id) throw new Error("QuickBooks invoice ensure failed before payment");
     const payment = await upsertInvoicePayment(input, customer.Id, invoice.Id);
     if (!payment?.Id) throw new Error("QuickBooks payment upsert failed");
     return {
