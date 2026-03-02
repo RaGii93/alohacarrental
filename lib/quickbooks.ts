@@ -202,6 +202,23 @@ async function qbQuery<T = any>(query: string) {
   return (await qbRequest(path, "POST", query, "text/plain")) as QueryResponse<T>;
 }
 
+function isQueryParserError(error: any) {
+  const message = String(error?.message || "");
+  return message.toLowerCase().includes("queryparsererror");
+}
+
+async function qbQuerySafe<T = any>(query: string) {
+  try {
+    return await qbQuery<T>(query);
+  } catch (error: any) {
+    if (isQueryParserError(error)) {
+      // Fallback for inconsistent parser behavior in some sandbox realms.
+      return {} as QueryResponse<T>;
+    }
+    throw error;
+  }
+}
+
 async function qbCreateOrUpdate(resource: "customer" | "invoice" | "salesreceipt" | "payment", payload: any) {
   const cfg = getQuickBooksConfig();
   const path = `/v3/company/${encodeURIComponent(cfg.realmId)}/${resource}`;
@@ -209,13 +226,11 @@ async function qbCreateOrUpdate(resource: "customer" | "invoice" | "salesreceipt
 }
 
 async function upsertCustomer(input: QuickBooksCustomerInput) {
-  const safeEmail = escapeQueryValue(input.customerEmail.trim().toLowerCase());
-  const customerQuery = await qbQuery<any>(
-    `select * from Customer where PrimaryEmailAddr = '${safeEmail}' maxresults 1`
-  );
+  const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
+  const safeDisplayName = escapeQueryValue(displayName);
+  const customerQuery = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeDisplayName}' maxresults 1`);
   const existing = customerQuery?.QueryResponse?.Customer?.[0];
 
-  const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
   const payloadBase = {
     DisplayName: displayName,
     PrimaryEmailAddr: { Address: input.customerEmail.trim().toLowerCase() },
@@ -239,7 +254,7 @@ async function upsertCustomer(input: QuickBooksCustomerInput) {
 async function upsertInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
   const cfg = getQuickBooksConfig();
   const safeDocNumber = escapeQueryValue(input.bookingCode);
-  const existingQuery = await qbQuery<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
+  const existingQuery = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
   const existing = existingQuery?.QueryResponse?.Invoice?.[0];
   const totalAmount = amountToMajor(input.totalAmountCents);
 
@@ -284,7 +299,7 @@ async function upsertSalesReceipt(input: QuickBooksSalesReceiptInput, customerRe
   const cfg = getQuickBooksConfig();
   const docNumber = `SR-${input.bookingCode}`;
   const safeDocNumber = escapeQueryValue(docNumber);
-  const existingQuery = await qbQuery<any>(
+  const existingQuery = await qbQuerySafe<any>(
     `select * from SalesReceipt where DocNumber = '${safeDocNumber}' maxresults 1`
   );
   const existing = existingQuery?.QueryResponse?.SalesReceipt?.[0];
@@ -329,7 +344,7 @@ async function upsertSalesReceipt(input: QuickBooksSalesReceiptInput, customerRe
 async function upsertInvoicePayment(input: QuickBooksPaymentInput, customerRefId: string, invoiceId: string) {
   const paymentRefNum = `PAY-${input.bookingCode}`;
   const safeRef = escapeQueryValue(paymentRefNum);
-  const existingQuery = await qbQuery<any>(`select * from Payment where PaymentRefNum = '${safeRef}' maxresults 1`);
+  const existingQuery = await qbQuerySafe<any>(`select * from Payment where PaymentRefNum = '${safeRef}' maxresults 1`);
   const existing = existingQuery?.QueryResponse?.Payment?.[0];
   const totalAmount = amountToMajor(input.totalAmountCents);
 

@@ -302,6 +302,7 @@ QUICKBOOKS_ITEM_ID=
   - `GET /api/quickbooks/health` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/items` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/env-check` (admin ROOT/OWNER only; masked runtime env preview)
+  - `GET /api/quickbooks/smoke` (admin ROOT/OWNER only; runs invoice/sales receipt/payment sync smoke test)
   - Set `QUICKBOOKS_REDIRECT_URI` to your callback URL, e.g. `https://your-domain.com/api/quickbooks/callback`
   - OAuth hardening implemented: fixed state prefix + per-request nonce + PKCE (`S256`) on connect/callback
 
