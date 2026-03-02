@@ -86,6 +86,14 @@ function escapeQueryValue(value: string) {
   return value.replaceAll("\\", "\\\\").replaceAll("'", "\\'");
 }
 
+function normalizeCustomerDisplayName(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function stripBookingSuffixFromDisplayName(value: string) {
+  return value.trim().replace(/\s*\([a-z0-9-]+\)\s*$/i, "").trim();
+}
+
 function amountToMajor(cents: number) {
   return Math.round(Math.max(0, cents)) / 100;
 }
@@ -249,24 +257,16 @@ async function findCustomerByDisplayName(displayName: string) {
   return result?.QueryResponse?.Customer?.[0] || null;
 }
 
-async function findCustomerByEmail(email: string) {
-  const safeEmail = escapeQueryValue(email.trim().toLowerCase());
-  const result = await qbQuerySafe<any>(`select * from Customer where PrimaryEmailAddr = '${safeEmail}' maxresults 1`);
-  return result?.QueryResponse?.Customer?.[0] || null;
-}
-
-async function findAnyCustomerMatch(displayName: string, email: string) {
+async function findAnyCustomerMatch(displayName: string) {
   const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
   const customers = allCustomers?.QueryResponse?.Customer || [];
-  const normalizedName = displayName.trim().toLowerCase();
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedName = normalizeCustomerDisplayName(displayName);
+  const normalizedBaseName = normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(displayName));
   return (
-    customers.find((customer: any) => String(customer?.DisplayName || "").trim().toLowerCase() === normalizedName) ||
+    customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedName) ||
     customers.find(
       (customer: any) =>
-        String(customer?.PrimaryEmailAddr?.Address || "")
-          .trim()
-          .toLowerCase() === normalizedEmail
+        normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(String(customer?.DisplayName || ""))) === normalizedBaseName
     ) ||
     null
   );
@@ -274,20 +274,25 @@ async function findAnyCustomerMatch(displayName: string, email: string) {
 
 async function ensureCustomer(input: QuickBooksCustomerInput) {
   const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
-  const normalizedEmail = input.customerEmail.trim().toLowerCase();
+  const bookingDisplayName = `${displayName} (${input.bookingCode})`;
   const existingByName = await findCustomerByDisplayName(displayName);
   if (existingByName?.Id) {
     return (await fetchEntityById("customer", String(existingByName.Id))) || existingByName;
   }
 
-  const existingByEmail = await findCustomerByEmail(normalizedEmail);
-  if (existingByEmail?.Id) {
-    return (await fetchEntityById("customer", String(existingByEmail.Id))) || existingByEmail;
+  const existingByBookingDisplayName = await findCustomerByDisplayName(bookingDisplayName);
+  if (existingByBookingDisplayName?.Id) {
+    return (await fetchEntityById("customer", String(existingByBookingDisplayName.Id))) || existingByBookingDisplayName;
+  }
+
+  const existingByAnyNameMatch = await findAnyCustomerMatch(displayName);
+  if (existingByAnyNameMatch?.Id) {
+    return (await fetchEntityById("customer", String(existingByAnyNameMatch.Id))) || existingByAnyNameMatch;
   }
 
   const payloadBase = {
     DisplayName: displayName,
-    PrimaryEmailAddr: { Address: normalizedEmail },
+    PrimaryEmailAddr: { Address: input.customerEmail.trim().toLowerCase() },
     ...(input.customerPhone ? { PrimaryPhone: { FreeFormNumber: input.customerPhone } } : {}),
   };
 
@@ -307,7 +312,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
 
   // Global name list conflicts can still occur even when no customer matches.
   const fallbackNames = [
-    `${displayName} (${input.bookingCode})`,
+    bookingDisplayName,
     `${displayName} (${input.bookingCode}-${Date.now().toString().slice(-6)})`,
   ];
   for (const fallbackName of fallbackNames) {
@@ -323,9 +328,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   }
 
   // Final re-fetch by email/name in case concurrent creation happened.
-  const reFetchedByEmail = await findCustomerByEmail(normalizedEmail);
-  if (reFetchedByEmail?.Id) return (await fetchEntityById("customer", String(reFetchedByEmail.Id))) || reFetchedByEmail;
-  const reFetchedAny = await findAnyCustomerMatch(displayName, normalizedEmail);
+  const reFetchedAny = await findAnyCustomerMatch(displayName);
   if (reFetchedAny?.Id) return (await fetchEntityById("customer", String(reFetchedAny.Id))) || reFetchedAny;
 
   throw new Error("QuickBooks customer ensure failed");
@@ -485,10 +488,23 @@ function buildRentalLineDescription(bookingCode: string, startDate: Date, endDat
   return `Rental period: ${formatDateOnly(startDate)} to ${formatDateOnly(endDate)} | Booking: ${bookingCode}`;
 }
 
-async function findInvoiceByDocNumber(docNumber: string) {
-  const safeDocNumber = escapeQueryValue(docNumber);
-  const result = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
-  return result?.QueryResponse?.Invoice?.[0] || null;
+function buildInvoiceMemo(input: Pick<QuickBooksInvoiceInput, "bookingCode" | "note">) {
+  return String(input.note || `Booking ${input.bookingCode}`).trim();
+}
+
+function normalizeMemo(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+async function findInvoiceByMemo(memo: string) {
+  const target = normalizeMemo(memo);
+  const allInvoices = await qbQuerySafe<any>("select * from Invoice maxresults 1000");
+  const invoices = allInvoices?.QueryResponse?.Invoice || [];
+  return (
+    invoices.find((invoice: any) => normalizeMemo(String(invoice?.PrivateNote || "")) === target) ||
+    invoices.find((invoice: any) => normalizeMemo(String(invoice?.CustomerMemo?.value || "")) === target) ||
+    null
+  );
 }
 
 async function findSalesReceiptByDocNumber(docNumber: string) {
@@ -498,9 +514,8 @@ async function findSalesReceiptByDocNumber(docNumber: string) {
 }
 
 async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
-  const safeDocNumber = escapeQueryValue(input.bookingCode);
-  const existingQuery = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
-  const existing = existingQuery?.QueryResponse?.Invoice?.[0];
+  const memo = buildInvoiceMemo(input);
+  const existing = await findInvoiceByMemo(memo);
   if (existing?.Id) return existing;
 
   const itemRef = await ensureItemRef();
@@ -510,7 +525,8 @@ async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: strin
     DocNumber: input.bookingCode,
     TxnDate: formatDateOnly(new Date()),
     DueDate: formatDateOnly(input.startDate),
-    PrivateNote: input.note || `Booking ${input.bookingCode}`,
+    PrivateNote: memo,
+    CustomerMemo: { value: memo },
     CustomerRef: { value: customerRefId },
     BillEmail: { Address: input.customerEmail.trim().toLowerCase() },
     Line: [
@@ -608,7 +624,7 @@ export async function syncQuickBooksInvoice(input: QuickBooksInvoiceInput) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const existingInvoice = await findInvoiceByDocNumber(input.bookingCode);
+    const existingInvoice = await findInvoiceByMemo(buildInvoiceMemo(input));
     if (existingInvoice?.Id) {
       return {
         success: true as const,
@@ -664,7 +680,7 @@ export async function receiveQuickBooksInvoicePayment(input: QuickBooksPaymentIn
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const existingInvoice = await findInvoiceByDocNumber(input.bookingCode);
+    const existingInvoice = await findInvoiceByMemo(buildInvoiceMemo(input));
     const customerIdFromInvoice = String(existingInvoice?.CustomerRef?.value || "");
     let customerId = customerIdFromInvoice;
     let invoice = existingInvoice;
