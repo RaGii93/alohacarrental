@@ -100,6 +100,14 @@ function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
 }
 
+function buildCanonicalCustomerDisplayName(email: string) {
+  const slug = normalizeEmail(email)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const base = `ER Customer ${slug || "unknown"}`.trim();
+  return base.slice(0, 100);
+}
+
 function stripBookingSuffixFromDisplayName(value: string) {
   return value.trim().replace(/\s*\([a-z0-9-]+\)\s*$/i, "").trim();
 }
@@ -274,9 +282,11 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   const normalizedDisplayName = normalizeCustomerDisplayName(displayName);
   const normalizedDisplayBaseName = normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(displayName));
   const normalizedEmail = normalizeEmail(input.customerEmail);
+  const canonicalDisplayName = buildCanonicalCustomerDisplayName(normalizedEmail);
   const deterministicNameCandidates = Array.from(
     new Set(
       [
+        canonicalDisplayName,
         displayName,
         `${displayName} (${normalizedEmail})`,
         `Customer ${normalizedEmail}`,
@@ -352,6 +362,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
     return (await fetchEntityById("customer", String(createdId))) || created.Customer;
   };
 
+  const createErrors: string[] = [];
   for (const candidateName of deterministicNameCandidates) {
     try {
       const created = await attemptCreate(
@@ -363,6 +374,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
       if (created?.Id) return created;
     } catch (error: any) {
       if (isDuplicateNameError(error)) {
+        createErrors.push(`duplicate:${candidateName}`);
         const duplicateId = parseDuplicateEntityId(error);
         if (duplicateId) {
           try {
@@ -378,6 +390,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
         }
         continue;
       }
+      createErrors.push(`${candidateName}:${normalizeQuickBooksError(error) || String(error?.message || "unknown error")}`);
       throw error;
     }
   }
@@ -386,7 +399,8 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   const reFetchedAny = await resolveExistingCustomer(deterministicNameCandidates);
   if (reFetchedAny?.Id) return (await fetchEntityById("customer", String(reFetchedAny.Id))) || reFetchedAny;
 
-  throw new Error("QuickBooks customer ensure failed");
+  const attemptsSummary = createErrors.length ? ` Attempts: ${createErrors.join(" | ")}` : "";
+  throw new Error(`QuickBooks customer ensure failed.${attemptsSummary}`);
 }
 
 async function findItemByName(name: string) {
