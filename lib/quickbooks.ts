@@ -285,7 +285,21 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
     );
   };
 
-  const matchedExisting = await listAndMatchExistingCustomer();
+  const findByExactDisplayName = async (name: string) => {
+    const safeName = escapeQueryValue(name);
+    const result = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeName}' maxresults 1`);
+    return result?.QueryResponse?.Customer?.[0] || null;
+  };
+
+  const resolveExistingCustomer = async () => {
+    const exactByName = await findByExactDisplayName(displayName);
+    if (exactByName?.Id) return exactByName;
+    const exactByBookingDisplayName = await findByExactDisplayName(bookingDisplayName);
+    if (exactByBookingDisplayName?.Id) return exactByBookingDisplayName;
+    return await listAndMatchExistingCustomer();
+  };
+
+  const matchedExisting = await resolveExistingCustomer();
   if (matchedExisting?.Id) {
     return (await fetchEntityById("customer", String(matchedExisting.Id))) || matchedExisting;
   }
@@ -308,7 +322,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
     if (created?.Id) return created;
   } catch (error: any) {
     if (isDuplicateNameError(error)) {
-      const resolvedAfterDuplicate = await listAndMatchExistingCustomer();
+      const resolvedAfterDuplicate = await resolveExistingCustomer();
       if (resolvedAfterDuplicate?.Id) {
         return (await fetchEntityById("customer", String(resolvedAfterDuplicate.Id))) || resolvedAfterDuplicate;
       }
@@ -317,7 +331,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   }
 
   // Final re-fetch in case concurrent creation happened.
-  const reFetchedAny = await listAndMatchExistingCustomer();
+  const reFetchedAny = await resolveExistingCustomer();
   if (reFetchedAny?.Id) return (await fetchEntityById("customer", String(reFetchedAny.Id))) || reFetchedAny;
 
   throw new Error("QuickBooks customer ensure failed");
