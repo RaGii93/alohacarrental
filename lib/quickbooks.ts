@@ -750,7 +750,10 @@ export async function syncQuickBooksInvoice(input: QuickBooksInvoiceInput) {
   }
 }
 
-export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptInput) {
+export async function syncQuickBooksSalesReceipt(
+  input: QuickBooksSalesReceiptInput,
+  context?: { customerId?: string }
+) {
   if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
   if (!hasRequiredQuickBooksConfig()) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
@@ -766,14 +769,18 @@ export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptIn
         salesReceiptId: String(existingSalesReceipt.Id),
       };
     }
-    const customer = await ensureCustomer(input);
-    if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
-    const salesReceipt = await ensureSalesReceipt(input, customer.Id);
+    let customerId = String(context?.customerId || "").trim();
+    if (!customerId) {
+      const customer = await ensureCustomer(input);
+      if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
+      customerId = String(customer.Id);
+    }
+    const salesReceipt = await ensureSalesReceipt(input, customerId);
     if (!salesReceipt?.Id) throw new Error("QuickBooks sales receipt ensure failed");
     return {
       success: true as const,
       skipped: false as const,
-      customerId: customer.Id,
+      customerId,
       salesReceiptId: salesReceipt.Id,
     };
   } catch (error: any) {
