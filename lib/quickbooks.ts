@@ -270,7 +270,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   const normalizedEmail = normalizeEmail(input.customerEmail);
 
   const listAndMatchExistingCustomer = async () => {
-    const allCustomers = await qbQuery<any>("select * from Customer maxresults 1000");
+    const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
     const customers = allCustomers?.QueryResponse?.Customer || [];
     return (
       customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedDisplayName) ||
