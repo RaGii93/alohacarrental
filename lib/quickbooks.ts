@@ -73,6 +73,12 @@ function isDuplicateNameError(error: any) {
   return message.includes("name supplied already exists") || message.includes("6240");
 }
 
+function parseDuplicateEntityId(error: any) {
+  const message = String(error?.message || "");
+  const match = message.match(/(?:^|[\s:])id\s*=\s*(\d+)\b/i);
+  return match?.[1] || null;
+}
+
 function parseBool(value: string | undefined, fallback = false) {
   if (!value) return fallback;
   return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
@@ -399,6 +405,20 @@ async function ensureItemRef() {
   } catch (error: any) {
     lastItemError = normalizeQuickBooksError(error) || String(error?.message || "");
     if (isDuplicateNameError(error)) {
+      const duplicateId = parseDuplicateEntityId(error);
+      if (duplicateId) {
+        try {
+          const duplicateItem = await fetchEntityById("item", duplicateId);
+          if (duplicateItem?.Id && isSalesLineUsableItem(duplicateItem)) {
+            return {
+              value: String(duplicateItem.Id),
+              name: String(duplicateItem.Name || rentalName),
+            };
+          }
+        } catch {
+          // Fall through to name-based lookup.
+        }
+      }
       const afterDuplicate = await findItemByName(rentalName);
       if (afterDuplicate?.Id && isSalesLineUsableItem(afterDuplicate)) {
         const fetched = (await fetchEntityById("item", String(afterDuplicate.Id))) || afterDuplicate;
@@ -437,6 +457,22 @@ async function ensureItemRef() {
     }
   } catch (error: any) {
     lastItemError = normalizeQuickBooksError(error) || String(error?.message || "");
+    if (isDuplicateNameError(error)) {
+      const duplicateId = parseDuplicateEntityId(error);
+      if (duplicateId) {
+        try {
+          const duplicateItem = await fetchEntityById("item", duplicateId);
+          if (duplicateItem?.Id && isSalesLineUsableItem(duplicateItem)) {
+            return {
+              value: String(duplicateItem.Id),
+              name: String(duplicateItem.Name || fallbackName),
+            };
+          }
+        } catch {
+          // Continue to broad fallback below.
+        }
+      }
+    }
     // Continue to broad fallback below.
   }
 
