@@ -263,18 +263,34 @@ async function fetchEntityById(resource: "customer" | "item", id: string) {
 
 async function ensureCustomer(input: QuickBooksCustomerInput) {
   const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
-  const bookingDisplayName = `${displayName} (${input.bookingCode})`;
   const normalizedDisplayName = normalizeCustomerDisplayName(displayName);
-  const normalizedBookingDisplayName = normalizeCustomerDisplayName(bookingDisplayName);
   const normalizedDisplayBaseName = normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(displayName));
   const normalizedEmail = normalizeEmail(input.customerEmail);
+  const deterministicNameCandidates = Array.from(
+    new Set(
+      [
+        displayName,
+        `${displayName} (${normalizedEmail})`,
+        `Customer ${normalizedEmail}`,
+      ].map((value) => value.trim().slice(0, 100))
+    )
+  ).filter(Boolean);
+  const normalizedNameCandidates = new Set(
+    deterministicNameCandidates.map((value) => normalizeCustomerDisplayName(value))
+  );
 
-  const listAndMatchExistingCustomer = async () => {
+  const listAndMatchExistingCustomer = async (preferredNames: string[] = []) => {
+    const normalizedPreferredNames = new Set(preferredNames.map((value) => normalizeCustomerDisplayName(value)));
     const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
     const customers = allCustomers?.QueryResponse?.Customer || [];
     return (
+      customers.find((customer: any) =>
+        normalizedPreferredNames.has(normalizeCustomerDisplayName(String(customer?.DisplayName || "")))
+      ) ||
       customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedDisplayName) ||
-      customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedBookingDisplayName) ||
+      customers.find((customer: any) =>
+        normalizedNameCandidates.has(normalizeCustomerDisplayName(String(customer?.DisplayName || "")))
+      ) ||
       customers.find(
         (customer: any) =>
           normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(String(customer?.DisplayName || ""))) ===
@@ -287,25 +303,36 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
 
   const findByExactDisplayName = async (name: string) => {
     const safeName = escapeQueryValue(name);
-    const result = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeName}' maxresults 1`);
-    return result?.QueryResponse?.Customer?.[0] || null;
+    const primaryQuery = `select * from Customer Where DisplayName = '${safeName}'`;
+    try {
+      const primaryResult = await qbQuery<any>(primaryQuery);
+      if (primaryResult?.QueryResponse?.Customer?.[0]) {
+        return primaryResult.QueryResponse.Customer[0];
+      }
+    } catch (error: any) {
+      if (!isQueryParserError(error)) throw error;
+    }
+
+    const fallbackResult = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeName}' maxresults 1`);
+    return fallbackResult?.QueryResponse?.Customer?.[0] || null;
   };
 
-  const resolveExistingCustomer = async () => {
+  const resolveExistingCustomer = async (preferredNames: string[] = []) => {
+    for (const candidateName of preferredNames) {
+      const exactByCandidate = await findByExactDisplayName(candidateName);
+      if (exactByCandidate?.Id) return exactByCandidate;
+    }
     const exactByName = await findByExactDisplayName(displayName);
     if (exactByName?.Id) return exactByName;
-    const exactByBookingDisplayName = await findByExactDisplayName(bookingDisplayName);
-    if (exactByBookingDisplayName?.Id) return exactByBookingDisplayName;
-    return await listAndMatchExistingCustomer();
+    return await listAndMatchExistingCustomer(preferredNames);
   };
 
-  const matchedExisting = await resolveExistingCustomer();
+  const matchedExisting = await resolveExistingCustomer(deterministicNameCandidates);
   if (matchedExisting?.Id) {
     return (await fetchEntityById("customer", String(matchedExisting.Id))) || matchedExisting;
   }
 
   const payloadBase = {
-    DisplayName: displayName,
     PrimaryEmailAddr: { Address: normalizedEmail },
     ...(input.customerPhone ? { PrimaryPhone: { FreeFormNumber: input.customerPhone } } : {}),
   };
@@ -317,21 +344,38 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
     return (await fetchEntityById("customer", String(createdId))) || created.Customer;
   };
 
-  try {
-    const created = await attemptCreate(payloadBase);
-    if (created?.Id) return created;
-  } catch (error: any) {
-    if (isDuplicateNameError(error)) {
-      const resolvedAfterDuplicate = await resolveExistingCustomer();
-      if (resolvedAfterDuplicate?.Id) {
-        return (await fetchEntityById("customer", String(resolvedAfterDuplicate.Id))) || resolvedAfterDuplicate;
+  for (const candidateName of deterministicNameCandidates) {
+    try {
+      const created = await attemptCreate(
+        {
+          ...payloadBase,
+          DisplayName: candidateName,
+        }
+      );
+      if (created?.Id) return created;
+    } catch (error: any) {
+      if (isDuplicateNameError(error)) {
+        const duplicateId = parseDuplicateEntityId(error);
+        if (duplicateId) {
+          try {
+            const duplicateCustomer = await fetchEntityById("customer", duplicateId);
+            if (duplicateCustomer?.Id) return duplicateCustomer;
+          } catch {
+            // Continue to resolver-based fallback.
+          }
+        }
+        const resolvedAfterDuplicate = await resolveExistingCustomer([candidateName, ...deterministicNameCandidates]);
+        if (resolvedAfterDuplicate?.Id) {
+          return (await fetchEntityById("customer", String(resolvedAfterDuplicate.Id))) || resolvedAfterDuplicate;
+        }
+        continue;
       }
+      throw error;
     }
-    throw error;
   }
 
   // Final re-fetch in case concurrent creation happened.
-  const reFetchedAny = await resolveExistingCustomer();
+  const reFetchedAny = await resolveExistingCustomer(deterministicNameCandidates);
   if (reFetchedAny?.Id) return (await fetchEntityById("customer", String(reFetchedAny.Id))) || reFetchedAny;
 
   throw new Error("QuickBooks customer ensure failed");
