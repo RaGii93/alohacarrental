@@ -96,6 +96,10 @@ function normalizeCustomerDisplayName(value: string) {
   return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+function normalizeEmail(value: string) {
+  return value.trim().toLowerCase();
+}
+
 function stripBookingSuffixFromDisplayName(value: string) {
   return value.trim().replace(/\s*\([a-z0-9-]+\)\s*$/i, "").trim();
 }
@@ -257,48 +261,38 @@ async function fetchEntityById(resource: "customer" | "item", id: string) {
   return response?.[resource === "customer" ? "Customer" : "Item"] || null;
 }
 
-async function findCustomerByDisplayName(displayName: string) {
-  const safeDisplayName = escapeQueryValue(displayName);
-  const result = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeDisplayName}' maxresults 1`);
-  return result?.QueryResponse?.Customer?.[0] || null;
-}
-
-async function findAnyCustomerMatch(displayName: string) {
-  const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
-  const customers = allCustomers?.QueryResponse?.Customer || [];
-  const normalizedName = normalizeCustomerDisplayName(displayName);
-  const normalizedBaseName = normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(displayName));
-  return (
-    customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedName) ||
-    customers.find(
-      (customer: any) =>
-        normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(String(customer?.DisplayName || ""))) === normalizedBaseName
-    ) ||
-    null
-  );
-}
-
 async function ensureCustomer(input: QuickBooksCustomerInput) {
   const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
   const bookingDisplayName = `${displayName} (${input.bookingCode})`;
-  const existingByName = await findCustomerByDisplayName(displayName);
-  if (existingByName?.Id) {
-    return (await fetchEntityById("customer", String(existingByName.Id))) || existingByName;
-  }
+  const normalizedDisplayName = normalizeCustomerDisplayName(displayName);
+  const normalizedBookingDisplayName = normalizeCustomerDisplayName(bookingDisplayName);
+  const normalizedDisplayBaseName = normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(displayName));
+  const normalizedEmail = normalizeEmail(input.customerEmail);
 
-  const existingByBookingDisplayName = await findCustomerByDisplayName(bookingDisplayName);
-  if (existingByBookingDisplayName?.Id) {
-    return (await fetchEntityById("customer", String(existingByBookingDisplayName.Id))) || existingByBookingDisplayName;
-  }
+  const listAndMatchExistingCustomer = async () => {
+    const allCustomers = await qbQuery<any>("select * from Customer maxresults 1000");
+    const customers = allCustomers?.QueryResponse?.Customer || [];
+    return (
+      customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedDisplayName) ||
+      customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedBookingDisplayName) ||
+      customers.find(
+        (customer: any) =>
+          normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(String(customer?.DisplayName || ""))) ===
+          normalizedDisplayBaseName
+      ) ||
+      customers.find((customer: any) => normalizeEmail(String(customer?.PrimaryEmailAddr?.Address || "")) === normalizedEmail) ||
+      null
+    );
+  };
 
-  const existingByAnyNameMatch = await findAnyCustomerMatch(displayName);
-  if (existingByAnyNameMatch?.Id) {
-    return (await fetchEntityById("customer", String(existingByAnyNameMatch.Id))) || existingByAnyNameMatch;
+  const matchedExisting = await listAndMatchExistingCustomer();
+  if (matchedExisting?.Id) {
+    return (await fetchEntityById("customer", String(matchedExisting.Id))) || matchedExisting;
   }
 
   const payloadBase = {
     DisplayName: displayName,
-    PrimaryEmailAddr: { Address: input.customerEmail.trim().toLowerCase() },
+    PrimaryEmailAddr: { Address: normalizedEmail },
     ...(input.customerPhone ? { PrimaryPhone: { FreeFormNumber: input.customerPhone } } : {}),
   };
 
@@ -313,28 +307,17 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
     const created = await attemptCreate(payloadBase);
     if (created?.Id) return created;
   } catch (error: any) {
-    if (!isDuplicateNameError(error)) throw error;
-  }
-
-  // Global name list conflicts can still occur even when no customer matches.
-  const fallbackNames = [
-    bookingDisplayName,
-    `${displayName} (${input.bookingCode}-${Date.now().toString().slice(-6)})`,
-  ];
-  for (const fallbackName of fallbackNames) {
-    try {
-      const fallbackCreated = await attemptCreate({
-        ...payloadBase,
-        DisplayName: fallbackName,
-      });
-      if (fallbackCreated?.Id) return fallbackCreated;
-    } catch (error: any) {
-      if (!isDuplicateNameError(error)) throw error;
+    if (isDuplicateNameError(error)) {
+      const resolvedAfterDuplicate = await listAndMatchExistingCustomer();
+      if (resolvedAfterDuplicate?.Id) {
+        return (await fetchEntityById("customer", String(resolvedAfterDuplicate.Id))) || resolvedAfterDuplicate;
+      }
     }
+    throw error;
   }
 
-  // Final re-fetch by email/name in case concurrent creation happened.
-  const reFetchedAny = await findAnyCustomerMatch(displayName);
+  // Final re-fetch in case concurrent creation happened.
+  const reFetchedAny = await listAndMatchExistingCustomer();
   if (reFetchedAny?.Id) return (await fetchEntityById("customer", String(reFetchedAny.Id))) || reFetchedAny;
 
   throw new Error("QuickBooks customer ensure failed");
