@@ -591,6 +591,10 @@ function buildInvoiceMemo(input: Pick<QuickBooksInvoiceInput, "bookingCode" | "n
   return String(input.note || `Booking ${input.bookingCode}`).trim();
 }
 
+function buildSalesReceiptMemo(input: Pick<QuickBooksSalesReceiptInput, "bookingCode" | "note">) {
+  return String(input.note || `Sales receipt for booking ${input.bookingCode}`).trim();
+}
+
 function normalizeMemo(value: string) {
   return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
@@ -606,16 +610,15 @@ async function findInvoiceByMemo(memo: string) {
   );
 }
 
-async function findSalesReceiptByDocNumber(docNumber: string) {
-  const safeDocNumber = escapeQueryValue(docNumber);
-  const result = await qbQuerySafe<any>(`select * from SalesReceipt where DocNumber = '${safeDocNumber}' maxresults 1`);
-  return result?.QueryResponse?.SalesReceipt?.[0] || null;
-}
-
-async function findInvoiceByDocNumber(docNumber: string) {
-  const safeDocNumber = escapeQueryValue(docNumber);
-  const result = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
-  return result?.QueryResponse?.Invoice?.[0] || null;
+async function findSalesReceiptByMemo(memo: string) {
+  const target = normalizeMemo(memo);
+  const allSalesReceipts = await qbQuerySafe<any>("select * from SalesReceipt maxresults 1000");
+  const salesReceipts = allSalesReceipts?.QueryResponse?.SalesReceipt || [];
+  return (
+    salesReceipts.find((salesReceipt: any) => normalizeMemo(String(salesReceipt?.PrivateNote || "")) === target) ||
+    salesReceipts.find((salesReceipt: any) => normalizeMemo(String(salesReceipt?.CustomerMemo?.value || "")) === target) ||
+    null
+  );
 }
 
 async function fetchInvoiceById(id: string) {
@@ -633,7 +636,6 @@ async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: strin
   const totalAmount = amountToMajor(input.totalAmountCents);
 
   const payloadBase = {
-    DocNumber: input.bookingCode,
     TxnDate: formatDateOnly(new Date()),
     DueDate: formatDateOnly(input.startDate),
     PrivateNote: memo,
@@ -659,17 +661,17 @@ async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: strin
 }
 
 async function ensureSalesReceipt(input: QuickBooksSalesReceiptInput, customerRefId: string) {
-  const docNumber = buildBoundedReference("SR-", input.bookingCode);
-  const existing = await findSalesReceiptByDocNumber(docNumber);
+  const memo = buildSalesReceiptMemo(input);
+  const existing = await findSalesReceiptByMemo(memo);
   if (existing?.Id) return existing;
 
   const itemRef = await ensureItemRef();
   const totalAmount = amountToMajor(input.totalAmountCents);
 
   const payloadBase = {
-    DocNumber: docNumber,
     TxnDate: formatDateOnly(new Date()),
-    PrivateNote: input.note || `Sales receipt for booking ${input.bookingCode}`,
+    PrivateNote: memo,
+    CustomerMemo: { value: memo },
     CustomerRef: { value: customerRefId },
     BillEmail: { Address: input.customerEmail.trim().toLowerCase() },
     Line: [
@@ -759,8 +761,7 @@ export async function syncQuickBooksSalesReceipt(
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const docNumber = buildBoundedReference("SR-", input.bookingCode);
-    const existingSalesReceipt = await findSalesReceiptByDocNumber(docNumber);
+    const existingSalesReceipt = await findSalesReceiptByMemo(buildSalesReceiptMemo(input));
     if (existingSalesReceipt?.Id) {
       return {
         success: true as const,
@@ -815,8 +816,7 @@ export async function receiveQuickBooksInvoicePayment(
 
     if (!invoice?.Id) {
       const existingInvoiceByMemo = await findInvoiceByMemo(buildInvoiceMemo(input));
-      const existingInvoiceByDocNumber = await findInvoiceByDocNumber(input.bookingCode);
-      invoice = existingInvoiceByMemo || existingInvoiceByDocNumber || null;
+      invoice = existingInvoiceByMemo || null;
       if (!customerId) customerId = String(invoice?.CustomerRef?.value || "");
     }
 
