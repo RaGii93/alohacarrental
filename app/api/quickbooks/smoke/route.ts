@@ -40,7 +40,10 @@ export async function GET(request: Request) {
 
   const invoice = await syncQuickBooksInvoice(payload);
   const salesReceipt = await syncQuickBooksSalesReceipt(payload);
-  const payment = await receiveQuickBooksInvoicePayment(payload);
+  const payment = await receiveQuickBooksInvoicePayment(payload, {
+    invoiceId: invoice.success ? String((invoice as any).invoiceId || "") : "",
+    customerId: invoice.success ? String((invoice as any).customerId || "") : "",
+  });
 
   const success = invoice.success && salesReceipt.success && payment.success;
   return NextResponse.json(

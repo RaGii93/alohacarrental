@@ -113,6 +113,14 @@ const QUICKBOOKS_SANDBOX_API_BASE = "https://sandbox-quickbooks.api.intuit.com";
 const QUICKBOOKS_DEFAULT_MINOR_VERSION = "75";
 const QUICKBOOKS_DEFAULT_ITEM_NAME = "Vehicle Rental";
 const QUICKBOOKS_FALLBACK_ITEM_NAME = "Vehicle Rental Service";
+const QUICKBOOKS_DOC_NUMBER_MAX_LENGTH = 21;
+
+function buildBoundedReference(prefix: string, rawValue: string, maxLength = QUICKBOOKS_DOC_NUMBER_MAX_LENGTH) {
+  const base = `${prefix}${rawValue}`.trim();
+  if (base.length <= maxLength) return base;
+  const allowedRawLength = Math.max(1, maxLength - prefix.length);
+  return `${prefix}${rawValue.slice(-allowedRawLength)}`;
+}
 
 function isSalesLineUsableItem(item: any) {
   const type = String(item?.Type || "").toLowerCase();
@@ -590,6 +598,18 @@ async function findSalesReceiptByDocNumber(docNumber: string) {
   return result?.QueryResponse?.SalesReceipt?.[0] || null;
 }
 
+async function findInvoiceByDocNumber(docNumber: string) {
+  const safeDocNumber = escapeQueryValue(docNumber);
+  const result = await qbQuerySafe<any>(`select * from Invoice where DocNumber = '${safeDocNumber}' maxresults 1`);
+  return result?.QueryResponse?.Invoice?.[0] || null;
+}
+
+async function fetchInvoiceById(id: string) {
+  const cfg = getQuickBooksConfig();
+  const response = await qbRequest(`/v3/company/${encodeURIComponent(cfg.realmId)}/invoice/${encodeURIComponent(id)}`, "GET");
+  return response?.Invoice || null;
+}
+
 async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: string) {
   const memo = buildInvoiceMemo(input);
   const existing = await findInvoiceByMemo(memo);
@@ -625,12 +645,8 @@ async function ensureInvoice(input: QuickBooksInvoiceInput, customerRefId: strin
 }
 
 async function ensureSalesReceipt(input: QuickBooksSalesReceiptInput, customerRefId: string) {
-  const docNumber = `SR-${input.bookingCode}`;
-  const safeDocNumber = escapeQueryValue(docNumber);
-  const existingQuery = await qbQuerySafe<any>(
-    `select * from SalesReceipt where DocNumber = '${safeDocNumber}' maxresults 1`
-  );
-  const existing = existingQuery?.QueryResponse?.SalesReceipt?.[0];
+  const docNumber = buildBoundedReference("SR-", input.bookingCode);
+  const existing = await findSalesReceiptByDocNumber(docNumber);
   if (existing?.Id) return existing;
 
   const itemRef = await ensureItemRef();
@@ -661,7 +677,7 @@ async function ensureSalesReceipt(input: QuickBooksSalesReceiptInput, customerRe
 }
 
 async function upsertInvoicePayment(input: QuickBooksPaymentInput, customerRefId: string, invoiceId: string) {
-  const paymentRefNum = `PAY-${input.bookingCode}`;
+  const paymentRefNum = buildBoundedReference("PAY-", input.bookingCode);
   const safeRef = escapeQueryValue(paymentRefNum);
   const existingQuery = await qbQuerySafe<any>(`select * from Payment where PaymentRefNum = '${safeRef}' maxresults 1`);
   const existing = existingQuery?.QueryResponse?.Payment?.[0];
@@ -726,7 +742,7 @@ export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptIn
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const docNumber = `SR-${input.bookingCode}`;
+    const docNumber = buildBoundedReference("SR-", input.bookingCode);
     const existingSalesReceipt = await findSalesReceiptByDocNumber(docNumber);
     if (existingSalesReceipt?.Id) {
       return {
@@ -751,16 +767,38 @@ export async function syncQuickBooksSalesReceipt(input: QuickBooksSalesReceiptIn
   }
 }
 
-export async function receiveQuickBooksInvoicePayment(input: QuickBooksPaymentInput) {
+export async function receiveQuickBooksInvoicePayment(
+  input: QuickBooksPaymentInput,
+  context?: { invoiceId?: string; customerId?: string }
+) {
   if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
   if (!hasRequiredQuickBooksConfig()) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
-    const existingInvoice = await findInvoiceByMemo(buildInvoiceMemo(input));
-    const customerIdFromInvoice = String(existingInvoice?.CustomerRef?.value || "");
-    let customerId = customerIdFromInvoice;
-    let invoice = existingInvoice;
+    let customerId = String(context?.customerId || "");
+    let invoice: any = null;
+
+    const contextInvoiceId = String(context?.invoiceId || "").trim();
+    if (contextInvoiceId) {
+      try {
+        const invoiceFromContext = await fetchInvoiceById(contextInvoiceId);
+        if (invoiceFromContext?.Id) {
+          invoice = invoiceFromContext;
+          if (!customerId) customerId = String(invoiceFromContext?.CustomerRef?.value || "");
+        }
+      } catch {
+        // Fall through to standard lookup.
+      }
+    }
+
+    if (!invoice?.Id) {
+      const existingInvoiceByMemo = await findInvoiceByMemo(buildInvoiceMemo(input));
+      const existingInvoiceByDocNumber = await findInvoiceByDocNumber(input.bookingCode);
+      invoice = existingInvoiceByMemo || existingInvoiceByDocNumber || null;
+      if (!customerId) customerId = String(invoice?.CustomerRef?.value || "");
+    }
+
     if (!invoice?.Id) {
       const customer = await ensureCustomer(input);
       if (!customer?.Id) throw new Error("QuickBooks customer ensure failed");
