@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getSession } from "@/lib/session";
+import { setQuickBooksRefreshToken } from "@/lib/settings";
 
 const QUICKBOOKS_TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer";
 const QUICKBOOKS_STATE_PREFIX = "edge-rent-qbo-oauth-state";
@@ -136,6 +137,7 @@ export async function GET(request: Request) {
     refreshTokenMasked: mask(String(json.refresh_token || "")),
     accessTokenExpiresIn: json.expires_in || null,
   });
+  await setQuickBooksRefreshToken(String(json.refresh_token));
   const result = NextResponse.json({
     success: true,
     quickbooks: {

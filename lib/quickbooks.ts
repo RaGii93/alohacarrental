@@ -1,3 +1,5 @@
+import { getQuickBooksRefreshToken, setQuickBooksRefreshToken } from "@/lib/settings";
+
 type QuickBooksCustomerInput = {
   bookingCode: string;
   customerName: string;
@@ -169,15 +171,20 @@ export function isQuickBooksEnabled() {
 function hasRequiredQuickBooksConfig() {
   const cfg = getQuickBooksConfig();
   if (!cfg.enabled) return false;
-  return Boolean(cfg.realmId && cfg.clientId && cfg.clientSecret && cfg.refreshToken);
+  return Boolean(cfg.realmId && cfg.clientId && cfg.clientSecret);
 }
 
 async function resolveAccessToken() {
   const cfg = getQuickBooksConfig();
+  const persistedRefreshToken = await getQuickBooksRefreshToken();
+  const refreshToken = persistedRefreshToken || cfg.refreshToken;
+  if (!refreshToken) {
+    throw new Error("Missing QuickBooks refresh token. Reconnect OAuth from /api/quickbooks/connect.");
+  }
   const basic = Buffer.from(`${cfg.clientId}:${cfg.clientSecret}`).toString("base64");
   const body = new URLSearchParams({
     grant_type: "refresh_token",
-    refresh_token: cfg.refreshToken,
+    refresh_token: refreshToken,
   });
   const response = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
     method: "POST",
@@ -201,6 +208,9 @@ async function resolveAccessToken() {
       new Error(json?.error_description || json?.error || text || `QuickBooks OAuth refresh failed (${response.status})`)
     );
     throw new Error(message);
+  }
+  if (json?.refresh_token) {
+    await setQuickBooksRefreshToken(String(json.refresh_token));
   }
   return String(json.access_token);
 }
@@ -916,6 +926,91 @@ export async function getQuickBooksHealth() {
     };
   } catch (error: any) {
     return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks health check failed" };
+  }
+}
+
+export async function checkQuickBooksRefreshToken() {
+  if (!isQuickBooksEnabled()) {
+    return { success: false as const, error: "QuickBooks is disabled", tokenValid: false as const };
+  }
+  if (!hasRequiredQuickBooksConfig()) {
+    return {
+      success: false as const,
+      error: "QuickBooks is enabled but missing required env configuration",
+      tokenValid: false as const,
+    };
+  }
+
+  try {
+    const cfg = getQuickBooksConfig();
+    const persistedRefreshToken = await getQuickBooksRefreshToken();
+    const refreshToken = persistedRefreshToken || cfg.refreshToken;
+    const tokenSource = persistedRefreshToken ? ("db" as const) : ("env" as const);
+
+    if (!refreshToken) {
+      return {
+        success: false as const,
+        tokenValid: false as const,
+        tokenSource,
+        error: "Missing QuickBooks refresh token. Reconnect OAuth from /api/quickbooks/connect.",
+      };
+    }
+
+    const basic = Buffer.from(`${cfg.clientId}:${cfg.clientSecret}`).toString("base64");
+    const body = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    });
+    const response = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${basic}`,
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: body.toString(),
+      cache: "no-store",
+    });
+    const text = await response.text();
+    let json: any = null;
+    try {
+      json = text ? JSON.parse(text) : null;
+    } catch {
+      json = null;
+    }
+
+    if (!response.ok || !json?.access_token) {
+      const error = normalizeQuickBooksError(
+        new Error(json?.error_description || json?.error || text || `QuickBooks OAuth refresh failed (${response.status})`)
+      );
+      return {
+        success: false as const,
+        tokenValid: false as const,
+        tokenSource,
+        httpStatus: response.status,
+        error,
+      };
+    }
+
+    if (json?.refresh_token) {
+      await setQuickBooksRefreshToken(String(json.refresh_token));
+    }
+
+    return {
+      success: true as const,
+      tokenValid: true as const,
+      tokenSource,
+      httpStatus: response.status,
+      accessTokenExpiresIn: Number(json?.expires_in || 0) || null,
+      refreshTokenExpiresIn: Number(json?.x_refresh_token_expires_in || 0) || null,
+      scope: String(json?.scope || ""),
+    };
+  } catch (error: any) {
+    return {
+      success: false as const,
+      tokenValid: false as const,
+      error: normalizeQuickBooksError(error) || "QuickBooks token check failed",
+    };
   }
 }
 

@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 
 const TAX_KEY = "tax_percentage";
 const MIN_BOOKING_DAYS_KEY = "minimum_booking_days";
+const QUICKBOOKS_REFRESH_TOKEN_KEY = "quickbooks_refresh_token";
 
 function clampTaxPercentage(input: number): number {
   if (!Number.isFinite(input)) return 0;
@@ -84,4 +85,28 @@ export async function setMinBookingDays(nextMinBookingDays: number): Promise<num
   `;
 
   return normalized;
+}
+
+export async function getQuickBooksRefreshToken(): Promise<string> {
+  await ensureSettingsTable();
+
+  const rows = await db.$queryRaw<Array<{ value: string }>>`
+    SELECT value FROM "AppSetting" WHERE key = ${QUICKBOOKS_REFRESH_TOKEN_KEY} LIMIT 1
+  `;
+
+  return String(rows[0]?.value || "").trim();
+}
+
+export async function setQuickBooksRefreshToken(refreshToken: string): Promise<void> {
+  await ensureSettingsTable();
+
+  const normalized = String(refreshToken || "").trim();
+  if (!normalized) return;
+
+  await db.$executeRaw`
+    INSERT INTO "AppSetting" (key, value, "updatedAt")
+    VALUES (${QUICKBOOKS_REFRESH_TOKEN_KEY}, ${normalized}, NOW())
+    ON CONFLICT (key)
+    DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
+  `;
 }
