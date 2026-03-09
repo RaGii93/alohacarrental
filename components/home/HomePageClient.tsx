@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { getFaqEntries } from "@/lib/faq";
 import HeroSection from "./HeroSection";
 import FleetSection from "./FleetSection";
+import FooterSection from "./FooterSection";
 import WhyChooseSection from "./Why-Choose-Section";
 import ReviewsSection from "./ReviewsSection";
 
@@ -63,6 +64,7 @@ export function HomePageClient({ locations }: HomePageClientProps) {
       <FleetSection />
       <WhyChooseSection />
       <ReviewsSection reviews={reviews} loading={loadingReviews} faqItems={faqEntries} />
+      <FooterSection />
     </>
   );
 }

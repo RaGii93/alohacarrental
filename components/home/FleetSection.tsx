@@ -5,27 +5,28 @@ import { Card } from "@/components/ui/card.tsx";
 import { UsersIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 const FLEET = [
   {
     name: "Kia Picanto",
     seats: 4,
-    image: "https://cdn.hercules.app/file_yFGdOeJG8q66unQbytbU986r",
+    image: "/home/fleet-kia-picanto.png",
   },
   {
     name: "Hyundai Accent",
     seats: 5,
-    image: "https://cdn.hercules.app/file_3L50kvQsig85P67iOBZ04ENu",
+    image: "/home/fleet-hyundai-accent.png",
   },
   {
     name: "SUV",
     seats: 5,
-    image: "https://cdn.hercules.app/file_4ON3muL589Ud6JgkMZ2QLW46",
+    image: "/home/fleet-suv.png",
   },
   {
     name: "Pickup",
     seats: 5,
-    image: "https://cdn.hercules.app/file_YOIJpVfPdraNk2yiOXDiK3JN",
+    image: "/home/fleet-pickup.png",
   },
 ];
 
@@ -48,11 +49,15 @@ export default function FleetSection() {
               key={car.name}
               className="overflow-hidden border-0 p-0 shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <img
-                src={car.image}
-                alt={car.name}
-                className="h-40 w-full object-cover sm:h-48"
-              />
+              <div className="relative h-40 w-full sm:h-48">
+                <Image
+                  src={car.image}
+                  alt={car.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-cover"
+                />
+              </div>
               <div className="space-y-2 p-4 text-center">
                 <h3 className="text-lg font-bold">{car.name}</h3>
                 <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">

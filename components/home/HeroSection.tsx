@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
@@ -16,7 +17,7 @@ import {
 import { MapPinIcon, UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
-const HERO_BG = "https://cdn.hercules.app/file_6LNZzPgCogqgsMeQg2XTyr0A";
+const HERO_BG = "/home/hero-bg.png";
 
 type HeroSectionProps = {
   locations: { id: string; name: string; address?: string | null }[];
@@ -82,10 +83,13 @@ export default function HeroSection({ locations }: HeroSectionProps) {
   return (
     <section className="relative min-h-[620px] overflow-hidden pb-16">
       <div className="absolute inset-0">
-        <img
+        <Image
           src={HERO_BG}
           alt={t("landing.title")}
-          className="h-full w-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#071a36]/85 via-[#071a36]/55 to-[#071a36]/20" />
       </div>

@@ -13,11 +13,8 @@ async function main() {
   console.log("Seeding database...");
 
   const users: Array<{ email: string; password: string; role: Role }> = [
-    { email: "root@endlessedget.com", password: "3dGe123$", role: "ROOT" },
-    { email: "owner@edgerent.com", password: "Owner123!", role: "OWNER" },
-    { email: "staff1@edgerent.com", password: "Staff123!", role: "STAFF" },
-    { email: "staff2@edgerent.com", password: "Staff123!", role: "STAFF" },
-    { email: "staff3@edgerent.com", password: "Staff123!", role: "STAFF" },
+    { email: "support@endlessedgetechnology.com", password: "ROOT123$", role: "ROOT" },
+    { email: "alohaservicesbonaire@gmail.com ", password: "Owner123!", role: "OWNER" },
   ];
 
   for (const user of users) {

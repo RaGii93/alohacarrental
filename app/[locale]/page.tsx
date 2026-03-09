@@ -37,10 +37,15 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const jsonLd = getHomeJsonLd(locale);
-  const locations = await db.location.findMany({
-    select: { id: true, name: true, address: true },
-    orderBy: { name: "asc" },
-  });
+  let locations: { id: string; name: string; address: string | null }[] = [];
+  try {
+    locations = await db.location.findMany({
+      select: { id: true, name: true, address: true },
+      orderBy: { name: "asc" },
+    });
+  } catch {
+    locations = [];
+  }
 
   return (
     <>

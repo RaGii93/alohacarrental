@@ -46,10 +46,15 @@ export default async function BookingPage({
   ]);
 
   // Fetch predefined pickup/dropoff locations
-  const locations = await db.location.findMany({
-    select: { id: true, name: true, code: true, address: true },
-    orderBy: { name: "asc" },
-  });
+  let locations: { id: string; name: string; code: string | null; address: string | null }[] = [];
+  try {
+    locations = await db.location.findMany({
+      select: { id: true, name: true, code: true, address: true },
+      orderBy: { name: "asc" },
+    });
+  } catch {
+    locations = [];
+  }
 
   let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
