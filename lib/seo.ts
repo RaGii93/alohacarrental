@@ -37,7 +37,7 @@ export function buildMetadata(input: {
   noIndex?: boolean;
 }): Metadata {
   const tenant = getTenantConfig();
-  const siteName = tenant.tenantName || "EdgeRent Lite";
+  const siteName = tenant.tenantName || "Aloha Car Rental";
   const description =
     input.description ||
     defaultDescriptionByLocale(input.locale, siteName);

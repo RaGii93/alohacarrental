@@ -17,7 +17,7 @@ export async function sendEmail(params: SendEmailParams): Promise<{ success: boo
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { success: false, error: "Missing RESEND_API_KEY" };
 
-  const from = process.env.RESEND_FROM || "EdgeRent <EdgeRent@endlessedgetechnology.com>";
+  const from = process.env.RESEND_FROM || "Aloha Car Rental Bonaire <alohacarrentalbonaire@endlessedgetechnology.com>";
 
   try {
     const res = await fetch("https://api.resend.com/emails", {

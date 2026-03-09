@@ -1,4 +1,4 @@
-# EdgeRent Lite
+# Aloha Car Rental
 
 Single-tenant vehicle rental platform built with Next.js 16, Prisma, and PostgreSQL.
 
@@ -6,7 +6,7 @@ Single-tenant vehicle rental platform built with Next.js 16, Prisma, and Postgre
 
 ## 1. What This Project Is
 
-EdgeRent Lite is a **single-tenant** rental system.
+Aloha Car Rental is a **single-tenant** rental system.
 
 - One deployment = one client/business
 - Tenant identity/branding is configured via `.env` (`TENANT_*`)
@@ -254,7 +254,7 @@ DATABASE_URL=postgresql://...
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
 SESSION_SECRET=long-random-secret
 RESEND_API_KEY=re_...
-RESEND_FROM="EdgeRent <EdgeRent@endlessedgetechnology.com>"
+RESEND_FROM="Aloha Car Rental Bonaire <alohacarrentalbonaire@endlessedgetechnology.com>"
 NEXT_PUBLIC_APP_URL=https://your-domain.com
 QUICKBOOKS_ENABLED=false
 QUICKBOOKS_ENVIRONMENT=production
@@ -268,12 +268,12 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 LICENSE_STATUS=ACTIVE
 LICENSE_MESSAGE=Your license has been suspended...
 
-TENANT_NAME="EdgeRent Lite"
+TENANT_NAME="Aloha Car Rental"
 TENANT_LOGO_URL="/logo.svg"
 TENANT_PRIMARY_COLOR="#2563eb"
 TENANT_PHONE="+599 700 0000"
 TENANT_WHATSAPP="+599 700 0000"
-TENANT_EMAIL="EdgeRent@endlessedgetechnology.com"
+TENANT_EMAIL="alohacarrentalbonaire@endlessedgetechnology.com"
 TENANT_ADDRESS="Kaya Example 100, Kralendijk, Bonaire"
 TENANT_CURRENCY="USD"
 TENANT_PAYMENT_INSTRUCTIONS="Please pay by bank transfer or card and include your booking code in the payment reference."

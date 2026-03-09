@@ -9,11 +9,18 @@ import {NextIntlClientProvider} from 'next-intl';
 import {routing} from '@/i18n/routing';
 import { buildMetadata } from "@/lib/seo";
 import { getTenantConfig } from "@/lib/tenant";
+import { Poppins } from "next/font/google";
  
 type Props = {
   children: React.ReactNode;
   params: Promise<{locale: string}>;
 };
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
+});
 
 export async function generateMetadata({
   params,
@@ -42,7 +49,8 @@ export default async function RootLayout({children, params}: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className="antialiased">
+      <body className={poppins.variable}>
+        <div className="min-h-screen overflow-x-hidden">
         <NextIntlClientProvider messages={messages}>
           <Header />
           <SocialFABs
@@ -56,6 +64,7 @@ export default async function RootLayout({children, params}: Props) {
           <main className="min-h-screen">{children}</main>
         </NextIntlClientProvider>
         <Toaster position="bottom-right" />
+        </div>
       </body>
     </html>
   );

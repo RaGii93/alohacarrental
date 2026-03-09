@@ -17,7 +17,7 @@ export interface TenantConfig {
 }
 
 export const defaultTenantConfig: TenantConfig = {
-  tenantName: process.env.TENANT_NAME || "EdgeRent Lite",
+  tenantName: process.env.TENANT_NAME || "Aloha Car Rental",
   logoUrl: process.env.TENANT_LOGO_URL || "/logo.svg",
   primaryColor: process.env.TENANT_PRIMARY_COLOR || "#2563eb",
   phone: process.env.TENANT_PHONE || "+1 (555) 123-4567",

@@ -9,7 +9,7 @@
     "fleetOverview": "Vlootoverzicht"
   },
   "common": {
-    "name": "EdgeRent Lite",
+    "name": "Aloha Car Rental",
     "phone": "Telefoonnummer",
     "email": "E-mailadres",
     "currency": "€",
@@ -39,7 +39,7 @@
     "cancelled": "Geannuleerd"
   },
   "landing": {
-    "title": "Welkom bij EdgeRent Lite",
+    "title": "Welkom bij Aloha Car Rental",
     "subtitle": "Reserveer je voertuig gemakkelijk",
     "tagline": "Rijd Je Dromen",
     "badge": "🚗 Premium Voertuig Verhuur Service",
@@ -55,8 +55,30 @@
       "support": "24/7",
       "supportLabel": "Ondersteuning"
     },
+    "hero": {
+      "headline": {
+        "line1": "Rijd het Paradijs",
+        "line2Prefix": "met",
+        "line2Highlight": "Aloha",
+        "line3": "Car Rental"
+      },
+      "featureLine": "Betrouwbaar · Betaalbaar · Voertuigen klaar voor het eiland",
+      "description": "Verken Bonaire's roze stranden, flamingoreservaten en prachtige zoutvlaktes op je eigen tempo.",
+      "bookButton": "Boek je auto",
+      "viewFleetButton": "Bekijk onze vloot",
+      "driverAge": "Leeftijd bestuurder",
+      "agePlaceholder": "Leeftijd...",
+      "completeFields": "Vul alle boekingszoekvelden in.",
+      "searchComingSoon": "Zoekfunctie komt binnenkort!"
+    },
+    "fleet": {
+      "title": "Onze Eilandvloot",
+      "seats": "{count} zitplaatsen",
+      "reserveNow": "Nu reserveren",
+      "comingSoon": "Reserveren komt binnenkort beschikbaar!"
+    },
     "whyChoose": {
-      "title": "Waarom EdgeRent Kiezen?",
+      "title": "Waarom Aloha Car Rental Bonaire Kiezen?",
       "subtitle": "Ervaar het beste in voertuigverhuur met onze premium diensten en onverslaanbare klantenservice.",
       "features": {
         "selection": {

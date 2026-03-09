@@ -3,6 +3,7 @@ import { HomePageClient } from "@/components/home/HomePageClient";
 import { buildMetadata } from "@/lib/seo";
 import { getHomeJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
+import { db } from "@/lib/db";
 
 export async function generateMetadata({
   params,
@@ -36,6 +37,10 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const jsonLd = getHomeJsonLd(locale);
+  const locations = await db.location.findMany({
+    select: { id: true, name: true, address: true },
+    orderBy: { name: "asc" },
+  });
 
   return (
     <>
@@ -46,7 +51,7 @@ export default async function HomePage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-      <HomePageClient />
+      <HomePageClient locations={locations} />
     </>
   );
 }

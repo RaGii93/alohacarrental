@@ -31,10 +31,13 @@ export async function generateMetadata({
 
 export default async function BookingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const query = await searchParams;
   const t = await getTranslations();
   const jsonLd = getBookingJsonLd(locale);
   const [taxPercentage, minimumBookingDays] = await Promise.all([
@@ -85,6 +88,20 @@ export default async function BookingPage({
     orderBy: { sortOrder: "asc" },
   });
 
+  const locationIds = new Set(locations.map((location) => location.id));
+  const asString = (value: string | string[] | undefined) =>
+    Array.isArray(value) ? value[0] : value;
+  const pickupLocationId = asString(query.pickupLocationId);
+  const dropoffLocationId = asString(query.dropoffLocationId);
+  const initialPrefill = {
+    startDate: asString(query.startDate) || undefined,
+    endDate: asString(query.endDate) || undefined,
+    pickupTime: asString(query.pickupTime) || undefined,
+    dropoffTime: asString(query.dropoffTime) || undefined,
+    pickupLocationId: pickupLocationId && locationIds.has(pickupLocationId) ? pickupLocationId : undefined,
+    dropoffLocationId: dropoffLocationId && locationIds.has(dropoffLocationId) ? dropoffLocationId : undefined,
+  };
+
   return (
     <>
       {jsonLd.map((item, index) => (
@@ -110,6 +127,7 @@ export default async function BookingPage({
           categories={categories as any}
           taxPercentage={taxPercentage}
           minimumBookingDays={minimumBookingDays}
+          initialPrefill={initialPrefill}
         />
       </div>
     </>

@@ -35,6 +35,15 @@ export interface BookingData {
   selectedExtras: Array<{ extraId: string; quantity: number }>;
 }
 
+type BookingPrefill = {
+  startDate?: string;
+  endDate?: string;
+  pickupTime?: string;
+  dropoffTime?: string;
+  pickupLocationId?: string;
+  dropoffLocationId?: string;
+};
+
 export function BookingWizard({
   locale,
   locations,
@@ -42,6 +51,7 @@ export function BookingWizard({
   categories,
   taxPercentage,
   minimumBookingDays,
+  initialPrefill,
 }: {
   locale: string;
   locations: { id: string; name: string; code?: string | null; address?: string | null }[];
@@ -57,15 +67,29 @@ export function BookingWizard({
   }>;
   taxPercentage: number;
   minimumBookingDays: number;
+  initialPrefill?: BookingPrefill;
 }) {
   const t = useTranslations();
   const [currentStep, setCurrentStep] = useState(1);
   const [availability, setAvailability] = useState<AvailabilityResult[]>([]);
+  const parseDate = (value?: string): Date | null => {
+    if (!value) return null;
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (dateOnly) {
+      const year = Number(dateOnly[1]);
+      const month = Number(dateOnly[2]);
+      const day = Number(dateOnly[3]);
+      const local = new Date(year, month - 1, day);
+      return Number.isNaN(local.getTime()) ? null : local;
+    }
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
   const [bookingData, setBookingData] = useState<BookingData>({
-    startDate: null,
-    endDate: null,
-    pickupTime: "10:00",
-    dropoffTime: "10:00",
+    startDate: parseDate(initialPrefill?.startDate),
+    endDate: parseDate(initialPrefill?.endDate),
+    pickupTime: initialPrefill?.pickupTime || "10:00",
+    dropoffTime: initialPrefill?.dropoffTime || "10:00",
     categoryId: null,
     customerName: "",
     customerEmail: "",
@@ -73,8 +97,8 @@ export function BookingWizard({
     birthDate: null,
     driverLicenseNumber: "",
     licenseExpiryDate: null,
-    pickupLocationId: "",
-    dropoffLocationId: "",
+    pickupLocationId: initialPrefill?.pickupLocationId || "",
+    dropoffLocationId: initialPrefill?.dropoffLocationId || "",
     driverLicenseUrl: "",
     notes: "",
     termsAccepted: false,

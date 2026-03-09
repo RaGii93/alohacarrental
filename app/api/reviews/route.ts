@@ -12,6 +12,7 @@ export async function GET() {
         customerName: true,
         rating: true,
         comment: true,
+        isVisible: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
@@ -113,4 +114,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

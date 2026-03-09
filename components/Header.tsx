@@ -25,7 +25,7 @@ export function Header() {
     >
       <div className="mx-auto flex h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="text-2xl font-bold hover:opacity-80 transition-opacity">
-          EdgeRent Lite
+          Aloha Car Rental
         </Link>
         <nav className="flex items-center gap-2 text-sm font-medium">
           <Link href="/" className="rounded-md px-3 py-2 hover:bg-slate-100 transition-colors inline-flex items-center gap-1.5">

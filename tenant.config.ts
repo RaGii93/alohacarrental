@@ -6,7 +6,7 @@ import { TenantConfig } from "@/lib/tenant";
  * For multi-client deployment, override values via environment variables.
  */
 export const tenantConfig: TenantConfig = {
-  tenantName: process.env.TENANT_NAME || "EdgeRent Lite",
+  tenantName: process.env.TENANT_NAME || "Aloha Car Rental",
   logoUrl: process.env.TENANT_LOGO_URL || "/logo.svg",
   primaryColor: process.env.TENANT_PRIMARY_COLOR || "#2563eb",
   phone: process.env.TENANT_PHONE || "+1 (555) 123-4567",

@@ -9,7 +9,7 @@
     "fleetOverview": "Fleet Overview"
   },
   "common": {
-    "name": "EdgeRent Lite",
+    "name": "Aloha Car Rental",
     "phone": "Phone",
     "email": "Email",
     "currency": "$",
@@ -39,7 +39,7 @@
     "cancelled": "Cancelled"
   },
   "landing": {
-    "title": "Welcome to EdgeRent Lite",
+    "title": "Welcome to Aloha Car Rental",
     "subtitle": "Book your vehicle with ease",
     "tagline": "Drive Your Dreams",
     "badge": "🚗 Premium Vehicle Rental Service",
@@ -55,8 +55,30 @@
       "support": "24/7",
       "supportLabel": "Support"
     },
+    "hero": {
+      "headline": {
+        "line1": "Drive Paradise",
+        "line2Prefix": "with",
+        "line2Highlight": "Aloha",
+        "line3": "Car Rental"
+      },
+      "featureLine": "Reliable · Affordable · Island Ready Vehicles",
+      "description": "Explore Bonaire's pink beaches, flamingo sanctuaries, and stunning salt flats at your own pace.",
+      "bookButton": "Book Your Car",
+      "viewFleetButton": "View Our Fleet",
+      "driverAge": "Driver Age",
+      "agePlaceholder": "Age...",
+      "completeFields": "Please complete all booking search fields.",
+      "searchComingSoon": "Search functionality coming soon!"
+    },
+    "fleet": {
+      "title": "Our Island Fleet",
+      "seats": "{count} seats",
+      "reserveNow": "Reserve Now",
+      "comingSoon": "Reservation functionality coming soon!"
+    },
     "whyChoose": {
-      "title": "Why Choose EdgeRent?",
+      "title": "Why Choose Aloha Car Rental Bonaire?",
       "subtitle": "Experience the best in vehicle rental with our premium services and unbeatable customer support.",
       "features": {
         "selection": {
