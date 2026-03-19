@@ -2,31 +2,36 @@
 
 import { Button } from "@/components/ui/button.tsx";
 import { Card } from "@/components/ui/card.tsx";
-import { UsersIcon } from "lucide-react";
-import { toast } from "sonner";
+import { CarFrontIcon, ChevronRightIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { Link } from "@/i18n/navigation";
+import Reveal from "./Reveal";
 
 const FLEET = [
   {
     name: "Kia Picanto",
     seats: 4,
     image: "/home/fleet-kia-picanto.png",
+    accent: "from-[#eef8ff] via-white to-[#d7efff]",
   },
   {
     name: "Hyundai Accent",
     seats: 5,
     image: "/home/fleet-hyundai-accent.png",
+    accent: "from-[#fff6e5] via-white to-[#ffe3a8]",
   },
   {
     name: "SUV",
     seats: 5,
     image: "/home/fleet-suv.png",
+    accent: "from-[#edfdf6] via-white to-[#c8f3de]",
   },
   {
     name: "Pickup",
     seats: 5,
     image: "/home/fleet-pickup.png",
+    accent: "from-[#eff2ff] via-white to-[#d8e0ff]",
   },
 ];
 
@@ -36,42 +41,74 @@ export default function FleetSection() {
   return (
     <section
       id="fleet"
-      className="relative bg-linear-to-b from-[#e0f4ff] to-[#f0f9ff] px-4 py-16 pb-24 sm:px-6 lg:px-8"
+      className="relative overflow-hidden bg-[linear-gradient(180deg,#f4fbff_0%,#e3f6ff_48%,#fffef8_100%)] px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24"
     >
-      <div className="mx-auto max-w-7xl">
-        <h2 className="mb-12 text-center text-3xl font-extrabold italic sm:text-4xl">
-          {t("landing.fleet.title")}
-        </h2>
+      <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,rgba(42,164,206,0.18),transparent_42%),radial-gradient(circle_at_top_right,rgba(247,191,0,0.18),transparent_34%)]" />
+      <div className="absolute left-[-5rem] top-24 h-40 w-40 rounded-full bg-[#2aa4ce]/10 blur-3xl" />
+      <div className="animate-float-soft absolute right-[-4rem] top-36 h-52 w-52 rounded-full bg-[#f7bf00]/10 blur-3xl" />
 
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-          {FLEET.map((car) => (
-            <Card
-              key={car.name}
-              className="overflow-hidden border-0 p-0 shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <div className="relative h-40 w-full sm:h-48">
-                <Image
-                  src={car.image}
-                  alt={car.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-2 p-4 text-center">
-                <h3 className="text-lg font-bold">{car.name}</h3>
-                <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-                  <UsersIcon className="h-4 w-4" />
-                  <span>{t("landing.fleet.seats", { count: car.seats })}</span>
+      <div className="relative mx-auto max-w-7xl">
+        <Reveal className="mb-12 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl space-y-4">
+            <span className="inline-flex w-fit rounded-full border border-[#0b2346]/10 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2346]/70 shadow-sm backdrop-blur">
+              Aloha Car Rental
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight text-[#071a36] sm:text-4xl lg:text-5xl">
+              {t("landing.fleet.title")}
+            </h2>
+            <p className="max-w-xl text-base leading-7 text-[#35506d] sm:text-lg">
+              {t("landing.whyChoose.subtitle")}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 rounded-full border border-[#0b2346]/10 bg-white/70 px-5 py-3 text-sm font-semibold text-[#0b2346] shadow-sm backdrop-blur">
+            <ShieldCheckIcon className="h-4 w-4 text-[#2aa4ce]" />
+            <span>{t("landing.hero.featureLine")}</span>
+          </div>
+        </Reveal>
+
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          {FLEET.map((car, index) => (
+            <Reveal key={car.name} delay={index * 90}>
+              <Card className="group overflow-hidden rounded-[1.75rem] border-white/70 bg-white/80 p-0 shadow-[0_30px_60px_-45px_rgba(7,26,54,0.65)] backdrop-blur transition-transform duration-300 hover:-translate-y-2">
+                <div className={`relative overflow-hidden bg-linear-to-br ${car.accent}`}>
+                  <div className="absolute left-4 top-4 z-10 rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#0b2346]/70 shadow-sm backdrop-blur">
+                    0{index + 1}
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-white/70 to-transparent" />
+                  <div className="relative h-52 w-full">
+                    <Image
+                      src={car.image}
+                      alt={car.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
+                      className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
                 </div>
-                <Button
-                  className="w-full rounded-full font-bold"
-                  onClick={() => toast.info(t("landing.fleet.comingSoon"))}
-                >
-                  {t("landing.fleet.reserveNow")}
-                </Button>
-              </div>
-            </Card>
+
+                <div className="space-y-5 p-5">
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-extrabold tracking-tight text-[#071a36]">{car.name}</h3>
+                    <div className="flex items-center gap-2 text-sm text-[#45627e]">
+                      <UsersIcon className="h-4 w-4 text-[#2aa4ce]" />
+                      <span>{t("landing.fleet.seats", { count: car.seats })}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-2xl bg-[#f5fbff] px-4 py-3 text-sm text-[#0b2346]">
+                    <div className="flex items-center gap-2">
+                      <CarFrontIcon className="h-4 w-4 text-[#f7bf00]" />
+                      <span className="font-semibold">{t("nav.fleetOverview")}</span>
+                    </div>
+                    <ChevronRightIcon className="h-4 w-4 text-[#2aa4ce]" />
+                  </div>
+
+                  <Button asChild className="w-full rounded-full font-bold">
+                    <Link href="/book">{t("landing.fleet.reserveNow")}</Link>
+                  </Button>
+                </div>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </div>

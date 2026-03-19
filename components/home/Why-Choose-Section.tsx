@@ -1,12 +1,16 @@
 "use client";
 
 import {
+  ArrowRightIcon,
   ShieldCheckIcon,
   ZapIcon,
   DollarSignIcon,
   HeadphonesIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button.tsx";
+import { Link } from "@/i18n/navigation";
+import Reveal from "./Reveal";
 
 export default function WhyChooseSection() {
   const t = useTranslations();
@@ -43,26 +47,69 @@ export default function WhyChooseSection() {
   ];
 
   return (
-    <section className="relative bg-[#fffef8] px-4 py-16 pb-24 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
-        <h2 className="mb-12 text-center text-3xl font-extrabold italic sm:text-4xl">
-          {t("landing.whyChoose.title")}
-        </h2>
+    <section className="relative overflow-hidden bg-[#fffef8] px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_center,rgba(247,191,0,0.09),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(42,164,206,0.14),transparent_28%)]" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <Reveal className="space-y-6">
+            <span className="inline-flex rounded-full border border-[#0b2346]/10 bg-white/85 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[#0b2346]/72 shadow-sm backdrop-blur">
+              Aloha Car Rental
+            </span>
+            <div className="space-y-4">
+              <h2 className="max-w-xl text-3xl font-extrabold tracking-tight text-[#071a36] sm:text-4xl lg:text-5xl">
+                {t("landing.whyChoose.title")}
+              </h2>
+              <p className="max-w-xl text-base leading-7 text-[#35506d] sm:text-lg">
+                {t("landing.whyChoose.subtitle")}
+              </p>
+            </div>
 
-        <div className="grid gap-8 sm:grid-cols-2">
-          {features.map((feature) => (
-            <div key={feature.title} className="flex items-start gap-4">
-              <div
-                className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${feature.bgColor}`}
-              >
-                <feature.icon className={`h-7 w-7 ${feature.iconColor}`} />
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-[1.5rem] border border-[#0b2346]/8 bg-white/85 p-5 shadow-[0_20px_50px_-42px_rgba(7,26,54,0.7)] backdrop-blur">
+                <div className="text-3xl font-extrabold tracking-tight text-[#071a36]">24/7</div>
+                <div className="mt-1 text-sm font-medium text-[#45627e]">
+                  {t("landing.whyChoose.features.support.title")}
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-bold">{feature.title}</h3>
-                <p className="mt-1 text-muted-foreground">{feature.description}</p>
+              <div className="rounded-[1.5rem] border border-[#0b2346]/8 bg-white/85 p-5 shadow-[0_20px_50px_-42px_rgba(7,26,54,0.7)] backdrop-blur">
+                <div className="text-3xl font-extrabold tracking-tight text-[#071a36]">100%</div>
+                <div className="mt-1 text-sm font-medium text-[#45627e]">
+                  {t("landing.whyChoose.features.security.title")}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-[#0b2346]/8 bg-white/85 p-5 shadow-[0_20px_50px_-42px_rgba(7,26,54,0.7)] backdrop-blur">
+                <div className="text-3xl font-extrabold tracking-tight text-[#071a36]">4.9</div>
+                <div className="mt-1 text-sm font-medium text-[#45627e]">
+                  {t("landing.whyChoose.features.rating.title")}
+                </div>
               </div>
             </div>
-          ))}
+
+            <Button asChild size="lg" className="rounded-full px-8 font-bold">
+              <Link href="/book">
+                {t("landing.ctaSection.button")}
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            </Button>
+          </Reveal>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            {features.map((feature, index) => (
+              <Reveal key={feature.title} delay={index * 90}>
+                <div className="group h-full rounded-[1.75rem] border border-[#0b2346]/8 bg-white/90 p-6 shadow-[0_28px_65px_-45px_rgba(7,26,54,0.7)] backdrop-blur transition-transform duration-300 hover:-translate-y-1.5">
+                  <div
+                    className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ${feature.bgColor} shadow-inner`}
+                  >
+                    <feature.icon className={`h-7 w-7 ${feature.iconColor}`} />
+                  </div>
+                  <h3 className="text-xl font-bold tracking-tight text-[#071a36]">{feature.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-[#45627e] sm:text-base">
+                    {feature.description}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
 

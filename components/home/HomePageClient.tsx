@@ -8,6 +8,7 @@ import FleetSection from "./FleetSection";
 import FooterSection from "./FooterSection";
 import WhyChooseSection from "./Why-Choose-Section";
 import ReviewsSection from "./ReviewsSection";
+import CtaSection from "./CtaSection";
 
 type PublicReview = {
   id: string;
@@ -64,6 +65,7 @@ export function HomePageClient({ locations }: HomePageClientProps) {
       <FleetSection />
       <WhyChooseSection />
       <ReviewsSection reviews={reviews} loading={loadingReviews} faqItems={faqEntries} />
+      <CtaSection />
       <FooterSection />
     </>
   );
