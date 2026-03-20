@@ -21,6 +21,7 @@ import Image from "next/image";
 export function Header() {
   const t = useTranslations();
   const pathname = usePathname();
+  if (pathname?.includes("/admin")) return null;
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {

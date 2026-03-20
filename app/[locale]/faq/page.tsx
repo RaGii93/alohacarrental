@@ -29,7 +29,7 @@ export default async function FAQPage({
   const faqEntries = getFaqEntries(locale);
 
   return (
-    <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+    <section className="mx-auto max-w-4xl space-y-6 px-4 pb-10 pt-32 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold">{t("nav.faq")}</h1>
       <p className="text-muted-foreground">
         Frequently asked questions about booking, required documents, payments, and pickup.

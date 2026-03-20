@@ -40,7 +40,7 @@ export default async function FleetOverviewPage() {
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <section className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-32 sm:px-6 lg:px-8">
       <div>
         <h1 className="text-3xl font-bold">{t("nav.fleetOverview")}</h1>
         <p className="text-muted-foreground mt-2">Browse active vehicle categories and available units.</p>

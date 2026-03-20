@@ -64,7 +64,7 @@ export default function AdminLoginPage({
   };
 
   return (
-    <div className="min-h-[calc(100vh-100px)] flex items-center justify-center bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8">
       <Card className="w-full max-w-md p-8">
         <h2 className="text-2xl font-bold text-center mb-8">
           {t("admin.login.title")}

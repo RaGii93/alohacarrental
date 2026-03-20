@@ -78,7 +78,7 @@ export function AppSidebar({
   ] as const;
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className="top-16 h-[calc(100svh-4rem)]">
+    <Sidebar variant="inset" collapsible="icon" className="pt-16">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>{tOr("common.navigation", "Navigation")}</SidebarGroupLabel>
