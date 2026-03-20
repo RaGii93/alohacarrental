@@ -10,7 +10,8 @@ export default function CtaSection() {
   const t = useTranslations();
 
   return (
-    <section className="relative overflow-hidden bg-[#fffef8] px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#fffef8_0%,#f7fbff_100%)] px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(42,164,206,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(247,191,0,0.08),transparent_26%)]" />
       <div className="mx-auto max-w-7xl">
         <Reveal>
           <div className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-[linear-gradient(135deg,#0b2346_0%,#184f90_55%,#2aa4ce_100%)] px-6 py-8 text-white shadow-[0_35px_100px_-45px_rgba(7,26,54,0.85)] sm:px-8 lg:px-12 lg:py-12">

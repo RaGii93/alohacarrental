@@ -122,7 +122,7 @@ export default function WhyChooseSection() {
         >
           <path
             d="M0,30 C480,60 960,0 1440,40 L1440,60 L0,60 Z"
-            fill="#e0f4ff"
+            fill="#dff5ff"
           />
         </svg>
       </div>

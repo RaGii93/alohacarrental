@@ -72,6 +72,11 @@ export function BookingWizard({
   const t = useTranslations();
   const [currentStep, setCurrentStep] = useState(1);
   const [availability, setAvailability] = useState<AvailabilityResult[]>([]);
+  const addDays = (date: Date, days: number) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + days);
+    return next;
+  };
   const parseDate = (value?: string): Date | null => {
     if (!value) return null;
     const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -108,7 +113,18 @@ export function BookingWizard({
   const licenseActive = isLicenseActive();
 
   const updateBookingData = (updates: Partial<BookingData>) => {
-    setBookingData(prev => ({ ...prev, ...updates }));
+    setBookingData((prev) => {
+      const next = { ...prev, ...updates };
+
+      if (updates.startDate) {
+        const minimumEndDate = addDays(updates.startDate, minimumBookingDays);
+        if (!next.endDate || next.endDate < minimumEndDate) {
+          next.endDate = minimumEndDate;
+        }
+      }
+
+      return next;
+    });
   };
   const mergeDateAndTime = (date: Date | null, time: string): Date | null => {
     if (!date) return null;

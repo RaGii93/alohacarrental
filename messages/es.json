@@ -107,6 +107,8 @@
     "reviews": {
       "title": "Reseñas de Clientes",
       "subtitle": "Últimas reseñas publicadas de reservas verificadas.",
+      "faqPreview": "Una vista previa breve de FAQ con las preguntas más comunes sobre reservas, pagos y recogida.",
+      "viewAllFaq": "Ver todas las FAQ",
       "leaveButton": "Dejar una Reseña",
       "empty": "Todavía no hay reseñas publicadas.",
       "form": {

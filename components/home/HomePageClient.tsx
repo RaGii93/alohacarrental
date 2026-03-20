@@ -27,7 +27,7 @@ export function HomePageClient({ locations }: HomePageClientProps) {
   const locale = useLocale();
   const [reviews, setReviews] = useState<PublicReview[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
-  const faqEntries = useMemo(() => getFaqEntries(locale).slice(0, 4), [locale]);
+  const faqEntries = useMemo(() => getFaqEntries(locale).slice(0, 5), [locale]);
 
   useEffect(() => {
     let active = true;

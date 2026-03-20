@@ -107,6 +107,8 @@
     "reviews": {
       "title": "Customer Reviews",
       "subtitle": "Latest published reviews from verified bookings.",
+      "faqPreview": "A quick FAQ preview for the most common booking, payment, and pickup questions.",
+      "viewAllFaq": "See all FAQ",
       "leaveButton": "Leave a Review",
       "empty": "No reviews are published yet.",
       "form": {

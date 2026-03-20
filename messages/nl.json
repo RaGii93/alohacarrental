@@ -107,6 +107,8 @@
     "reviews": {
       "title": "Klantbeoordelingen",
       "subtitle": "Nieuwste gepubliceerde reviews van geverifieerde reserveringen.",
+      "faqPreview": "Een korte FAQ-preview met de meest voorkomende vragen over reserveren, betalen en ophalen.",
+      "viewAllFaq": "Bekijk alle FAQ",
       "leaveButton": "Review Achterlaten",
       "empty": "Er zijn nog geen reviews gepubliceerd.",
       "form": {
