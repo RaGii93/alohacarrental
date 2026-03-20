@@ -19,7 +19,7 @@ export default function SiteFooter() {
 
   return (
     <footer
-      className="-mt-px overflow-hidden bg-[#071a36] px-4 py-12 text-white sm:px-6 lg:px-8"
+      className="relative -mt-px overflow-hidden bg-[#071a36] px-4 py-12 text-white sm:px-6 lg:px-8"
       style={{ backgroundColor: "#071a36" }}
     >
       <div className="absolute inset-x-0 top-0 h-px bg-white/12" />
