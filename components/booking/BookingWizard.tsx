@@ -32,6 +32,7 @@ export interface BookingData {
   driverLicenseUrl: string;
   notes: string;
   termsAccepted: boolean;
+  identificationConsentAccepted: boolean;
   selectedExtras: Array<{ extraId: string; quantity: number }>;
 }
 
@@ -107,6 +108,7 @@ export function BookingWizard({
     driverLicenseUrl: "",
     notes: "",
     termsAccepted: false,
+    identificationConsentAccepted: false,
     selectedExtras: [],
   });
 

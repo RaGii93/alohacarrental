@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -98,7 +99,8 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                      bookingData.licenseExpiryDate &&
                      isAtLeast21 &&
                      isLicenseValid &&
-                     bookingData.driverLicenseUrl;
+                     bookingData.driverLicenseUrl &&
+                     bookingData.identificationConsentAccepted;
 
   return (
     <div className="space-y-6">
@@ -245,6 +247,31 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                       </p>
                     </div>
                   </Label>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-muted bg-muted/35 p-4">
+                <p className="text-sm font-semibold text-foreground">{t("booking.termsOfService")}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("booking.identificationVerificationClause")}
+                </p>
+                <p className="mt-4 text-sm font-semibold text-foreground">{t("booking.privacyPolicy")}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("booking.personalDataRequestClause")}
+                </p>
+                <div className="mt-4 flex items-start gap-3 rounded-md border border-muted-foreground/15 bg-background/70 p-3">
+                  <Checkbox
+                    id="identification-consent"
+                    checked={bookingData.identificationConsentAccepted}
+                    onCheckedChange={(checked) =>
+                      updateBookingData({ identificationConsentAccepted: checked as boolean })
+                    }
+                    disabled={disabled}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="identification-consent" className="text-sm leading-6 text-foreground">
+                    {t("booking.identificationConsentLabel")}
+                  </label>
                 </div>
               </div>
 
