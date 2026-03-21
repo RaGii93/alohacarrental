@@ -72,7 +72,7 @@ export default async function AdminFleetPage({
   const utilizationPrevPct = activeVehiclesPrev > 0 ? Math.round((onRentNowPrev / activeVehiclesPrev) * 100) : 0;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
       <h2 className="text-xl font-semibold">{t("admin.dashboard.fleet.title")}</h2>
       <FleetDashboard
         activeVehicles={activeVehicles}

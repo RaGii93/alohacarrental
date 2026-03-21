@@ -38,7 +38,7 @@ export default async function AdminReviewsPage({
   const prevLabel = t("common.previous");
   const nextLabel = t("common.next");
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
       <h2 className="text-xl font-semibold">{t("admin.dashboard.reviews.title")}</h2>
       <p className="mb-4 text-sm text-muted-foreground">{t("admin.dashboard.reviews.subtitle")}</p>
       <div className="mb-3 flex flex-col gap-2 text-sm md:flex-row md:items-center md:justify-between">

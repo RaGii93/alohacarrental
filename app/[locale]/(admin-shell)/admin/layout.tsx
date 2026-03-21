@@ -9,6 +9,7 @@ import { requireAdmin } from "@/lib/auth-guards";
 import { isLicenseActive } from "@/lib/license";
 import { logoutAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export async function generateMetadata({
   params,
@@ -42,7 +43,7 @@ export default async function AdminLayout({
   return (
     <SidebarProvider>
       <AppSidebar userEmail={admin.email} role={admin.role} licenseActive={licenseActive} />
-      <SidebarInset>
+      <SidebarInset className="md:pl-[calc(var(--sidebar-width)+0.5rem)] md:peer-data-[state=collapsed]:pl-[4.5rem]">
         <header className="sticky top-0 z-10 flex min-h-12 flex-wrap items-center justify-between gap-2 border-b bg-white px-4 py-2">
           <div className="flex min-w-0 items-center gap-2">
             <SidebarTrigger />
@@ -66,11 +67,17 @@ export default async function AdminLayout({
               </div>
             </div>
           </div>
-          <form action={logoutAction.bind(null, locale)}>
-            <Button type="submit" variant="outline" size="sm">
-              {t("nav.logout")}
-            </Button>
-          </form>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher
+              triggerClassName="h-9 w-[150px] rounded-full border-[#e7d39a] bg-white text-[#071a36] shadow-none [&_svg]:text-[#b98900]"
+              contentClassName="rounded-2xl border-[#ecdcae] bg-white"
+            />
+            <form action={logoutAction.bind(null, locale)}>
+              <Button type="submit" variant="outline" size="sm">
+                {t("nav.logout")}
+              </Button>
+            </form>
+          </div>
         </header>
         <main className="flex-1">{children}</main>
       </SidebarInset>

@@ -70,7 +70,7 @@ export default async function AdminFinancialPage({
   const currency = (amountCents: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
       <h2 className="mb-4 text-xl font-semibold">{t("admin.dashboard.financial.title")}</h2>
       <FinancialFilters initialStart={toInputDate(financialStartDate)} initialEnd={toInputDate(financialEndDate)} />
       <p className="mb-4 text-xs text-muted-foreground">Filter range: {formatDateTime(financialStartDate)} to {formatDateTime(financialEndDate)}</p>

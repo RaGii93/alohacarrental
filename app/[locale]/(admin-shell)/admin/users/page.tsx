@@ -55,7 +55,7 @@ export default async function AdminUsersPage({
   const nextLabel = t("common.next");
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
       <h2 className="mb-4 text-xl font-semibold">{tOr("admin.users.title", "User Management")}</h2>
       <div className="mb-3 flex flex-col gap-2 text-sm md:flex-row md:items-center md:justify-between">
         <div className="text-muted-foreground">Showing {startRow}-{endRow} of {total}</div>
