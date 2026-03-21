@@ -225,6 +225,49 @@
       "next": "We nemen binnenkort contact met je op ter bevestiging."
     }
   },
+  "fleetPage": {
+    "badge": "Transparant Vlootoverzicht",
+    "title": "Moderne huurcategorieen met duidelijke dagprijzen.",
+    "description": "Bekijk onze actieve voertuigcategorieen, vergelijk de belangrijkste kenmerken in een oogopslag en reserveer met een duidelijker beeld van prijs en vlootstatus voordat je begint.",
+    "primaryCta": "Beschikbaarheid bekijken",
+    "secondaryCta": "Categorieen bekijken",
+    "highlights": {
+      "pricing": "Transparante prijzen",
+      "visibility": "Live zicht op de vloot"
+    },
+    "stats": {
+      "startingRate": "Vanaf per dag",
+      "pricing": "Prijsmodel",
+      "pricingValue": "Duidelijk",
+      "booking": "Boekingsflow",
+      "bookingValue": "Snel",
+      "support": "Ophaalservice",
+      "supportValue": "Direct"
+    },
+    "summary": {
+      "eyebrow": "Overzicht",
+      "title": "Een duidelijkere manier om je voertuig te kiezen",
+      "pricingTitle": "Wat de prijs omvat",
+      "pricingBody": "De dagtarieven die hier staan zijn de basisprijzen per categorie, exclusief belastingen, optionele extra's of boekingsspecifieke aanpassingen.",
+      "availabilityTitle": "Hoe beschikbaarheid wordt getoond",
+      "availabilityBody": "Deze pagina helpt je om categorieen snel te vergelijken. De exacte toewijzing hangt af van je gekozen datums, boekingsgegevens en definitieve bevestiging."
+    },
+    "card": {
+      "categoryLabel": "Vlootcategorie",
+      "perDay": "Per dag",
+      "defaultDescription": "Betrouwbaar, eilandklaar vervoer met een duidelijke dagprijs en beschikbaarheidsinformatie op categorieniveau.",
+      "seats": "{count} zitplaatsen",
+      "automatic": "Automaat",
+      "manual": "Handgeschakeld",
+      "ac": "Airconditioning",
+      "noAc": "Geen airconditioning",
+      "pricingTitle": "Categorieprijs",
+      "pricingNote": "Het uiteindelijke boekingstotaal kan verschillen door extra's, belastingen of beschikbaarheid op specifieke datums.",
+      "bookNow": "Reserveer deze categorie"
+    },
+    "emptyTitle": "Vlootcategorieen verschijnen hier binnenkort.",
+    "emptyBody": "Er zijn momenteel geen actieve categorieen gepubliceerd. Zodra voertuigen beschikbaar zijn, toont deze pagina prijzen, specificaties en live vlootinzichten."
+  },
   "admin": {
     "title": "Beheerpaneel",
     "login": {

@@ -225,6 +225,49 @@
       "next": "Nos pondremos en contacto pronto para confirmarla."
     }
   },
+  "fleetPage": {
+    "badge": "Resumen Transparente de la Flota",
+    "title": "Categorías modernas de alquiler con precios diarios claros.",
+    "description": "Revisa nuestras categorías activas de vehículos, compara lo esencial de un vistazo y reserva con una visión más clara del precio y del estado de la flota antes de comenzar.",
+    "primaryCta": "Consultar disponibilidad",
+    "secondaryCta": "Ver categorías",
+    "highlights": {
+      "pricing": "Precios transparentes",
+      "visibility": "Visibilidad en vivo de la flota"
+    },
+    "stats": {
+      "startingRate": "Tarifa diaria desde",
+      "pricing": "Modelo de precio",
+      "pricingValue": "Claro",
+      "booking": "Proceso de reserva",
+      "bookingValue": "Rápido",
+      "support": "Asistencia de entrega",
+      "supportValue": "Directa"
+    },
+    "summary": {
+      "eyebrow": "Resumen",
+      "title": "Una forma más clara de elegir tu vehículo",
+      "pricingTitle": "Qué incluye el precio",
+      "pricingBody": "Las tarifas diarias mostradas aquí son los precios base por categoría antes de impuestos, extras opcionales o ajustes específicos de la reserva.",
+      "availabilityTitle": "Cómo se muestra la disponibilidad",
+      "availabilityBody": "Esta página está pensada para ayudarte a comparar categorías rápidamente. La asignación exacta depende de tus fechas, los detalles de la reserva y la confirmación final."
+    },
+    "card": {
+      "categoryLabel": "Categoría de flota",
+      "perDay": "Por día",
+      "defaultDescription": "Transporte confiable y listo para la isla, con una tarifa diaria clara y detalles de disponibilidad por categoría.",
+      "seats": "{count} asientos",
+      "automatic": "Automático",
+      "manual": "Manual",
+      "ac": "Aire acondicionado",
+      "noAc": "Sin aire acondicionado",
+      "pricingTitle": "Precio de la categoría",
+      "pricingNote": "El total final de la reserva puede variar según extras, impuestos o disponibilidad para fechas específicas.",
+      "bookNow": "Reservar esta categoría"
+    },
+    "emptyTitle": "Las categorías de la flota aparecerán aquí pronto.",
+    "emptyBody": "No hay categorías activas publicados en este momento. Cuando haya vehículos disponibles, esta página mostrará precios, especificaciones y visibilidad en vivo de la flota."
+  },
   "admin": {
     "title": "Panel de Administración",
     "login": {

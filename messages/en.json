@@ -255,6 +255,49 @@
     "minPrice": "Min Price",
     "maxPrice": "Max Price"
   },
+  "fleetPage": {
+    "badge": "Transparent Fleet Overview",
+    "title": "Modern rental categories with clear daily pricing.",
+    "description": "Review our active vehicle categories, compare the essentials at a glance, and book with a clearer picture of pricing and fleet status before you start your reservation.",
+    "primaryCta": "Check Availability",
+    "secondaryCta": "Browse Categories",
+    "highlights": {
+      "pricing": "Transparent pricing",
+      "visibility": "Live fleet visibility"
+    },
+    "stats": {
+      "startingRate": "Starting daily rate",
+      "pricing": "Pricing model",
+      "pricingValue": "Clear",
+      "booking": "Booking flow",
+      "bookingValue": "Fast",
+      "support": "Pickup support",
+      "supportValue": "Direct"
+    },
+    "summary": {
+      "eyebrow": "Overview",
+      "title": "A clearer way to choose your vehicle",
+      "pricingTitle": "What the price includes",
+      "pricingBody": "Daily rates shown here are the base category prices before taxes, optional extras, or booking-specific adjustments.",
+      "availabilityTitle": "How availability is shown",
+      "availabilityBody": "This page is designed to help you compare categories quickly. Exact assignment depends on your selected dates, booking details, and final confirmation."
+    },
+    "card": {
+      "categoryLabel": "Fleet category",
+      "perDay": "Per day",
+      "defaultDescription": "Reliable, island-ready transport with a straightforward daily rate and category-level availability details.",
+      "seats": "{count} seats",
+      "automatic": "Automatic",
+      "manual": "Manual",
+      "ac": "Air conditioning",
+      "noAc": "No air conditioning",
+      "pricingTitle": "Category pricing",
+      "pricingNote": "Final booking totals may change when extras, taxes, or date-specific availability apply.",
+      "bookNow": "Reserve this category"
+    },
+    "emptyTitle": "Fleet categories will appear here soon.",
+    "emptyBody": "There are no active categories published right now. Once vehicles are available, this page will show pricing, specs, and live fleet visibility."
+  },
   "admin": {
     "title": "Admin Dashboard",
     "login": {
