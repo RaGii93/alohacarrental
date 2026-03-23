@@ -81,7 +81,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-[620px] overflow-hidden pb-16">
+    <section className="relative min-h-[700px] overflow-hidden pb-16">
       <div className="absolute inset-0">
         <Image
           src={HERO_BG}
@@ -94,7 +94,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-r from-[#071a36]/85 via-[#071a36]/55 to-[#071a36]/20" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-20 lg:pt-36">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="space-y-6 text-white">
             <h1 className="text-5xl font-extrabold italic leading-[1.08] tracking-tight sm:text-6xl">
