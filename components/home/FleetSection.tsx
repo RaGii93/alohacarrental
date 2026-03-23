@@ -2,40 +2,24 @@
 
 import { Button } from "@/components/ui/button.tsx";
 import { Card } from "@/components/ui/card.tsx";
-import { CarFrontIcon, ChevronRightIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
+import { CarFrontIcon, ChevronRightIcon, GaugeIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { getBlobProxyUrl } from "@/lib/blob";
 import Reveal from "./Reveal";
 
-const FLEET = [
-  {
-    name: "Kia Picanto",
-    seats: 4,
-    image: "/home/fleet-kia-picanto.png",
-    accent: "from-[#eef8ff] via-white to-[#d7efff]",
-  },
-  {
-    name: "Hyundai Accent",
-    seats: 5,
-    image: "/home/fleet-hyundai-accent.png",
-    accent: "from-[#fff6e5] via-white to-[#ffe3a8]",
-  },
-  {
-    name: "SUV",
-    seats: 5,
-    image: "/home/fleet-suv.png",
-    accent: "from-[#edfdf6] via-white to-[#c8f3de]",
-  },
-  {
-    name: "Pickup",
-    seats: 5,
-    image: "/home/fleet-pickup.png",
-    accent: "from-[#eff2ff] via-white to-[#d8e0ff]",
-  },
+type FleetSectionProps = {
+  categories: { id: string; name: string; seats: number; imageUrl: string | null }[];
+};
+
+const CARD_ACCENTS = [
+  "from-[#eef8ff] via-white to-[#d7efff]",
+  "from-[#fff6e5] via-white to-[#ffe3a8]",
+  "from-[#edfdf6] via-white to-[#c8f3de]",
+  "from-[#eff2ff] via-white to-[#d8e0ff]",
 ];
 
-export default function FleetSection() {
+export default function FleetSection({ categories }: FleetSectionProps) {
   const t = useTranslations();
 
   return (
@@ -66,51 +50,70 @@ export default function FleetSection() {
           </div>
         </Reveal>
 
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {FLEET.map((car, index) => (
-            <Reveal key={car.name} delay={index * 90}>
-              <Card className="group overflow-hidden rounded-[1.75rem] border-white/70 bg-white/80 p-0 shadow-[0_30px_60px_-45px_rgba(7,26,54,0.65)] backdrop-blur transition-transform duration-300 hover:-translate-y-2">
-                <div className={`relative overflow-hidden bg-linear-to-br ${car.accent}`}>
-                  <div className="absolute left-4 top-4 z-10 rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#0b2346]/70 shadow-sm backdrop-blur">
-                    0{index + 1}
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-white/70 to-transparent" />
-                  <div className="relative h-52 w-full">
-                    <Image
-                      src={car.image}
-                      alt={car.name}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
-                      className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                </div>
+        {categories.length ? (
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {categories.map((category, index) => {
+              const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
+              const imageSrc = category.imageUrl
+                ? category.imageUrl.startsWith("/")
+                  ? category.imageUrl
+                  : getBlobProxyUrl(category.imageUrl) || category.imageUrl
+                : null;
 
-                <div className="space-y-5 p-5">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-extrabold tracking-tight text-[#071a36]">{car.name}</h3>
-                    <div className="flex items-center gap-2 text-sm text-[#45627e]">
-                      <UsersIcon className="h-4 w-4 text-[#2aa4ce]" />
-                      <span>{t("landing.fleet.seats", { count: car.seats })}</span>
+              return (
+                <Reveal key={category.id} delay={index * 90}>
+                  <Card className="group overflow-hidden rounded-[1.75rem] border-white/70 bg-white/80 p-0 shadow-[0_30px_60px_-45px_rgba(7,26,54,0.65)] backdrop-blur transition-transform duration-300 hover:-translate-y-2">
+                    <div className={`relative overflow-hidden bg-linear-to-br ${accent}`}>
+                      <div className="absolute left-4 top-4 z-10 rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#0b2346]/70 shadow-sm backdrop-blur">
+                        {String(index + 1).padStart(2, "0")}
+                      </div>
+                      <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-white/70 to-transparent" />
+                      {imageSrc ? (
+                        <div className="relative h-52 w-full">
+                          <img
+                            src={imageSrc}
+                            alt={category.name}
+                            className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex h-52 w-full items-center justify-center p-6">
+                          <GaugeIcon className="h-12 w-12 text-[#7fa1bf]" />
+                        </div>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-between rounded-2xl bg-[#f5fbff] px-4 py-3 text-sm text-[#0b2346]">
-                    <div className="flex items-center gap-2">
-                      <CarFrontIcon className="h-4 w-4 text-[#f7bf00]" />
-                      <span className="font-semibold">{t("nav.fleetOverview")}</span>
+                    <div className="space-y-5 p-5">
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-extrabold tracking-tight text-[#071a36]">{category.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-[#45627e]">
+                          <UsersIcon className="h-4 w-4 text-[#2aa4ce]" />
+                          <span>{t("landing.fleet.seats", { count: category.seats })}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between rounded-2xl bg-[#f5fbff] px-4 py-3 text-sm text-[#0b2346]">
+                        <div className="flex items-center gap-2">
+                          <CarFrontIcon className="h-4 w-4 text-[#f7bf00]" />
+                          <span className="font-semibold">{t("nav.fleetOverview")}</span>
+                        </div>
+                        <ChevronRightIcon className="h-4 w-4 text-[#2aa4ce]" />
+                      </div>
+
+                      <Button asChild className="w-full rounded-full font-bold">
+                        <Link href="/book">{t("landing.fleet.reserveNow")}</Link>
+                      </Button>
                     </div>
-                    <ChevronRightIcon className="h-4 w-4 text-[#2aa4ce]" />
-                  </div>
-
-                  <Button asChild className="w-full rounded-full font-bold">
-                    <Link href="/book">{t("landing.fleet.reserveNow")}</Link>
-                  </Button>
-                </div>
-              </Card>
-            </Reveal>
-          ))}
-        </div>
+                  </Card>
+                </Reveal>
+              );
+            })}
+          </div>
+        ) : (
+          <Card className="rounded-[1.75rem] border-white/70 bg-white/80 p-8 text-center shadow-[0_30px_60px_-45px_rgba(7,26,54,0.45)] backdrop-blur">
+            <p className="text-base font-semibold text-[#071a36]">{t("fleetPage.emptyTitle")}</p>
+          </Card>
+        )}
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 translate-y-[1px]">

@@ -38,6 +38,12 @@ export default async function HomePage({
   const { locale } = await params;
   const jsonLd = getHomeJsonLd(locale);
   let locations: { id: string; name: string; address: string | null }[] = [];
+  let categories: {
+    id: string;
+    name: string;
+    seats: number;
+    imageUrl: string | null;
+  }[] = [];
   try {
     locations = await db.location.findMany({
       select: { id: true, name: true, address: true },
@@ -45,6 +51,21 @@ export default async function HomePage({
     });
   } catch {
     locations = [];
+  }
+
+  try {
+    categories = await db.vehicleCategory.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        seats: true,
+        imageUrl: true,
+      },
+      orderBy: { sortOrder: "asc" },
+    });
+  } catch {
+    categories = [];
   }
 
   return (
@@ -56,7 +77,7 @@ export default async function HomePage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-      <HomePageClient locations={locations} />
+      <HomePageClient locations={locations} categories={categories} />
     </>
   );
 }

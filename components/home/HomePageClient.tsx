@@ -21,9 +21,10 @@ type PublicReview = {
 
 type HomePageClientProps = {
   locations: { id: string; name: string; address?: string | null }[];
+  categories: { id: string; name: string; seats: number; imageUrl: string | null }[];
 };
 
-export function HomePageClient({ locations }: HomePageClientProps) {
+export function HomePageClient({ locations, categories }: HomePageClientProps) {
   const locale = useLocale();
   const [reviews, setReviews] = useState<PublicReview[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -62,7 +63,7 @@ export function HomePageClient({ locations }: HomePageClientProps) {
   return (
     <>
       <HeroSection locations={locations} />
-      <FleetSection />
+      <FleetSection categories={categories} />
       <WhyChooseSection />
       <ReviewsSection reviews={reviews} loading={loadingReviews} faqItems={faqEntries} />
       <CtaSection />
