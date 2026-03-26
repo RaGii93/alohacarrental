@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Pencil, Save, UserPlus, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -58,7 +59,6 @@ export function UserDialog({
   const isEdit = !!user?.id;
   const [isOpen, setIsOpen] = useState(!!user);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const tOr = (key: string, fallback: string) => (t.has(key as any) ? t(key as any) : fallback);
 
   const form = useForm({
     resolver: zodResolver(userSchema),
@@ -84,7 +84,7 @@ export function UserDialog({
     setIsSubmitting(true);
     try {
       if (!isEdit && (!values.password || String(values.password).trim().length < 8)) {
-        toast.error(tOr("admin.users.password", "Password") + ": minimum 8 characters");
+        toast.error(t("admin.users.passwordMin"));
         return;
       }
       const result = user?.id
@@ -93,17 +93,17 @@ export function UserDialog({
 
       if (!result.success) {
         if (result.error === "ROOT_PROTECTED") {
-          toast.error(tOr("admin.users.rootProtected", "ROOT user cannot be modified or deleted"));
+          toast.error(t("admin.users.rootProtected"));
         } else {
-          toast.error(result.error || tOr("common.error", "Error"));
+          toast.error(result.error || t("common.error"));
         }
         return;
       }
 
       toast.success(
         user?.id
-          ? tOr("admin.users.updated", "User updated")
-          : tOr("admin.users.created", "User created")
+          ? t("admin.users.updated")
+          : t("admin.users.created")
       );
       setIsOpen(false);
       onClose();
@@ -124,9 +124,10 @@ export function UserDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
+            {isEdit ? <Pencil className="mr-2 inline h-5 w-5" /> : <UserPlus className="mr-2 inline h-5 w-5" />}
             {isEdit
-              ? tOr("admin.users.edit", "Edit User")
-              : tOr("admin.users.add", "Add User")}
+              ? t("admin.users.edit")
+              : t("admin.users.add")}
           </DialogTitle>
         </DialogHeader>
 
@@ -137,7 +138,7 @@ export function UserDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{tOr("admin.users.email", "Email")}</FormLabel>
+                  <FormLabel>{t("admin.users.email")}</FormLabel>
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
@@ -151,7 +152,7 @@ export function UserDialog({
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{tOr("admin.users.role", "Role")}</FormLabel>
+                  <FormLabel>{t("admin.users.role")}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -159,8 +160,8 @@ export function UserDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="OWNER">OWNER</SelectItem>
-                      <SelectItem value="STAFF">STAFF</SelectItem>
+                      <SelectItem value="OWNER">{t("admin.users.roles.owner")}</SelectItem>
+                      <SelectItem value="STAFF">{t("admin.users.roles.staff")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -175,8 +176,8 @@ export function UserDialog({
                 <FormItem>
                   <FormLabel>
                     {isEdit
-                      ? tOr("admin.users.passwordOptional", "Password (optional)")
-                      : tOr("admin.users.password", "Password")}
+                      ? t("admin.users.passwordOptional")
+                      : t("admin.users.password")}
                   </FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
@@ -188,10 +189,12 @@ export function UserDialog({
 
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={onClose}>
-                {tOr("common.cancel", "Cancel")}
+                <X className="h-4 w-4" />
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? tOr("common.loading", "Loading...") : tOr("common.save", "Save")}
+                <Save className="h-4 w-4" />
+                {isSubmitting ? t("common.loading") : t("common.save")}
               </Button>
             </div>
           </form>

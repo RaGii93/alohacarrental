@@ -34,8 +34,10 @@ export function DatePicker({
   disabledDate,
   hideIcon = true,
 }: DatePickerProps) {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Popover>
+    <Popover modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -52,16 +54,27 @@ export function DatePicker({
           {value ? format(value, "PPP") : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="z-50 w-[21rem] p-2" align="start">
+      <PopoverContent
+        align="start"
+        side="bottom"
+        sideOffset={10}
+        collisionPadding={16}
+        className="z-[80] w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-[1.25rem] border border-[#d7e4f8] bg-white p-0 shadow-[0_28px_65px_-38px_rgba(12,74,160,0.45)]"
+      >
         <Calendar
-          className="w-full"
+          className="w-full border-0 bg-transparent p-3 shadow-none"
           mode="single"
           captionLayout="dropdown"
+          showOutsideDays={false}
           selected={value ?? undefined}
-          onSelect={(date) => onChange(date ?? null)}
+          onSelect={(date) => {
+            onChange(date ?? null);
+            if (date) setOpen(false);
+          }}
           fromYear={fromYear}
           toYear={toYear}
           disabled={disabledDate}
+          fixedWeeks
           initialFocus
         />
       </PopoverContent>

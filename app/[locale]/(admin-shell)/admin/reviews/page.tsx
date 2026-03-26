@@ -2,7 +2,25 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { ReviewsTable } from "@/components/admin/ReviewsTable";
-import { ADMIN_PAGE_SIZE_OPTIONS, requireAdminSection, toPageSize, toPositiveInt } from "@/app/[locale]/admin/_lib";
+import {
+  ADMIN_PAGE_KICKER,
+  ADMIN_PAGE_META_ROW,
+  ADMIN_PAGE_META_TEXT,
+  ADMIN_PAGE_PAGER,
+  ADMIN_PAGE_PAGER_BUTTON,
+  ADMIN_PAGE_PAGER_CURRENT,
+  ADMIN_PAGE_PAGER_DISABLED,
+  ADMIN_PAGE_ROWS_BUTTON,
+  ADMIN_PAGE_ROWS_BUTTON_ACTIVE,
+  ADMIN_PAGE_ROWS_BUTTON_IDLE,
+  ADMIN_PAGE_ROWS_WRAP,
+  ADMIN_PAGE_SHELL,
+  ADMIN_PAGE_STACK,
+  ADMIN_PAGE_SIZE_OPTIONS,
+  requireAdminSection,
+  toPageSize,
+  toPositiveInt,
+} from "@/app/[locale]/admin/_lib";
 
 export default async function AdminReviewsPage({
   params,
@@ -38,39 +56,41 @@ export default async function AdminReviewsPage({
   const prevLabel = t("common.previous");
   const nextLabel = t("common.next");
   return (
-    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
-      <h2 className="text-xl font-semibold">{t("admin.dashboard.reviews.title")}</h2>
-      <p className="mb-4 text-sm text-muted-foreground">{t("admin.dashboard.reviews.subtitle")}</p>
-      <div className="mb-3 flex flex-col gap-2 text-sm md:flex-row md:items-center md:justify-between">
-        <div className="text-muted-foreground">Showing {startRow}-{endRow} of {total}</div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Rows:</span>
+    <div className={ADMIN_PAGE_SHELL}>
+      <div className={ADMIN_PAGE_STACK}>
+      <p className={ADMIN_PAGE_KICKER}>{t("admin.dashboard.reviews.title")}</p>
+      <p className={ADMIN_PAGE_META_TEXT}>{t("admin.dashboard.reviews.subtitle")}</p>
+      <div className={ADMIN_PAGE_META_ROW}>
+        <div className={ADMIN_PAGE_META_TEXT}>Showing {startRow}-{endRow} of {total}</div>
+        <div className={ADMIN_PAGE_ROWS_WRAP}>
+          <span className={ADMIN_PAGE_META_TEXT}>Rows:</span>
           {ADMIN_PAGE_SIZE_OPTIONS.map((size) => (
-            <Link key={size} className={`inline-flex h-8 items-center rounded-md border px-2 text-xs ${pageSize === size ? "bg-accent font-medium" : "hover:bg-accent"}`} href={buildHref({ page_size: size, reviews_page: 1 })}>
+            <Link key={size} className={`${ADMIN_PAGE_ROWS_BUTTON} ${pageSize === size ? ADMIN_PAGE_ROWS_BUTTON_ACTIVE : ADMIN_PAGE_ROWS_BUTTON_IDLE}`} href={buildHref({ page_size: size, reviews_page: 1 })}>
               {size}
             </Link>
           ))}
         </div>
       </div>
       <ReviewsTable reviews={rows as any[]} locale={locale} />
-      <div className="mt-4 flex items-center justify-end gap-2">
+      <div className={ADMIN_PAGE_PAGER}>
         {safePage > 1 ? (
-          <Link className="inline-flex h-8 items-center rounded-md border px-3 text-xs hover:bg-accent" href={buildHref({ reviews_page: safePage - 1 })}>
+          <Link className={ADMIN_PAGE_PAGER_BUTTON} href={buildHref({ reviews_page: safePage - 1 })}>
             {prevLabel}
           </Link>
         ) : (
-          <span className="inline-flex h-8 items-center rounded-md border px-3 text-xs opacity-50">{prevLabel}</span>
+          <span className={ADMIN_PAGE_PAGER_DISABLED}>{prevLabel}</span>
         )}
-        <span className="inline-flex h-8 items-center rounded-md border px-2 text-xs">
+        <span className={ADMIN_PAGE_PAGER_CURRENT}>
           {safePage}/{totalPages}
         </span>
         {safePage < totalPages ? (
-          <Link className="inline-flex h-8 items-center rounded-md border px-3 text-xs hover:bg-accent" href={buildHref({ reviews_page: safePage + 1 })}>
+          <Link className={ADMIN_PAGE_PAGER_BUTTON} href={buildHref({ reviews_page: safePage + 1 })}>
             {nextLabel}
           </Link>
         ) : (
-          <span className="inline-flex h-8 items-center rounded-md border px-3 text-xs opacity-50">{nextLabel}</span>
+          <span className={ADMIN_PAGE_PAGER_DISABLED}>{nextLabel}</span>
         )}
+      </div>
       </div>
     </div>
   );

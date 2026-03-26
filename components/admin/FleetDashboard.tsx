@@ -70,6 +70,8 @@ function TrendIcon({ isUp, isDown }: { isUp: boolean; isDown: boolean }) {
   return <BarChart3 className="h-3.5 w-3.5" />;
 }
 
+const flatMetricCard = "rounded-[1.6rem] border-0 bg-white p-4 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]";
+
 export function FleetDashboard({
   activeVehicles,
   activeVehiclesPrev,
@@ -101,7 +103,6 @@ export function FleetDashboard({
       value: activeVehicles,
       prev: activeVehiclesPrev,
       icon: Activity,
-      gradient: "from-emerald-50 to-white",
       iconWrap: "bg-emerald-100 text-emerald-700",
     },
     {
@@ -109,7 +110,6 @@ export function FleetDashboard({
       value: onRentNow,
       prev: onRentNowPrev,
       icon: Car,
-      gradient: "from-cyan-50 to-white",
       iconWrap: "bg-cyan-100 text-cyan-700",
     },
     {
@@ -118,7 +118,6 @@ export function FleetDashboard({
       prev: utilizationPrevPct,
       suffix: "%",
       icon: Gauge,
-      gradient: "from-blue-50 to-white",
       iconWrap: "bg-blue-100 text-blue-700",
     },
     {
@@ -126,7 +125,6 @@ export function FleetDashboard({
       value: pickups7d,
       prev: pickups7dPrev,
       icon: CalendarClock,
-      gradient: "from-violet-50 to-white",
       iconWrap: "bg-violet-100 text-violet-700",
     },
     {
@@ -134,7 +132,6 @@ export function FleetDashboard({
       value: returns7d,
       prev: returns7dPrev,
       icon: CalendarSync,
-      gradient: "from-orange-50 to-white",
       iconWrap: "bg-orange-100 text-orange-700",
     },
     {
@@ -142,7 +139,6 @@ export function FleetDashboard({
       value: returnsToday,
       prev: returnsTodayPrev,
       icon: Undo2,
-      gradient: "from-amber-50 to-white",
       iconWrap: "bg-amber-100 text-amber-700",
     },
     {
@@ -150,7 +146,6 @@ export function FleetDashboard({
       value: overdueReturns,
       prev: overdueReturnsPrev,
       icon: TimerOff,
-      gradient: "from-rose-50 to-white",
       iconWrap: "bg-rose-100 text-rose-700",
     },
   ];
@@ -161,7 +156,6 @@ export function FleetDashboard({
       value: expectedDemandTotal,
       prev: expectedDemandPrevTotal,
       icon: CalendarDays,
-      gradient: "from-indigo-50 to-white",
       iconWrap: "bg-indigo-100 text-indigo-700",
     },
     {
@@ -170,7 +164,6 @@ export function FleetDashboard({
       prev: topDemandPrevCount,
       customValue: topDemandLabel,
       icon: Star,
-      gradient: "from-fuchsia-50 to-white",
       iconWrap: "bg-fuchsia-100 text-fuchsia-700",
     },
   ];
@@ -190,7 +183,7 @@ export function FleetDashboard({
             {forecastMetrics.map((item) => {
               const itemTrend = trend(item.value, item.prev);
               return (
-                <Card key={item.title} className={`relative overflow-hidden border shadow-sm bg-gradient-to-br ${item.gradient} p-4`}>
+                <Card key={item.title} className={flatMetricCard}>
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className={`rounded-md p-2 ${item.iconWrap}`}>
                       <item.icon className="h-4 w-4" />
@@ -210,7 +203,7 @@ export function FleetDashboard({
             })}
           </div>
 
-          <Card className="p-4">
+          <Card className={flatMetricCard}>
             <p className="mb-3 font-semibold">Weekly Flow (Current vs Previous)</p>
             <div className="space-y-3">
               {[
@@ -235,7 +228,7 @@ export function FleetDashboard({
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className={flatMetricCard}>
             <p className="mb-3 font-semibold">Expected Demand by Category (Next 7 Days)</p>
             <div className="space-y-3">
               {demandByCategory.length === 0 ? (
@@ -262,7 +255,7 @@ export function FleetDashboard({
             {operationalMetrics.map((item) => {
               const itemTrend = trend(item.value, item.prev);
               return (
-                <Card key={item.title} className={`relative overflow-hidden border shadow-sm bg-gradient-to-br ${item.gradient} p-4`}>
+                <Card key={item.title} className={flatMetricCard}>
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className={`rounded-md p-2 ${item.iconWrap}`}>
                       <item.icon className="h-4 w-4" />

@@ -263,7 +263,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     ty -= h;
   };
 
-  drawRow(`Base rental (${rentalDays} day${rentalDays > 1 ? "s" : ""})`, currency(data.baseRentalAmount));
+  drawRow(`Base rental (${rentalDays} day${rentalDays > 1 ? "s" : ""}, tax included)`, currency(data.baseRentalAmount));
   if (data.discountAmount > 0) {
     drawRow(
       `Discount${data.discountCode ? ` (${data.discountCode})` : ""}`,
@@ -278,7 +278,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
   }
   if ((data.taxAmount || 0) > 0) {
     const percentage = data.taxPercentage ?? 0;
-    drawRow(`Tax (${formatPercentage(percentage)}%)`, currency(data.taxAmount || 0));
+    drawRow(`Tax on extras (${formatPercentage(percentage)}%)`, currency(data.taxAmount || 0));
   }
   drawRow("Total Amount", currency(data.totalAmount), true);
 

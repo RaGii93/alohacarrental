@@ -4,6 +4,19 @@ import { isLicenseActive } from "@/lib/license";
 
 export const DEFAULT_ADMIN_PAGE_SIZE = 20;
 export const ADMIN_PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
+export const ADMIN_PAGE_SHELL = "w-full px-4 py-8 sm:px-6 lg:px-8";
+export const ADMIN_PAGE_STACK = "space-y-6";
+export const ADMIN_PAGE_KICKER = "text-sm font-medium text-[hsl(var(--foreground)/0.78)]";
+export const ADMIN_PAGE_META_ROW = "flex flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between";
+export const ADMIN_PAGE_META_TEXT = "font-medium text-[hsl(var(--foreground)/0.72)]";
+export const ADMIN_PAGE_ROWS_WRAP = "flex items-center gap-2";
+export const ADMIN_PAGE_ROWS_BUTTON = "inline-flex h-9 items-center rounded-xl border px-3 text-xs transition-colors";
+export const ADMIN_PAGE_ROWS_BUTTON_ACTIVE = "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.08)] font-semibold text-[hsl(var(--primary))]";
+export const ADMIN_PAGE_ROWS_BUTTON_IDLE = "border-[hsl(var(--border))] bg-white text-[hsl(var(--foreground)/0.75)] hover:bg-[hsl(var(--secondary))]";
+export const ADMIN_PAGE_PAGER = "flex items-center justify-end gap-2";
+export const ADMIN_PAGE_PAGER_BUTTON = "inline-flex h-9 items-center rounded-xl border border-[hsl(var(--border))] bg-white px-3 text-xs text-[hsl(var(--foreground)/0.78)] hover:bg-[hsl(var(--secondary))]";
+export const ADMIN_PAGE_PAGER_DISABLED = "inline-flex h-9 items-center rounded-xl border border-[hsl(var(--border))] bg-white px-3 text-xs opacity-50";
+export const ADMIN_PAGE_PAGER_CURRENT = "inline-flex h-9 items-center rounded-xl border border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.08)] px-3 text-xs font-semibold text-[hsl(var(--primary))]";
 
 export function toPositiveInt(value: string | undefined, fallback = 1) {
   const parsed = Number.parseInt(String(value || ""), 10);
@@ -25,7 +38,7 @@ export async function requireLicensedAdmin(locale: string) {
   return { admin, licenseActive };
 }
 
-const STAFF_ALLOWED_SECTIONS = new Set(["bookings", "deliveries", "returns", "fleet"]);
+const STAFF_ALLOWED_SECTIONS = new Set(["bookings", "deliveries", "returns", "fleet", "help"]);
 
 export function canAccessAdminSection(role: string, section: string) {
   if (role === "ROOT" || role === "OWNER") return true;

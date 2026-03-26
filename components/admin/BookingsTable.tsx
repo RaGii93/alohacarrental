@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { Eye, Truck, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime, formatDateTimeRange } from "@/lib/datetime";
-import { markBookingDeliveredAction, markBookingReturnedAction } from "@/actions/booking";
 
 interface Booking {
   id: string;
@@ -113,31 +112,9 @@ export function BookingsTable({
     }
   };
 
-  const markDelivered = async (bookingId: string) => {
-    if (!window.confirm("Mark this booking as delivered now?")) return;
-    const result = await markBookingDeliveredAction(bookingId, locale);
-    if (!result.success) {
-      toast.error(result.error || "Failed to mark as delivered");
-      return;
-    }
-    toast.success("Booking marked as delivered.");
-    router.refresh();
-  };
-
-  const markReturned = async (bookingId: string) => {
-    if (!window.confirm("Mark this booking as returned now?")) return;
-    const result = await markBookingReturnedAction(bookingId, locale);
-    if (!result.success) {
-      toast.error(result.error || "Failed to mark as returned");
-      return;
-    }
-    toast.success("Booking marked as returned.");
-    router.refresh();
-  };
-
   return (
-    <div className="mt-6 overflow-x-auto">
-      <Table>
+    <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
+      <Table className="bg-transparent">
         <TableHeader>
           <TableRow>
             <TableHead>
@@ -187,37 +164,32 @@ export function BookingsTable({
                 <div className="flex flex-wrap items-center gap-2">
                   <Link href={`/${locale}/admin/bookings/${booking.id}`}>
                     <Button size="sm" variant="outline">
+                      <Eye className="h-4 w-4" />
                       {t("admin.bookings.actions.view")}
                     </Button>
                   </Link>
                   {actionMode === "deliveries" && (
                     booking.deliveredAt ? (
-                      <span className="text-xs text-muted-foreground">Delivered</span>
+                      <span className="text-xs text-muted-foreground">{t("admin.bookings.actions.delivered")}</span>
                     ) : booking.paymentReceivedAt ? (
-                      <Button
-                        size="sm"
-                        className="bg-indigo-600 hover:bg-indigo-700"
-                        onClick={() => markDelivered(booking.id)}
-                      >
-                        Mark Delivered
+                      <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700" onClick={() => router.push(`/${locale}/admin/bookings/${booking.id}`)}>
+                        <Truck className="h-4 w-4" />
+                        {t("admin.bookings.detail.inspection.title.pickup")}
                       </Button>
                     ) : (
-                      <span className="text-xs text-amber-700">Awaiting payment</span>
+                      <span className="text-xs text-amber-700">{t("admin.bookings.actions.awaitingPayment")}</span>
                     )
                   )}
                   {actionMode === "returns" && (
                     booking.returnedAt ? (
-                      <span className="text-xs text-muted-foreground">Returned</span>
+                      <span className="text-xs text-muted-foreground">{t("admin.bookings.actions.returned")}</span>
                     ) : booking.deliveredAt ? (
-                      <Button
-                        size="sm"
-                        className="bg-slate-700 hover:bg-slate-800"
-                        onClick={() => markReturned(booking.id)}
-                      >
-                        Mark Returned
+                      <Button size="sm" className="bg-slate-700 hover:bg-slate-800" onClick={() => router.push(`/${locale}/admin/bookings/${booking.id}`)}>
+                        <Undo2 className="h-4 w-4" />
+                        {t("admin.bookings.detail.inspection.title.return")}
                       </Button>
                     ) : (
-                      <span className="text-xs text-muted-foreground">Not delivered</span>
+                      <span className="text-xs text-muted-foreground">{t("admin.bookings.actions.notDelivered")}</span>
                     )
                   )}
                 </div>
@@ -228,7 +200,7 @@ export function BookingsTable({
       </Table>
 
       {bookings.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="border-t border-[hsl(214_32%_92%)] bg-white px-6 py-12 text-center text-sm font-medium text-[hsl(var(--muted-foreground))]">
           {t("admin.bookings.empty")}
         </div>
       )}

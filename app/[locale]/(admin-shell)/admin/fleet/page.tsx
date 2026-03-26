@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { FleetDashboard } from "@/components/admin/FleetDashboard";
-import { requireAdminSection } from "@/app/[locale]/admin/_lib";
+import { ADMIN_PAGE_KICKER, ADMIN_PAGE_SHELL, ADMIN_PAGE_STACK, requireAdminSection } from "@/app/[locale]/admin/_lib";
 
 export default async function AdminFleetPage({
   params,
@@ -72,8 +72,9 @@ export default async function AdminFleetPage({
   const utilizationPrevPct = activeVehiclesPrev > 0 ? Math.round((onRentNowPrev / activeVehiclesPrev) * 100) : 0;
 
   return (
-    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
-      <h2 className="text-xl font-semibold">{t("admin.dashboard.fleet.title")}</h2>
+    <div className={ADMIN_PAGE_SHELL}>
+      <div className={ADMIN_PAGE_STACK}>
+      <p className={ADMIN_PAGE_KICKER}>{t("admin.dashboard.fleet.title")}</p>
       <FleetDashboard
         activeVehicles={activeVehicles}
         activeVehiclesPrev={activeVehiclesPrev}
@@ -96,6 +97,7 @@ export default async function AdminFleetPage({
         topDemandPrevCount={topDemandPrevCount}
         demandByCategory={demandByCategory}
       />
+      </div>
     </div>
   );
 }

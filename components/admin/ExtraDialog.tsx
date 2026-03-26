@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { createExtraAction, updateExtraAction } from "@/actions/extras";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +19,7 @@ export function ExtraDialog({
   locale: string;
   onClose: () => void;
 }) {
+  const t = useTranslations();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(!!extra);
   const [name, setName] = useState(extra?.name || "");
@@ -46,10 +48,10 @@ export function ExtraDialog({
       : await createExtraAction(payload, locale);
     setBusy(false);
     if (!result.success) {
-      toast.error(result.error || "Failed to save extra");
+      toast.error(result.error || t("admin.extras.messages.saveFailed"));
       return;
     }
-    toast.success(extra?.id ? "Extra updated" : "Extra created");
+    toast.success(extra?.id ? t("admin.extras.messages.updated") : t("admin.extras.messages.created"));
     onClose();
     router.refresh();
   };
@@ -60,24 +62,24 @@ export function ExtraDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PackagePlus className="h-5 w-5" />
-            {extra?.id ? "Edit Extra" : "Add Extra"}
+            {extra?.id ? t("admin.extras.edit") : t("admin.extras.add")}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
-          <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" />
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("admin.extras.name")} />
+          <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("admin.extras.description")} />
           <select value={pricingType} onChange={(e) => setPricingType(e.target.value as any)} className="h-10 w-full rounded-md border px-3 text-sm">
-            <option value="FLAT">Flat rate</option>
-            <option value="DAILY">Daily rate</option>
+            <option value="FLAT">{t("admin.extras.flatRate")}</option>
+            <option value="DAILY">{t("admin.extras.dailyRate")}</option>
           </select>
-          <Input type="number" step="0.01" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value || "0"))} placeholder="Amount" />
+          <Input type="number" step="0.01" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value || "0"))} placeholder={t("admin.extras.amount")} />
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-            Active
+            {t("admin.extras.active")}
           </label>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}><X className="h-4 w-4" />Cancel</Button>
-            <Button onClick={handleSave} disabled={busy}><Save className="h-4 w-4" />{busy ? "Saving..." : "Save"}</Button>
+            <Button variant="outline" onClick={onClose}><X className="h-4 w-4" />{t("common.cancel")}</Button>
+            <Button onClick={handleSave} disabled={busy}><Save className="h-4 w-4" />{busy ? t("admin.settings.saving") : t("common.save")}</Button>
           </div>
         </div>
       </DialogContent>

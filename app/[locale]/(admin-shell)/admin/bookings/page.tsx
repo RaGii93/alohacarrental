@@ -27,7 +27,7 @@ export default async function AdminBookingsPage({
   const t = await getTranslations();
   const tOr = (key: string, values: Record<string, any>, fallback: string) =>
     t.has(key as any) ? t(key as any, values as any) : fallback;
-  await requireAdminSection(locale, "bookings");
+  const auth = await requireAdminSection(locale, "bookings");
   const activeStatus =
     bookings_status === "confirmed" || bookings_status === "declined" ? bookings_status : "pending";
   const pageSize = toPageSize(page_size);
@@ -81,46 +81,67 @@ export default async function AdminBookingsPage({
   const nextLabel = t("common.next");
 
   return (
-    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
-      <p className="mb-4 text-sm text-muted-foreground">
-        {statusLabel}: {statusTotal}
-      </p>
-
-      <div className="mb-3 flex flex-col gap-2 text-sm md:flex-row md:items-center md:justify-between">
-        <div className="text-muted-foreground">Showing {startRow}-{endRow} of {total}</div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Rows:</span>
-          {ADMIN_PAGE_SIZE_OPTIONS.map((size) => (
-            <Link key={size} className={`inline-flex h-8 items-center rounded-md border px-2 text-xs ${pageSize === size ? "bg-accent font-medium" : "hover:bg-accent"}`} href={buildHref({ page_size: size, [pageParam]: 1 })}>
-              {size}
+    <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-medium text-[hsl(var(--foreground)/0.78)]">
+            {statusLabel}: {statusTotal}
+          </p>
+          {(auth.admin.role === "ROOT" || auth.admin.role === "OWNER") && (
+            <Link
+              href={`/${locale}/admin/bookings/new`}
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-[hsl(var(--primary))] px-4 text-sm font-semibold text-white transition-colors hover:bg-[hsl(var(--primary)/0.92)]"
+            >
+              {tOr("admin.bookings.create", {}, "New booking")}
             </Link>
-          ))}
+          )}
         </div>
-      </div>
 
-      <BookingsTable
-        bookings={rows as any}
-        locale={locale}
-        status={activeStatus === "pending" ? "PENDING" : activeStatus === "confirmed" ? "CONFIRMED" : "DECLINED"}
-      />
-      <div className="mt-4 flex items-center justify-end gap-2">
-        {safePage > 1 ? (
-          <Link className="inline-flex h-8 items-center rounded-md border px-3 text-xs hover:bg-accent" href={buildHref({ [pageParam]: safePage - 1 })}>
-            {prevLabel}
-          </Link>
-        ) : (
-          <span className="inline-flex h-8 items-center rounded-md border px-3 text-xs opacity-50">{prevLabel}</span>
-        )}
-        <span className="inline-flex h-8 items-center rounded-md border px-2 text-xs">
-          {safePage}/{totalPages}
-        </span>
-        {safePage < totalPages ? (
-          <Link className="inline-flex h-8 items-center rounded-md border px-3 text-xs hover:bg-accent" href={buildHref({ [pageParam]: safePage + 1 })}>
-            {nextLabel}
-          </Link>
-        ) : (
-          <span className="inline-flex h-8 items-center rounded-md border px-3 text-xs opacity-50">{nextLabel}</span>
-        )}
+        <div className="flex flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between">
+          <div className="font-medium text-[hsl(var(--foreground)/0.72)]">Showing {startRow}-{endRow} of {total}</div>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-[hsl(var(--foreground)/0.72)]">Rows:</span>
+            {ADMIN_PAGE_SIZE_OPTIONS.map((size) => (
+              <Link
+                key={size}
+                className={`inline-flex h-9 items-center rounded-xl border px-3 text-xs transition-colors ${
+                  pageSize === size
+                    ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.08)] font-semibold text-[hsl(var(--primary))]"
+                    : "border-[hsl(var(--border))] bg-white text-[hsl(var(--foreground)/0.75)] hover:bg-[hsl(var(--secondary))]"
+                }`}
+                href={buildHref({ page_size: size, [pageParam]: 1 })}
+              >
+                {size}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <BookingsTable
+          bookings={rows as any}
+          locale={locale}
+          status={activeStatus === "pending" ? "PENDING" : activeStatus === "confirmed" ? "CONFIRMED" : "DECLINED"}
+        />
+
+        <div className="flex items-center justify-end gap-2">
+          {safePage > 1 ? (
+            <Link className="inline-flex h-9 items-center rounded-xl border border-[hsl(var(--border))] bg-white px-3 text-xs text-[hsl(var(--foreground)/0.78)] hover:bg-[hsl(var(--secondary))]" href={buildHref({ [pageParam]: safePage - 1 })}>
+              {prevLabel}
+            </Link>
+          ) : (
+            <span className="inline-flex h-9 items-center rounded-xl border border-[hsl(var(--border))] bg-white px-3 text-xs opacity-50">{prevLabel}</span>
+          )}
+          <span className="inline-flex h-9 items-center rounded-xl border border-[hsl(var(--primary))] bg-[hsl(var(--primary)/0.08)] px-3 text-xs font-semibold text-[hsl(var(--primary))]">
+            {safePage}/{totalPages}
+          </span>
+          {safePage < totalPages ? (
+            <Link className="inline-flex h-9 items-center rounded-xl border border-[hsl(var(--border))] bg-white px-3 text-xs text-[hsl(var(--foreground)/0.78)] hover:bg-[hsl(var(--secondary))]" href={buildHref({ [pageParam]: safePage + 1 })}>
+              {nextLabel}
+            </Link>
+          ) : (
+            <span className="inline-flex h-9 items-center rounded-xl border border-[hsl(var(--border))] bg-white px-3 text-xs opacity-50">{nextLabel}</span>
+          )}
+        </div>
       </div>
     </div>
   );

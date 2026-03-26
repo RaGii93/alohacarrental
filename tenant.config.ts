@@ -8,7 +8,6 @@ import { TenantConfig } from "@/lib/tenant";
 export const tenantConfig: TenantConfig = {
   tenantName: process.env.TENANT_NAME || "Aloha Car Rental",
   logoUrl: process.env.TENANT_LOGO_URL || "/logo.svg",
-  primaryColor: process.env.TENANT_PRIMARY_COLOR || "#2563eb",
   phone: process.env.TENANT_PHONE || "+1 (555) 123-4567",
   whatsapp: process.env.TENANT_WHATSAPP || "+1 (555) 123-4567",
   whatsappUrl: process.env.TENANT_WHATSAPP_URL || undefined,
@@ -23,4 +22,15 @@ export const tenantConfig: TenantConfig = {
     process.env.TENANT_PAYMENT_INSTRUCTIONS ||
     "Please pay via bank transfer using your booking reference as the transaction reference.",
   termsPdfUrl: process.env.TENANT_TERMS_PDF_URL || "/terms.pdf",
+  theme: {
+    primary: process.env.TENANT_THEME_PRIMARY || "211 100% 35%",
+    primaryForeground: process.env.TENANT_THEME_PRIMARY_FOREGROUND || "0 0% 98%",
+    accent: process.env.TENANT_THEME_ACCENT || "212 100% 97%",
+    accentForeground: process.env.TENANT_THEME_ACCENT_FOREGROUND || "211 100% 22%",
+    ring: process.env.TENANT_THEME_RING || "211 100% 35%",
+    sidebarPrimary: process.env.TENANT_THEME_SIDEBAR_PRIMARY || "211 100% 35%",
+    sidebarPrimaryForeground: process.env.TENANT_THEME_SIDEBAR_PRIMARY_FOREGROUND || "0 0% 98%",
+    sidebarAccent: process.env.TENANT_THEME_SIDEBAR_ACCENT || "212 100% 97%",
+    sidebarAccentForeground: process.env.TENANT_THEME_SIDEBAR_ACCENT_FOREGROUND || "211 100% 22%",
+  },
 };

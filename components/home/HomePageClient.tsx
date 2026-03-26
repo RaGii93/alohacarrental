@@ -28,7 +28,23 @@ export function HomePageClient({ locations, categories }: HomePageClientProps) {
   const locale = useLocale();
   const [reviews, setReviews] = useState<PublicReview[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
-  const faqEntries = useMemo(() => getFaqEntries(locale).slice(0, 5), [locale]);
+  const faqEntries = useMemo(
+    () =>
+      getFaqEntries(locale)
+        .slice(0, 5)
+        .map((entry) => ({
+          id: entry.id,
+          question: entry.question,
+          answer: entry.blocks
+            .map((block) =>
+              block.type === "paragraph"
+                ? block.runs.map((run) => run.text).join("")
+                : block.items.map((item) => item.map((run) => run.text).join("")).join(" ")
+            )
+            .join(" "),
+        })),
+    [locale]
+  );
 
   useEffect(() => {
     let active = true;

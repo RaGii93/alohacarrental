@@ -9,6 +9,7 @@ import { requireAdmin } from "@/lib/auth-guards";
 import { isLicenseActive } from "@/lib/license";
 import { logoutAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
+import { getInvoiceProvider } from "@/lib/settings";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export async function generateMetadata({
@@ -17,12 +18,13 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const tenant = getTenantConfig();
+  const tenant = await getTenantConfig();
   return buildMetadata({
     locale,
     path: "/admin",
     title: `Admin | ${tenant.tenantName}`,
     noIndex: true,
+    tenant,
   });
 }
 
@@ -36,50 +38,77 @@ export default async function AdminLayout({
   const { locale } = await params;
   const t = await getTranslations();
   const admin = await requireAdmin(locale);
+  const invoiceProvider = await getInvoiceProvider();
   const licenseActive = isLicenseActive();
   if (!licenseActive && admin.role !== "ROOT") {
     redirect(`/${locale}/admin/billing-required`);
   }
   return (
-    <SidebarProvider>
-      <AppSidebar userEmail={admin.email} role={admin.role} licenseActive={licenseActive} />
-      <SidebarInset className="md:pl-[calc(var(--sidebar-width)+0.5rem)] md:peer-data-[state=collapsed]:pl-[4.5rem]">
-        <header className="sticky top-0 z-10 flex min-h-12 flex-wrap items-center justify-between gap-2 border-b bg-white px-4 py-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <SidebarTrigger />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">
-                {t("admin.dashboard.header.welcome", { user: admin.email })}
-              </p>
-              <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
-                  {t("admin.dashboard.header.role", { role: admin.role })}
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                    licenseActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {licenseActive
-                    ? t("admin.dashboard.header.licenseActive")
-                    : t("admin.dashboard.header.licenseSuspended")}
-                </span>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "18rem",
+          "--header-height": "3.75rem",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar
+        userEmail={admin.email}
+        role={admin.role}
+        licenseActive={licenseActive}
+        invoiceProvider={invoiceProvider}
+        variant="inset"
+      />
+      <SidebarInset className="min-w-0 bg-[hsl(220_33%_98%)]">
+        <header className="shrink-0 border-b border-[hsl(214_32%_92%)] px-4 py-4 lg:px-6">
+          <div className="flex w-full flex-col gap-4 rounded-2xl bg-white px-4 py-4 shadow-[0_16px_34px_-24px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.04)] md:flex-row md:items-start md:justify-between">
+            <div className="flex min-w-0 flex-1 flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="h-10 w-10 rounded-xl border border-[hsl(214_32%_88%)] bg-[hsl(220_33%_98%)] text-[hsl(var(--foreground))] shadow-sm hover:bg-[hsl(214_60%_97%)]" />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[hsl(var(--foreground))]">
+                    {t("nav.admin")}
+                  </p>
+                  <p className="text-xs text-[hsl(var(--muted-foreground))] md:hidden">
+                    Navigation
+                  </p>
+                </div>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-[hsl(var(--foreground))] md:text-[15px]">
+                  {t("admin.dashboard.header.welcome", { user: admin.email })}
+                </p>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <span className="rounded-full bg-[hsl(var(--secondary))] px-2 py-0.5 text-[11px] font-medium text-[hsl(var(--secondary-foreground))]">
+                    {t("admin.dashboard.header.role", { role: admin.role })}
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                      licenseActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {licenseActive
+                      ? t("admin.dashboard.header.licenseActive")
+                      : t("admin.dashboard.header.licenseSuspended")}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher
-              triggerClassName="h-9 w-[150px] rounded-full border-[#e7d39a] bg-white text-[#071a36] shadow-none [&_svg]:text-[#b98900]"
-              contentClassName="rounded-2xl border-[#ecdcae] bg-white"
-            />
-            <form action={logoutAction.bind(null, locale)}>
-              <Button type="submit" variant="outline" size="sm">
-                {t("nav.logout")}
-              </Button>
+            <form action={logoutAction.bind(null, locale)} className="w-full shrink-0 md:w-auto">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:justify-end">
+                <LanguageSwitcher />
+                <Button type="submit" variant="outline" size="sm" className="h-11 w-full rounded-xl sm:w-auto">
+                  {t("nav.logout")}
+                </Button>
+              </div>
             </form>
           </div>
         </header>
-        <main className="flex-1">{children}</main>
+        <div className="@container/main flex flex-1 flex-col">
+          <main className="min-w-0 flex flex-1 flex-col">
+            {children}
+          </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

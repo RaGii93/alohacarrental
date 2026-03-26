@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { MapPinPlus, Pencil, Save, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,6 @@ export function LocationDialog({
   const isEdit = !!location?.id;
   const [isOpen, setIsOpen] = useState(!!location);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const tOr = (key: string, fallback: string) => (t.has(key as any) ? t(key as any) : fallback);
 
   const form = useForm({
     resolver: zodResolver(locationSchema),
@@ -71,14 +71,14 @@ export function LocationDialog({
         : await createLocationAction(values, locale);
 
       if (!result.success) {
-        toast.error(result.error || tOr("common.error", "Error"));
+        toast.error(result.error || t("common.error"));
         return;
       }
 
       toast.success(
         location?.id
-          ? tOr("admin.locations.updated", "Location updated")
-          : tOr("admin.locations.created", "Location created")
+          ? t("admin.locations.updated")
+          : t("admin.locations.created")
       );
       setIsOpen(false);
       onClose();
@@ -99,9 +99,10 @@ export function LocationDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
+            {isEdit ? <Pencil className="mr-2 inline h-5 w-5" /> : <MapPinPlus className="mr-2 inline h-5 w-5" />}
             {isEdit
-              ? tOr("admin.locations.edit", "Edit Location")
-              : tOr("admin.locations.add", "Add Location")}
+              ? t("admin.locations.edit")
+              : t("admin.locations.add")}
           </DialogTitle>
         </DialogHeader>
 
@@ -112,7 +113,7 @@ export function LocationDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{tOr("admin.locations.name", "Name")}</FormLabel>
+                  <FormLabel>{t("admin.locations.name")}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -126,7 +127,7 @@ export function LocationDialog({
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{tOr("admin.locations.code", "Code")}</FormLabel>
+                  <FormLabel>{t("admin.locations.code")}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -140,7 +141,7 @@ export function LocationDialog({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{tOr("admin.locations.address", "Address")}</FormLabel>
+                  <FormLabel>{t("admin.locations.address")}</FormLabel>
                   <FormControl>
                     <Textarea rows={3} {...field} />
                   </FormControl>
@@ -151,10 +152,12 @@ export function LocationDialog({
 
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={onClose}>
-                {tOr("common.cancel", "Cancel")}
+                <X className="h-4 w-4" />
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? tOr("common.loading", "Loading...") : tOr("common.save", "Save")}
+                <Save className="h-4 w-4" />
+                {isSubmitting ? t("common.loading") : t("common.save")}
               </Button>
             </div>
           </form>

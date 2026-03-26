@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { Pencil, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,6 +18,7 @@ import {
 import { deleteAdminUserAction } from "@/actions/users";
 import { formatDateTime } from "@/lib/datetime";
 import { UserDialog } from "@/components/admin/UserDialog";
+import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
 
 type AdminUserRow = {
   id: string;
@@ -36,9 +38,9 @@ export function UsersTable({
   const router = useRouter();
   const [selected, setSelected] = useState<AdminUserRow | Record<string, never> | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; role: string } | null>(null);
   const [sortKey, setSortKey] = useState<"email" | "role" | "createdAt">("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const tOr = (key: string, fallback: string) => (t.has(key as any) ? t(key as any) : fallback);
 
   const toggleSort = (key: typeof sortKey) => {
     if (sortKey === key) {
@@ -75,53 +77,68 @@ export function UsersTable({
 
   const handleDelete = async (id: string, role: string) => {
     if (role === "ROOT") {
-      toast.error(tOr("admin.users.rootProtected", "ROOT user cannot be modified or deleted"));
+      toast.error(t("admin.users.rootProtected"));
       return;
     }
-    if (!window.confirm(tOr("admin.users.deleteConfirm", "Delete this user?"))) return;
     setBusyId(id);
     const result = await deleteAdminUserAction(id, locale);
     setBusyId(null);
+    setPendingDelete(null);
     if (!result.success) {
       if (result.error === "ROOT_PROTECTED") {
-        toast.error(tOr("admin.users.rootProtected", "ROOT user cannot be modified or deleted"));
+        toast.error(t("admin.users.rootProtected"));
       } else {
-        toast.error(result.error || tOr("admin.users.errors.delete", "Failed to delete user"));
+        toast.error(result.error || t("admin.users.errors.delete"));
       }
       return;
     }
-    toast.success(tOr("admin.users.deleted", "User deleted"));
+    toast.success(t("admin.users.deleted"));
     router.refresh();
   };
 
   return (
     <div className="space-y-4">
-      <Button onClick={() => setSelected({})}>+ {tOr("admin.users.add", "Add User")}</Button>
+      <ConfirmActionDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open && !busyId) setPendingDelete(null);
+        }}
+        title={t("admin.users.deleteTitle")}
+        description={t("admin.users.deleteConfirm")}
+        confirmLabel={t("common.delete")}
+        destructive
+        loading={Boolean(busyId)}
+        onConfirm={() => pendingDelete ? handleDelete(pendingDelete.id, pendingDelete.role) : undefined}
+      />
+      <Button onClick={() => setSelected({})}>
+        <UserPlus className="h-4 w-4" />
+        {t("admin.users.add")}
+      </Button>
       <UserDialog user={(selected as any) || null} locale={locale} onClose={() => setSelected(null)} />
 
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
+        <Table className="bg-transparent">
           <TableHeader>
             <TableRow>
               <TableHead>
                 <button type="button" onClick={() => toggleSort("email")}>
-                  {tOr("admin.users.email", "Email")}
+                  {t("admin.users.email")}
                   {sortIndicator("email")}
                 </button>
               </TableHead>
               <TableHead>
                 <button type="button" onClick={() => toggleSort("role")}>
-                  {tOr("admin.users.role", "Role")}
+                  {t("admin.users.role")}
                   {sortIndicator("role")}
                 </button>
               </TableHead>
               <TableHead>
                 <button type="button" onClick={() => toggleSort("createdAt")}>
-                  {tOr("admin.users.createdAt", "Created")}
+                  {t("admin.users.createdAt")}
                   {sortIndicator("createdAt")}
                 </button>
               </TableHead>
-              <TableHead>{tOr("admin.users.actions", "Actions")}</TableHead>
+              <TableHead>{t("admin.users.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -150,19 +167,21 @@ export function UsersTable({
                         setSelected(user);
                       }}
                     >
-                      {tOr("common.edit", "Edit")}
+                      <Pencil className="h-4 w-4" />
+                      {t("common.edit")}
                     </Button>
                     <Button
                       size="sm"
                       variant="destructive"
                       disabled={isRoot || busyId === user.id}
-                      onClick={() => handleDelete(user.id, user.role)}
+                      onClick={() => setPendingDelete({ id: user.id, role: user.role })}
                     >
-                      {tOr("common.delete", "Delete")}
+                      <Trash2 className="h-4 w-4" />
+                      {t("common.delete")}
                     </Button>
                     {isRoot && (
                       <Badge className="bg-slate-100 text-slate-700">
-                        {tOr("admin.users.protected", "Protected")}
+                        {t("admin.users.protected")}
                       </Badge>
                     )}
                   </TableCell>
@@ -174,8 +193,8 @@ export function UsersTable({
       </div>
 
       {sorted.length === 0 && (
-        <div className="py-8 text-center text-sm text-muted-foreground">
-          {tOr("admin.users.empty", "No users found")}
+        <div className="rounded-[1.3rem] border border-dashed border-[hsl(var(--border))] bg-white/85 py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
+          {t("admin.users.empty")}
         </div>
       )}
     </div>

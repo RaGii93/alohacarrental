@@ -23,6 +23,15 @@ const normalizeWhatsAppUrl = (url: string | undefined, fallbackPhone?: string) =
   return digits ? `https://wa.me/${digits}` : "";
 };
 
+const faqEntryToPlainText = (blocks: ReturnType<typeof getFaqEntries>[number]["blocks"]) =>
+  blocks
+    .map((block) =>
+      block.type === "paragraph"
+        ? block.runs.map((run) => run.text).join("")
+        : block.items.map((item) => item.map((run) => run.text).join("")).join(" ")
+    )
+    .join(" ");
+
 export function SocialFABs({
   whatsapp,
   whatsappUrl,
@@ -105,7 +114,7 @@ export function SocialFABs({
     const lower = question.toLowerCase();
     const found = faqEntries.find((entry) => entry.keywords.some((kw) => lower.includes(kw)));
     const reply = found
-      ? `${found.answer} ${assistantCopy.readMore}`
+      ? `${faqEntryToPlainText(found.blocks)} ${assistantCopy.readMore}`
       : assistantCopy.notFound;
 
     setChat((prev) => [...prev, { role: "user", text: question }, { role: "bot", text: reply }]);

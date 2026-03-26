@@ -5,11 +5,12 @@
     "admin": "Panel de Administración",
     "logout": "Cerrar Sesión",
     "login": "Iniciar Sesión",
+    "security": "Seguridad",
     "faq": "Preguntas frecuentes",
     "fleetOverview": "Resumen de flota"
   },
   "common": {
-    "name": "Aloha Car Rental",
+    "name": "EdgeRent Lite",
     "phone": "Teléfono",
     "email": "Correo Electrónico",
     "currency": "$",
@@ -23,6 +24,10 @@
     "confirm": "Confirmar",
     "decline": "Rechazar",
     "back": "Atrás",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "yes": "Sí",
+    "no": "No",
     "next": "Siguiente",
     "previous": "Anterior",
     "search": "Buscar",
@@ -38,8 +43,191 @@
     "declined": "Rechazado",
     "cancelled": "Cancelado"
   },
+  "homePage": {
+    "heroEyebrow": "Alquiler listo para la isla",
+    "heroTitleLead": "Explora Curazao",
+    "heroTitleTail": "con",
+    "heroDescription": "Estilo premium, precios claros y servicio confiable para días de playa, recogidas en el aeropuerto y escapadas por la isla.",
+    "heroPrimary": "Reserva Tu Auto",
+    "heroSecondary": "Ver Flota",
+    "heroCardTitle": "Servicio listo para el aeropuerto",
+    "heroCardBody": "Confirmaciones rápidas, recogida fluida y apoyo cuando cambian tus planes.",
+    "fleetEyebrow": "Nuestra flota",
+    "fleetTitle": "Elige el vehículo perfecto para tu viaje",
+    "fleetDescription": "Explora nuestras categorías más solicitadas y reserva el vehículo que combina con tu estilo, grupo y presupuesto.",
+    "fleetButton": "Ver Todos Los Vehículos",
+    "servicesEyebrow": "Por qué nos eligen",
+    "servicesTitle": "Comodidad premium con energía caribeña",
+    "promoEyebrow": "Por qué elegirnos",
+    "promoTitle": "Descubre la belleza de Curazao con estilo",
+    "promoDescription": "Desde mañanas en el malecón de Willemstad hasta atardeceres en la costa oeste, tu alquiler debe sentirse elegante, simple y listo para todo el itinerario.",
+    "promoButton": "Más Información",
+    "stepsEyebrow": "Cómo funciona",
+    "stepsTitle": "Reserva tu conducción en tres pasos",
+    "dayLabel": "día",
+    "phoneLabel": "Teléfono",
+    "emailLabel": "Correo",
+    "locationLabel": "Ubicación",
+    "manualLabel": "Manual",
+    "automaticLabel": "Automático",
+    "acLabel": "A/C",
+    "noAcLabel": "Sin A/C",
+    "reviewsCountLabel": "reseñas aprobadas y sumando.",
+    "contactLead": "Listo para un recorrido elegante por la isla, una llegada fluida al aeropuerto o una reserva de último minuto.",
+    "contactTitle": "Contáctanos",
+    "reviewsSpotlight": "Opiniones de Clientes",
+    "bookingCardLead": "Reserva en línea ahora, revisa la flota y usa el mismo flujo de reserva ya conectado a tu sitio.",
+    "trust": [
+      "Mejores precios garantizados",
+      "Vehículos nuevos y bien mantenidos",
+      "Recogida y entrega gratis en el aeropuerto"
+    ],
+    "perks": [
+      {
+        "title": "Grandes Tarifas",
+        "description": "Precios diarios claros y sin sorpresas incómodas."
+      },
+      {
+        "title": "Reserva Fácil",
+        "description": "Reserva en línea en minutos desde cualquier dispositivo."
+      },
+      {
+        "title": "Máxima Comodidad",
+        "description": "Interiores limpios, aire frío y entrega fluida."
+      },
+      {
+        "title": "Soporte 24/7",
+        "description": "Ayuda rápida antes, durante y después de la recogida."
+      }
+    ],
+    "services": [
+      {
+        "title": "Llegadas fáciles al aeropuerto",
+        "description": "Aterriza, recibe tus llaves y empieza tu viaje sin perder tu primer día en filas."
+      },
+      {
+        "title": "Flota moderna y confiable",
+        "description": "Vehículos bien mantenidos, presentables y elegidos para el clima caribeño."
+      },
+      {
+        "title": "Reserva rápida",
+        "description": "Disponibilidad, precio y confirmación se resuelven en una sola experiencia fluida."
+      },
+      {
+        "title": "Soporte local real",
+        "description": "Preguntas, cambios y asistencia atendidos rápido por personas que conocen la isla."
+      }
+    ],
+    "steps": [
+      {
+        "step": "01",
+        "title": "Elige tu vehículo",
+        "description": "Selecciona la categoría ideal según tu estadía, pasajeros y presupuesto."
+      },
+      {
+        "step": "02",
+        "title": "Confirma tus datos",
+        "description": "Selecciona fechas, ubicaciones y datos del conductor dentro del flujo de reserva."
+      },
+      {
+        "step": "03",
+        "title": "Recoge y explora",
+        "description": "Llega, recoge tu auto y disfruta Curazao con tranquilidad."
+      }
+    ]
+  },
+  "faqPage": {
+    "heroTitle": "Respuestas dentro de la misma experiencia cuidada que el resto del sitio",
+    "heroDescription": "Encuentra respuestas rápidas sobre reservas, recogida, documentos, pagos, seguro y soporte sin navegar por bloques de texto anticuados.",
+    "popularTopic": "Tema popular",
+    "helpCenterEyebrow": "Centro de ayuda",
+    "helpCenterTitle": "Preguntas frecuentes",
+    "helpCenterDescription": "Cada respuesta aquí sigue las mismas reglas de reserva y el mismo proceso de soporte que el resto del proyecto.",
+    "supportTitle": "¿Aún necesitas ayuda?",
+    "supportDescription": "Comunícate directamente con {tenantName} para preguntas sobre reservas, cambios de horario, coordinación de recogida o soporte urgente.",
+    "openingHoursLabel": "Horario",
+    "openingHoursDays": "Lunes a sábado",
+    "openingHoursTime": "08:00 a 18:00"
+  },
+  "securityPage": {
+    "metaTitle": "Seguridad y manejo de datos",
+    "metaDescription": "Conoce cómo EdgeRent Lite gestiona control de acceso, carga de archivos, retención de licencias, registros de auditoría y prácticas operativas por despliegue.",
+    "eyebrow": "Seguridad y manejo de datos",
+    "title": "Cómo EdgeRent Lite maneja la seguridad, la privacidad y los controles operativos",
+    "intro": "Esta página describe los controles que están implementados hoy en el producto y los temas operativos que tratamos con los clientes durante el despliegue. Evitamos afirmaciones amplias y nos centramos en lo que realmente existe.",
+    "pillars": {
+      "access": {
+        "title": "Acceso administrativo controlado",
+        "description": "El acceso administrativo está protegido por sesiones autenticadas y permisos por rol para usuarios ROOT, OWNER y STAFF."
+      },
+      "uploads": {
+        "title": "Cargas validadas",
+        "description": "Las cargas de licencias de conducir están limitadas por tipo de archivo, tamaño y validación básica de firma del archivo antes del almacenamiento."
+      },
+      "retention": {
+        "title": "Controles de retención",
+        "description": "Los archivos de licencias de conducir subidos se programan para eliminarse 30 días después de la fecha de finalización del alquiler."
+      },
+      "audit": {
+        "title": "Registro operativo",
+        "description": "Las acciones administrativas pueden registrarse en auditoría para revisar más tarde cambios en reservas y gestión."
+      }
+    },
+    "controlsEyebrow": "Controles verificados del producto",
+    "controlsTitle": "Controles implementados en el producto actual",
+    "controls": {
+      "identity": {
+        "title": "Gestión de contraseñas",
+        "body": "Las contraseñas de administrador se almacenan como hashes bcrypt. La aplicación no guarda contraseñas en texto plano en la base de datos."
+      },
+      "sessions": {
+        "title": "Sesiones autenticadas",
+        "body": "Las sesiones administrativas se emiten como tokens firmados con expiración de 24 horas. Las cookies de sesión son httpOnly, usan sameSite=lax y se marcan como secure en producción."
+      },
+      "uploads": {
+        "title": "Validación de cargas",
+        "body": "Las cargas de licencias aceptan solo JPG, PNG y PDF, aplican un límite de 8 MB y validan firmas de archivo antes de aceptar el documento."
+      },
+      "storage": {
+        "title": "Almacenamiento privado de archivos",
+        "body": "Los archivos sensibles cargados se guardan en almacenamiento privado y se sirven a través de un proxy de la aplicación en lugar de exponerse como archivos públicos."
+      },
+      "retention": {
+        "title": "Retención de licencias",
+        "body": "A los archivos de licencias se les asigna una fecha de eliminación y un proceso protegido los borra cuando vence la ventana de retención."
+      },
+      "audit": {
+        "title": "Auditoría y evidencia",
+        "body": "La plataforma guarda marcas de tiempo operativas como aceptación de términos, eventos de entrega y devolución, y puede registrar acciones administrativas en auditoría."
+      }
+    },
+    "operationsEyebrow": "Operaciones del despliegue",
+    "operationsTitle": "Temas tratados como parte del despliegue y la operación del servicio",
+    "operations": {
+      "backup": {
+        "title": "Respaldos",
+        "body": "Los horarios y la retención de respaldos dependen del despliegue. Para cada entorno del cliente, las expectativas de respaldo deben acordarse y documentarse a nivel de infraestructura."
+      },
+      "recovery": {
+        "title": "Recuperación y restauración",
+        "body": "Los procedimientos de recuperación, las pruebas de restauración y las expectativas de servicio deben definirse por despliegue para que el cliente conozca la ruta real de recuperación de su entorno."
+      }
+    },
+    "sidebar": {
+      "title": "Conversaciones de seguridad claras para clientes",
+      "description": "Cuando un cliente pregunta por ciberseguridad, recomendamos hablar de controles verificados, reglas de retención, gestión de accesos y la política de respaldo documentada para su entorno.",
+      "points": {
+        "one": "El acceso administrativo por roles ayuda a limitar quién puede ver y gestionar datos operativos.",
+        "two": "Las cargas sensibles son privadas y tienen una regla de retención definida.",
+        "three": "La aceptación de términos y los eventos operativos se registran para trazabilidad.",
+        "four": "Los compromisos de respaldo y recuperación ante desastres deben confirmarse por entorno y por escrito."
+      },
+      "primaryCta": "Ver página de seguridad",
+      "secondaryCta": "Reservar una demo"
+    }
+  },
   "landing": {
-    "title": "Bienvenido a Aloha Car Rental",
+    "title": "Bienvenido a EdgeRent Lite",
     "subtitle": "Reserva tu vehículo fácilmente",
     "tagline": "Conduce Tus Sueños",
     "badge": "🚗 Servicio Premium de Alquiler de Vehículos",
@@ -55,30 +243,8 @@
       "support": "24/7",
       "supportLabel": "Soporte"
     },
-    "hero": {
-      "headline": {
-        "line1": "Descubre Bonaire",
-        "line2Prefix": "con",
-        "line2Highlight": "Aloha",
-        "line3": "Car Rental"
-      },
-      "featureLine": "Confiable · Asequible · Vehículos listos para la isla",
-      "description": "Explora las playas rosadas de Bonaire, sus santuarios de flamencos y sus impresionantes salinas a tu propio ritmo.",
-      "bookButton": "Reserva tu auto",
-      "viewFleetButton": "Ver nuestra flota",
-      "driverAge": "Edad del conductor",
-      "agePlaceholder": "Edad...",
-      "completeFields": "Completa todos los campos de búsqueda de reserva.",
-      "searchComingSoon": "¡La búsqueda estará disponible pronto!"
-    },
-    "fleet": {
-      "title": "Nuestra Flota en la Isla",
-      "seats": "{count} asientos",
-      "reserveNow": "Reservar ahora",
-      "comingSoon": "¡La reserva estará disponible pronto!"
-    },
     "whyChoose": {
-      "title": "¿Por Qué Elegir Aloha Car Rental Bonaire?",
+      "title": "¿Por Qué Elegir EdgeRent?",
       "subtitle": "Experimenta lo mejor en alquiler de vehículos con nuestros servicios premium y soporte al cliente incomparable.",
       "features": {
         "selection": {
@@ -104,11 +270,203 @@
       "subtitle": "Reserva tu vehículo perfecto hoy y experimenta la libertad de la carretera.",
       "button": "Reservar Ahora"
     },
+    "hero": {
+      "pill": "EdgeRent Lite para operadores de alquiler",
+      "featureLine": "Reserva rapida, precios claros y soporte local en el que puedes confiar.",
+      "title": "Deja de perder reservas",
+      "titleAccent": "y toma el control de tu negocio de alquiler.",
+      "description": "Gestiona reservas, vehículos, recogidas, devoluciones y pagos en un sistema profesional. No más WhatsApp, Excel ni errores manuales frenando a tu equipo.",
+      "primaryCta": "Agenda tu demo",
+      "secondaryCta": "Ver cómo funciona",
+      "dashboardAlt": "Vista previa del panel de EdgeRent",
+      "bookingCard": {
+        "title": "Recogida y devolución controladas",
+        "detail": "Reserva, vehículo y estado de entrega en un solo lugar"
+      },
+      "quickbooksStatus": "Sincronizado con QuickBooks",
+      "combinedStatus": "Listo para QuickBooks y Zoho",
+      "pricing": {
+        "setupLabel": "Configuración única",
+        "setupValue": "$500",
+        "subscriptionLabel": "Suscripción mensual",
+        "subscriptionValue": "$100"
+      },
+      "highlights": {
+        "onlineBooking": "Sitio web de reservas en línea",
+        "noDoubleBookings": "Sin reservas duplicadas",
+        "adminDashboard": "Panel administrativo completo",
+        "pickupReturnTracking": "Seguimiento de recogidas y devoluciones",
+        "accountingIntegrations": "Integración con QuickBooks y Zoho"
+      },
+      "integrationReadiness": {
+        "zoho": {
+          "title": "Listo para Zoho Invoice",
+          "description": "Los flujos de facturación están listos para operaciones de cobro profesionales."
+        },
+        "quickbooks": {
+          "title": "Listo para QuickBooks",
+          "description": "Mantén una contabilidad más ordenada con datos estructurados de reservas y pagos."
+        }
+      },
+      "trust": {
+        "noDoubleBookings": "Sin reservas duplicadas",
+        "quickbooksReady": "Integración lista para QuickBooks",
+        "zohoReady": "Integración lista para Zoho Invoice",
+        "multiLanguage": "Creado para equipos de alquiler profesionales"
+      }
+    },
+    "statsStrip": {
+      "eyebrow": "Resumen de la plataforma",
+      "title": "Operaciones profesionales de alquiler de un vistazo",
+      "items": {
+        "bookingAccuracy": {
+          "value": "100%",
+          "label": "Precisión de reservas"
+        },
+        "islandsSupported": {
+          "value": "3",
+          "label": "Islas compatibles"
+        },
+        "onlineBooking": {
+          "value": "24/7",
+          "label": "Reservas en línea"
+        },
+        "languagesBuiltIn": {
+          "value": "3",
+          "label": "Idiomas integrados"
+        }
+      }
+    },
+    "core": {
+      "eyebrow": "Plataforma principal",
+      "title": "Todo lo que necesitas para gestionar tu negocio de alquiler",
+      "description": "EdgeRent mantiene bajo control las reservas, la flota, las entregas, las devoluciones y la facturación en un solo sistema profesional. Desde reservas online hasta integraciones con QuickBooks Online y Zoho Invoice, está hecho para equipos de alquiler serios.",
+      "features": {
+        "onlineBooking": {
+          "title": "Sitio web de reservas online",
+          "description": "Ofrece a tus clientes un flujo de reserva profesional con disponibilidad en vivo, precios y captura inmediata de reservas desde cualquier dispositivo."
+        },
+        "noDoubleBooking": {
+          "title": "Sin doble reserva",
+          "description": "Verificaciones de disponibilidad en tiempo real con asignación transaccional. Cada vehículo se reserva una sola vez por franja horaria."
+        },
+        "vehicleManagement": {
+          "title": "Gestión de vehículos",
+          "description": "Panel completo de flota con estados para activos, alquilados, en mantenimiento e inactivos."
+        },
+        "vehicleBlocking": {
+          "title": "Bloqueo de vehículos",
+          "description": "Bloquea vehículos por mantenimiento, reparaciones o reservas para que no aparezcan como disponibles al cliente."
+        },
+        "pickupReturn": {
+          "title": "Seguimiento de entrega y devolución",
+          "description": "Gestiona fechas de entrega, fechas de devolución, ubicaciones y traspasos operativos con la visibilidad que tu equipo necesita cada día."
+        },
+        "adminOperations": {
+          "title": "Panel administrativo completo",
+          "description": "Controla reservas, entregas, devoluciones, pagos, reseñas y actividad de la flota desde un solo centro operativo."
+        },
+        "accounting": {
+          "title": "QuickBooks Online y Zoho Invoice",
+          "description": "Las integraciones contables permiten sincronizar facturas y clientes para mantener conectada la operación diaria del alquiler con tu flujo financiero.",
+          "badge": "Integraciones"
+        }
+      }
+    },
+    "extended": {
+      "eyebrow": "Conjunto completo de funciones",
+      "title": "Creado para operaciones reales de alquiler",
+      "description": "Cada función está diseñada alrededor de flujos de trabajo reales de alquiler en el Caribe.",
+      "features": {
+        "pdfInvoices": {
+          "title": "Facturas y recibos PDF",
+          "description": "Documentos de cobro automáticos y personalizados"
+        },
+        "licenseUpload": {
+          "title": "Carga y validación de licencias",
+          "description": "Almacenamiento privado seguro con verificación de vencimiento"
+        },
+        "automatedEmails": {
+          "title": "Correos automáticos",
+          "description": "Confirmaciones de reserva, facturas y recordatorios"
+        },
+        "multiLanguage": {
+          "title": "Multilenguaje",
+          "description": "Incluye inglés, neerlandés y español"
+        },
+        "mobileBooking": {
+          "title": "Reserva móvil primero",
+          "description": "Asistente responsivo de 3 pasos para clientes"
+        },
+        "adminDashboard": {
+          "title": "Panel administrativo",
+          "description": "Reservas, entregas, devoluciones y finanzas"
+        },
+        "tenantBranding": {
+          "title": "Marca del inquilino",
+          "description": "Tu logo, colores e información de contacto en todas partes"
+        },
+        "flexiblePricing": {
+          "title": "Precios flexibles",
+          "description": "Tarifas diarias, extras, descuentos e impuestos"
+        }
+      }
+    },
+    "whyUs": {
+      "eyebrow": "Por qué EdgeRent",
+      "title": "Creado por operadores,",
+      "titleAccent": "para operadores",
+      "description": "Entendemos los desafíos únicos de gestionar un negocio de alquiler en el Caribe neerlandés. EdgeRent fue diseñado desde cero para este mercado.",
+      "imageAlt": "Negocio de alquiler en el Caribe",
+      "islands": {
+        "curacao": "Curaçao",
+        "aruba": "Aruba",
+        "bonaire": "Bonaire"
+      },
+      "items": {
+        "caribbean": {
+          "title": "Hecho para el Caribe",
+          "description": "Diseñado específicamente para negocios de alquiler en Curaçao, Aruba y Bonaire con flujos locales y soporte multimoneda."
+        },
+        "reliability": {
+          "title": "Fiabilidad primero",
+          "description": "Las reservas transaccionales evitan sobreventas. La gestión de bloqueos y solapamientos protege tu flota."
+        },
+        "branding": {
+          "title": "Tu negocio, tu marca",
+          "description": "La arquitectura single-tenant mantiene tus datos aislados y tu marca visible en cada punto de contacto con el cliente."
+        },
+        "support": {
+          "title": "Soporte dedicado",
+          "description": "Contacto directo con el equipo de desarrollo con conocimiento específico del sector de alquiler."
+        }
+      }
+    },
+    "steps": {
+      "eyebrow": "Cómo funciona",
+      "title": "De la configuración a la primera reserva en días",
+      "items": {
+        "configure": {
+          "step": "01",
+          "title": "Configura tu flota",
+          "description": "Agrega vehículos, categorías, extras, precios y ubicaciones. Configura tu marca y detalles del negocio."
+        },
+        "goLive": {
+          "step": "02",
+          "title": "Lánzate en vivo",
+          "description": "Tus clientes pueden reservar en línea 24/7 con un flujo de 3 pasos para fechas, datos y carga de licencia."
+        },
+        "manage": {
+          "step": "03",
+          "title": "Gestiona y factura",
+          "description": "Confirma reservas, genera facturas, rastrea pagos y sincroniza opcionalmente con QuickBooks Online o Zoho Invoice."
+        }
+      }
+    },
     "reviews": {
+      "eyebrow": "Historias de clientes",
       "title": "Reseñas de Clientes",
       "subtitle": "Últimas reseñas publicadas de reservas verificadas.",
-      "faqPreview": "Una vista previa breve de FAQ con las preguntas más comunes sobre reservas, pagos y recogida.",
-      "viewAllFaq": "Ver todas las FAQ",
       "leaveButton": "Dejar una Reseña",
       "empty": "Todavía no hay reseñas publicadas.",
       "form": {
@@ -131,6 +489,39 @@
       "success": {
         "pendingApproval": "Reseña enviada. Será visible después de la aprobación del administrador."
       }
+    },
+    "footer": {
+      "pill": "Curaçao • Aruba • Bonaire",
+      "title": "¿Listo para modernizar tu",
+      "titleAccent": "negocio de alquiler?",
+      "description": "Solicita una demo personalizada y descubre cómo EdgeRent puede optimizar tus operaciones, evitar sobreventas y ayudar a crecer tu negocio.",
+      "primaryCta": "Solicitar una demo",
+      "secondaryCta": "Contactar ventas",
+      "note": "Implementación single-tenant • Tus datos siguen siendo tuyos • Marca blanca completa"
+    },
+    "showcase": {
+      "eyebrow": "Adopción en el Caribe",
+      "title": "Creado para operadores que necesitan flujos de alquiler listos para contabilidad",
+      "description": "{tenantName} está posicionado como un sistema operativo profesional para equipos de alquiler de autos en el Caribe, con procesos listos para facturación y una experiencia de cliente preparada para escalar.",
+      "logosEyebrow": "Clientes de confianza",
+      "logosTitle": "Empresas de alquiler que confían en EdgeRent",
+      "logosDescription": "Operadores reales en Bonaire y Curazao que usan EdgeRent en su negocio.",
+      "professionalEyebrow": "Por qué cambian los equipos",
+      "professionalDescription": "Reemplaza mensajes dispersos de WhatsApp, hojas de cálculo y seguimientos manuales por un flujo de alquiler más limpio que tu equipo pueda gestionar con confianza.",
+      "clients": {
+        "greatDeals": {
+          "status": "Cliente activo",
+          "detail": "Actualmente usa la plataforma en sus operaciones diarias de alquiler."
+        },
+        "sunFun": {
+          "status": "Cliente activo",
+          "detail": "Gestiona reservas y operaciones desde Bonaire en la plataforma."
+        },
+        "bonDrive": {
+          "status": "Comienza pronto",
+          "detail": "Preparando el despliegue para uso operativo en Bonaire."
+        }
+      }
     }
   },
   "booking": {
@@ -138,6 +529,7 @@
     "customerName": "Nombre Completo",
     "customerEmail": "Correo Electrónico",
     "customerPhone": "Número de Teléfono",
+    "flightNumber": "Número de Vuelo",
     "birthDate": "Fecha de Nacimiento",
     "driverLicenseNumber": "Número de Licencia de Conducir",
     "licenseExpiryDate": "Fecha de Vencimiento de Licencia",
@@ -150,11 +542,6 @@
     "dropoffLocation": "Ubicación de Devolución",
     "notes": "Notas Especiales",
     "driverLicense": "Licencia de Conducir",
-    "termsOfService": "Términos del Servicio",
-    "identificationVerificationClause": "Los usuarios aceptan proporcionar una identificación válida para la verificación del alquiler.",
-    "privacyPolicy": "Política de Privacidad",
-    "personalDataRequestClause": "Si deseas acceder o eliminar tus datos personales, por favor contacta a: alohacarrental@gmail.com",
-    "identificationConsentLabel": "Entiendo que mi identificación se utilizará para la verificación del alquiler y se almacenará temporalmente de acuerdo con la Política de Privacidad.",
     "paymentProof": "Comprobante de Pago",
     "submit": "Enviar Reserva",
     "select": "Seleccionar",
@@ -176,8 +563,16 @@
     "pricePerDay": "Precio por día",
     "extras": "Extras",
     "tax": "Impuesto ({percentage}%)",
+    "taxOnBooking": "Impuesto de la reserva ({percentage}%)",
+    "taxExtrasOnly": "Impuesto sobre extras ({percentage}%)",
     "reviewBooking": "Revisar Reserva",
     "terms": "Términos y Condiciones",
+    "termsOfService": "Términos del Servicio",
+    "identificationClause": "Los usuarios aceptan proporcionar una identificación válida para la verificación del alquiler.",
+    "gdprNotice": "Los documentos de identificación se solicitan para la verificación del alquiler y requisitos de cumplimiento, incluidas obligaciones relacionadas con el RGPD.",
+    "privacyPolicy": "Política de Privacidad",
+    "privacyDeletionNotice": "Si deseas eliminar tus datos personales, por favor contacta a: privacy@edgerentlite.com",
+    "privacyConsentCheckbox": "Entiendo que mi identificación se utilizará para la verificación del alquiler y se almacenará temporalmente de acuerdo con la Política de Privacidad.",
     "viewTerms": "Ver Términos (PDF)",
     "acceptTerms": "Acepto los Términos y Condiciones",
     "termsRequired": "Debes aceptar los términos y condiciones",
@@ -213,6 +608,7 @@
       "fileSize": "El tamaño del archivo no debe exceder 8MB",
       "fileType": "Solo se permiten archivos JPG, PNG y PDF",
       "uploadFailed": "Error al subir el archivo",
+      "privacyConsentRequired": "Debes aceptar la declaración de consentimiento de privacidad",
       "termsNotAccepted": "Debes aceptar los términos y condiciones",
       "birthLicenseRequired": "La fecha de nacimiento y vencimiento de licencia son obligatorias",
       "ageMinimum": "El cliente debe tener al menos 21 años",
@@ -225,51 +621,16 @@
       "next": "Nos pondremos en contacto pronto para confirmarla."
     }
   },
-  "fleetPage": {
-    "badge": "Resumen Transparente de la Flota",
-    "title": "Categorías modernas de alquiler con precios diarios claros.",
-    "description": "Revisa nuestras categorías activas de vehículos, compara lo esencial de un vistazo y reserva con una visión más clara del precio y del estado de la flota antes de comenzar.",
-    "primaryCta": "Consultar disponibilidad",
-    "secondaryCta": "Ver categorías",
-    "highlights": {
-      "pricing": "Precios transparentes",
-      "visibility": "Visibilidad en vivo de la flota"
-    },
-    "stats": {
-      "startingRate": "Tarifa diaria desde",
-      "pricing": "Modelo de precio",
-      "pricingValue": "Claro",
-      "booking": "Proceso de reserva",
-      "bookingValue": "Rápido",
-      "support": "Asistencia de entrega",
-      "supportValue": "Directa"
-    },
-    "summary": {
-      "eyebrow": "Resumen",
-      "title": "Una forma más clara de elegir tu vehículo",
-      "pricingTitle": "Qué incluye el precio",
-      "pricingBody": "Las tarifas diarias mostradas aquí son los precios base por categoría antes de impuestos, extras opcionales o ajustes específicos de la reserva.",
-      "availabilityTitle": "Cómo se muestra la disponibilidad",
-      "availabilityBody": "Esta página está pensada para ayudarte a comparar categorías rápidamente. La asignación exacta depende de tus fechas, los detalles de la reserva y la confirmación final."
-    },
-    "card": {
-      "categoryLabel": "Categoría de flota",
-      "perDay": "Por día",
-      "defaultDescription": "Transporte confiable y listo para la isla, con una tarifa diaria clara y detalles de disponibilidad por categoría.",
-      "seats": "{count} asientos",
-      "automatic": "Automático",
-      "manual": "Manual",
-      "ac": "Aire acondicionado",
-      "noAc": "Sin aire acondicionado",
-      "pricingTitle": "Precio de la categoría",
-      "pricingNote": "El total final de la reserva puede variar según extras, impuestos o disponibilidad para fechas específicas.",
-      "bookNow": "Reservar esta categoría"
-    },
-    "emptyTitle": "Las categorías de la flota aparecerán aquí pronto.",
-    "emptyBody": "No hay categorías activas publicados en este momento. Cuando haya vehículos disponibles, esta página mostrará precios, especificaciones y visibilidad en vivo de la flota."
-  },
   "admin": {
     "title": "Panel de Administración",
+    "filters": {
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha final",
+      "selectStartDate": "Selecciona la fecha de inicio",
+      "selectEndDate": "Selecciona la fecha final",
+      "apply": "Aplicar filtro",
+      "reset": "Restablecer"
+    },
     "login": {
       "title": "Inicio de Sesión de Administrador",
       "email": "Correo Electrónico",
@@ -290,7 +651,21 @@
       "title": "Reservas",
       "empty": "No se encontraron reservas",
       "actions": {
-        "view": "Ver"
+        "view": "Ver",
+        "markDelivered": "Marcar entregado",
+        "markReturned": "Marcar devuelto",
+        "delivered": "Entregado",
+        "returned": "Devuelto",
+        "awaitingPayment": "Pago pendiente",
+        "notDelivered": "No entregado",
+        "deliverSuccess": "Reserva marcada como entregada.",
+        "returnSuccess": "Reserva marcada como devuelta.",
+        "deliverFailed": "No se pudo marcar como entregada",
+        "returnFailed": "No se pudo marcar como devuelta",
+        "deliverConfirmTitle": "¿Marcar reserva como entregada?",
+        "deliverConfirmDescription": "Esto marcará la reserva seleccionada como entregada.",
+        "returnConfirmTitle": "¿Marcar reserva como devuelta?",
+        "returnConfirmDescription": "Esto marcará la reserva seleccionada como devuelta."
       },
       "table": {
         "id": "ID",
@@ -307,15 +682,328 @@
         "bookingInfo": "Información de la Reserva",
         "files": "Archivos",
         "notes": "Notas",
-        "actions": "Acciones",
-        "confirm": "Confirmar Reserva",
+        "actions": {
+          "copyCode": "Copiar código",
+          "editBooking": "Editar reserva",
+          "openBillingDoc": "Abrir documento de cobro",
+          "processing": "Procesando...",
+          "confirm": "Confirmar",
+          "sendInvoice": "Enviar factura",
+          "resendInvoice": "Reenviar factura",
+          "salesReceipt": "Recibo de venta",
+          "createSalesReceipt": "Crear recibo de venta",
+          "receivePayment": "Registrar pago"
+        },
+        "confirm": {
+          "paymentTitle": "¿Registrar pago de factura?",
+          "paymentDescription": "Esto registra el pago sin crear un recibo de venta.",
+          "deliverTitle": "¿Marcar reserva como entregada?",
+          "deliverDescription": "Esto marca el vehículo como entregado al cliente.",
+          "returnTitle": "¿Marcar reserva como devuelta?",
+          "returnDescription": "Esto cierra el alquiler y devuelve el vehículo a la flota."
+        },
         "decline": "Rechazar Reserva",
         "addNote": "Agregar Nota",
         "generateInvoice": "Generar Factura",
         "declineReason": "Razón del Rechazo",
         "confirmSuccess": "Reserva confirmada exitosamente",
         "declineSuccess": "Reserva rechazada exitosamente",
-        "invoiceGenerated": "Factura generada y enviada"
+        "invoiceGenerated": "Factura generada y enviada",
+        "header": {
+          "title": "Reserva {code}",
+          "vehiclePending": "Vehículo pendiente",
+          "createdAt": "Creada {date}"
+        },
+        "messages": {
+          "codeCopied": "Código de reserva copiado",
+          "codeCopyFailed": "No se pudo copiar el código de reserva",
+          "confirmSuccess": "Reserva confirmada correctamente",
+          "confirmError": "Error al confirmar la reserva",
+          "declineSuccess": "Reserva rechazada correctamente",
+          "declineError": "Error al rechazar la reserva",
+          "invoiceResent": "Factura reenviada al cliente.",
+          "invoiceSent": "Factura enviada al cliente para el pago.",
+          "invoiceError": "Error al enviar la factura",
+          "salesReceiptDelivered": "Recibo de venta creado, pago registrado y reserva marcada como entregada.",
+          "salesReceiptCreated": "Recibo de venta creado y pago registrado.",
+          "salesReceiptError": "Error al crear el recibo de venta",
+          "paymentReceived": "El pago de la factura fue marcado como recibido.",
+          "paymentReceivedError": "Error al marcar el pago como recibido",
+          "discountApplied": "Descuento aplicado y totales actualizados.",
+          "discountError": "No se pudo aplicar el descuento",
+          "extraAdded": "Extra agregado y totales actualizados.",
+          "extraError": "No se pudo agregar el extra",
+          "paymentReceivedBadge": "Pago recibido"
+        },
+        "declineDialog": {
+          "title": "Rechazar reserva",
+          "description": "Proporcione una razón para rechazar esta reserva.",
+          "label": "Motivo del rechazo",
+          "placeholder": "Ingrese el motivo del rechazo",
+          "confirm": "Rechazar reserva"
+        },
+        "salesReceipt": {
+          "description": "Registra el pago de esta reserva y opcionalmente muévela directamente al estado de entregada.",
+          "deliverNow": "Marcar esta reserva como entregada inmediatamente después de crear el recibo de venta.",
+          "title": "Crear recibo de venta"
+        },
+        "operations": {
+          "title": "Operaciones de la reserva",
+          "description": "Los controles principales del flujo de trabajo permanecen fijados en la parte superior.",
+          "deliverHint": "Marcar entregado aparece después de registrar el pago. Primero usa Registrar pago o crea un recibo de venta."
+        },
+        "pendingAlert": "Esta reserva aún está pendiente de confirmación y puede caducar automáticamente si se cierra la ventana de retención.",
+        "customerProfile": {
+          "title": "Perfil del cliente",
+          "description": "Identidad del arrendatario principal y datos de licencia.",
+          "fields": {
+            "flightNumber": "Número de vuelo",
+            "birthDate": "Fecha de nacimiento",
+            "licenseNumber": "Número de licencia",
+            "licenseExpiry": "Vencimiento de licencia"
+          }
+        },
+        "trip": {
+          "title": "Viaje y logística",
+          "description": "Horario del alquiler, asignación del vehículo y logística de entrega.",
+          "openMap": "Abrir mapa",
+          "fields": {
+            "vehicle": "Vehículo",
+            "category": "Categoría",
+            "pickup": "Recogida",
+            "dropoff": "Entrega",
+            "pickupLocation": "Lugar de recogida",
+            "dropoffLocation": "Lugar de entrega"
+          }
+        },
+        "pricing": {
+          "title": "Ajustes de precio",
+          "description": "Gestiona servicios extra y descuentos del alquiler desde un solo lugar.",
+          "applyDiscount": "Aplicar código de descuento",
+          "discountHint": "Los porcentajes de descuento se aplican solo al alquiler.",
+          "enterCode": "Ingresar código",
+          "apply": "Aplicar",
+          "activeDiscount": "Descuento activo: {code} ({percentage}%)",
+          "addExtra": "Agregar extra",
+          "extraHint": "Elige un extra diario o fijo y aplícalo directamente al precio.",
+          "selectExtra": "Seleccionar extra",
+          "add": "Agregar",
+          "currentExtras": "Extras actuales"
+        },
+        "billing": {
+          "title": "Resumen de cobro",
+          "description": "Desglose claro de cómo se construye el total de esta reserva.",
+          "baseRental": "Alquiler base",
+          "extras": "Extras",
+          "discount": "Descuento",
+          "subtotalBeforeTax": "Subtotal antes de impuestos",
+          "subtotalBeforeExtraTax": "Subtotal antes de impuesto extra",
+          "taxOnExtras": "Impuesto sobre extras ({tax}%)",
+          "taxOnBooking": "Impuesto de la reserva ({tax}%)",
+          "totalAmount": "Monto total",
+          "lateReturnCharge": "Cargo por devolución tardía",
+          "fuelDifferenceCharge": "Cargo por diferencia de combustible",
+          "returnDamageCharge": "Cargo por daños en devolución",
+          "taxInline": "Impuesto: ${amount}",
+          "taxExtrasInline": "Impuesto sobre extras: ${amount}",
+          "taxBookingInline": "Impuesto de la reserva: ${amount}",
+          "fuelRateInline": "Tarifa de combustible: ${amount} por 1/4 de tanque",
+          "liveLatePreview": "Si se devuelve ahora: recargo tardío de ${amount} ({days} día(s) extra)"
+        },
+        "inspection": {
+          "title": {
+            "pickup": "Check-In de Entrega",
+            "return": "Check-In de Devolución"
+          },
+          "description": "Registra el estado del vehículo, sube fotos de inspección y recopila la aceptación del cliente antes de cerrar este paso.",
+          "steps": {
+            "condition": "Estado",
+            "photos": "Fotos",
+            "acceptance": "Aceptación"
+          },
+          "vehicleState": "Estado del vehículo",
+          "fields": {
+            "odometer": "Odómetro (km)",
+            "fuelLevel": "Nivel de combustible",
+            "damageToggle": "Hay daños presentes o deben registrarse en esta etapa.",
+            "damageNotes": "Notas de daños",
+            "damagePlaceholder": "Describe rayones, abolladuras, artículos faltantes o cualquier detalle que el cliente deba reconocer.",
+            "agentNotes": "Notas del agente",
+            "agentNotesPlaceholder": "Notas operativas opcionales para el personal."
+          },
+          "summary": {
+            "title": "Resumen",
+            "pickupFuel": "Combustible al recoger",
+            "returnFuel": "Combustible al devolver",
+            "missingQuarters": "Cuartos faltantes",
+            "categoryRate": "Tarifa de categoría",
+            "lateReturnCharge": "Cargo por devolución tardía",
+            "fuelChargePreview": "Vista previa del cargo de combustible",
+            "damageCharge": "Cargo por daños",
+            "lateBannerTitle": "Devolución tardía detectada",
+            "lateBannerDescription": "La entrega programada era {scheduled}. La ventana de gracia de {graceHours} horas ya pasó, por lo que se aplicará un cargo adicional de alquiler.",
+            "lateNotice": "Devuelto después del período de gracia de 4 horas. Días extra de alquiler: {days}.",
+            "pickupHelp": "La inspección de entrega registra el odómetro inicial, el nivel de combustible y los daños visibles antes de entregar el vehículo."
+          },
+          "photos": {
+            "title": "Fotos de inspección",
+            "description": "Las imágenes se comprimen antes de subirlas y se guardan como evidencia compacta.",
+            "uploading": "Subiendo...",
+            "add": "Agregar fotos",
+            "alt": "Inspección",
+            "remove": "Eliminar",
+            "empty": "Aún no se han subido fotos."
+          },
+          "acceptance": {
+            "title": "Aceptación",
+            "clientOverview": "Resumen del cliente",
+            "odometer": "Odómetro",
+            "fuel": "Combustible",
+            "damageRecorded": "Daño registrado",
+            "category": "Categoría",
+            "fuelCharge": "Cargo de combustible",
+            "totalCloseout": "Cargo total de cierre",
+            "acceptedBy": "Aceptado por el cliente",
+            "acceptedByPlaceholder": "Nombre completo del cliente",
+            "checkbox": "Confirmo que el cliente revisó este resumen y aceptó el estado registrado, el nivel de combustible y los cargos si corresponde."
+          },
+          "completePickup": "Completar entrega",
+          "completeReturn": "Completar devolución",
+          "validation": {
+            "odometer": "Ingresa el odómetro en kilómetros.",
+            "fuelLevel": "Selecciona el nivel de combustible.",
+            "damageNotes": "Describe el daño antes de continuar.",
+            "acceptedBy": "Ingresa el nombre del cliente para la aceptación.",
+            "acceptance": "Confirma la aceptación del cliente antes de completar la inspección."
+          },
+          "toasts": {
+            "uploadFailed": "La carga de la imagen falló",
+            "pickupCompleted": "Inspección de entrega completada.",
+            "returnCompleted": "Inspección de devolución completada. Cargos adicionales {amount}.",
+            "completeFailed": {
+              "pickup": "No se pudo completar la inspección de entrega",
+              "return": "No se pudo completar la inspección de devolución"
+            }
+          }
+        },
+        "conditionLog": {
+          "title": "Registro de Estado del Vehículo",
+          "description": "Registros de inspección de entrega y devolución capturados por tu equipo.",
+          "pickupInspection": "Inspección de entrega",
+          "returnInspection": "Inspección de devolución",
+          "notCompleted": "No completado",
+          "odometer": "Odómetro",
+          "fuel": "Combustible",
+          "damageRecorded": "Daño registrado",
+          "acceptedBy": "Aceptado por",
+          "scheduledDropoff": "Entrega programada",
+          "actualReturn": "Devolución real",
+          "pickupPhotoAlt": "Inspección de entrega",
+          "returnPhotoAlt": "Inspección de devolución"
+        },
+        "sync": {
+          "title": "Operaciones y sincronización",
+          "description": "Estado del pago, estado de entrega y datos contables posteriores.",
+          "paymentReceived": "Pago recibido",
+          "billingDocument": "Documento de cobro",
+          "quickbooksTransfer": "Transferencia a QuickBooks",
+          "zohoTransfer": "Transferencia a Zoho Invoice",
+          "notGenerated": "No generado",
+          "notQueued": "No en cola",
+          "quickbooksError": "Error de QuickBooks",
+          "zohoError": "Error de Zoho Invoice",
+          "openQuickbooksTransfers": "Abrir transferencias de QuickBooks",
+          "openZohoTransfers": "Abrir transferencias de Zoho Invoice"
+        },
+        "filesActions": {
+          "sendByEmail": "Enviar por correo",
+          "sending": "Enviando...",
+          "sent": "Documento de facturación enviado por correo.",
+          "sendFailed": "No se pudo enviar el documento de facturación por correo."
+        },
+        "notesCard": {
+          "title": "Notas internas",
+          "description": "Contexto operativo guardado con la reserva."
+        },
+        "summaryCards": {
+          "total": "Total",
+          "totalHint": "Base con impuesto incluido; los extras se gravan por separado",
+          "billing": "Facturación",
+          "rentalWindow": "Período de alquiler",
+          "rentalDays": "{count, plural, one {# día} other {# días}}",
+          "categoryInline": "Categoría {category}",
+          "lifecycle": "Ciclo",
+          "lifecyclePaid": "Pagado",
+          "lifecycleOpen": "Abierto",
+          "awaitingNextAction": "Esperando la siguiente acción"
+        },
+        "filesCard": {
+          "description": "Documentos del cliente y comprobantes de facturación generados.",
+          "openPaymentProof": "Abrir comprobante de pago"
+        }
+      },
+      "edit": {
+        "messages": {
+          "completeRequired": "Completa los campos obligatorios antes de guardar.",
+          "updateFailed": "No se pudo actualizar la reserva",
+          "updated": "Reserva actualizada"
+        },
+        "sections": {
+          "customer": {
+            "title": "Datos del cliente",
+            "description": "Actualiza la identidad y el contacto del arrendatario usados para esta reserva."
+          },
+          "window": {
+            "description": "Cambiar el horario o la categoría activará una nueva verificación de disponibilidad antes de guardar."
+          },
+          "routing": {
+            "title": "Vehículo y ruta",
+            "description": "El sistema mantendrá el vehículo actual solo si todavía encaja con el horario actualizado."
+          },
+          "notes": {
+            "description": "Mantén un contexto operativo breve con la reserva."
+          },
+          "extras": {
+            "description": "Agrega, elimina y ajusta servicios opcionales antes de guardar la reserva."
+          }
+        },
+        "fields": {
+          "pickupDateTime": "Fecha y hora de recogida",
+          "dropoffDateTime": "Fecha y hora de entrega",
+          "assignedVehicle": "Vehículo asignado",
+          "selectVehicle": "Selecciona un vehículo",
+          "selectPickupLocation": "Selecciona lugar de recogida",
+          "selectDropoffLocation": "Selecciona lugar de entrega",
+          "addExtra": "Agregar extra",
+          "dailyExtra": "Extra diario",
+          "flatExtra": "Extra fijo",
+          "qty": "Cant.",
+          "lineTotal": "Total de línea",
+          "removeExtra": "Quitar",
+          "noExtras": "No hay extras seleccionados para esta reserva."
+        },
+        "sidebar": {
+          "title": "Plan de guardado",
+          "description": "Revisa qué sucederá antes de confirmar la actualización.",
+          "booking": "Reserva",
+          "points": {
+            "recalculate": "Guardar recalcula los totales usando los extras, descuentos y la regla de impuesto sobre extras actuales.",
+            "availability": "El sistema vuelve a comprobar la disponibilidad y conserva el vehículo actual solo si aún encaja.",
+            "history": "La facturación existente y el historial de la reserva permanecen vinculados al mismo registro.",
+            "invoice": "Guardar envía una factura/solicitud de pago actualizada al cliente con el precio revisado."
+          }
+        },
+        "preview": {
+          "title": "Vista previa de precio actualizada",
+          "description": "Esto refleja lo que se guardará y se facturará.",
+          "rentalDays": "Días de alquiler",
+          "discount": "Descuento ({code})",
+          "projectedTotal": "Total proyectado",
+          "includedExtras": "Extras incluidos"
+        },
+        "actions": {
+          "saveChanges": "Guardar cambios"
+        }
       }
     },
     "vehicles": {
@@ -338,7 +1026,9 @@
       "empty": "No se encontraron vehículos",
       "errors": {
         "delete": "Error al eliminar vehículo",
-        "updateStatus": "Error al actualizar estado del vehículo"
+        "updateStatus": "Error al actualizar estado del vehículo",
+        "create": "Error al crear el vehículo",
+        "update": "Error al actualizar el vehículo"
       },
       "table": {
         "name": "Nombre",
@@ -347,6 +1037,26 @@
         "rate": "Tarifa Diaria",
         "status": "Estado",
         "actions": "Acciones"
+      },
+      "onRent": "En alquiler",
+      "placeholders": {
+        "name": "p. ej., Kia Picanto #1",
+        "plate": "p. ej., ABC-1234",
+        "selectCategory": "Selecciona una categoría",
+        "notes": "Notas opcionales"
+      },
+      "stepCounter": "Paso {current} de {total}",
+      "steps": {
+        "identity": "Identidad",
+        "identityDescription": "Nombre del vehículo y número de placa.",
+        "assignment": "Asignación",
+        "assignmentDescription": "Categoría y tarifa diaria.",
+        "status": "Estado",
+        "statusDescription": "Estado operativo y notas internas."
+      },
+      "confirm": {
+        "deleteTitle": "¿Eliminar vehículo?",
+        "deleteDescription": "Esto eliminará permanentemente el vehículo seleccionado."
       }
     },
     "billingRequired": {
@@ -366,11 +1076,16 @@
         "returns": "Devoluciones",
         "financial": "Finanzas",
         "fleet": "Flota",
+        "quickbooks": "QuickBooks",
+        "zoho": "Zoho Invoice",
+        "blockouts": "Bloqueos de disponibilidad",
         "vehicles": "Gestión de Vehículos",
         "reviews": "Reseñas",
         "settings": "Configuración",
         "locations": "Ubicaciones",
-        "users": "Usuarios"
+        "logs": "Registros",
+        "users": "Usuarios",
+        "help": "Centro de ayuda"
       },
       "deliveries": {
         "title": "Próximas Entregas (Siguientes 7 Días)"
@@ -396,11 +1111,149 @@
       },
       "vehicles": {
         "manage": "Gestionar Vehículos",
-        "pricing": "Precios"
+        "pricing": "Precios",
+        "features": "Opciones",
+        "categories": "Categorías",
+        "extras": "Extras",
+        "discounts": "Descuentos"
       },
       "reviews": {
         "title": "Moderación de Reseñas",
-        "subtitle": "Mostrar u ocultar reseñas de clientes en la página principal."
+        "subtitle": "Mostrar u ocultar reseñas de clientes en la página principal.",
+        "empty": "Todavía no hay reseñas.",
+        "table": {
+          "booking": "Reserva",
+          "customer": "Cliente",
+          "rating": "Calificación",
+          "review": "Reseña",
+          "status": "Estado",
+          "date": "Fecha",
+          "actions": "Acciones",
+          "fullReview": "Reseña completa"
+        },
+        "visibility": {
+          "visible": "VISIBLE",
+          "hidden": "OCULTA"
+        },
+        "messages": {
+          "visible": "La reseña ahora es visible",
+          "hidden": "La reseña ahora está oculta",
+          "updateFailed": "No se pudo actualizar la reseña"
+        }
+      }
+    },
+    "blockouts": {
+      "deleteConfirmTitle": "¿Eliminar bloqueo?",
+      "deleteConfirmDescription": "Esto eliminará el bloqueo de disponibilidad seleccionado.",
+      "form": {
+        "vehicleScope": "Alcance del vehículo",
+        "allVehicles": "Todos los vehículos",
+        "start": "Inicio",
+        "end": "Fin",
+        "reason": "Motivo",
+        "optionalNote": "Nota opcional",
+        "saving": "Guardando...",
+        "create": "Crear bloqueo"
+      },
+      "table": {
+        "scope": "Alcance",
+        "start": "Inicio",
+        "end": "Fin",
+        "reason": "Motivo",
+        "created": "Creado",
+        "action": "Acción",
+        "fullReason": "Motivo completo",
+        "deleting": "Eliminando..."
+      },
+      "messages": {
+        "created": "Bloqueo creado.",
+        "deleted": "Bloqueo eliminado.",
+        "createFailed": "No se pudo crear el bloqueo",
+        "deleteFailed": "No se pudo eliminar el bloqueo"
+      },
+      "title": "Bloqueos de disponibilidad",
+      "description": "Bloquea todos los vehículos o uno específico para un rango de fechas. Estos bloqueos se aplican en la búsqueda de disponibilidad y en la creación de reservas."
+    },
+    "quickbooks": {
+      "description": "Las transferencias se ponen en cola desde acciones de cobro y se ejecutan por separado de la gestión de reservas.",
+      "actions": {
+        "refreshCache": "Actualizar caché QB",
+        "refreshing": "Actualizando...",
+        "syncPending": "Sincronizar pendientes",
+        "syncing": "Sincronizando...",
+        "sync": "Sincronizar",
+        "resync": "Volver a sincronizar"
+      },
+      "table": {
+        "booking": "Reserva",
+        "customer": "Cliente",
+        "billing": "Cobro",
+        "qbStatus": "Estado QB",
+        "requested": "Solicitado",
+        "synced": "Sincronizado",
+        "amount": "Monto",
+        "action": "Acción",
+        "openBooking": "Abrir reserva",
+        "none": "Ninguno",
+        "paymentReceived": "Pago recibido",
+        "awaitingPayment": "Pago pendiente",
+        "notQueued": "NO_EN_COLA",
+        "fullSyncError": "Error completo de sincronización"
+      },
+      "messages": {
+        "transferFailed": "La transferencia a QuickBooks falló",
+        "transferCompleted": "Transferencia a QuickBooks completada.",
+        "runFailed": "La ejecución de transferencias de QuickBooks falló",
+        "runCompletedWithFailures": "Completadas {completed}. Fallidas {failed}.",
+        "runCompleted": "Completadas {completed} transferencia(s) de QuickBooks.",
+        "cacheRefreshFailed": "La actualización de caché de QuickBooks falló",
+        "cacheRefreshed": "Caché de nombres de QuickBooks actualizada ({count})."
+      },
+      "title": "Transferencias de QuickBooks",
+      "pageDescription": "Los documentos de facturación se colocan aquí para sincronización externa. Las páginas de reserva ya no llaman a QuickBooks directamente.",
+      "filters": {
+        "all": "Todos",
+        "failed": "Fallidos",
+        "completed": "Completados"
+      }
+    },
+    "zoho": {
+      "description": "Las transferencias se ponen en cola desde acciones de cobro y se ejecutan por separado de la gestión de reservas.",
+      "actions": {
+        "syncPending": "Sincronizar pendientes",
+        "syncing": "Sincronizando...",
+        "sync": "Sincronizar",
+        "resync": "Volver a sincronizar"
+      },
+      "table": {
+        "booking": "Reserva",
+        "customer": "Cliente",
+        "billing": "Cobro",
+        "status": "Estado Zoho",
+        "requested": "Solicitado",
+        "synced": "Sincronizado",
+        "amount": "Monto",
+        "action": "Acción",
+        "openBooking": "Abrir reserva",
+        "none": "Ninguno",
+        "paymentReceived": "Pago recibido",
+        "awaitingPayment": "Pago pendiente",
+        "notQueued": "NO_EN_COLA",
+        "fullSyncError": "Error completo de sincronización"
+      },
+      "messages": {
+        "transferFailed": "La transferencia a Zoho Invoice falló",
+        "transferCompleted": "Transferencia a Zoho Invoice completada.",
+        "runFailed": "La ejecución de transferencias de Zoho Invoice falló",
+        "runCompletedWithFailures": "Completadas {completed}. Fallidas {failed}.",
+        "runCompleted": "Completadas {completed} transferencia(s) de Zoho Invoice."
+      },
+      "title": "Transferencias de Zoho Invoice",
+      "pageDescription": "Los documentos de facturación se colocan aquí para sincronización con Zoho Invoice. Las páginas de reserva ya no llaman a contabilidad directamente.",
+      "filters": {
+        "all": "Todos",
+        "failed": "Fallidos",
+        "completed": "Completados"
       }
     },
     "users": {
@@ -422,6 +1275,11 @@
       "empty": "No se encontraron usuarios",
       "errors": {
         "delete": "Error al eliminar usuario"
+      },
+      "passwordMin": "Contraseña: mínimo 8 caracteres",
+      "roles": {
+        "owner": "PROPIETARIO",
+        "staff": "PERSONAL"
       }
     },
     "locations": {
@@ -440,24 +1298,253 @@
       "empty": "No se encontraron ubicaciones",
       "errors": {
         "delete": "Error al eliminar ubicación"
-      }
+      },
+      "fullAddress": "Dirección completa"
     },
     "settings": {
       "title": "Configuración del Sistema",
       "subtitle": "Se aplica a totales de reserva, PDFs de facturas y recibos de venta.",
       "taxPercentage": "Porcentaje de Impuesto",
       "minimumBookingDays": "Días Mínimos de Reserva",
+      "vehicleRatesTaxMode": {
+        "label": "Modo de impuesto de tarifas de vehículos",
+        "description": "Cuando está activado, las tarifas de alquiler del vehículo ya incluyen impuesto y solo los extras reciben impuesto adicional. Cuando está desactivado, el impuesto se agrega tanto al alquiler como a los extras.",
+        "included": "Las tarifas del vehículo ya incluyen impuesto",
+        "excluded": "Las tarifas del vehículo no incluyen impuesto"
+      },
       "saving": "Guardando...",
       "errors": {
         "invalidTax": "Ingresa un porcentaje de impuesto válido entre 0 y 100.",
         "invalidMinDays": "Ingresa una duración mínima de reserva válida entre 1 y 365 días.",
-        "updateFailed": "No se pudieron actualizar los ajustes."
+        "updateFailed": "No se pudieron actualizar los ajustes.",
+        "requiredTenantFields": "El nombre del inquilino, el correo electrónico y la moneda son obligatorios."
       },
       "success": {
         "updated": "Ajustes actualizados. Impuesto: {tax}%, Reserva mínima: {days} día(s)."
+      },
+      "branding": {
+        "title": "Marca del inquilino",
+        "description": "El entorno proporciona valores predeterminados. Guardar aquí los reemplaza en tiempo de ejecución para este inquilino.",
+        "tenantName": "Nombre del inquilino",
+        "logoUrl": "URL del logo",
+        "email": "Correo electrónico",
+        "phone": "Teléfono",
+        "whatsappLabel": "Etiqueta de WhatsApp",
+        "whatsappUrl": "URL de WhatsApp",
+        "facebookUrl": "URL de Facebook",
+        "instagramUrl": "URL de Instagram",
+        "linkedinUrl": "URL de LinkedIn",
+        "tiktokUrl": "URL de TikTok",
+        "currency": "Moneda",
+        "termsPdfUrl": "URL del PDF de términos",
+        "address": "Dirección",
+        "paymentInstructions": "Instrucciones de pago"
+      },
+      "theme": {
+        "title": "Tokens del tema",
+        "description": "Usa valores HSL compatibles con Tailwind, por ejemplo 216 85% 34%.",
+        "primary": "Primario",
+        "primaryForeground": "Texto primario",
+        "accent": "Acento",
+        "accentForeground": "Texto de acento",
+        "ring": "Anillo",
+        "sidebarPrimary": "Primario de barra lateral",
+        "sidebarPrimaryForeground": "Texto primario de barra lateral",
+        "sidebarAccent": "Acento de barra lateral",
+        "sidebarAccentForeground": "Texto de acento de barra lateral"
+      },
+      "integrations": {
+        "title": "Integraciones",
+        "description": "Selecciona un solo proveedor contable a la vez. El proveedor seleccionado controla la pestaña del sidebar y la cola de transferencias de reservas.",
+        "invoiceProvider": "Proveedor de facturación",
+        "providerNone": "Ninguno",
+        "providerQuickbooks": "QuickBooks",
+        "providerZoho": "Zoho Invoice",
+        "noneDescription": "No mostrar una pestaña contable ni usar sincronización con proveedor.",
+        "quickbooksDescription": "Mostrar solo QuickBooks y usarlo como proveedor de facturación activo.",
+        "zohoDescription": "Mostrar solo Zoho Invoice y usarlo como proveedor de facturación activo.",
+        "showQuickbooks": "Mostrar QuickBooks en admin",
+        "allowQuickbooks": "Permitir sincronización/acciones de QuickBooks",
+        "quickbooksControls": "Controles de QuickBooks",
+        "zohoOrganizationId": "ID de organización de Zoho",
+        "zohoRefreshToken": "Refresh token de Zoho",
+        "envWarning": "Las credenciales de entorno de QuickBooks están incompletas. El control no puede habilitarlo hasta que el entorno esté configurado.",
+        "zohoEnvWarning": "Las credenciales de entorno de Zoho Invoice están incompletas. Agrega client id y client secret antes de usar Zoho."
+      },
+      "messages": {
+        "updated": "Configuración actualizada."
       }
     },
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "shared": {
+      "showing": "Mostrando {start}-{end} de {total}",
+      "rows": "Filas:"
+    },
+    "categories": {
+      "title": "Categorías",
+      "add": "Agregar categoría",
+      "edit": "Editar categoría",
+      "name": "Nombre",
+      "description": "Descripción",
+      "image": "Imagen de categoría",
+      "imageUrl": "URL de la imagen",
+      "previewAlt": "Vista previa de categoría",
+      "dailyRate": "Tarifa diaria ($)",
+      "fuelChargePerQuarter": "Cargo de combustible por 1/4 de tanque ($)",
+      "sortOrder": "Orden",
+      "seats": "Asientos",
+      "features": "Opciones del vehículo",
+      "featuresHint": "Crea las opciones una vez en la pestaña de características y asígnalas aquí.",
+      "featuresFlowTitle": "Cómo funcionan las opciones",
+      "featuresFlowDescription": "Las opciones se administran en la pestaña Características y luego se asignan aquí a las categorías. Los vehículos heredan esas opciones de su categoría asignada.",
+      "stepCounter": "Paso {current} de {total}",
+      "steps": {
+        "basics": "Básicos",
+        "basicsDescription": "Nombre, descripción e imagen.",
+        "pricing": "Precios",
+        "pricingDescription": "Tarifas, orden y estado activo.",
+        "options": "Opciones",
+        "optionsDescription": "Asientos, transmisión y características asignadas."
+      },
+      "carPlay": "Apple CarPlay",
+      "carPlayShort": "CarPlay",
+      "backupCamera": "Cámara de reversa",
+      "transmission": "Transmisión",
+      "automatic": "Automática",
+      "manual": "Manual",
+      "acAvailable": "A/C disponible",
+      "acShort": "A/C",
+      "noAc": "Sin A/C",
+      "active": "Activa",
+      "uploading": "Subiendo...",
+      "actions": {
+        "archive": "Archivar"
+      },
+      "confirm": {
+        "archiveTitle": "¿Archivar categoría?",
+        "archiveDescription": "Esto archivará la categoría seleccionada."
+      },
+      "status": {
+        "active": "ACTIVA",
+        "archived": "ARCHIVADA"
+      },
+      "table": {
+        "image": "Imagen",
+        "features": "Características",
+        "fuelCharge": "Cargo de combustible",
+        "vehicles": "Vehículos",
+        "bookings": "Reservas",
+        "fullDescription": "Descripción completa",
+        "fullFeatures": "Características completas",
+        "featuresSummary": "{seats} asientos • {transmission} • {features}",
+        "noFeatures": "Sin opciones asignadas",
+        "fuelChargeValue": "${amount}/1/4"
+      },
+      "pricingCard": {
+        "features": "{seats} asientos • {transmission} • {features}",
+        "fuelRefill": "Recarga de combustible: {amount} por 1/4 de tanque"
+      },
+      "messages": {
+        "saveFailed": "No se pudo guardar la categoría",
+        "updated": "Categoría actualizada",
+        "created": "Categoría creada",
+        "imageUploadFailed": "La carga de la imagen falló",
+        "imageUploaded": "Imagen cargada",
+        "archiveFailed": "No se pudo archivar la categoría",
+        "archived": "Categoría archivada"
+      }
+    },
+    "features": {
+      "title": "Características del vehículo",
+      "pageHint": "Administra el catálogo de opciones una sola vez y luego asígnalo a las categorías. Las tarjetas públicas y los resultados de reserva leen este catálogo.",
+      "createHint": "Crea opciones reutilizables como Bluetooth, dashcam o USB-C sin otro cambio de esquema.",
+      "assignHint": "Después de crear una opción, abre una categoría y asígnala allí para que los vehículos de esa categoría la muestren automáticamente.",
+      "liveHint": "Las opciones activas quedan disponibles de inmediato para asignarlas a categorías y mostrarlas públicamente.",
+      "tableHint": "Esta lista es el catálogo maestro de características usado por la asignación de categorías y las tarjetas públicas de vehículos.",
+      "add": "Agregar característica",
+      "edit": "Editar característica",
+      "name": "Nombre de la característica",
+      "slug": "Slug",
+      "sortOrder": "Orden",
+      "active": "Activa",
+      "actions": {
+        "archive": "Archivar"
+      },
+      "confirm": {
+        "archiveTitle": "¿Archivar característica?",
+        "archiveDescription": "Esto archivará la característica seleccionada."
+      },
+      "status": {
+        "active": "ACTIVA",
+        "archived": "ARCHIVADA"
+      },
+      "table": {
+        "categories": "Categorías"
+      },
+      "messages": {
+        "saveFailed": "No se pudo guardar la característica",
+        "updated": "Característica actualizada",
+        "created": "Característica creada",
+        "archiveFailed": "No se pudo archivar la característica",
+        "archived": "Característica archivada"
+      }
+    },
+    "extras": {
+      "title": "Extras",
+      "add": "Agregar extra",
+      "edit": "Editar extra",
+      "name": "Nombre",
+      "description": "Descripción",
+      "flatRate": "Tarifa fija",
+      "dailyRate": "Tarifa diaria",
+      "amount": "Monto",
+      "active": "Activo",
+      "actions": {
+        "archive": "Archivar"
+      },
+      "status": {
+        "active": "ACTIVO",
+        "archived": "ARCHIVADO"
+      },
+      "table": {
+        "type": "Tipo"
+      },
+      "messages": {
+        "saveFailed": "No se pudo guardar el extra",
+        "updated": "Extra actualizado",
+        "created": "Extra creado",
+        "archiveFailed": "No se pudo archivar el extra",
+        "archived": "Extra archivado"
+      }
+    },
+    "discounts": {
+      "title": "Códigos de descuento",
+      "add": "Agregar código de descuento",
+      "edit": "Editar código de descuento",
+      "code": "Código",
+      "description": "Descripción",
+      "percentage": "Porcentaje",
+      "maxUses": "Usos máximos (opcional)",
+      "active": "Activo",
+      "actions": {
+        "deactivate": "Desactivar"
+      },
+      "status": {
+        "active": "ACTIVO",
+        "inactive": "INACTIVO"
+      },
+      "table": {
+        "uses": "Usos",
+        "expires": "Vence"
+      },
+      "messages": {
+        "saveFailed": "No se pudo guardar el descuento",
+        "updated": "Descuento actualizado",
+        "created": "Descuento creado",
+        "deactivateFailed": "No se pudo desactivar el código",
+        "deactivated": "Descuento desactivado"
+      }
+    }
   },
   "errors": {
     "notFound": "Página no encontrada",

@@ -1,4 +1,4 @@
-import { getTenantConfig } from "@/lib/tenant";
+import { getTenantConfig, tenantThemeTokenToHex } from "@/lib/tenant";
 import { formatDateTime } from "@/lib/datetime";
 
 type SendEmailParams = {
@@ -17,7 +17,7 @@ export async function sendEmail(params: SendEmailParams): Promise<{ success: boo
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { success: false, error: "Missing RESEND_API_KEY" };
 
-  const from = process.env.RESEND_FROM || "Aloha Car Rental Bonaire <alohacarrentalbonaire@endlessedgetechnology.com>";
+  const from = process.env.RESEND_FROM || "EdgeRent <EdgeRent@endlessedgetechnology.com>";
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -50,17 +50,22 @@ export async function sendEmail(params: SendEmailParams): Promise<{ success: boo
   }
 }
 
-export function bookingEmailHtml(input: {
+export async function bookingEmailHtml(input: {
   title: string;
   customerName: string;
   bookingCode: string;
   startDate: Date;
   endDate: Date;
   totalAmountCents: number;
+  extras?: Array<{ name: string; quantity: number; lineTotal: number }>;
   invoiceUrl?: string | null;
   documentLabel?: string;
+  termsUrl?: string | null;
+  termsLabel?: string;
 }) {
-  const tenant = getTenantConfig();
+  const tenant = await getTenantConfig();
+  const primaryHex = tenantThemeTokenToHex(tenant.theme.primary);
+  const primaryForegroundHex = tenantThemeTokenToHex(tenant.theme.primaryForeground);
   const documentLabel = input.documentLabel || "Billing document";
   const amount = `${tenant.currency} ${(input.totalAmountCents / 100).toFixed(2)}`;
   const pickup = formatDateTime(input.startDate);
@@ -85,11 +90,21 @@ export function bookingEmailHtml(input: {
   const safeEmail = escapeHtml(tenant.email || "-");
   const safePhone = escapeHtml(tenant.phone || "-");
   const safeInvoiceUrl = input.invoiceUrl ? escapeHtml(input.invoiceUrl) : null;
+  const safeTermsUrl = input.termsUrl ? escapeHtml(input.termsUrl) : null;
+  const safeTermsLabel = escapeHtml(input.termsLabel || "Terms and Conditions");
+  const extrasRows = (input.extras || [])
+    .map((extra) => `
+      <tr>
+        <td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Extra</td>
+        <td style="padding:10px 12px;font-size:13px;color:#0f172a;border-top:1px solid #e2e8f0;">${escapeHtml(`${extra.name} x${extra.quantity}`)} - ${escapeHtml(`${tenant.currency} ${(extra.lineTotal / 100).toFixed(2)}`)}</td>
+      </tr>
+    `)
+    .join("");
 
   return `
     <div style="margin:0;background:#f3f6fb;padding:28px 14px;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
       <div style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #dbe3ef;border-radius:12px;overflow:hidden;">
-        <div style="padding:22px 26px;background:linear-gradient(135deg,#0f3a7d,#1d4ed8);color:#ffffff;">
+        <div style="padding:22px 26px;background:linear-gradient(135deg,#0f172a,#334155);color:#ffffff;">
           <p style="margin:0;font-size:12px;letter-spacing:.08em;opacity:.9;text-transform:uppercase;">${safeTenant}</p>
           <h2 style="margin:8px 0 0 0;font-size:24px;line-height:1.25;">${safeTitle}</h2>
         </div>
@@ -117,6 +132,7 @@ export function bookingEmailHtml(input: {
               <td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Total Amount</td>
               <td style="padding:10px 12px;font-size:15px;font-weight:700;color:#0f172a;border-top:1px solid #e2e8f0;">${safeAmount}</td>
             </tr>
+            ${extrasRows}
           </table>
 
           ${
@@ -124,7 +140,18 @@ export function bookingEmailHtml(input: {
               ? `
           <div style="margin-top:18px;padding:14px;border:1px solid #dbeafe;background:#eff6ff;border-radius:8px;">
             <p style="margin:0 0 10px 0;font-size:13px;color:#1e3a8a;font-weight:600;">${safeDocumentLabel}</p>
-            <a href="${safeInvoiceUrl}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;">Open ${safeDocumentLabel}</a>
+            <a href="${safeInvoiceUrl}" style="display:inline-block;background:${primaryHex};color:${primaryForegroundHex};text-decoration:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;">Open ${safeDocumentLabel}</a>
+          </div>
+          `
+              : ""
+          }
+
+          ${
+            safeTermsUrl
+              ? `
+          <div style="margin-top:18px;padding:14px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:8px;">
+            <p style="margin:0 0 10px 0;font-size:13px;color:#334155;font-weight:600;">${safeTermsLabel}</p>
+            <a href="${safeTermsUrl}" style="display:inline-block;background:#ffffff;color:#0f172a;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;font-weight:600;">Open ${safeTermsLabel}</a>
           </div>
           `
               : ""

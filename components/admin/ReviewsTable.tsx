@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CompactText } from "@/components/shared/CompactText";
 import { setReviewVisibilityAction } from "@/actions/reviews";
 import { formatDate } from "@/lib/datetime";
 
@@ -15,6 +17,7 @@ function stars(rating: number) {
 }
 
 export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: string }) {
+  const t = useTranslations();
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<"bookingCode" | "customerName" | "rating" | "status" | "createdAt">("createdAt");
@@ -68,25 +71,26 @@ export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: stri
     const result = await setReviewVisibilityAction(reviewId, isVisible, locale);
     setBusyId(null);
     if (!result.success) {
-      toast.error(result.error || "Failed to update review");
+      toast.error(result.error || t("admin.dashboard.reviews.messages.updateFailed"));
       return;
     }
-    toast.success(isVisible ? "Review is now visible" : "Review is now hidden");
+    toast.success(isVisible ? t("admin.dashboard.reviews.messages.visible") : t("admin.dashboard.reviews.messages.hidden"));
     router.refresh();
   };
 
   return (
     <div className="space-y-3">
-      <Table>
+      <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
+      <Table className="bg-transparent">
         <TableHeader>
           <TableRow>
-            <TableHead><button type="button" onClick={() => toggleSort("bookingCode")}>Booking{sortIndicator("bookingCode")}</button></TableHead>
-            <TableHead><button type="button" onClick={() => toggleSort("customerName")}>Customer{sortIndicator("customerName")}</button></TableHead>
-            <TableHead><button type="button" onClick={() => toggleSort("rating")}>Rating{sortIndicator("rating")}</button></TableHead>
-            <TableHead>Review</TableHead>
-            <TableHead><button type="button" onClick={() => toggleSort("status")}>Status{sortIndicator("status")}</button></TableHead>
-            <TableHead><button type="button" onClick={() => toggleSort("createdAt")}>Date{sortIndicator("createdAt")}</button></TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead><button type="button" onClick={() => toggleSort("bookingCode")}>{t("admin.dashboard.reviews.table.booking")}{sortIndicator("bookingCode")}</button></TableHead>
+            <TableHead><button type="button" onClick={() => toggleSort("customerName")}>{t("admin.dashboard.reviews.table.customer")}{sortIndicator("customerName")}</button></TableHead>
+            <TableHead><button type="button" onClick={() => toggleSort("rating")}>{t("admin.dashboard.reviews.table.rating")}{sortIndicator("rating")}</button></TableHead>
+            <TableHead>{t("admin.dashboard.reviews.table.review")}</TableHead>
+            <TableHead><button type="button" onClick={() => toggleSort("status")}>{t("admin.dashboard.reviews.table.status")}{sortIndicator("status")}</button></TableHead>
+            <TableHead><button type="button" onClick={() => toggleSort("createdAt")}>{t("admin.dashboard.reviews.table.date")}{sortIndicator("createdAt")}</button></TableHead>
+            <TableHead>{t("admin.dashboard.reviews.table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -95,10 +99,12 @@ export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: stri
               <TableCell className="font-medium">{review.bookingCode}</TableCell>
               <TableCell>{review.customerName}</TableCell>
               <TableCell>{stars(review.rating)} ({review.rating}/5)</TableCell>
-              <TableCell className="max-w-[360px]">{review.comment}</TableCell>
+              <TableCell>
+                <CompactText text={review.comment} widthClassName="max-w-[26rem]" expandedTitle={t("admin.dashboard.reviews.table.fullReview")} />
+              </TableCell>
               <TableCell>
                 <Badge className={review.isVisible ? "bg-green-100 text-green-800" : "bg-slate-100 text-slate-700"}>
-                  {review.isVisible ? "VISIBLE" : "HIDDEN"}
+                  {review.isVisible ? t("admin.dashboard.reviews.visibility.visible") : t("admin.dashboard.reviews.visibility.hidden")}
                 </Badge>
               </TableCell>
               <TableCell>{formatDate(review.createdAt)}</TableCell>
@@ -110,7 +116,7 @@ export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: stri
                     disabled={busyId === review.id}
                     onClick={() => onToggle(review.id, false)}
                   >
-                    Hide
+                    {t("common.hide")}
                   </Button>
                 ) : (
                   <Button
@@ -118,7 +124,7 @@ export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: stri
                     disabled={busyId === review.id}
                     onClick={() => onToggle(review.id, true)}
                   >
-                    Show
+                    {t("common.show")}
                   </Button>
                 )}
               </TableCell>
@@ -127,12 +133,13 @@ export function ReviewsTable({ reviews, locale }: { reviews: any[]; locale: stri
           {reviews.length === 0 && (
             <TableRow>
               <TableCell colSpan={7} className="text-sm text-muted-foreground">
-                No reviews yet.
+                {t("admin.dashboard.reviews.empty")}
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

@@ -12,7 +12,6 @@ export async function GET() {
         customerName: true,
         rating: true,
         comment: true,
-        isVisible: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
@@ -85,7 +84,7 @@ export async function POST(request: Request) {
     });
 
     try {
-      const tenant = getTenantConfig();
+      const tenant = await getTenantConfig();
       await sendEmail({
         to: tenant.email,
         subject: `New Review Submitted - ${booking.bookingCode}`,

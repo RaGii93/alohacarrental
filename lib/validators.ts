@@ -36,8 +36,9 @@ export const categoryFormSchema = z.object({
   imageUrl: z.string().optional(),
   seats: z.number().int().min(2, "Seats must be at least 2").max(12, "Seats must be 12 or less"),
   transmission: z.enum(["AUTOMATIC", "MANUAL"]),
-  hasAC: z.boolean(),
+  featureIds: z.array(z.string()).default([]),
   dailyRate: z.number().min(1, "Daily rate must be greater than 0"),
+  fuelChargePerQuarter: z.number().min(0, "Fuel charge must be 0 or greater"),
   sortOrder: z.number().int().min(0),
   isActive: z.boolean(),
 });
@@ -67,6 +68,7 @@ export const categoryBookingFormSchema = z.object({
   customerName: z.string().min(2, "Name must be at least 2 characters"),
   customerEmail: z.string().email("Invalid email address"),
   customerPhone: z.string().min(5, "Invalid phone number"),
+  flightNumber: z.string().trim().max(50, "Flight number must be 50 characters or less").optional(),
   birthDate: z.date(),
   driverLicenseNumber: z.string().min(1, "Driver license number is required"),
   licenseExpiryDate: z.date(),
@@ -79,9 +81,29 @@ export const categoryBookingFormSchema = z.object({
   pickupLocation: z.string().optional(),
   dropoffLocation: z.string().optional(),
   driverLicenseUrl: z.string().url("Driver license upload is required"),
+  privacyConsentAccepted: z.boolean().refine((val) => val === true, {
+    message: "You must accept the privacy consent",
+  }),
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: "You must accept the terms and conditions",
   }),
+  notes: z.string().optional(),
+});
+
+export const adminCategoryBookingUpdateSchema = z.object({
+  categoryId: z.string().min(1, "Please select a category"),
+  vehicleId: z.string().optional(),
+  customerName: z.string().min(2, "Name must be at least 2 characters"),
+  customerEmail: z.string().email("Invalid email address"),
+  customerPhone: z.string().min(5, "Invalid phone number"),
+  flightNumber: z.string().trim().max(50, "Flight number must be 50 characters or less").optional(),
+  birthDate: z.date(),
+  driverLicenseNumber: z.string().min(1, "Driver license number is required"),
+  licenseExpiryDate: z.date(),
+  startDate: z.date(),
+  endDate: z.date(),
+  pickupLocationId: z.string().min(1, "Pickup location is required"),
+  dropoffLocationId: z.string().min(1, "Dropoff location is required"),
   notes: z.string().optional(),
 });
 
@@ -110,9 +132,34 @@ export const categoryBookingFormSchemaRefined = categoryBookingFormSchema.refine
   }
 );
 
+export const adminCategoryBookingUpdateSchemaRefined = adminCategoryBookingUpdateSchema.refine(
+  (data) => data.endDate > data.startDate,
+  {
+    message: "End date must be after start date",
+    path: ["endDate"],
+  }
+).refine(
+  (data) => {
+    const today = new Date();
+    const threshold = new Date(today.getFullYear() - 21, today.getMonth(), today.getDate());
+    return data.birthDate <= threshold;
+  },
+  {
+    message: "Renter must be at least 21 years old",
+    path: ["birthDate"],
+  }
+).refine(
+  (data) => data.licenseExpiryDate > data.startDate,
+  {
+    message: "License must be valid for the rental period start date",
+    path: ["licenseExpiryDate"],
+  }
+);
+
 export type LoginFormInput = z.infer<typeof loginFormSchema>;
 export type BookingFormInput = z.infer<typeof bookingFormSchemaRefined>;
 export type CategoryBookingFormInput = z.infer<typeof categoryBookingFormSchemaRefined>;
+export type AdminCategoryBookingUpdateInput = z.infer<typeof adminCategoryBookingUpdateSchemaRefined>;
 export type VehicleFormInput = z.infer<typeof vehicleFormSchema>;
 export type CategoryFormInput = z.infer<typeof categoryFormSchema>;
 export type LocationFormInput = z.infer<typeof locationFormSchema>;

@@ -183,12 +183,36 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const isCollapsed = state === "collapsed"
+    const isInsetLike = variant === "floating" || variant === "inset"
+    const desktopGapWidth =
+      collapsible === "offcanvas" && isCollapsed
+        ? "w-0"
+        : collapsible === "icon" && isCollapsed
+          ? isInsetLike
+            ? "w-[calc(var(--sidebar-width-icon)+1rem)]"
+            : "w-[var(--sidebar-width-icon)]"
+          : "w-[var(--sidebar-width)]"
+    const desktopSidebarWidth =
+      collapsible === "offcanvas" && isCollapsed
+        ? side === "left"
+          ? "left-[calc(var(--sidebar-width)*-1)]"
+          : "right-[calc(var(--sidebar-width)*-1)]"
+        : side === "left"
+          ? "left-0"
+          : "right-0"
+    const desktopSidebarSize =
+      collapsible === "icon" && isCollapsed
+        ? isInsetLike
+          ? "w-[calc(var(--sidebar-width-icon)+1rem)]"
+          : "w-[var(--sidebar-width-icon)]"
+        : "w-[var(--sidebar-width)]"
 
     if (collapsible === "none") {
       return (
         <div
           className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+            "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground",
             className
           )}
           ref={ref}
@@ -205,7 +229,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[var(--sidebar-width)] border-r border-[hsl(var(--sidebar-border))] bg-white p-0 text-[hsl(var(--sidebar-foreground))] shadow-[0_24px_80px_-32px_hsl(215_28%_17%/0.35)] [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -226,33 +250,23 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="group peer hidden text-sidebar-foreground md:block"
+        className={cn("group peer hidden text-sidebar-foreground md:block md:shrink-0", desktopGapWidth)}
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
       >
         {/* This is what handles the sidebar gap on desktop */}
+        <div className="relative h-svh w-full bg-transparent transition-[width] duration-200 ease-linear" />
         <div
           className={cn(
-            "relative w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear",
-            "group-data-[collapsible=offcanvas]:w-0",
-            "group-data-[side=right]:rotate-180",
-            variant === "floating" || variant === "inset"
-              ? "group-data-[collapsible=icon]:w-[4rem]"
-              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
-          )}
-        />
-        <div
-          className={cn(
-            "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex",
-            side === "left"
-              ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
-              : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
+            "fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] duration-200 ease-linear md:flex",
+            desktopSidebarWidth,
+            desktopSidebarSize,
             // Adjust the padding for floating and inset variants.
             variant === "floating" || variant === "inset"
-              ? "p-2 group-data-[collapsible=icon]:w-[calc(4rem+2px)]"
-              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
+              ? "p-2"
+              : "group-data-[side=left]:border-r group-data-[side=right]:border-l",
             className
           )}
           {...props}
@@ -333,8 +347,7 @@ const SidebarInset = React.forwardRef<
     <main
       ref={ref}
       className={cn(
-        "relative flex w-full flex-1 flex-col bg-background",
-        "md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
+        "relative flex min-w-0 flex-1 flex-col bg-background",
         className
       )}
       {...props}
@@ -529,7 +542,7 @@ const sidebarMenuButtonVariants = cva(
       variant: {
         default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         outline:
-          "bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_var(--sidebar-accent)]",
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
         default: "h-8 text-sm",

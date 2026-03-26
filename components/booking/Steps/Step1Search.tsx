@@ -4,19 +4,17 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { searchAvailabilityAction, AvailabilityResult } from "@/actions/availability";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { BookingData } from "../BookingWizard";
 import {
-  AirVent,
   CalendarDays,
+  CheckCircle2,
   Clock3,
   Gauge,
   MapPin,
@@ -49,6 +47,22 @@ export function Step1Search({
 }: Step1SearchProps) {
   const t = useTranslations();
   const [isSearching, setIsSearching] = useState(false);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const toDateInputValue = (date: Date | null) => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+  const fromDateInputValue = (value: string) => (value ? new Date(`${value}T12:00:00`) : null);
+
+  const minimumEndDate = bookingData.startDate ? new Date(bookingData.startDate) : null;
+  if (minimumEndDate) {
+    minimumEndDate.setHours(0, 0, 0, 0);
+    minimumEndDate.setDate(minimumEndDate.getDate() + minimumBookingDays);
+  }
 
   const mergeDateAndTime = (date: Date | null, time: string): Date | null => {
     if (!date) return null;
@@ -91,49 +105,45 @@ export function Step1Search({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-4">{t("booking.selectDateRange")}</h2>
+      <div className="rounded-[1.75rem] border border-[#d3e1f8] bg-white/90 p-6 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+        <h2 className="mb-4 text-xl font-black text-[#0c3e88]">{t("booking.selectDateRange")}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
+              <CalendarDays className="h-4 w-4 text-[#0f57b2]" />
               {t("booking.startDate")}
             </label>
-            <DatePicker
-              value={bookingData.startDate}
-              onChange={(date) => updateBookingData({ startDate: date })}
-              placeholder={t("booking.selectDateRange")}
-              hideIcon
+            <Input
+              type="date"
+              value={toDateInputValue(bookingData.startDate)}
+              onChange={(e) => updateBookingData({ startDate: fromDateInputValue(e.target.value) })}
               disabled={disabled}
-              fromYear={new Date().getFullYear()}
-              toYear={new Date().getFullYear() + 3}
-              disabledDate={(date) => date < new Date() || date < new Date("1900-01-01")}
+              min={toDateInputValue(today)}
+              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
             />
           </div>
 
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
+              <CalendarDays className="h-4 w-4 text-[#0f57b2]" />
               {t("booking.endDate")}
             </label>
-            <DatePicker
-              value={bookingData.endDate}
-              onChange={(date) => updateBookingData({ endDate: date })}
-              placeholder={t("booking.selectDateRange")}
-              hideIcon
+            <Input
+              type="date"
+              value={toDateInputValue(bookingData.endDate)}
+              onChange={(e) => updateBookingData({ endDate: fromDateInputValue(e.target.value) })}
               disabled={disabled}
-              fromYear={new Date().getFullYear()}
-              toYear={new Date().getFullYear() + 3}
-              disabledDate={(date) => date < new Date() || date < new Date("1900-01-01")}
+              min={toDateInputValue(minimumEndDate ?? today)}
+              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
-              <Clock3 className="h-4 w-4 text-muted-foreground" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
+              <Clock3 className="h-4 w-4 text-[#0f57b2]" />
               {t("booking.pickupTime")}
             </label>
             <Input
@@ -141,11 +151,12 @@ export function Step1Search({
               value={bookingData.pickupTime}
               onChange={(e) => updateBookingData({ pickupTime: e.target.value })}
               disabled={disabled}
+              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
             />
           </div>
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-medium">
-              <Clock3 className="h-4 w-4 text-muted-foreground" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
+              <Clock3 className="h-4 w-4 text-[#0f57b2]" />
               {t("booking.dropoffTime")}
             </label>
             <Input
@@ -153,14 +164,15 @@ export function Step1Search({
               value={bookingData.dropoffTime}
               onChange={(e) => updateBookingData({ dropoffTime: e.target.value })}
               disabled={disabled}
+              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <Label className="mb-2 flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
+            <Label className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
+              <MapPin className="h-4 w-4 text-[#0f57b2]" />
               {t("booking.pickupLocation")}
             </Label>
             <Select
@@ -168,7 +180,7 @@ export function Step1Search({
               onValueChange={(value) => updateBookingData({ pickupLocationId: value })}
               disabled={disabled}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 w-full rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]">
                 <SelectValue placeholder={t("booking.selectLocation")} />
               </SelectTrigger>
               <SelectContent>
@@ -182,8 +194,8 @@ export function Step1Search({
           </div>
 
           <div>
-            <Label className="mb-2 flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
+            <Label className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
+              <MapPin className="h-4 w-4 text-[#0f57b2]" />
               {t("booking.dropoffLocation")}
             </Label>
             <Select
@@ -191,7 +203,7 @@ export function Step1Search({
               onValueChange={(value) => updateBookingData({ dropoffLocationId: value })}
               disabled={disabled}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 w-full rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]">
                 <SelectValue placeholder={t("booking.selectLocation")} />
               </SelectTrigger>
               <SelectContent>
@@ -221,7 +233,7 @@ export function Step1Search({
           <Button
             onClick={handleSearch}
             disabled={!hasValidRange || !meetsMinimumDuration || isSearching || disabled}
-            className="w-full"
+            className="h-12 w-full rounded-md bg-[#ffc93b] font-extrabold uppercase tracking-[0.08em] text-[#0d4aa0] shadow-[0_20px_40px_-20px_rgba(255,201,59,0.9)] hover:bg-[#ffd65f]"
           >
             <Search className="h-4 w-4" />
             {isSearching ? t("common.loading") : t("booking.searchAvailability")}
@@ -230,8 +242,8 @@ export function Step1Search({
       </div>
 
       {availability.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mb-4">{t("booking.selectCategory")}</h3>
+        <div className="rounded-[1.75rem] border border-[#d3e1f8] bg-[linear-gradient(180deg,#ffffff,#f3f8ff)] p-6 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+          <h3 className="mb-4 text-lg font-black text-[#0c3e88]">{t("booking.selectCategory")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {availability.map((cat) => {
               const isSelected = bookingData.categoryId === cat.categoryId;
@@ -242,8 +254,8 @@ export function Step1Search({
                 <Card
                   key={cat.categoryId}
                   className={cn(
-                    "cursor-pointer transition-all",
-                    isSelected && "ring-2 ring-primary",
+                    "cursor-pointer overflow-hidden rounded-[1.5rem] border-[#c7daf9] bg-white shadow-[0_20px_50px_-40px_rgba(12,74,160,0.55)] transition-all hover:-translate-y-1 hover:shadow-[0_28px_60px_-42px_rgba(12,74,160,0.7)]",
+                    isSelected && "border-[#0f57b2] ring-2 ring-[#0f57b2]/20",
                     !isAvailable && "opacity-50"
                   )}
                   onClick={() => isAvailable && handleCategorySelect(cat.categoryId)}
@@ -252,42 +264,38 @@ export function Step1Search({
                     <img
                       src={cat.categoryImageUrl.startsWith("/") ? cat.categoryImageUrl : getBlobProxyUrl(cat.categoryImageUrl) || cat.categoryImageUrl}
                       alt={cat.categoryName}
-                      className="h-32 w-full rounded-t-lg object-cover"
+                      className="h-32 w-full object-cover"
                     />
                   ) : null}
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{cat.categoryName}</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-lg font-black text-[#0c3e88]">{cat.categoryName}</CardTitle>
+                    <CardDescription className="font-semibold text-[#164d9b]">
                       {formatCurrency(cat.dailyRate)} / {t("booking.days").toLowerCase()}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">{t("booking.available")}:</span>
-                        <Badge variant={isAvailable ? "default" : "secondary"}>
-                          {isAvailable ? cat.availableCount : t("booking.soldOut")}
-                        </Badge>
+                        <span className="text-sm text-[#5f7ead]">{t("booking.total")}:</span>
+                        <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.totalForRange)}</span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">{t("booking.total")}:</span>
-                        <span className="font-semibold">{formatCurrency(cat.totalForRange)}</span>
-                      </div>
-                      <div className="space-y-1 text-xs text-muted-foreground">
+                      <div className="space-y-1 text-xs text-[#5f7ead]">
                         <p className="flex items-center gap-1.5">
-                          <Sofa className="h-3.5 w-3.5" />
+                          <Sofa className="h-3.5 w-3.5 text-[#0f57b2]" />
                           {(cat.seats ?? 5)} seats
                         </p>
                         <p className="flex items-center gap-1.5">
-                          <Settings2 className="h-3.5 w-3.5" />
+                          <Settings2 className="h-3.5 w-3.5 text-[#0f57b2]" />
                           {cat.transmission === "MANUAL" ? "Manual" : "Automatic"}
                         </p>
+                        {(cat.features || []).slice(0, 4).map((feature) => (
+                          <p key={feature} className="flex items-center gap-1.5">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-[#0f57b2]" />
+                            {feature}
+                          </p>
+                        ))}
                         <p className="flex items-center gap-1.5">
-                          <AirVent className="h-3.5 w-3.5" />
-                          {cat.hasAC === false ? "No A/C" : "A/C"}
-                        </p>
-                        <p className="flex items-center gap-1.5">
-                          <Gauge className="h-3.5 w-3.5" />
+                          <Gauge className="h-3.5 w-3.5 text-[#0f57b2]" />
                           Standard performance
                         </p>
                       </div>
@@ -304,6 +312,7 @@ export function Step1Search({
         <Button
           onClick={onNext}
           disabled={!canContinue || disabled}
+          className="h-12 rounded-md bg-[#0f57b2] px-6 font-extrabold uppercase tracking-[0.08em] text-white hover:bg-[#0b4a97]"
         >
           <ArrowRight className="h-4 w-4" />
           {t("booking.continue")}

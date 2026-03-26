@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { sendBillingDocumentEmailAction } from "@/actions/booking";
@@ -8,7 +9,7 @@ import { sendBillingDocumentEmailAction } from "@/actions/booking";
 export function SendBillingEmailButton({
   bookingId,
   locale,
-  label = "Send by Email",
+  label,
   className,
   variant = "link",
 }: {
@@ -18,6 +19,7 @@ export function SendBillingEmailButton({
   className?: string;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }) {
+  const t = useTranslations();
   const [isSending, setIsSending] = useState(false);
 
   const handleClick = async () => {
@@ -26,16 +28,16 @@ export function SendBillingEmailButton({
     setIsSending(false);
 
     if (result.success) {
-      toast.success("Billing document sent via email.");
+      toast.success(t("admin.bookings.detail.filesActions.sent"));
       return;
     }
 
-    toast.error(result.error || "Failed to send billing document email.");
+    toast.error(result.error || t("admin.bookings.detail.filesActions.sendFailed"));
   };
 
   return (
     <Button type="button" variant={variant} size="sm" className={className} disabled={isSending} onClick={handleClick}>
-      {isSending ? "Sending..." : label}
+      {isSending ? t("admin.bookings.detail.filesActions.sending") : label || t("admin.bookings.detail.filesActions.sendByEmail")}
     </Button>
   );
 }

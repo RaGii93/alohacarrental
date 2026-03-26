@@ -5,11 +5,12 @@
     "admin": "Beheerpaneel",
     "logout": "Afmelden",
     "login": "Aanmelden",
+    "security": "Beveiliging",
     "faq": "FAQ",
     "fleetOverview": "Vlootoverzicht"
   },
   "common": {
-    "name": "Aloha Car Rental",
+    "name": "EdgeRent Lite",
     "phone": "Telefoonnummer",
     "email": "E-mailadres",
     "currency": "€",
@@ -23,6 +24,10 @@
     "confirm": "Bevestigen",
     "decline": "Afwijzen",
     "back": "Terug",
+    "show": "Toon",
+    "hide": "Verberg",
+    "yes": "Ja",
+    "no": "Nee",
     "next": "Volgende",
     "previous": "Vorige",
     "search": "Zoeken",
@@ -38,8 +43,191 @@
     "declined": "Afgewezen",
     "cancelled": "Geannuleerd"
   },
+  "homePage": {
+    "heroEyebrow": "Autoverhuur voor het eiland",
+    "heroTitleLead": "Ontdek Curaçao",
+    "heroTitleTail": "met",
+    "heroDescription": "Een luxe uitstraling, heldere prijzen en betrouwbare service voor stranddagen, luchthavenophaalingen en eilandtrips.",
+    "heroPrimary": "Reserveer Je Auto",
+    "heroSecondary": "Bekijk Vloot",
+    "heroCardTitle": "Service klaar voor de luchthaven",
+    "heroCardBody": "Snelle bevestigingen, soepele overdracht en hulp wanneer plannen veranderen.",
+    "fleetEyebrow": "Onze vloot",
+    "fleetTitle": "Kies de perfecte auto voor jouw reis",
+    "fleetDescription": "Bekijk onze populairste categorieën en reserveer het voertuig dat past bij je stijl, gezelschap en budget.",
+    "fleetButton": "Bekijk Alle Voertuigen",
+    "servicesEyebrow": "Waarom gasten voor ons kiezen",
+    "servicesTitle": "Premium gemak met Caribische flair",
+    "promoEyebrow": "Waarom voor ons kiezen",
+    "promoTitle": "Ontdek het mooiste van Curaçao in stijl",
+    "promoDescription": "Van ochtenden aan de Handelskade tot zonsondergangen aan de westkust: je huurauto moet moeiteloos, verzorgd en klaar voor het hele programma voelen.",
+    "promoButton": "Meer Informatie",
+    "stepsEyebrow": "Hoe het werkt",
+    "stepsTitle": "Boek jouw eilandrit in drie eenvoudige stappen",
+    "dayLabel": "dag",
+    "phoneLabel": "Telefoon",
+    "emailLabel": "E-mail",
+    "locationLabel": "Locatie",
+    "manualLabel": "Handgeschakeld",
+    "automaticLabel": "Automaat",
+    "acLabel": "A/C",
+    "noAcLabel": "Geen A/C",
+    "reviewsCountLabel": "goedgekeurde reviews en meer.",
+    "contactLead": "Klaar voor een stijlvolle eilandrit, een soepele aankomst op de luchthaven of een snelle last-minute reservering.",
+    "contactTitle": "Contact",
+    "reviewsSpotlight": "Klantbeoordelingen",
+    "bookingCardLead": "Reserveer nu online, bekijk de vloot en gebruik dezelfde boekingsflow die al aan je site is gekoppeld.",
+    "trust": [
+      "Beste prijzen gegarandeerd",
+      "Nieuwe en goed onderhouden voertuigen",
+      "Gratis ophalen en afleveren op de luchthaven"
+    ],
+    "perks": [
+      {
+        "title": "Sterke Tarieven",
+        "description": "Duidelijke dagprijzen zonder vervelende verrassingen."
+      },
+      {
+        "title": "Makkelijk Boeken",
+        "description": "Reserveer online in enkele minuten vanaf elk apparaat."
+      },
+      {
+        "title": "Vol Comfort",
+        "description": "Schone interieurs, koude airco en een vlotte overdracht."
+      },
+      {
+        "title": "24/7 Support",
+        "description": "Snelle hulp voor, tijdens en na het ophalen."
+      }
+    ],
+    "services": [
+      {
+        "title": "Vlotte aankomst op de luchthaven",
+        "description": "Land, ontvang je sleutels en vertrek zonder je eerste vakantiedag in de rij te verliezen."
+      },
+      {
+        "title": "Betrouwbare moderne vloot",
+        "description": "Voertuigen worden goed onderhouden en geselecteerd voor comfort in Caribische warmte."
+      },
+      {
+        "title": "Snelle boekingsflow",
+        "description": "Beschikbaarheid, prijs en bevestiging worden in één soepele ervaring geregeld."
+      },
+      {
+        "title": "Echte lokale ondersteuning",
+        "description": "Vragen, wijzigingen en hulp worden snel afgehandeld door mensen die het eiland kennen."
+      }
+    ],
+    "steps": [
+      {
+        "step": "01",
+        "title": "Kies je voertuig",
+        "description": "Selecteer de categorie die past bij je verblijf, passagiers en budget."
+      },
+      {
+        "step": "02",
+        "title": "Bevestig je gegevens",
+        "description": "Kies data, locaties en bestuurdersinformatie in het boekingsproces."
+      },
+      {
+        "step": "03",
+        "title": "Ophalen en ontdekken",
+        "description": "Kom aan, haal je auto op en geniet zorgeloos van Curaçao."
+      }
+    ]
+  },
+  "faqPage": {
+    "heroTitle": "Antwoorden in dezelfde verzorgde stijl als de rest van de site",
+    "heroDescription": "Vind snel antwoorden over reserveren, ophalen, documenten, betalingen, verzekering en support zonder door verouderde tekstblokken te moeten zoeken.",
+    "popularTopic": "Populair onderwerp",
+    "helpCenterEyebrow": "Helpcentrum",
+    "helpCenterTitle": "Veelgestelde vragen",
+    "helpCenterDescription": "Alle antwoorden hieronder volgen dezelfde boekingsregels en supportflow als de rest van het project.",
+    "supportTitle": "Nog hulp nodig?",
+    "supportDescription": "Neem direct contact op met {tenantName} voor vragen over reserveringen, wijzigingen, ophaalafspraken of urgente ondersteuning.",
+    "openingHoursLabel": "Openingstijden",
+    "openingHoursDays": "Maandag t/m zaterdag",
+    "openingHoursTime": "08:00 tot 18:00"
+  },
+  "securityPage": {
+    "metaTitle": "Beveiliging en gegevensverwerking",
+    "metaDescription": "Lees hoe EdgeRent Lite toegangsbeheer, bestandsuploads, rijbewijsretentie, auditlogging en deployment-specifieke operationele praktijken behandelt.",
+    "eyebrow": "Beveiliging en gegevensverwerking",
+    "title": "Hoe EdgeRent Lite omgaat met beveiliging, privacy en operationele controles",
+    "intro": "Deze pagina beschrijft de controles die vandaag in het product aanwezig zijn en de operationele onderwerpen die we met klanten bespreken tijdens een deployment. We vermijden brede claims en focussen op wat daadwerkelijk is geïmplementeerd.",
+    "pillars": {
+      "access": {
+        "title": "Gecontroleerde admin-toegang",
+        "description": "Admin-toegang wordt beschermd door geauthenticeerde sessies en rolgebaseerde rechten voor ROOT-, OWNER- en STAFF-gebruikers."
+      },
+      "uploads": {
+        "title": "Gevalideerde uploads",
+        "description": "Uploads van rijbewijzen zijn beperkt op bestandstype, bestandsgrootte en basisvalidatie van de bestandssignatuur vóór opslag."
+      },
+      "retention": {
+        "title": "Retentiecontroles",
+        "description": "Geüploade rijbewijsbestanden worden gepland voor verwijdering 30 dagen na de einddatum van de huur."
+      },
+      "audit": {
+        "title": "Operationeel auditspoor",
+        "description": "Beheeracties kunnen in auditlogs worden vastgelegd zodat boekings- en beheerwijzigingen later kunnen worden gecontroleerd."
+      }
+    },
+    "controlsEyebrow": "Geverifieerde productcontroles",
+    "controlsTitle": "Controles die in het huidige product zijn geïmplementeerd",
+    "controls": {
+      "identity": {
+        "title": "Wachtwoordverwerking",
+        "body": "Admin-wachtwoorden worden opgeslagen als bcrypt-hashes. Wachtwoorden in platte tekst worden niet opgeslagen in de applicatiedatabase."
+      },
+      "sessions": {
+        "title": "Geauthenticeerde sessies",
+        "body": "Admin-sessies worden uitgegeven als ondertekende tokens met een vervaltijd van 24 uur. Sessiecookies zijn httpOnly, gebruiken sameSite=lax en worden in productie als secure gemarkeerd."
+      },
+      "uploads": {
+        "title": "Uploadvalidatie",
+        "body": "Rijbewijsuploads accepteren alleen JPG, PNG en PDF, hanteren een limiet van 8 MB en valideren bestandssignaturen voordat het document wordt geaccepteerd."
+      },
+      "storage": {
+        "title": "Privé bestandsopslag",
+        "body": "Gevoelige uploads worden opgeslagen in privé blob-opslag en via een applicatieproxy geleverd in plaats van als publieke bestanden beschikbaar gemaakt."
+      },
+      "retention": {
+        "title": "Rijbewijsretentie",
+        "body": "Rijbewijsbestanden krijgen een verwijderdatum en een beschermde cleanup-job verwijdert ze wanneer de retentieperiode is verlopen."
+      },
+      "audit": {
+        "title": "Audit en bewijs",
+        "body": "Het platform bewaart operationele tijdstempels zoals acceptatie van voorwaarden, pickup- en returngebeurtenissen en kan beheeracties in auditlogs registreren."
+      }
+    },
+    "operationsEyebrow": "Deployment-operaties",
+    "operationsTitle": "Onderwerpen die onderdeel zijn van deployment en bedrijfsvoering",
+    "operations": {
+      "backup": {
+        "title": "Back-ups",
+        "body": "Back-upschema’s en retentie zijn deployment-specifiek. Voor elke klantomgeving moeten back-upverwachtingen op infrastructuurniveau worden afgesproken en gedocumenteerd."
+      },
+      "recovery": {
+        "title": "Herstel en restore",
+        "body": "Herstelprocedures, restore-tests en serviceverwachtingen moeten per deployment worden vastgelegd zodat de klant het echte herstelpad voor zijn omgeving kent."
+      }
+    },
+    "sidebar": {
+      "title": "Duidelijke securitygesprekken met klanten",
+      "description": "Wanneer klanten naar cybersecurity vragen, adviseren we om geverifieerde controles, retentieregels, toegangsbeheer en het gedocumenteerde back-upbeleid voor hun omgeving te bespreken.",
+      "points": {
+        "one": "Rolgebaseerde admin-toegang helpt beperken wie operationele data kan zien en beheren.",
+        "two": "Gevoelige uploads zijn privé en hebben een vastgestelde retentieregel.",
+        "three": "Acceptatie van voorwaarden en operationele gebeurtenissen worden vastgelegd voor traceerbaarheid.",
+        "four": "Back-up- en disaster-recoveryafspraken moeten per omgeving schriftelijk worden bevestigd."
+      },
+      "primaryCta": "Bekijk beveiligingspagina",
+      "secondaryCta": "Boek een demo"
+    }
+  },
   "landing": {
-    "title": "Welkom bij Aloha Car Rental",
+    "title": "Welkom bij EdgeRent Lite",
     "subtitle": "Reserveer je voertuig gemakkelijk",
     "tagline": "Rijd Je Dromen",
     "badge": "🚗 Premium Voertuig Verhuur Service",
@@ -55,30 +243,8 @@
       "support": "24/7",
       "supportLabel": "Ondersteuning"
     },
-    "hero": {
-      "headline": {
-        "line1": "Ontdek Bonaire",
-        "line2Prefix": "met",
-        "line2Highlight": "Aloha",
-        "line3": "Car Rental"
-      },
-      "featureLine": "Betrouwbaar · Betaalbaar · Voertuigen klaar voor het eiland",
-      "description": "Verken Bonaire's roze stranden, flamingoreservaten en prachtige zoutvlaktes op je eigen tempo.",
-      "bookButton": "Boek je auto",
-      "viewFleetButton": "Bekijk onze vloot",
-      "driverAge": "Leeftijd bestuurder",
-      "agePlaceholder": "Leeftijd...",
-      "completeFields": "Vul alle boekingszoekvelden in.",
-      "searchComingSoon": "Zoekfunctie komt binnenkort!"
-    },
-    "fleet": {
-      "title": "Onze Eilandvloot",
-      "seats": "{count} zitplaatsen",
-      "reserveNow": "Nu reserveren",
-      "comingSoon": "Reserveren komt binnenkort beschikbaar!"
-    },
     "whyChoose": {
-      "title": "Waarom Aloha Car Rental Bonaire Kiezen?",
+      "title": "Waarom EdgeRent Kiezen?",
       "subtitle": "Ervaar het beste in voertuigverhuur met onze premium diensten en onverslaanbare klantenservice.",
       "features": {
         "selection": {
@@ -104,11 +270,203 @@
       "subtitle": "Reserveer vandaag je perfecte voertuig en ervaar de vrijheid van de weg.",
       "button": "Nu Reserveren"
     },
+    "hero": {
+      "pill": "EdgeRent Lite voor autoverhuuroperators",
+      "featureLine": "Snel boeken, duidelijke prijzen en lokale service waarop je kunt vertrouwen.",
+      "title": "Stop met reserveringen verliezen",
+      "titleAccent": "en neem controle over je verhuurbedrijf.",
+      "description": "Beheer reserveringen, voertuigen, ophaalmomenten, retouren en betalingen in één professioneel systeem. Geen WhatsApp, Excel of handmatige fouten meer die je team vertragen.",
+      "primaryCta": "Plan je demo",
+      "secondaryCta": "Bekijk hoe het werkt",
+      "dashboardAlt": "Voorbeeld van het EdgeRent-dashboard",
+      "bookingCard": {
+        "title": "Pickup en return in beeld",
+        "detail": "Reservering, voertuig en overdrachtsstatus op één plek"
+      },
+      "quickbooksStatus": "Gesynchroniseerd met QuickBooks",
+      "combinedStatus": "QuickBooks- en Zoho-klaar",
+      "pricing": {
+        "setupLabel": "Eenmalige setup",
+        "setupValue": "$500",
+        "subscriptionLabel": "Maandelijks abonnement",
+        "subscriptionValue": "$100"
+      },
+      "highlights": {
+        "onlineBooking": "Online boekingswebsite",
+        "noDoubleBookings": "Geen dubbele reserveringen",
+        "adminDashboard": "Volledig admin-dashboard",
+        "pickupReturnTracking": "Pickup- en returntracking",
+        "accountingIntegrations": "QuickBooks- en Zoho-integratie"
+      },
+      "integrationReadiness": {
+        "zoho": {
+          "title": "Zoho Invoice-klaar",
+          "description": "Factuurworkflows zijn klaar voor professionele financiële processen."
+        },
+        "quickbooks": {
+          "title": "QuickBooks-klaar",
+          "description": "Houd je boekhouding strakker met gestructureerde reserverings- en betalingsdata."
+        }
+      },
+      "trust": {
+        "noDoubleBookings": "Geen dubbele reserveringen",
+        "quickbooksReady": "QuickBooks-integratie klaar",
+        "zohoReady": "Zoho Invoice-integratie klaar",
+        "multiLanguage": "Gebouwd voor serieuze verhuurteams"
+      }
+    },
+    "statsStrip": {
+      "eyebrow": "Platformoverzicht",
+      "title": "Professionele verhuuroperaties in één oogopslag",
+      "items": {
+        "bookingAccuracy": {
+          "value": "100%",
+          "label": "Boekingsnauwkeurigheid"
+        },
+        "islandsSupported": {
+          "value": "3",
+          "label": "Ondersteunde eilanden"
+        },
+        "onlineBooking": {
+          "value": "24/7",
+          "label": "Online reserveren"
+        },
+        "languagesBuiltIn": {
+          "value": "3",
+          "label": "Ingebouwde talen"
+        }
+      }
+    },
+    "core": {
+      "eyebrow": "Kernplatform",
+      "title": "Alles wat je nodig hebt om je verhuurbedrijf te runnen",
+      "description": "EdgeRent houdt reserveringen, vlootbeheer, pickups, retouren en facturatie onder controle in één professioneel systeem. Van online reserveringen tot integraties met QuickBooks Online en Zoho Invoice, het is gebouwd voor serieuze verhuurteams.",
+      "features": {
+        "onlineBooking": {
+          "title": "Online boekingswebsite",
+          "description": "Geef klanten een professionele boekingsflow met live beschikbaarheid, tarieven en directe reserveringsvastlegging op elk apparaat."
+        },
+        "noDoubleBooking": {
+          "title": "Geen dubbele reservering",
+          "description": "Realtime beschikbaarheidscontroles met transactionele toewijzing. Elk voertuig wordt maar één keer per tijdslot geboekt."
+        },
+        "vehicleManagement": {
+          "title": "Voertuigbeheer",
+          "description": "Compleet vlootdashboard met statussen voor actief, verhuurd, onderhoud en inactief."
+        },
+        "vehicleBlocking": {
+          "title": "Voertuigen blokkeren",
+          "description": "Blokkeer voertuigen voor onderhoud, reparaties of reserveringen zodat ze niet als beschikbaar verschijnen."
+        },
+        "pickupReturn": {
+          "title": "Pickup- en retourtracking",
+          "description": "Beheer pickupdatums, retourdatums, locaties en operationele overdrachten met de zichtbaarheid die je team elke dag nodig heeft."
+        },
+        "adminOperations": {
+          "title": "Volledig beheerdashboard",
+          "description": "Volg reserveringen, leveringen, retouren, betalingen, reviews en vlootactiviteit vanuit één operationeel controlepunt."
+        },
+        "accounting": {
+          "title": "QuickBooks Online en Zoho Invoice",
+          "description": "Boekhoudintegraties ondersteunen synchronisatie van facturen en klanten zodat je financiële workflow gekoppeld blijft aan de dagelijkse verhuuractiviteiten.",
+          "badge": "Integraties"
+        }
+      }
+    },
+    "extended": {
+      "eyebrow": "Volledige functieset",
+      "title": "Gebouwd voor echte verhuurprocessen",
+      "description": "Elke functie is ontworpen rond echte verhuurworkflows in het Caribisch gebied.",
+      "features": {
+        "pdfInvoices": {
+          "title": "PDF-facturen en bonnen",
+          "description": "Automatisch gegenereerde, gepersonaliseerde factuurdocumenten"
+        },
+        "licenseUpload": {
+          "title": "Rijbewijs upload en validatie",
+          "description": "Veilige privé-opslag met controle op vervaldatum"
+        },
+        "automatedEmails": {
+          "title": "Geautomatiseerde e-mails",
+          "description": "Boekingsbevestigingen, facturen en herinneringen"
+        },
+        "multiLanguage": {
+          "title": "Meertalig",
+          "description": "Ingebouwd Engels, Nederlands en Spaans"
+        },
+        "mobileBooking": {
+          "title": "Mobile-first reserveren",
+          "description": "Responsieve 3-staps wizard voor klanten"
+        },
+        "adminDashboard": {
+          "title": "Beheerdashboard",
+          "description": "Reserveringen, leveringen, retouren en financiën"
+        },
+        "tenantBranding": {
+          "title": "Tenant-branding",
+          "description": "Je logo, kleuren en contactgegevens overal zichtbaar"
+        },
+        "flexiblePricing": {
+          "title": "Flexibele prijzen",
+          "description": "Dagtarieven, extra's, kortingscodes en belasting"
+        }
+      }
+    },
+    "whyUs": {
+      "eyebrow": "Waarom EdgeRent",
+      "title": "Gebouwd door operators,",
+      "titleAccent": "voor operators",
+      "description": "We begrijpen de unieke uitdagingen van een verhuurbedrijf in het Nederlands Caribisch gebied. EdgeRent is vanaf de basis voor deze markt ontworpen.",
+      "imageAlt": "Caribisch verhuurbedrijf",
+      "islands": {
+        "curacao": "Curaçao",
+        "aruba": "Aruba",
+        "bonaire": "Bonaire"
+      },
+      "items": {
+        "caribbean": {
+          "title": "Gebouwd voor het Caribisch gebied",
+          "description": "Speciaal ontworpen voor verhuurbedrijven in Curaçao, Aruba en Bonaire met lokale workflows en multi-currency ondersteuning."
+        },
+        "reliability": {
+          "title": "Betrouwbaarheid eerst",
+          "description": "Transactionele reserveringen voorkomen overboekingen. Goed beheer van blokkades en overlappingen beschermt je vloot."
+        },
+        "branding": {
+          "title": "Jouw bedrijf, jouw merk",
+          "description": "Single-tenant architectuur houdt je data gescheiden en je merk zichtbaar op elk klantcontactmoment."
+        },
+        "support": {
+          "title": "Toegewijde ondersteuning",
+          "description": "Direct contact met het ontwikkelingsteam met productkennis van de verhuurbranche."
+        }
+      }
+    },
+    "steps": {
+      "eyebrow": "Hoe het werkt",
+      "title": "Van setup tot eerste reservering in enkele dagen",
+      "items": {
+        "configure": {
+          "step": "01",
+          "title": "Configureer je vloot",
+          "description": "Voeg voertuigen, categorieën, extra's, prijzen en locaties toe. Stel je branding en bedrijfsgegevens in."
+        },
+        "goLive": {
+          "step": "02",
+          "title": "Ga live",
+          "description": "Klanten kunnen 24/7 online reserveren met een gerichte 3-staps flow voor data, gegevens en rijbewijsupload."
+        },
+        "manage": {
+          "step": "03",
+          "title": "Beheer en factureer",
+          "description": "Bevestig reserveringen, genereer facturen, volg betalingen en synchroniseer optioneel met QuickBooks Online of Zoho Invoice."
+        }
+      }
+    },
     "reviews": {
+      "eyebrow": "Klantverhalen",
       "title": "Klantbeoordelingen",
       "subtitle": "Nieuwste gepubliceerde reviews van geverifieerde reserveringen.",
-      "faqPreview": "Een korte FAQ-preview met de meest voorkomende vragen over reserveren, betalen en ophalen.",
-      "viewAllFaq": "Bekijk alle FAQ",
       "leaveButton": "Review Achterlaten",
       "empty": "Er zijn nog geen reviews gepubliceerd.",
       "form": {
@@ -131,6 +489,39 @@
       "success": {
         "pendingApproval": "Review verzonden. Deze wordt zichtbaar na goedkeuring door beheer."
       }
+    },
+    "footer": {
+      "pill": "Curaçao • Aruba • Bonaire",
+      "title": "Klaar om je",
+      "titleAccent": "verhuurbedrijf te moderniseren?",
+      "description": "Vraag een persoonlijke demo aan en ontdek hoe EdgeRent je processen kan stroomlijnen, overboekingen kan voorkomen en je bedrijf kan laten groeien.",
+      "primaryCta": "Vraag een demo aan",
+      "secondaryCta": "Contact sales",
+      "note": "Single-tenant deployment • Jouw data blijft van jou • Volledige white-label branding"
+    },
+    "showcase": {
+      "eyebrow": "Caribische adoptie",
+      "title": "Gebouwd voor operators die boekhoudklare verhuurworkflows nodig hebben",
+      "description": "{tenantName} is gepositioneerd als een professioneel besturingssysteem voor Caribische autoverhuurteams, met factuurklare processen en een klantgerichte ervaring die klaar is om op te schalen.",
+      "logosEyebrow": "Vertrouwde klanten",
+      "logosTitle": "Autoverhuurbedrijven die EdgeRent vertrouwen",
+      "logosDescription": "Echte operators in Bonaire en Curaçao die EdgeRent in hun bedrijf gebruiken.",
+      "professionalEyebrow": "Waarom teams overstappen",
+      "professionalDescription": "Vervang losse WhatsApp-berichten, spreadsheets en handmatige opvolging door een strakkere verhuurworkflow die je team met vertrouwen kan beheren.",
+      "clients": {
+        "greatDeals": {
+          "status": "Actieve klant",
+          "detail": "Gebruikt het platform momenteel in de dagelijkse verhuuractiviteiten."
+        },
+        "sunFun": {
+          "status": "Actieve klant",
+          "detail": "Draait reserveringen en operations vanuit Bonaire op het platform."
+        },
+        "bonDrive": {
+          "status": "Start binnenkort",
+          "detail": "Bezig met de uitrol voor operationeel gebruik in Bonaire."
+        }
+      }
     }
   },
   "booking": {
@@ -138,6 +529,7 @@
     "customerName": "Volledige Naam",
     "customerEmail": "E-mailadres",
     "customerPhone": "Telefoonnummer",
+    "flightNumber": "Vluchtnummer",
     "birthDate": "Geboortedatum",
     "driverLicenseNumber": "Rijbewijsnummer",
     "licenseExpiryDate": "Vervaldatum Rijbewijs",
@@ -150,11 +542,6 @@
     "dropoffLocation": "Retourlocatie",
     "notes": "Speciale Opmerkingen",
     "driverLicense": "Rijbewijs",
-    "termsOfService": "Servicevoorwaarden",
-    "identificationVerificationClause": "Gebruikers gaan ermee akkoord geldige identificatie te verstrekken voor verificatie van de verhuur.",
-    "privacyPolicy": "Privacybeleid",
-    "personalDataRequestClause": "Als je toegang wilt tot je persoonsgegevens of deze wilt laten verwijderen, neem dan contact op via: alohacarrental@gmail.com",
-    "identificationConsentLabel": "Ik begrijp dat mijn identificatie zal worden gebruikt voor huurverificatie en tijdelijk wordt opgeslagen in overeenstemming met het Privacybeleid.",
     "paymentProof": "Betalingsbewijs",
     "submit": "Reservering Indienen",
     "select": "Selecteren",
@@ -176,8 +563,16 @@
     "pricePerDay": "Prijs per dag",
     "extras": "Extra's",
     "tax": "Belasting ({percentage}%)",
+    "taxOnBooking": "Belasting op boeking ({percentage}%)",
+    "taxExtrasOnly": "Belasting op extra's ({percentage}%)",
     "reviewBooking": "Reservering Beoordelen",
     "terms": "Algemene Voorwaarden",
+    "termsOfService": "Servicevoorwaarden",
+    "identificationClause": "Gebruikers gaan ermee akkoord geldige identificatie te verstrekken voor verificatie van de huur.",
+    "gdprNotice": "Identificatiedocumenten worden gevraagd voor huurverificatie en nalevingsvereisten, waaronder verplichtingen met betrekking tot de AVG.",
+    "privacyPolicy": "Privacybeleid",
+    "privacyDeletionNotice": "Als je je persoonsgegevens wilt laten verwijderen, neem dan contact op met: privacy@edgerentlite.com",
+    "privacyConsentCheckbox": "Ik begrijp dat mijn identificatie wordt gebruikt voor huurverificatie en tijdelijk wordt opgeslagen in overeenstemming met het Privacybeleid.",
     "viewTerms": "Voorwaarden Bekijken (PDF)",
     "acceptTerms": "Ik ga akkoord met de Algemene Voorwaarden",
     "termsRequired": "Je moet akkoord gaan met de voorwaarden",
@@ -213,6 +608,7 @@
       "fileSize": "Bestandsgrootte mag niet meer dan 8MB zijn",
       "fileType": "Alleen JPG-, PNG- en PDF-bestanden zijn toegestaan",
       "uploadFailed": "Bestand uploaden mislukt",
+      "privacyConsentRequired": "Je moet instemmen met de privacytoestemmingsverklaring",
       "termsNotAccepted": "Je moet akkoord gaan met de voorwaarden",
       "birthLicenseRequired": "Geboortedatum en vervaldatum rijbewijs zijn verplicht",
       "ageMinimum": "Huurder moet minimaal 21 jaar oud zijn",
@@ -225,51 +621,16 @@
       "next": "We nemen binnenkort contact met je op ter bevestiging."
     }
   },
-  "fleetPage": {
-    "badge": "Transparant Vlootoverzicht",
-    "title": "Moderne huurcategorieen met duidelijke dagprijzen.",
-    "description": "Bekijk onze actieve voertuigcategorieen, vergelijk de belangrijkste kenmerken in een oogopslag en reserveer met een duidelijker beeld van prijs en vlootstatus voordat je begint.",
-    "primaryCta": "Beschikbaarheid bekijken",
-    "secondaryCta": "Categorieen bekijken",
-    "highlights": {
-      "pricing": "Transparante prijzen",
-      "visibility": "Live zicht op de vloot"
-    },
-    "stats": {
-      "startingRate": "Vanaf per dag",
-      "pricing": "Prijsmodel",
-      "pricingValue": "Duidelijk",
-      "booking": "Boekingsflow",
-      "bookingValue": "Snel",
-      "support": "Ophaalservice",
-      "supportValue": "Direct"
-    },
-    "summary": {
-      "eyebrow": "Overzicht",
-      "title": "Een duidelijkere manier om je voertuig te kiezen",
-      "pricingTitle": "Wat de prijs omvat",
-      "pricingBody": "De dagtarieven die hier staan zijn de basisprijzen per categorie, exclusief belastingen, optionele extra's of boekingsspecifieke aanpassingen.",
-      "availabilityTitle": "Hoe beschikbaarheid wordt getoond",
-      "availabilityBody": "Deze pagina helpt je om categorieen snel te vergelijken. De exacte toewijzing hangt af van je gekozen datums, boekingsgegevens en definitieve bevestiging."
-    },
-    "card": {
-      "categoryLabel": "Vlootcategorie",
-      "perDay": "Per dag",
-      "defaultDescription": "Betrouwbaar, eilandklaar vervoer met een duidelijke dagprijs en beschikbaarheidsinformatie op categorieniveau.",
-      "seats": "{count} zitplaatsen",
-      "automatic": "Automaat",
-      "manual": "Handgeschakeld",
-      "ac": "Airconditioning",
-      "noAc": "Geen airconditioning",
-      "pricingTitle": "Categorieprijs",
-      "pricingNote": "Het uiteindelijke boekingstotaal kan verschillen door extra's, belastingen of beschikbaarheid op specifieke datums.",
-      "bookNow": "Reserveer deze categorie"
-    },
-    "emptyTitle": "Vlootcategorieen verschijnen hier binnenkort.",
-    "emptyBody": "Er zijn momenteel geen actieve categorieen gepubliceerd. Zodra voertuigen beschikbaar zijn, toont deze pagina prijzen, specificaties en live vlootinzichten."
-  },
   "admin": {
     "title": "Beheerpaneel",
+    "filters": {
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "selectStartDate": "Selecteer startdatum",
+      "selectEndDate": "Selecteer einddatum",
+      "apply": "Filter toepassen",
+      "reset": "Resetten"
+    },
     "login": {
       "title": "Beheeraanmelding",
       "email": "E-mailadres",
@@ -290,7 +651,21 @@
       "title": "Reserveringen",
       "empty": "Geen reserveringen gevonden",
       "actions": {
-        "view": "Bekijken"
+        "view": "Bekijken",
+        "markDelivered": "Markeer als geleverd",
+        "markReturned": "Markeer als ingeleverd",
+        "delivered": "Geleverd",
+        "returned": "Ingeleverd",
+        "awaitingPayment": "Wacht op betaling",
+        "notDelivered": "Niet geleverd",
+        "deliverSuccess": "Reservering gemarkeerd als geleverd.",
+        "returnSuccess": "Reservering gemarkeerd als ingeleverd.",
+        "deliverFailed": "Markeren als geleverd is mislukt",
+        "returnFailed": "Markeren als ingeleverd is mislukt",
+        "deliverConfirmTitle": "Reservering als geleverd markeren?",
+        "deliverConfirmDescription": "Dit markeert de geselecteerde reservering als geleverd.",
+        "returnConfirmTitle": "Reservering als ingeleverd markeren?",
+        "returnConfirmDescription": "Dit markeert de geselecteerde reservering als ingeleverd."
       },
       "table": {
         "id": "ID",
@@ -307,15 +682,328 @@
         "bookingInfo": "Reserveringsinformatie",
         "files": "Bestanden",
         "notes": "Opmerkingen",
-        "actions": "Acties",
-        "confirm": "Reservering Bevestigen",
+        "actions": {
+          "copyCode": "Code kopiëren",
+          "editBooking": "Reservering bewerken",
+          "openBillingDoc": "Factuurdocument openen",
+          "processing": "Verwerken...",
+          "confirm": "Bevestigen",
+          "sendInvoice": "Factuur verzenden",
+          "resendInvoice": "Factuur opnieuw verzenden",
+          "salesReceipt": "Verkoopbewijs",
+          "createSalesReceipt": "Verkoopbewijs aanmaken",
+          "receivePayment": "Betaling ontvangen"
+        },
+        "confirm": {
+          "paymentTitle": "Factuurbetaling ontvangen?",
+          "paymentDescription": "Dit registreert de betaling zonder een verkoopbewijs aan te maken.",
+          "deliverTitle": "Reservering als geleverd markeren?",
+          "deliverDescription": "Dit markeert het voertuig als geleverd aan de klant.",
+          "returnTitle": "Reservering als ingeleverd markeren?",
+          "returnDescription": "Dit sluit de huur af en zet het voertuig terug in de vloot."
+        },
         "decline": "Reservering Afwijzen",
         "addNote": "Opmerking Toevoegen",
         "generateInvoice": "Factuur Genereren",
         "declineReason": "Reden van Afwijzing",
         "confirmSuccess": "Reservering succesvol bevestigd",
         "declineSuccess": "Reservering succesvol afgewezen",
-        "invoiceGenerated": "Factuur gegenereerd en verzonden"
+        "invoiceGenerated": "Factuur gegenereerd en verzonden",
+        "header": {
+          "title": "Reservering {code}",
+          "vehiclePending": "Voertuig in afwachting",
+          "createdAt": "Aangemaakt {date}"
+        },
+        "messages": {
+          "codeCopied": "Reserveringscode gekopieerd",
+          "codeCopyFailed": "Kon reserveringscode niet kopiëren",
+          "confirmSuccess": "Boeking succesvol bevestigd",
+          "confirmError": "Fout bij het bevestigen van de boeking",
+          "declineSuccess": "Boeking succesvol afgewezen",
+          "declineError": "Fout bij het afwijzen van de boeking",
+          "invoiceResent": "Factuur opnieuw naar de klant verzonden.",
+          "invoiceSent": "Factuur naar de klant verzonden voor betaling.",
+          "invoiceError": "Fout bij het verzenden van de factuur",
+          "salesReceiptDelivered": "Verkoopbon aangemaakt, betaling geregistreerd en boeking als afgeleverd gemarkeerd.",
+          "salesReceiptCreated": "Verkoopbon aangemaakt en betaling geregistreerd.",
+          "salesReceiptError": "Fout bij het aanmaken van de verkoopbon",
+          "paymentReceived": "Factuurbetaling gemarkeerd als ontvangen.",
+          "paymentReceivedError": "Fout bij het markeren van de betaling als ontvangen",
+          "discountApplied": "Korting toegepast en totalen vernieuwd.",
+          "discountError": "Korting toepassen mislukt",
+          "extraAdded": "Extra toegevoegd en totalen vernieuwd.",
+          "extraError": "Extra toevoegen mislukt",
+          "paymentReceivedBadge": "Betaling ontvangen"
+        },
+        "declineDialog": {
+          "title": "Reservering afwijzen",
+          "description": "Geef een reden op voor het afwijzen van deze reservering.",
+          "label": "Reden van afwijzing",
+          "placeholder": "Voer reden van afwijzing in",
+          "confirm": "Reservering afwijzen"
+        },
+        "salesReceipt": {
+          "description": "Registreer de betaling voor deze reservering en zet deze desgewenst direct op geleverd.",
+          "deliverNow": "Markeer deze reservering direct als geleverd na het aanmaken van het verkoopbewijs.",
+          "title": "Verkoopbon aanmaken"
+        },
+        "operations": {
+          "title": "Reserveringsacties",
+          "description": "De belangrijkste workflow-acties blijven bovenaan het overzicht zichtbaar.",
+          "deliverHint": "Markeer als geleverd verschijnt nadat betaling is ontvangen. Gebruik eerst Betaling ontvangen of maak een verkoopbewijs aan."
+        },
+        "pendingAlert": "Deze reservering wacht nog op bevestiging en kan automatisch verlopen als het hold-venster sluit.",
+        "customerProfile": {
+          "title": "Klantprofiel",
+          "description": "Identiteits- en rijbewijsgegevens van de hoofdhuurder.",
+          "fields": {
+            "flightNumber": "Vluchtnummer",
+            "birthDate": "Geboortedatum",
+            "licenseNumber": "Rijbewijsnummer",
+            "licenseExpiry": "Vervaldatum rijbewijs"
+          }
+        },
+        "trip": {
+          "title": "Rit en logistiek",
+          "description": "Huurtiming, voertuigtoewijzing en ophaallogistiek.",
+          "openMap": "Kaart openen",
+          "fields": {
+            "vehicle": "Voertuig",
+            "category": "Categorie",
+            "pickup": "Ophalen",
+            "dropoff": "Inleveren",
+            "pickupLocation": "Ophaallocatie",
+            "dropoffLocation": "Inleverlocatie"
+          }
+        },
+        "pricing": {
+          "title": "Prijsaanpassingen",
+          "description": "Beheer extra services en alleen-huurkortingen op één plek.",
+          "applyDiscount": "Kortingscode toepassen",
+          "discountHint": "Kortingspercentages gelden alleen voor het huurgedeelte.",
+          "enterCode": "Voer code in",
+          "apply": "Toepassen",
+          "activeDiscount": "Actieve korting: {code} ({percentage}%)",
+          "addExtra": "Extra toevoegen",
+          "extraHint": "Kies een dag- of vaste extra en voeg die direct toe aan de prijs.",
+          "selectExtra": "Selecteer extra",
+          "add": "Toevoegen",
+          "currentExtras": "Huidige extra's"
+        },
+        "billing": {
+          "title": "Factuuroverzicht",
+          "description": "Duidelijke uitsplitsing van hoe dit reserveringstotaal is opgebouwd.",
+          "baseRental": "Basishuur",
+          "extras": "Extra's",
+          "discount": "Korting",
+          "subtotalBeforeTax": "Subtotaal vóór belasting",
+          "subtotalBeforeExtraTax": "Subtotaal vóór extra belasting",
+          "taxOnExtras": "Belasting op extra's ({tax}%)",
+          "taxOnBooking": "Belasting op boeking ({tax}%)",
+          "totalAmount": "Totaalbedrag",
+          "lateReturnCharge": "Toeslag late inlevering",
+          "fuelDifferenceCharge": "Brandstofverschil-toeslag",
+          "returnDamageCharge": "Schadebedrag bij inlevering",
+          "taxInline": "Belasting: ${amount}",
+          "taxExtrasInline": "Belasting op extra's: ${amount}",
+          "taxBookingInline": "Belasting op boeking: ${amount}",
+          "fuelRateInline": "Brandstoftarief: ${amount} per 1/4 tank",
+          "liveLatePreview": "Als nu ingeleverd: ${amount} te-laat-toeslag ({days} extra dag(en))"
+        },
+        "inspection": {
+          "title": {
+            "pickup": "Uitgifte Check-In",
+            "return": "Inlever Check-In"
+          },
+          "description": "Leg de staat van het voertuig vast, upload inspectiefoto's en verzamel klantacceptatie voordat deze stap wordt afgerond.",
+          "steps": {
+            "condition": "Staat",
+            "photos": "Foto's",
+            "acceptance": "Acceptatie"
+          },
+          "vehicleState": "Voertuigstatus",
+          "fields": {
+            "odometer": "Kilometerstand (km)",
+            "fuelLevel": "Brandstofniveau",
+            "damageToggle": "Er is schade aanwezig of die moet in deze stap worden vastgelegd.",
+            "damageNotes": "Schadenotities",
+            "damagePlaceholder": "Beschrijf krassen, deuken, ontbrekende items of andere zaken die de klant moet erkennen.",
+            "agentNotes": "Notities van medewerker",
+            "agentNotesPlaceholder": "Optionele operationele notities voor het team."
+          },
+          "summary": {
+            "title": "Samenvatting",
+            "pickupFuel": "Brandstof bij uitgifte",
+            "returnFuel": "Brandstof bij inlevering",
+            "missingQuarters": "Ontbrekende kwarttanks",
+            "categoryRate": "Categorietarief",
+            "lateReturnCharge": "Toeslag late inlevering",
+            "fuelChargePreview": "Voorbeeld brandstoftoeslag",
+            "damageCharge": "Schadebedrag",
+            "lateBannerTitle": "Te late inlevering gedetecteerd",
+            "lateBannerDescription": "De geplande inlevertijd was {scheduled}. De respijtperiode van {graceHours} uur is verstreken, dus er wordt een extra huurtoeslag toegepast.",
+            "lateNotice": "Ingeleverd na de respijtperiode van 4 uur. Extra huurdagen: {days}.",
+            "pickupHelp": "De uitgifte-inspectie registreert de beginstand, het brandstofniveau en zichtbare schade voordat het voertuig wordt meegegeven."
+          },
+          "photos": {
+            "title": "Inspectiefoto's",
+            "description": "Afbeeldingen worden gecomprimeerd voor upload en opgeslagen als compacte documentatiesnapshots.",
+            "uploading": "Uploaden...",
+            "add": "Foto's toevoegen",
+            "alt": "Inspectie",
+            "remove": "Verwijderen",
+            "empty": "Nog geen foto's geüpload."
+          },
+          "acceptance": {
+            "title": "Acceptatie",
+            "clientOverview": "Klantoverzicht",
+            "odometer": "Kilometerstand",
+            "fuel": "Brandstof",
+            "damageRecorded": "Schade vastgelegd",
+            "category": "Categorie",
+            "fuelCharge": "Brandstoftoeslag",
+            "totalCloseout": "Totale afsluittaks",
+            "acceptedBy": "Geaccepteerd door klant",
+            "acceptedByPlaceholder": "Volledige naam klant",
+            "checkbox": "Ik bevestig dat de klant dit overzicht heeft bekeken en de vastgelegde staat, het brandstofniveau en eventuele kosten heeft geaccepteerd."
+          },
+          "completePickup": "Uitgifte voltooien",
+          "completeReturn": "Inlevering voltooien",
+          "validation": {
+            "odometer": "Voer de kilometerstand in kilometers in.",
+            "fuelLevel": "Selecteer het brandstofniveau.",
+            "damageNotes": "Beschrijf de schade voordat je doorgaat.",
+            "acceptedBy": "Voer de naam van de klant in voor acceptatie.",
+            "acceptance": "Bevestig klantacceptatie voordat je de inspectie afrondt."
+          },
+          "toasts": {
+            "uploadFailed": "Uploaden van afbeelding mislukt",
+            "pickupCompleted": "Uitgifte-inspectie voltooid.",
+            "returnCompleted": "Inlever-inspectie voltooid. Extra kosten {amount}.",
+            "completeFailed": {
+              "pickup": "Uitgifte-inspectie voltooien mislukt",
+              "return": "Inlever-inspectie voltooien mislukt"
+            }
+          }
+        },
+        "conditionLog": {
+          "title": "Voertuigstatuslog",
+          "description": "Uitgifte- en inleverinspecties vastgelegd door je team.",
+          "pickupInspection": "Uitgifte-inspectie",
+          "returnInspection": "Inlever-inspectie",
+          "notCompleted": "Niet voltooid",
+          "odometer": "Kilometerstand",
+          "fuel": "Brandstof",
+          "damageRecorded": "Schade vastgelegd",
+          "acceptedBy": "Geaccepteerd door",
+          "scheduledDropoff": "Geplande inlevering",
+          "actualReturn": "Werkelijke inlevering",
+          "pickupPhotoAlt": "Uitgifte-inspectie",
+          "returnPhotoAlt": "Inlever-inspectie"
+        },
+        "sync": {
+          "title": "Operaties en synchronisatie",
+          "description": "Betalingsstatus, leveringsstatus en boekhoudgegevens verderop in de keten.",
+          "paymentReceived": "Betaling ontvangen",
+          "billingDocument": "Factuurdocument",
+          "quickbooksTransfer": "QuickBooks-overdracht",
+          "zohoTransfer": "Zoho Invoice-overdracht",
+          "notGenerated": "Niet gegenereerd",
+          "notQueued": "Niet in wachtrij",
+          "quickbooksError": "QuickBooks-fout",
+          "zohoError": "Zoho Invoice-fout",
+          "openQuickbooksTransfers": "QuickBooks-overdrachten openen",
+          "openZohoTransfers": "Zoho Invoice-overdrachten openen"
+        },
+        "filesActions": {
+          "sendByEmail": "Per e-mail verzenden",
+          "sending": "Verzenden...",
+          "sent": "Factuurdocument per e-mail verzonden.",
+          "sendFailed": "Factuurdocument per e-mail verzenden mislukt."
+        },
+        "notesCard": {
+          "title": "Interne notities",
+          "description": "Operationele context die bij de reservering is opgeslagen."
+        },
+        "summaryCards": {
+          "total": "Totaal",
+          "totalHint": "Basis inclusief belasting, extra’s apart belast",
+          "billing": "Facturatie",
+          "rentalWindow": "Huurperiode",
+          "rentalDays": "{count, plural, one {# dag} other {# dagen}}",
+          "categoryInline": "{category} categorie",
+          "lifecycle": "Levenscyclus",
+          "lifecyclePaid": "Betaald",
+          "lifecycleOpen": "Open",
+          "awaitingNextAction": "Wacht op volgende actie"
+        },
+        "filesCard": {
+          "description": "Klantdocumenten en gegenereerde factuurbestanden.",
+          "openPaymentProof": "Betalingsbewijs openen"
+        }
+      },
+      "edit": {
+        "messages": {
+          "completeRequired": "Vul de verplichte boekingsvelden in voordat je opslaat.",
+          "updateFailed": "Boeking bijwerken mislukt",
+          "updated": "Boeking bijgewerkt"
+        },
+        "sections": {
+          "customer": {
+            "title": "Klantgegevens",
+            "description": "Werk de identiteit en contactgegevens van de huurder voor deze boeking bij."
+          },
+          "window": {
+            "description": "Het wijzigen van timing of categorie activeert een nieuwe beschikbaarheidscontrole voordat je opslaat."
+          },
+          "routing": {
+            "title": "Voertuig en route",
+            "description": "Het systeem behoudt het huidige voertuig alleen als het nog past bij de bijgewerkte planning."
+          },
+          "notes": {
+            "description": "Bewaar beknopte operationele context bij de boeking."
+          },
+          "extras": {
+            "description": "Voeg optionele diensten toe, verwijder ze of pas ze aan voordat je de boeking opslaat."
+          }
+        },
+        "fields": {
+          "pickupDateTime": "Ophaaldatum en tijd",
+          "dropoffDateTime": "Inleverdatum en tijd",
+          "assignedVehicle": "Toegewezen voertuig",
+          "selectVehicle": "Selecteer voertuig",
+          "selectPickupLocation": "Selecteer ophaallocatie",
+          "selectDropoffLocation": "Selecteer inleverlocatie",
+          "addExtra": "Extra toevoegen",
+          "dailyExtra": "Dagextra",
+          "flatExtra": "Vaste extra",
+          "qty": "Aantal",
+          "lineTotal": "Regeltotaal",
+          "removeExtra": "Verwijderen",
+          "noExtras": "Geen extra’s geselecteerd voor deze boeking."
+        },
+        "sidebar": {
+          "title": "Opslagplan",
+          "description": "Controleer wat er gebeurt voordat je de update opslaat.",
+          "booking": "Boeking",
+          "points": {
+            "recalculate": "Opslaan herberekent totalen met de huidige extra’s, kortingen en de belasting-op-extra’s-regel.",
+            "availability": "Het systeem controleert de beschikbaarheid opnieuw en behoudt het huidige voertuig alleen als het nog past.",
+            "history": "Bestaande facturatie en boekingshistorie blijven aan hetzelfde boekingsrecord gekoppeld.",
+            "invoice": "Opslaan verstuurt een vernieuwde factuur/betalingsaanvraag naar de klant met de bijgewerkte prijs."
+          }
+        },
+        "preview": {
+          "title": "Bijgewerkte prijsweergave",
+          "description": "Dit is wat wordt opgeslagen en gefactureerd.",
+          "rentalDays": "Huurdagen",
+          "discount": "Korting ({code})",
+          "projectedTotal": "Verwacht totaal",
+          "includedExtras": "Inbegrepen extra’s"
+        },
+        "actions": {
+          "saveChanges": "Wijzigingen opslaan"
+        }
       }
     },
     "vehicles": {
@@ -338,7 +1026,9 @@
       "empty": "Geen voertuigen gevonden",
       "errors": {
         "delete": "Fout bij verwijderen van voertuig",
-        "updateStatus": "Fout bij bijwerken voertuigstatus"
+        "updateStatus": "Fout bij bijwerken voertuigstatus",
+        "create": "Fout bij het aanmaken van voertuig",
+        "update": "Fout bij het bijwerken van voertuig"
       },
       "table": {
         "name": "Naam",
@@ -347,6 +1037,26 @@
         "rate": "Dagprijs",
         "status": "Status",
         "actions": "Acties"
+      },
+      "onRent": "Verhuurd",
+      "placeholders": {
+        "name": "bijv. Kia Picanto #1",
+        "plate": "bijv. ABC-1234",
+        "selectCategory": "Selecteer categorie",
+        "notes": "Optionele notities"
+      },
+      "stepCounter": "Stap {current} van {total}",
+      "steps": {
+        "identity": "Identiteit",
+        "identityDescription": "Voertuignaam en kentekenplaat.",
+        "assignment": "Toewijzing",
+        "assignmentDescription": "Categorie en dagprijs.",
+        "status": "Status",
+        "statusDescription": "Operationele status en interne notities."
+      },
+      "confirm": {
+        "deleteTitle": "Voertuig verwijderen?",
+        "deleteDescription": "Dit verwijdert het geselecteerde voertuig permanent."
       }
     },
     "billingRequired": {
@@ -366,11 +1076,16 @@
         "returns": "Innames",
         "financial": "Financieel",
         "fleet": "Vloot",
+        "quickbooks": "QuickBooks",
+        "zoho": "Zoho Invoice",
+        "blockouts": "Beschikbaarheidsblokken",
         "vehicles": "Voertuigbeheer",
         "reviews": "Reviews",
         "settings": "Instellingen",
         "locations": "Locaties",
-        "users": "Gebruikers"
+        "logs": "Logs",
+        "users": "Gebruikers",
+        "help": "Helpcentrum"
       },
       "deliveries": {
         "title": "Aankomende Leveringen (Volgende 7 Dagen)"
@@ -396,11 +1111,149 @@
       },
       "vehicles": {
         "manage": "Voertuigen Beheren",
-        "pricing": "Prijzen"
+        "pricing": "Prijzen",
+        "features": "Opties",
+        "categories": "Categorieën",
+        "extras": "Extra’s",
+        "discounts": "Kortingen"
       },
       "reviews": {
         "title": "Review Moderatie",
-        "subtitle": "Toon of verberg klantreviews op de startpagina."
+        "subtitle": "Toon of verberg klantreviews op de startpagina.",
+        "empty": "Er zijn nog geen reviews.",
+        "table": {
+          "booking": "Reservering",
+          "customer": "Klant",
+          "rating": "Beoordeling",
+          "review": "Review",
+          "status": "Status",
+          "date": "Datum",
+          "actions": "Acties",
+          "fullReview": "Volledige review"
+        },
+        "visibility": {
+          "visible": "ZICHTBAAR",
+          "hidden": "VERBORGEN"
+        },
+        "messages": {
+          "visible": "Review is nu zichtbaar",
+          "hidden": "Review is nu verborgen",
+          "updateFailed": "Review bijwerken mislukt"
+        }
+      }
+    },
+    "blockouts": {
+      "deleteConfirmTitle": "Blokkade verwijderen?",
+      "deleteConfirmDescription": "Dit verwijdert het geselecteerde beschikbaarheidsblok.",
+      "form": {
+        "vehicleScope": "Voertuigbereik",
+        "allVehicles": "Alle voertuigen",
+        "start": "Start",
+        "end": "Einde",
+        "reason": "Reden",
+        "optionalNote": "Optionele notitie",
+        "saving": "Opslaan...",
+        "create": "Blokkade aanmaken"
+      },
+      "table": {
+        "scope": "Bereik",
+        "start": "Start",
+        "end": "Einde",
+        "reason": "Reden",
+        "created": "Aangemaakt",
+        "action": "Actie",
+        "fullReason": "Volledige reden",
+        "deleting": "Verwijderen..."
+      },
+      "messages": {
+        "created": "Blokkade aangemaakt.",
+        "deleted": "Blokkade verwijderd.",
+        "createFailed": "Blokkade aanmaken mislukt",
+        "deleteFailed": "Blokkade verwijderen mislukt"
+      },
+      "title": "Beschikbaarheidsblokkeringen",
+      "description": "Blokkeer alle voertuigen of één specifiek voertuig voor een datumbereik. Deze blokkeringen worden toegepast in de beschikbaarheidszoekopdracht en bij het maken van boekingen."
+    },
+    "quickbooks": {
+      "description": "Overdrachten worden vanuit facturatie-acties in de wachtrij gezet en draaien los van reserveringsbeheer.",
+      "actions": {
+        "refreshCache": "QB-cache verversen",
+        "refreshing": "Verversen...",
+        "syncPending": "Wachtende syncen",
+        "syncing": "Synchroniseren...",
+        "sync": "Synchroniseren",
+        "resync": "Opnieuw synchroniseren"
+      },
+      "table": {
+        "booking": "Reservering",
+        "customer": "Klant",
+        "billing": "Facturatie",
+        "qbStatus": "QB-status",
+        "requested": "Aangevraagd",
+        "synced": "Gesynchroniseerd",
+        "amount": "Bedrag",
+        "action": "Actie",
+        "openBooking": "Reservering openen",
+        "none": "Geen",
+        "paymentReceived": "Betaling ontvangen",
+        "awaitingPayment": "Wacht op betaling",
+        "notQueued": "NIET_IN_WACHTRIJ",
+        "fullSyncError": "Volledige synchronisatiefout"
+      },
+      "messages": {
+        "transferFailed": "QuickBooks-overdracht mislukt",
+        "transferCompleted": "QuickBooks-overdracht voltooid.",
+        "runFailed": "Uitvoeren van QuickBooks-overdrachten mislukt",
+        "runCompletedWithFailures": "{completed} voltooid. {failed} mislukt.",
+        "runCompleted": "{completed} QuickBooks-overdracht(en) voltooid.",
+        "cacheRefreshFailed": "Verversen van QuickBooks-cache mislukt",
+        "cacheRefreshed": "QuickBooks-naamcache ververst ({count})."
+      },
+      "title": "QuickBooks-overdrachten",
+      "pageDescription": "Factuurdocumenten komen hier in de wachtrij voor externe synchronisatie. Boekingspagina’s roepen QuickBooks niet langer direct aan.",
+      "filters": {
+        "all": "Alle",
+        "failed": "Mislukt",
+        "completed": "Voltooid"
+      }
+    },
+    "zoho": {
+      "description": "Overdrachten worden vanuit facturatie-acties in de wachtrij gezet en draaien los van reserveringsbeheer.",
+      "actions": {
+        "syncPending": "Wachtende syncen",
+        "syncing": "Synchroniseren...",
+        "sync": "Synchroniseren",
+        "resync": "Opnieuw synchroniseren"
+      },
+      "table": {
+        "booking": "Reservering",
+        "customer": "Klant",
+        "billing": "Facturatie",
+        "status": "Zoho-status",
+        "requested": "Aangevraagd",
+        "synced": "Gesynchroniseerd",
+        "amount": "Bedrag",
+        "action": "Actie",
+        "openBooking": "Reservering openen",
+        "none": "Geen",
+        "paymentReceived": "Betaling ontvangen",
+        "awaitingPayment": "Wacht op betaling",
+        "notQueued": "NIET_IN_WACHTRIJ",
+        "fullSyncError": "Volledige synchronisatiefout"
+      },
+      "messages": {
+        "transferFailed": "Zoho Invoice-overdracht mislukt",
+        "transferCompleted": "Zoho Invoice-overdracht voltooid.",
+        "runFailed": "Uitvoeren van Zoho Invoice-overdrachten mislukt",
+        "runCompletedWithFailures": "{completed} voltooid. {failed} mislukt.",
+        "runCompleted": "{completed} Zoho Invoice-overdracht(en) voltooid."
+      },
+      "title": "Zoho Invoice-overdrachten",
+      "pageDescription": "Factuurdocumenten komen hier in de wachtrij voor synchronisatie met Zoho Invoice. Boekingspagina’s roepen boekhouding niet langer direct aan.",
+      "filters": {
+        "all": "Alle",
+        "failed": "Mislukt",
+        "completed": "Voltooid"
       }
     },
     "users": {
@@ -422,6 +1275,11 @@
       "empty": "Geen gebruikers gevonden",
       "errors": {
         "delete": "Gebruiker verwijderen mislukt"
+      },
+      "passwordMin": "Wachtwoord: minimaal 8 tekens",
+      "roles": {
+        "owner": "EIGENAAR",
+        "staff": "MEDEWERKER"
       }
     },
     "locations": {
@@ -440,24 +1298,253 @@
       "empty": "Geen locaties gevonden",
       "errors": {
         "delete": "Locatie verwijderen mislukt"
-      }
+      },
+      "fullAddress": "Volledig adres"
     },
     "settings": {
       "title": "Systeeminstellingen",
       "subtitle": "Van toepassing op reserveringstotalen, factuur-pdf's en verkoopbewijzen.",
       "taxPercentage": "Belastingpercentage",
       "minimumBookingDays": "Minimale reserveringsduur (dagen)",
+      "vehicleRatesTaxMode": {
+        "label": "Belastingmodus voor voertuigtarieven",
+        "description": "Wanneer dit is ingeschakeld, bevatten autotarieven de belasting al en krijgen alleen extra's extra belasting. Wanneer dit is uitgeschakeld, wordt belasting toegevoegd aan zowel huur als extra's.",
+        "included": "Voertuigtarieven zijn inclusief belasting",
+        "excluded": "Voertuigtarieven zijn exclusief belasting"
+      },
       "saving": "Opslaan...",
       "errors": {
         "invalidTax": "Voer een geldig belastingpercentage in tussen 0 en 100.",
         "invalidMinDays": "Voer een geldige minimale reserveringsduur in tussen 1 en 365 dagen.",
-        "updateFailed": "Instellingen bijwerken mislukt."
+        "updateFailed": "Instellingen bijwerken mislukt.",
+        "requiredTenantFields": "Tenantnaam, e-mail en valuta zijn verplicht."
       },
       "success": {
         "updated": "Instellingen bijgewerkt. Belasting: {tax}%, Minimale reservering: {days} dag(en)."
+      },
+      "branding": {
+        "title": "Tenant branding",
+        "description": "De omgeving levert standaardwaarden. Opslaan hier overschrijft ze tijdens runtime voor deze tenant.",
+        "tenantName": "Tenantnaam",
+        "logoUrl": "Logo-URL",
+        "email": "E-mail",
+        "phone": "Telefoon",
+        "whatsappLabel": "WhatsApp-label",
+        "whatsappUrl": "WhatsApp-URL",
+        "facebookUrl": "Facebook-URL",
+        "instagramUrl": "Instagram-URL",
+        "linkedinUrl": "LinkedIn-URL",
+        "tiktokUrl": "TikTok-URL",
+        "currency": "Valuta",
+        "termsPdfUrl": "Voorwaarden PDF-URL",
+        "address": "Adres",
+        "paymentInstructions": "Betaalinstructies"
+      },
+      "theme": {
+        "title": "Thematokens",
+        "description": "Gebruik Tailwind-compatibele HSL-tokenwaarden, bijvoorbeeld 216 85% 34%.",
+        "primary": "Primair",
+        "primaryForeground": "Primaire voorgrond",
+        "accent": "Accent",
+        "accentForeground": "Accentvoorgrond",
+        "ring": "Ring",
+        "sidebarPrimary": "Sidebar primair",
+        "sidebarPrimaryForeground": "Sidebar primaire voorgrond",
+        "sidebarAccent": "Sidebar accent",
+        "sidebarAccentForeground": "Sidebar accentvoorgrond"
+      },
+      "integrations": {
+        "title": "Integraties",
+        "description": "Selecteer steeds maar één boekhoudprovider. De gekozen provider bepaalt de sidebar-tab en de boekingsoverdrachtsqueue.",
+        "invoiceProvider": "Factuurprovider",
+        "providerNone": "Geen",
+        "providerQuickbooks": "QuickBooks",
+        "providerZoho": "Zoho Invoice",
+        "noneDescription": "Toon geen boekhoudtab en gebruik geen providersynchronisatie.",
+        "quickbooksDescription": "Toon alleen QuickBooks en gebruik het als actieve factuurprovider.",
+        "zohoDescription": "Toon alleen Zoho Invoice en gebruik het als actieve factuurprovider.",
+        "showQuickbooks": "QuickBooks tonen in admin",
+        "allowQuickbooks": "QuickBooks-sync/acties toestaan",
+        "quickbooksControls": "QuickBooks-bediening",
+        "zohoOrganizationId": "Zoho organisatie-ID",
+        "zohoRefreshToken": "Zoho refresh token",
+        "envWarning": "QuickBooks-omgevingsgegevens zijn onvolledig. De runtime-schakelaar kan het pas inschakelen nadat de omgeving is geconfigureerd.",
+        "zohoEnvWarning": "Zoho Invoice-omgevingsgegevens zijn onvolledig. Voeg client id en client secret toe voordat je Zoho gebruikt."
+      },
+      "messages": {
+        "updated": "Instellingen bijgewerkt."
       }
     },
-    "logout": "Afmelden"
+    "logout": "Afmelden",
+    "shared": {
+      "showing": "{start}-{end} van {total} weergegeven",
+      "rows": "Rijen:"
+    },
+    "categories": {
+      "title": "Categorieën",
+      "add": "Categorie toevoegen",
+      "edit": "Categorie bewerken",
+      "name": "Naam",
+      "description": "Beschrijving",
+      "image": "Categorieafbeelding",
+      "imageUrl": "Afbeeldings-URL",
+      "previewAlt": "Voorbeeld van categorie",
+      "dailyRate": "Dagtarief ($)",
+      "fuelChargePerQuarter": "Brandstoftoeslag per 1/4 tank ($)",
+      "sortOrder": "Sorteervolgorde",
+      "seats": "Zitplaatsen",
+      "features": "Auto-opties",
+      "featuresHint": "Maak opties één keer aan op het tabblad kenmerken en wijs ze hier toe.",
+      "featuresFlowTitle": "Hoe opties werken",
+      "featuresFlowDescription": "Opties worden beheerd op het tabblad Kenmerken en hier aan categorieën gekoppeld. Voertuigen erven die opties van hun toegewezen categorie.",
+      "stepCounter": "Stap {current} van {total}",
+      "steps": {
+        "basics": "Basis",
+        "basicsDescription": "Naam, beschrijving en afbeelding.",
+        "pricing": "Prijzen",
+        "pricingDescription": "Tarieven, volgorde en actieve status.",
+        "options": "Opties",
+        "optionsDescription": "Zitplaatsen, transmissie en toegewezen kenmerken."
+      },
+      "carPlay": "Apple CarPlay",
+      "carPlayShort": "CarPlay",
+      "backupCamera": "Achteruitrijcamera",
+      "transmission": "Transmissie",
+      "automatic": "Automaat",
+      "manual": "Handgeschakeld",
+      "acAvailable": "Airco beschikbaar",
+      "acShort": "Airco",
+      "noAc": "Geen airco",
+      "active": "Actief",
+      "uploading": "Uploaden...",
+      "actions": {
+        "archive": "Archiveren"
+      },
+      "confirm": {
+        "archiveTitle": "Categorie archiveren?",
+        "archiveDescription": "Dit archiveert de geselecteerde categorie."
+      },
+      "status": {
+        "active": "ACTIEF",
+        "archived": "GEARCHIVEERD"
+      },
+      "table": {
+        "image": "Afbeelding",
+        "features": "Kenmerken",
+        "fuelCharge": "Brandstoftoeslag",
+        "vehicles": "Voertuigen",
+        "bookings": "Boekingen",
+        "fullDescription": "Volledige beschrijving",
+        "fullFeatures": "Volledige kenmerken",
+        "featuresSummary": "{seats} zitplaatsen • {transmission} • {features}",
+        "noFeatures": "Geen opties toegewezen",
+        "fuelChargeValue": "${amount}/1/4"
+      },
+      "pricingCard": {
+        "features": "{seats} zitplaatsen • {transmission} • {features}",
+        "fuelRefill": "Brandstofaanvulling: {amount} per 1/4 tank"
+      },
+      "messages": {
+        "saveFailed": "Categorie opslaan mislukt",
+        "updated": "Categorie bijgewerkt",
+        "created": "Categorie aangemaakt",
+        "imageUploadFailed": "Uploaden van afbeelding mislukt",
+        "imageUploaded": "Afbeelding geüpload",
+        "archiveFailed": "Categorie archiveren mislukt",
+        "archived": "Categorie gearchiveerd"
+      }
+    },
+    "features": {
+      "title": "Voertuigkenmerken",
+      "pageHint": "Beheer de optiecatalogus één keer en wijs die daarna toe aan categorieën. Publieke vlootkaarten en boekingsresultaten lezen uit deze catalogus.",
+      "createHint": "Maak herbruikbare opties zoals Bluetooth, dashcam of USB-C zonder nog een schemawijziging.",
+      "assignHint": "Maak eerst een optie aan en open daarna een categorie om die optie daar te koppelen, zodat voertuigen in die categorie hem automatisch tonen.",
+      "liveHint": "Actieve opties zijn direct beschikbaar voor categorietoewijzing en publieke weergave.",
+      "tableHint": "Deze lijst is de hoofdcatalogus met kenmerken die wordt gebruikt voor categorietoewijzing en publieke voertuigkaarten.",
+      "add": "Kenmerk toevoegen",
+      "edit": "Kenmerk bewerken",
+      "name": "Naam van kenmerk",
+      "slug": "Slug",
+      "sortOrder": "Sorteervolgorde",
+      "active": "Actief",
+      "actions": {
+        "archive": "Archiveren"
+      },
+      "confirm": {
+        "archiveTitle": "Kenmerk archiveren?",
+        "archiveDescription": "Dit archiveert het geselecteerde kenmerk."
+      },
+      "status": {
+        "active": "ACTIEF",
+        "archived": "GEARCHIVEERD"
+      },
+      "table": {
+        "categories": "Categorieën"
+      },
+      "messages": {
+        "saveFailed": "Kenmerk opslaan mislukt",
+        "updated": "Kenmerk bijgewerkt",
+        "created": "Kenmerk aangemaakt",
+        "archiveFailed": "Kenmerk archiveren mislukt",
+        "archived": "Kenmerk gearchiveerd"
+      }
+    },
+    "extras": {
+      "title": "Extra’s",
+      "add": "Extra toevoegen",
+      "edit": "Extra bewerken",
+      "name": "Naam",
+      "description": "Beschrijving",
+      "flatRate": "Vast tarief",
+      "dailyRate": "Dagtarief",
+      "amount": "Bedrag",
+      "active": "Actief",
+      "actions": {
+        "archive": "Archiveren"
+      },
+      "status": {
+        "active": "ACTIEF",
+        "archived": "GEARCHIVEERD"
+      },
+      "table": {
+        "type": "Type"
+      },
+      "messages": {
+        "saveFailed": "Extra opslaan mislukt",
+        "updated": "Extra bijgewerkt",
+        "created": "Extra aangemaakt",
+        "archiveFailed": "Extra archiveren mislukt",
+        "archived": "Extra gearchiveerd"
+      }
+    },
+    "discounts": {
+      "title": "Kortingscodes",
+      "add": "Kortingscode toevoegen",
+      "edit": "Kortingscode bewerken",
+      "code": "Code",
+      "description": "Beschrijving",
+      "percentage": "Percentage",
+      "maxUses": "Max. aantal gebruiken (optioneel)",
+      "active": "Actief",
+      "actions": {
+        "deactivate": "Deactiveren"
+      },
+      "status": {
+        "active": "ACTIEF",
+        "inactive": "INACTIEF"
+      },
+      "table": {
+        "uses": "Gebruik",
+        "expires": "Verloopt"
+      },
+      "messages": {
+        "saveFailed": "Korting opslaan mislukt",
+        "updated": "Korting bijgewerkt",
+        "created": "Korting aangemaakt",
+        "deactivateFailed": "Code deactiveren mislukt",
+        "deactivated": "Korting gedeactiveerd"
+      }
+    }
   },
   "errors": {
     "notFound": "Pagina niet gevonden",

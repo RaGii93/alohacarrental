@@ -24,6 +24,14 @@ export async function createCategoryAction(formData: any, locale: string) {
 
   try {
     const validated = categoryFormSchema.parse(formData);
+    const selectedFeatureIds = Array.from(new Set(validated.featureIds));
+    const selectedFeatures = selectedFeatureIds.length
+      ? await db.vehicleFeature.findMany({
+          where: { id: { in: selectedFeatureIds } },
+          select: { id: true, slug: true },
+        })
+      : [];
+    const selectedSlugs = new Set(selectedFeatures.map((feature) => feature.slug));
     const created = await db.vehicleCategory.create({
       data: {
         name: validated.name,
@@ -31,10 +39,21 @@ export async function createCategoryAction(formData: any, locale: string) {
         imageUrl: validated.imageUrl || null,
         seats: validated.seats,
         transmission: validated.transmission,
-        hasAC: validated.hasAC,
+        hasAC: selectedSlugs.has("ac"),
+        hasCarPlay: selectedSlugs.has("apple-carplay"),
+        hasBackupCamera: selectedSlugs.has("backup-camera"),
         dailyRate: Math.round(validated.dailyRate * 100),
+        fuelChargePerQuarter: Math.round(validated.fuelChargePerQuarter * 100),
         sortOrder: validated.sortOrder,
         isActive: validated.isActive,
+        features: selectedFeatureIds.length
+          ? {
+              createMany: {
+                data: selectedFeatureIds.map((featureId) => ({ featureId })),
+                skipDuplicates: true,
+              },
+            }
+          : undefined,
       },
     });
     await db.auditLog.create({
@@ -55,6 +74,14 @@ export async function updateCategoryAction(categoryId: string, formData: any, lo
 
   try {
     const validated = categoryFormSchema.parse(formData);
+    const selectedFeatureIds = Array.from(new Set(validated.featureIds));
+    const selectedFeatures = selectedFeatureIds.length
+      ? await db.vehicleFeature.findMany({
+          where: { id: { in: selectedFeatureIds } },
+          select: { id: true, slug: true },
+        })
+      : [];
+    const selectedSlugs = new Set(selectedFeatures.map((feature) => feature.slug));
     const updated = await db.vehicleCategory.update({
       where: { id: categoryId },
       data: {
@@ -63,10 +90,24 @@ export async function updateCategoryAction(categoryId: string, formData: any, lo
         imageUrl: validated.imageUrl || null,
         seats: validated.seats,
         transmission: validated.transmission,
-        hasAC: validated.hasAC,
+        hasAC: selectedSlugs.has("ac"),
+        hasCarPlay: selectedSlugs.has("apple-carplay"),
+        hasBackupCamera: selectedSlugs.has("backup-camera"),
         dailyRate: Math.round(validated.dailyRate * 100),
+        fuelChargePerQuarter: Math.round(validated.fuelChargePerQuarter * 100),
         sortOrder: validated.sortOrder,
         isActive: validated.isActive,
+        features: selectedFeatureIds.length
+          ? {
+              deleteMany: {},
+              createMany: {
+                data: selectedFeatureIds.map((featureId) => ({ featureId })),
+                skipDuplicates: true,
+              },
+            }
+          : {
+              deleteMany: {},
+            },
       },
     });
     await db.auditLog.create({

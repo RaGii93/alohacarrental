@@ -1,4 +1,11 @@
-import { getQuickBooksRefreshToken, setQuickBooksRefreshToken } from "@/lib/settings";
+import {
+  getAppSettingValue,
+  getQuickBooksFeatureSettings,
+  getQuickBooksRefreshToken,
+  getQuickBooksSetupSettings,
+  setAppSettingValue,
+  setQuickBooksRefreshToken,
+} from "@/lib/settings";
 
 type QuickBooksCustomerInput = {
   bookingCode: string;
@@ -21,6 +28,8 @@ type QuickBooksPaymentInput = QuickBooksInvoiceInput;
 type QueryResponse<T = any> = {
   QueryResponse?: {
     Customer?: T[];
+    Vendor?: T[];
+    Employee?: T[];
     Invoice?: T[];
     SalesReceipt?: T[];
     Payment?: T[];
@@ -28,6 +37,19 @@ type QueryResponse<T = any> = {
     Account?: T[];
   };
   Fault?: any;
+};
+
+type QuickBooksNameListEntityType = "CUSTOMER" | "VENDOR" | "EMPLOYEE";
+
+type QuickBooksNameListEntry = {
+  entityType: QuickBooksNameListEntityType;
+  id: string;
+  displayName: string;
+  fullyQualifiedName: string;
+  companyName: string;
+  email: string;
+  phone: string;
+  active: boolean | null;
 };
 
 function parseQuickBooksFaultPayload(payload: any) {
@@ -50,7 +72,7 @@ function buildQuickBooksHint(code: string, message: string) {
 }
 
 function normalizeQuickBooksError(error: any) {
-  const raw = String(error?.message || "QuickBooks request failed");
+  const raw = String(error?.rawPayload || error?.message || "QuickBooks request failed");
   let parsed: any = null;
   try {
     parsed = JSON.parse(raw);
@@ -71,12 +93,35 @@ function normalizeQuickBooksError(error: any) {
 }
 
 function isDuplicateNameError(error: any) {
-  const message = String(error?.message || "").toLowerCase();
+  const message = String(error?.rawPayload || error?.message || "").toLowerCase();
   return message.includes("name supplied already exists") || message.includes("6240");
 }
 
 function parseDuplicateEntityId(error: any) {
-  const message = String(error?.message || "");
+  const message = String(error?.rawPayload || error?.message || "");
+  let parsed: any = null;
+  try {
+    parsed = JSON.parse(message);
+  } catch {
+    parsed = null;
+  }
+
+  const payloadCandidates = [
+    parsed?.Fault?.Error?.[0]?.Detail,
+    parsed?.Fault?.Error?.[0]?.Message,
+    parsed?.fault?.error?.[0]?.detail,
+    parsed?.fault?.error?.[0]?.message,
+    parsed?.Fault?.Error?.[0]?.element,
+    parsed?.fault?.error?.[0]?.element,
+  ]
+    .map((value) => String(value || ""))
+    .filter(Boolean);
+
+  for (const candidate of payloadCandidates) {
+    const payloadMatch = candidate.match(/(?:^|[\s:])id\s*=\s*(\d+)\b/i);
+    if (payloadMatch?.[1]) return payloadMatch[1];
+  }
+
   const match = message.match(/(?:^|[\s:])id\s*=\s*(\d+)\b/i);
   return match?.[1] || null;
 }
@@ -102,16 +147,68 @@ function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
 }
 
-function buildCanonicalCustomerDisplayName(email: string) {
-  const slug = normalizeEmail(email)
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  const base = `ER Customer ${slug || "unknown"}`.trim();
-  return base.slice(0, 100);
-}
-
 function stripBookingSuffixFromDisplayName(value: string) {
   return value.trim().replace(/\s*\([a-z0-9-]+\)\s*$/i, "").trim();
+}
+
+function stripEmailSuffixFromDisplayName(value: string) {
+  return value.trim().replace(/\s*\([^()]*@[^()]*\)\s*$/i, "").trim();
+}
+
+function sanitizeCustomerDisplayName(value: string) {
+  return stripBookingSuffixFromDisplayName(stripEmailSuffixFromDisplayName(value)).trim();
+}
+
+function buildFallbackCustomerDisplayName(input: Pick<QuickBooksCustomerInput, "bookingCode" | "customerEmail">) {
+  const emailLocalPart = normalizeEmail(input.customerEmail).split("@")[0] || "";
+  const fallback = emailLocalPart.replace(/[._-]+/g, " ").trim();
+  return (fallback || `Customer ${input.bookingCode}`).slice(0, 100);
+}
+
+function buildCustomerMatchCandidates(input: QuickBooksCustomerInput) {
+  const rawName = input.customerName.trim();
+  const sanitizedName = sanitizeCustomerDisplayName(rawName);
+  const fallbackName = buildFallbackCustomerDisplayName(input);
+
+  return Array.from(new Set([sanitizedName, rawName, fallbackName].map((value) => value.trim().slice(0, 100)).filter(Boolean)));
+}
+
+function buildCustomerNormalizedNameSet(customer: any) {
+  const values = [
+    String(customer?.DisplayName || ""),
+    String(customer?.FullyQualifiedName || ""),
+    String(customer?.PrintOnCheckName || ""),
+    [customer?.GivenName, customer?.MiddleName, customer?.FamilyName].filter(Boolean).join(" "),
+    [customer?.Title, customer?.GivenName, customer?.MiddleName, customer?.FamilyName, customer?.Suffix].filter(Boolean).join(" "),
+  ];
+
+  return new Set(
+    values
+      .flatMap((value) => [value, sanitizeCustomerDisplayName(value)])
+      .map((value) => normalizeCustomerDisplayName(value))
+      .filter(Boolean)
+  );
+}
+
+function splitCustomerPersonName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return {};
+  if (parts.length === 1) return { GivenName: parts[0] };
+  return {
+    GivenName: parts[0],
+    FamilyName: parts.slice(1).join(" "),
+  };
+}
+
+function summarizeCustomerForDebug(customer: any) {
+  return {
+    Id: String(customer?.Id || ""),
+    DisplayName: String(customer?.DisplayName || ""),
+    FullyQualifiedName: String(customer?.FullyQualifiedName || ""),
+    Active: typeof customer?.Active === "boolean" ? customer.Active : null,
+    PrimaryEmailAddr: String(customer?.PrimaryEmailAddr?.Address || ""),
+    PrimaryPhone: String(customer?.PrimaryPhone?.FreeFormNumber || ""),
+  };
 }
 
 function amountToMajor(cents: number) {
@@ -124,12 +221,64 @@ const QUICKBOOKS_DEFAULT_MINOR_VERSION = "75";
 const QUICKBOOKS_DEFAULT_ITEM_NAME = "Vehicle Rental";
 const QUICKBOOKS_FALLBACK_ITEM_NAME = "Vehicle Rental Service";
 const QUICKBOOKS_DOC_NUMBER_MAX_LENGTH = 21;
+const QUICKBOOKS_NAME_CACHE_KEY = "quickbooks_name_list_cache_v1";
+const QUICKBOOKS_NAME_CACHE_MAX_AGE_MS = 1000 * 60 * 30;
 
 function buildBoundedReference(prefix: string, rawValue: string, maxLength = QUICKBOOKS_DOC_NUMBER_MAX_LENGTH) {
   const base = `${prefix}${rawValue}`.trim();
   if (base.length <= maxLength) return base;
   const allowedRawLength = Math.max(1, maxLength - prefix.length);
   return `${prefix}${rawValue.slice(-allowedRawLength)}`;
+}
+
+function getNameListEntryEmail(entity: any) {
+  return normalizeEmail(String(entity?.PrimaryEmailAddr?.Address || entity?.BillAddr?.Email || ""));
+}
+
+function getNameListEntryPhone(entity: any) {
+  return String(
+    entity?.PrimaryPhone?.FreeFormNumber ||
+      entity?.Mobile?.FreeFormNumber ||
+      entity?.Fax?.FreeFormNumber ||
+      ""
+  ).trim();
+}
+
+function mapNameListEntry(entityType: QuickBooksNameListEntityType, entity: any): QuickBooksNameListEntry {
+  return {
+    entityType,
+    id: String(entity?.Id || ""),
+    displayName: String(entity?.DisplayName || "").trim(),
+    fullyQualifiedName: String(entity?.FullyQualifiedName || "").trim(),
+    companyName: String(entity?.CompanyName || "").trim(),
+    email: getNameListEntryEmail(entity),
+    phone: getNameListEntryPhone(entity),
+    active: typeof entity?.Active === "boolean" ? entity.Active : null,
+  };
+}
+
+async function getQuickBooksNameListCache() {
+  const raw = await getAppSettingValue(QUICKBOOKS_NAME_CACHE_KEY);
+  if (!raw) return { updatedAt: 0, entries: [] as QuickBooksNameListEntry[] };
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      updatedAt: Number(parsed?.updatedAt || 0),
+      entries: Array.isArray(parsed?.entries) ? (parsed.entries as QuickBooksNameListEntry[]) : [],
+    };
+  } catch {
+    return { updatedAt: 0, entries: [] as QuickBooksNameListEntry[] };
+  }
+}
+
+async function setQuickBooksNameListCache(entries: QuickBooksNameListEntry[]) {
+  await setAppSettingValue(
+    QUICKBOOKS_NAME_CACHE_KEY,
+    JSON.stringify({
+      updatedAt: Date.now(),
+      entries,
+    })
+  );
 }
 
 function isSalesLineUsableItem(item: any) {
@@ -141,11 +290,9 @@ function resolveQuickBooksApiBase(environment: string) {
   return environment === "sandbox" ? QUICKBOOKS_SANDBOX_API_BASE : QUICKBOOKS_PRODUCTION_API_BASE;
 }
 
-function getQuickBooksConfig() {
-  const enabled = parseBool(process.env.QUICKBOOKS_ENABLED, false);
+function getQuickBooksEnvConfig() {
   const environment = (process.env.QUICKBOOKS_ENVIRONMENT || "production").trim().toLowerCase();
   return {
-    enabled,
     environment: environment === "sandbox" ? "sandbox" : "production",
     realmId: process.env.QUICKBOOKS_REALM_ID || "",
     clientId: process.env.QUICKBOOKS_CLIENT_ID || "",
@@ -164,18 +311,35 @@ function maskValue(value: string, visible = 4) {
   return `${normalized.slice(0, visible)}...${normalized.slice(-visible)}`;
 }
 
-export function isQuickBooksEnabled() {
-  return getQuickBooksConfig().enabled;
+async function getQuickBooksConfig() {
+  const env = getQuickBooksEnvConfig();
+  const feature = await getQuickBooksFeatureSettings();
+  const setup = await getQuickBooksSetupSettings();
+  const persistedRealmId = String(await getAppSettingValue("quickbooks_realm_id")).trim();
+  return {
+    ...env,
+    environment: setup.environment || env.environment,
+    realmId: persistedRealmId || setup.realmId || env.realmId,
+    clientId: setup.clientId || env.clientId,
+    clientSecret: setup.clientSecret || env.clientSecret,
+    itemId: setup.itemId || env.itemId,
+    enabled: feature.enabled,
+    visibleInAdmin: feature.visibleInAdmin,
+  };
 }
 
-function hasRequiredQuickBooksConfig() {
-  const cfg = getQuickBooksConfig();
+export async function isQuickBooksEnabled() {
+  return (await getQuickBooksFeatureSettings()).enabled;
+}
+
+async function hasRequiredQuickBooksConfig() {
+  const cfg = await getQuickBooksConfig();
   if (!cfg.enabled) return false;
   return Boolean(cfg.realmId && cfg.clientId && cfg.clientSecret);
 }
 
 async function resolveAccessToken() {
-  const cfg = getQuickBooksConfig();
+  const cfg = await getQuickBooksConfig();
   const persistedRefreshToken = await getQuickBooksRefreshToken();
   const refreshToken = persistedRefreshToken || cfg.refreshToken;
   if (!refreshToken) {
@@ -216,7 +380,7 @@ async function resolveAccessToken() {
 }
 
 async function qbRequest(path: string, method: "GET" | "POST", body?: unknown, contentType = "application/json") {
-  const cfg = getQuickBooksConfig();
+  const cfg = await getQuickBooksConfig();
   const accessToken = await resolveAccessToken();
   const apiBase = resolveQuickBooksApiBase(cfg.environment);
   const url = `${apiBase}${path}${path.includes("?") ? "&" : "?"}minorversion=${encodeURIComponent(cfg.minorVersion)}`;
@@ -240,22 +404,19 @@ async function qbRequest(path: string, method: "GET" | "POST", body?: unknown, c
   }
 
   if (!response.ok) {
-    const faultMessage =
-      json?.Fault?.Error?.[0]?.Detail ||
-      json?.Fault?.Error?.[0]?.Message ||
-      text ||
-      `QuickBooks API error ${response.status}`;
-    const message = normalizeQuickBooksError(new Error(faultMessage));
-    throw new Error(message);
+    const rawErrorPayload = json ? JSON.stringify(json) : text || `QuickBooks API error ${response.status}`;
+    const error = new Error(normalizeQuickBooksError({ rawPayload: rawErrorPayload }));
+    (error as any).rawPayload = rawErrorPayload;
+    throw error;
   }
 
   return json;
 }
 
 async function qbQuery<T = any>(query: string) {
-  const cfg = getQuickBooksConfig();
-  const path = `/v3/company/${encodeURIComponent(cfg.realmId)}/query`;
-  return (await qbRequest(path, "POST", query, "text/plain")) as QueryResponse<T>;
+  const cfg = await getQuickBooksConfig();
+  const path = `/v3/company/${encodeURIComponent(cfg.realmId)}/query?query=${encodeURIComponent(query)}`;
+  return (await qbRequest(path, "GET")) as QueryResponse<T>;
 }
 
 function isQueryParserError(error: any) {
@@ -275,55 +436,215 @@ async function qbQuerySafe<T = any>(query: string) {
   }
 }
 
+async function qbQueryDiagnostic<T = any>(query: string) {
+  try {
+    const result = await qbQuery<T>(query);
+    return { result, error: null as string | null };
+  } catch (error: any) {
+    return {
+      result: {} as QueryResponse<T>,
+      error: normalizeQuickBooksError(error) || String(error?.message || "unknown query error"),
+    };
+  }
+}
+
 async function qbCreateOrUpdate(resource: "customer" | "invoice" | "salesreceipt" | "payment", payload: any) {
-  const cfg = getQuickBooksConfig();
+  const cfg = await getQuickBooksConfig();
   const path = `/v3/company/${encodeURIComponent(cfg.realmId)}/${resource}`;
   return await qbRequest(path, "POST", payload, "application/json");
 }
 
 async function fetchEntityById(resource: "customer" | "item", id: string) {
-  const cfg = getQuickBooksConfig();
+  const cfg = await getQuickBooksConfig();
   const response = await qbRequest(`/v3/company/${encodeURIComponent(cfg.realmId)}/${resource}/${encodeURIComponent(id)}`, "GET");
   return response?.[resource === "customer" ? "Customer" : "Item"] || null;
 }
 
-async function ensureCustomer(input: QuickBooksCustomerInput) {
-  const displayName = input.customerName.trim() || `Customer ${input.bookingCode}`;
-  const normalizedDisplayName = normalizeCustomerDisplayName(displayName);
-  const normalizedDisplayBaseName = normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(displayName));
-  const normalizedEmail = normalizeEmail(input.customerEmail);
-  const canonicalDisplayName = buildCanonicalCustomerDisplayName(normalizedEmail);
-  const deterministicNameCandidates = Array.from(
-    new Set(
-      [
-        canonicalDisplayName,
-        displayName,
-        `${displayName} (${normalizedEmail})`,
-        `Customer ${normalizedEmail}`,
-      ].map((value) => value.trim().slice(0, 100))
-    )
-  ).filter(Boolean);
-  const normalizedNameCandidates = new Set(
-    deterministicNameCandidates.map((value) => normalizeCustomerDisplayName(value))
+async function listNameListEntities(entity: "Customer" | "Vendor" | "Employee") {
+  const pageSize = 1000;
+  const values: any[] = [];
+
+  for (let startPosition = 1; startPosition <= 10000; startPosition += pageSize) {
+    const query = `select * from ${entity} startposition ${startPosition} maxresults ${pageSize}`;
+    const { result, error } = await qbQueryDiagnostic<any>(query);
+    if (error) {
+      throw new Error(`QuickBooks ${entity} cache refresh failed: ${error}`);
+    }
+
+    const page = result?.QueryResponse?.[entity] || [];
+    if (!page.length) break;
+    values.push(...page);
+    if (page.length < pageSize) break;
+  }
+
+  return values;
+}
+
+export async function refreshQuickBooksNameListCache(options?: { force?: boolean }) {
+  if (!(await isQuickBooksEnabled())) {
+    return { success: false as const, error: "QuickBooks is disabled" };
+  }
+  if (!(await hasRequiredQuickBooksConfig())) {
+    return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
+  }
+
+  const cached = await getQuickBooksNameListCache();
+  if (!options?.force && cached.entries.length > 0 && Date.now() - cached.updatedAt < QUICKBOOKS_NAME_CACHE_MAX_AGE_MS) {
+    return { success: true as const, refreshed: false as const, count: cached.entries.length };
+  }
+
+  try {
+    const [customers, vendors, employees] = await Promise.all([
+      listNameListEntities("Customer"),
+      listNameListEntities("Vendor"),
+      listNameListEntities("Employee"),
+    ]);
+    const entries = [
+      ...customers.map((entity) => mapNameListEntry("CUSTOMER", entity)),
+      ...vendors.map((entity) => mapNameListEntry("VENDOR", entity)),
+      ...employees.map((entity) => mapNameListEntry("EMPLOYEE", entity)),
+    ].filter((entry) => entry.id && (entry.displayName || entry.email || entry.phone || entry.companyName));
+
+    await setQuickBooksNameListCache(entries);
+    return { success: true as const, refreshed: true as const, count: entries.length };
+  } catch (error: any) {
+    return { success: false as const, error: normalizeQuickBooksError(error) || "QuickBooks name cache refresh failed" };
+  }
+}
+
+async function ensureQuickBooksNameListCache() {
+  const refresh = await refreshQuickBooksNameListCache();
+  if (!refresh.success) return { updatedAt: 0, entries: [] as QuickBooksNameListEntry[] };
+  return await getQuickBooksNameListCache();
+}
+
+function findCachedCustomerMatch(input: QuickBooksCustomerInput, entries: QuickBooksNameListEntry[]) {
+  const candidateNames = buildCustomerMatchCandidates(input).map((value) => normalizeCustomerDisplayName(value));
+  const candidateEmail = normalizeEmail(input.customerEmail);
+  const candidatePhone = String(input.customerPhone || "").trim();
+  const customers = entries.filter((entry) => entry.entityType === "CUSTOMER");
+
+  return (
+    customers.find((entry) => candidateNames.includes(normalizeCustomerDisplayName(entry.displayName))) ||
+    customers.find((entry) => entry.email && entry.email === candidateEmail) ||
+    customers.find((entry) => entry.phone && candidatePhone && entry.phone === candidatePhone) ||
+    null
   );
+}
+
+async function listAllCustomersSafe() {
+  const pageSize = 1000;
+  const customers: any[] = [];
+  const scopes = [
+    "",
+    " where Active = false",
+  ];
+
+  for (const scope of scopes) {
+    for (let startPosition = 1; startPosition <= 10000; startPosition += pageSize) {
+      const response = await qbQuerySafe<any>(
+        `select * from Customer${scope} startposition ${startPosition} maxresults ${pageSize}`
+      );
+      const page = response?.QueryResponse?.Customer || [];
+      if (!page.length) break;
+      customers.push(...page);
+      if (page.length < pageSize) break;
+    }
+  }
+
+  const unique = new Map<string, any>();
+  for (const customer of customers) {
+    const id = String(customer?.Id || "");
+    if (id && !unique.has(id)) {
+      unique.set(id, customer);
+    }
+  }
+
+  return Array.from(unique.values());
+}
+
+async function findCustomersByDisplayNamePrefix(name: string) {
+  const safeName = escapeQueryValue(name);
+  const queries = [
+    `select * from Customer where DisplayName like '${safeName}%' maxresults 100`,
+    `select * from Customer where FullyQualifiedName like '${safeName}%' maxresults 100`,
+    `select * from Customer where Active = false and DisplayName like '${safeName}%' maxresults 100`,
+    `select * from Customer where Active = false and FullyQualifiedName like '${safeName}%' maxresults 100`,
+  ];
+  const matches: any[] = [];
+  for (const query of queries) {
+    const response = await qbQuerySafe<any>(query);
+    const customers = response?.QueryResponse?.Customer || [];
+    matches.push(...customers);
+  }
+
+  const unique = new Map<string, any>();
+  for (const customer of matches) {
+    const id = String(customer?.Id || "");
+    if (id && !unique.has(id)) unique.set(id, customer);
+  }
+  return Array.from(unique.values());
+}
+
+async function ensureCustomer(input: QuickBooksCustomerInput) {
+  const displayNameCandidates = buildCustomerMatchCandidates(input);
+  const displayName = displayNameCandidates[0] || `Customer ${input.bookingCode}`;
+  const normalizedDisplayCandidates = new Set(
+    displayNameCandidates
+      .flatMap((value) => [value, sanitizeCustomerDisplayName(value)])
+      .map((value) => normalizeCustomerDisplayName(value))
+      .filter(Boolean)
+  );
+  const normalizedEmail = normalizeEmail(input.customerEmail);
+  const cachedNameList = await ensureQuickBooksNameListCache();
+  const cachedCustomerMatch = findCachedCustomerMatch(input, cachedNameList.entries);
+  const debugState: {
+    exactMatches: Array<{ candidate: string; result: any | null }>;
+    prefixMatches: Array<{ candidate: string; results: any[] }>;
+    listScanSample: any[];
+    queryErrors: Array<{ query: string; error: string }>;
+    duplicatePayload: string | null;
+    duplicateParsedId: string | null;
+  } = {
+    exactMatches: [],
+    prefixMatches: [],
+    listScanSample: [],
+    queryErrors: [],
+    duplicatePayload: null,
+    duplicateParsedId: null,
+  };
+
+  if (cachedCustomerMatch?.id) {
+    const fetchedCachedCustomer = await fetchEntityById("customer", cachedCustomerMatch.id);
+    if (fetchedCachedCustomer?.Id) return fetchedCachedCustomer;
+  }
 
   const listAndMatchExistingCustomer = async (preferredNames: string[] = []) => {
-    const normalizedPreferredNames = new Set(preferredNames.map((value) => normalizeCustomerDisplayName(value)));
-    const allCustomers = await qbQuerySafe<any>("select * from Customer maxresults 1000");
-    const customers = allCustomers?.QueryResponse?.Customer || [];
+    const normalizedPreferredNames = new Set(
+      preferredNames
+        .flatMap((value) => [value, sanitizeCustomerDisplayName(value)])
+        .map((value) => normalizeCustomerDisplayName(value))
+        .filter(Boolean)
+    );
+    const customers = await listAllCustomersSafe();
+    debugState.listScanSample = customers
+      .filter((customer: any) => {
+        const customerNames = buildCustomerNormalizedNameSet(customer);
+        return Array.from(new Set([...normalizedPreferredNames, ...normalizedDisplayCandidates])).some((candidate) =>
+          customerNames.has(candidate)
+        );
+      })
+      .slice(0, 10)
+      .map((customer: any) => summarizeCustomerForDebug(customer));
     return (
-      customers.find((customer: any) =>
-        normalizedPreferredNames.has(normalizeCustomerDisplayName(String(customer?.DisplayName || "")))
-      ) ||
-      customers.find((customer: any) => normalizeCustomerDisplayName(String(customer?.DisplayName || "")) === normalizedDisplayName) ||
-      customers.find((customer: any) =>
-        normalizedNameCandidates.has(normalizeCustomerDisplayName(String(customer?.DisplayName || "")))
-      ) ||
-      customers.find(
-        (customer: any) =>
-          normalizeCustomerDisplayName(stripBookingSuffixFromDisplayName(String(customer?.DisplayName || ""))) ===
-          normalizedDisplayBaseName
-      ) ||
+      customers.find((customer: any) => {
+        const customerNames = buildCustomerNormalizedNameSet(customer);
+        return Array.from(normalizedPreferredNames).some((candidate) => customerNames.has(candidate));
+      }) ||
+      customers.find((customer: any) => {
+        const customerNames = buildCustomerNormalizedNameSet(customer);
+        return Array.from(normalizedDisplayCandidates).some((candidate) => customerNames.has(candidate));
+      }) ||
       customers.find((customer: any) => normalizeEmail(String(customer?.PrimaryEmailAddr?.Address || "")) === normalizedEmail) ||
       null
     );
@@ -331,18 +652,40 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
 
   const findByExactDisplayName = async (name: string) => {
     const safeName = escapeQueryValue(name);
-    const primaryQuery = `select * from Customer Where DisplayName = '${safeName}'`;
-    try {
-      const primaryResult = await qbQuery<any>(primaryQuery);
-      if (primaryResult?.QueryResponse?.Customer?.[0]) {
-        return primaryResult.QueryResponse.Customer[0];
+    const exactQueries = [
+      `select * from Customer where DisplayName = '${safeName}'`,
+      `select * from Customer where Active = false and DisplayName = '${safeName}'`,
+    ];
+
+    for (const primaryQuery of exactQueries) {
+      const { result, error } = await qbQueryDiagnostic<any>(primaryQuery);
+      if (error) {
+        debugState.queryErrors.push({ query: primaryQuery, error });
       }
-    } catch (error: any) {
-      if (!isQueryParserError(error)) throw error;
+      if (result?.QueryResponse?.Customer?.[0]) {
+        const match = result.QueryResponse.Customer[0];
+        debugState.exactMatches.push({ candidate: name, result: summarizeCustomerForDebug(match) });
+        return match;
+      }
     }
 
-    const fallbackResult = await qbQuerySafe<any>(`select * from Customer where DisplayName = '${safeName}' maxresults 1`);
-    return fallbackResult?.QueryResponse?.Customer?.[0] || null;
+    for (const fallbackQuery of [
+      `select * from Customer where DisplayName = '${safeName}' maxresults 1`,
+      `select * from Customer where Active = false and DisplayName = '${safeName}' maxresults 1`,
+    ]) {
+      const { result: fallbackResult, error } = await qbQueryDiagnostic<any>(fallbackQuery);
+      if (error) {
+        debugState.queryErrors.push({ query: fallbackQuery, error });
+      }
+      if (fallbackResult?.QueryResponse?.Customer?.[0]) {
+        const match = fallbackResult.QueryResponse.Customer[0];
+        debugState.exactMatches.push({ candidate: name, result: summarizeCustomerForDebug(match) });
+        return match;
+      }
+    }
+
+    debugState.exactMatches.push({ candidate: name, result: null });
+    return null;
   };
 
   const resolveExistingCustomer = async (preferredNames: string[] = []) => {
@@ -352,10 +695,25 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
     }
     const exactByName = await findByExactDisplayName(displayName);
     if (exactByName?.Id) return exactByName;
+
+    for (const candidateName of preferredNames.length ? preferredNames : displayNameCandidates) {
+      const prefixed = await findCustomersByDisplayNamePrefix(candidateName);
+      debugState.prefixMatches.push({
+        candidate: candidateName,
+        results: prefixed.slice(0, 10).map((customer: any) => summarizeCustomerForDebug(customer)),
+      });
+      const matchedByPrefix = prefixed.find((customer: any) => {
+        const customerNames = buildCustomerNormalizedNameSet(customer);
+        return customerNames.has(normalizeCustomerDisplayName(candidateName)) ||
+          customerNames.has(normalizeCustomerDisplayName(sanitizeCustomerDisplayName(candidateName)));
+      });
+      if (matchedByPrefix?.Id) return matchedByPrefix;
+    }
+
     return await listAndMatchExistingCustomer(preferredNames);
   };
 
-  const matchedExisting = await resolveExistingCustomer(deterministicNameCandidates);
+  const matchedExisting = await resolveExistingCustomer(displayNameCandidates);
   if (matchedExisting?.Id) {
     return (await fetchEntityById("customer", String(matchedExisting.Id))) || matchedExisting;
   }
@@ -363,6 +721,7 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   const payloadBase = {
     PrimaryEmailAddr: { Address: normalizedEmail },
     ...(input.customerPhone ? { PrimaryPhone: { FreeFormNumber: input.customerPhone } } : {}),
+    ...splitCustomerPersonName(displayName),
   };
 
   const attemptCreate = async (payload: any) => {
@@ -373,40 +732,56 @@ async function ensureCustomer(input: QuickBooksCustomerInput) {
   };
 
   const createErrors: string[] = [];
-  for (const candidateName of deterministicNameCandidates) {
-    try {
-      const created = await attemptCreate(
-        {
-          ...payloadBase,
-          DisplayName: candidateName,
+  try {
+    const created = await attemptCreate({
+      ...payloadBase,
+      DisplayName: displayName,
+    });
+    if (created?.Id) return created;
+  } catch (error: any) {
+    if (isDuplicateNameError(error)) {
+      createErrors.push(`duplicate:${displayName}`);
+      debugState.duplicatePayload = String(error?.rawPayload || error?.message || "");
+      const duplicateId = parseDuplicateEntityId(error);
+      debugState.duplicateParsedId = duplicateId;
+      if (duplicateId) {
+        try {
+          const duplicateCustomer = await fetchEntityById("customer", duplicateId);
+          if (duplicateCustomer?.Id) return duplicateCustomer;
+        } catch {
+          // Continue to resolver-based fallback.
         }
-      );
-      if (created?.Id) return created;
-    } catch (error: any) {
-      if (isDuplicateNameError(error)) {
-        createErrors.push(`duplicate:${candidateName}`);
-        const duplicateId = parseDuplicateEntityId(error);
-        if (duplicateId) {
-          try {
-            const duplicateCustomer = await fetchEntityById("customer", duplicateId);
-            if (duplicateCustomer?.Id) return duplicateCustomer;
-          } catch {
-            // Continue to resolver-based fallback.
-          }
-        }
-        const resolvedAfterDuplicate = await resolveExistingCustomer([candidateName, ...deterministicNameCandidates]);
-        if (resolvedAfterDuplicate?.Id) {
-          return (await fetchEntityById("customer", String(resolvedAfterDuplicate.Id))) || resolvedAfterDuplicate;
-        }
-        continue;
       }
-      createErrors.push(`${candidateName}:${normalizeQuickBooksError(error) || String(error?.message || "unknown error")}`);
+      const resolvedAfterDuplicate = await resolveExistingCustomer(displayNameCandidates);
+      if (resolvedAfterDuplicate?.Id) {
+        return (await fetchEntityById("customer", String(resolvedAfterDuplicate.Id))) || resolvedAfterDuplicate;
+      }
+      throw new Error(
+        `QuickBooks name conflict: "${displayName}" already exists in QuickBooks, but no matching Customer record could be resolved. ` +
+          `Debug: ${JSON.stringify({
+            bookingCustomer: {
+              displayName,
+              bookingCode: input.bookingCode,
+              email: normalizedEmail,
+              phone: String(input.customerPhone || ""),
+            },
+            cachedCustomerMatch,
+            exactMatches: debugState.exactMatches,
+            prefixMatches: debugState.prefixMatches,
+            listScanSample: debugState.listScanSample,
+            queryErrors: debugState.queryErrors,
+            duplicateParsedId: debugState.duplicateParsedId,
+            duplicatePayload: debugState.duplicatePayload,
+          })}`
+      );
+    } else {
+      createErrors.push(`${displayName}:${normalizeQuickBooksError(error) || String(error?.message || "unknown error")}`);
       throw error;
     }
   }
 
   // Final re-fetch in case concurrent creation happened.
-  const reFetchedAny = await resolveExistingCustomer(deterministicNameCandidates);
+  const reFetchedAny = await resolveExistingCustomer(displayNameCandidates);
   if (reFetchedAny?.Id) return (await fetchEntityById("customer", String(reFetchedAny.Id))) || reFetchedAny;
 
   const attemptsSummary = createErrors.length ? ` Attempts: ${createErrors.join(" | ")}` : "";
@@ -425,7 +800,7 @@ async function listAllItemsSafe() {
 }
 
 async function ensureItemRef() {
-  const cfg = getQuickBooksConfig();
+  const cfg = await getQuickBooksConfig();
   let lastItemError = "";
   if (cfg.itemId) {
     try {
@@ -632,7 +1007,7 @@ async function findSalesReceiptByMemo(memo: string) {
 }
 
 async function fetchInvoiceById(id: string) {
-  const cfg = getQuickBooksConfig();
+  const cfg = await getQuickBooksConfig();
   const response = await qbRequest(`/v3/company/${encodeURIComponent(cfg.realmId)}/invoice/${encodeURIComponent(id)}`, "GET");
   return response?.Invoice || null;
 }
@@ -738,8 +1113,8 @@ async function upsertInvoicePayment(input: QuickBooksPaymentInput, customerRefId
 }
 
 export async function syncQuickBooksInvoice(input: QuickBooksInvoiceInput) {
-  if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
-  if (!hasRequiredQuickBooksConfig()) {
+  if (!(await isQuickBooksEnabled())) return { success: true as const, skipped: true as const };
+  if (!(await hasRequiredQuickBooksConfig())) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
@@ -766,8 +1141,8 @@ export async function syncQuickBooksSalesReceipt(
   input: QuickBooksSalesReceiptInput,
   context?: { customerId?: string }
 ) {
-  if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
-  if (!hasRequiredQuickBooksConfig()) {
+  if (!(await isQuickBooksEnabled())) return { success: true as const, skipped: true as const };
+  if (!(await hasRequiredQuickBooksConfig())) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
@@ -803,8 +1178,8 @@ export async function receiveQuickBooksInvoicePayment(
   input: QuickBooksPaymentInput,
   context?: { invoiceId?: string; customerId?: string }
 ) {
-  if (!isQuickBooksEnabled()) return { success: true as const, skipped: true as const };
-  if (!hasRequiredQuickBooksConfig()) {
+  if (!(await isQuickBooksEnabled())) return { success: true as const, skipped: true as const };
+  if (!(await hasRequiredQuickBooksConfig())) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
   try {
@@ -852,15 +1227,15 @@ export async function receiveQuickBooksInvoicePayment(
 }
 
 export async function getQuickBooksHealth() {
-  if (!isQuickBooksEnabled()) {
+  if (!(await isQuickBooksEnabled())) {
     return { success: false as const, error: "QuickBooks is disabled" };
   }
-  if (!hasRequiredQuickBooksConfig()) {
+  if (!(await hasRequiredQuickBooksConfig())) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
 
   try {
-    const cfg = getQuickBooksConfig();
+    const cfg = await getQuickBooksConfig();
     const token = await resolveAccessToken();
     const apiBase = resolveQuickBooksApiBase(cfg.environment);
     const companyInfoResponse = await qbRequest(
@@ -930,10 +1305,10 @@ export async function getQuickBooksHealth() {
 }
 
 export async function checkQuickBooksRefreshToken() {
-  if (!isQuickBooksEnabled()) {
+  if (!(await isQuickBooksEnabled())) {
     return { success: false as const, error: "QuickBooks is disabled", tokenValid: false as const };
   }
-  if (!hasRequiredQuickBooksConfig()) {
+  if (!(await hasRequiredQuickBooksConfig())) {
     return {
       success: false as const,
       error: "QuickBooks is enabled but missing required env configuration",
@@ -942,7 +1317,7 @@ export async function checkQuickBooksRefreshToken() {
   }
 
   try {
-    const cfg = getQuickBooksConfig();
+    const cfg = await getQuickBooksConfig();
     const persistedRefreshToken = await getQuickBooksRefreshToken();
     const refreshToken = persistedRefreshToken || cfg.refreshToken;
     const tokenSource = persistedRefreshToken ? ("db" as const) : ("env" as const);
@@ -1014,10 +1389,14 @@ export async function checkQuickBooksRefreshToken() {
   }
 }
 
-export function getQuickBooksRuntimePreview() {
-  const cfg = getQuickBooksConfig();
+export async function getQuickBooksRuntimePreview() {
+  const cfg = await getQuickBooksConfig();
+  const feature = await getQuickBooksFeatureSettings();
   return {
     enabled: cfg.enabled,
+    visibleInAdmin: feature.visibleInAdmin,
+    envEnabled: feature.envEnabled,
+    envConfigured: feature.envConfigured,
     realmId: cfg.realmId,
     realmIdMasked: maskValue(cfg.realmId, 4),
     itemId: cfg.itemId,
@@ -1036,10 +1415,10 @@ export function getQuickBooksRuntimePreview() {
 }
 
 export async function listQuickBooksItems(options?: { limit?: number; activeOnly?: boolean }) {
-  if (!isQuickBooksEnabled()) {
+  if (!(await isQuickBooksEnabled())) {
     return { success: false as const, error: "QuickBooks is disabled" };
   }
-  if (!hasRequiredQuickBooksConfig()) {
+  if (!(await hasRequiredQuickBooksConfig())) {
     return { success: false as const, error: "QuickBooks is enabled but missing required env configuration" };
   }
 

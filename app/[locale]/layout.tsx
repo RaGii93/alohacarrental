@@ -2,25 +2,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
 import { getMessages } from "next-intl/server";
-import { Header } from "@/components/Header";
-import { SocialFABs } from "@/components/SocialFABs";
 import "@/app/globals.css";
 import {NextIntlClientProvider} from 'next-intl';
 import {routing} from '@/i18n/routing';
 import { buildMetadata } from "@/lib/seo";
-import { getTenantConfig } from "@/lib/tenant";
-import { Poppins } from "next/font/google";
+import { buildTenantCssVariables, getTenantConfig } from "@/lib/tenant";
  
 type Props = {
   children: React.ReactNode;
   params: Promise<{locale: string}>;
 };
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-poppins",
-});
 
 export async function generateMetadata({
   params,
@@ -28,17 +19,19 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const tenant = getTenantConfig();
+  const tenant = await getTenantConfig();
   return buildMetadata({
     locale,
     path: "/",
     title: tenant.tenantName,
+    tenant,
   });
 }
  
 export default async function RootLayout({children, params}: Props) {
   const {locale} = await params;
-  const tenant = getTenantConfig();
+  const tenant = await getTenantConfig();
+  const tenantThemeStyles = buildTenantCssVariables(tenant);
 
   // Validate that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
@@ -49,19 +42,10 @@ export default async function RootLayout({children, params}: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={poppins.variable}>
+      <body style={tenantThemeStyles}>
         <div className="min-h-screen overflow-x-hidden">
         <NextIntlClientProvider messages={messages}>
-          <Header />
-          <SocialFABs
-            whatsapp={tenant.whatsapp}
-            whatsappUrl={tenant.whatsappUrl}
-            facebookUrl={tenant.facebookUrl}
-            instagramUrl={tenant.instagramUrl}
-            linkedinUrl={tenant.linkedinUrl}
-            tiktokUrl={tenant.tiktokUrl}
-          />
-          <main className="min-h-screen">{children}</main>
+          {children}
         </NextIntlClientProvider>
         <Toaster position="bottom-right" />
         </div>

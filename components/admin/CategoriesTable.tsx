@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,6 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { CategoryDialog } from "./CategoryDialog";
 import { archiveCategoryAction } from "@/actions/categories";
 import { getBlobProxyUrl } from "@/lib/blob";
+import { CompactText } from "@/components/shared/CompactText";
+import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
+import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 
 type Category = {
   id: string;
@@ -18,8 +22,9 @@ type Category = {
   imageUrl?: string | null;
   seats?: number;
   transmission?: "AUTOMATIC" | "MANUAL";
-  hasAC?: boolean;
+  features?: Array<{ featureId?: string; feature?: { id?: string; name?: string | null } | null }>;
   dailyRate: number;
+  fuelChargePerQuarter?: number;
   sortOrder: number;
   isActive: boolean;
   _count?: { vehicles?: number; bookings?: number };
@@ -27,14 +32,18 @@ type Category = {
 
 export function CategoriesTable({
   categories,
+  availableFeatures,
   locale,
 }: {
   categories: Category[];
+  availableFeatures: Array<{ id: string; name: string; isActive: boolean }>;
   locale: string;
 }) {
+  const t = useTranslations();
   const router = useRouter();
   const [selected, setSelected] = useState<Partial<Category> | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [pendingArchiveId, setPendingArchiveId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<"name" | "dailyRate" | "vehicles" | "bookings" | "status">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -82,37 +91,50 @@ export function CategoriesTable({
   const pageRows = sorted;
 
   const handleArchive = async (categoryId: string) => {
-    if (!window.confirm("Archive this category?")) return;
     setBusyId(categoryId);
     const result = await archiveCategoryAction(categoryId, locale);
     setBusyId(null);
+    setPendingArchiveId(null);
     if (!result.success) {
-      toast.error(result.error || "Failed to archive category");
+      toast.error(result.error || t("admin.categories.messages.archiveFailed"));
       return;
     }
-    toast.success("Category archived");
+    toast.success(t("admin.categories.messages.archived"));
     router.refresh();
   };
 
   return (
     <div className="space-y-4">
-      <Button onClick={() => setSelected({})}>+ Add Category</Button>
+      <ConfirmActionDialog
+        open={Boolean(pendingArchiveId)}
+        onOpenChange={(open) => {
+          if (!open && !busyId) setPendingArchiveId(null);
+        }}
+        title={t("admin.categories.confirm.archiveTitle")}
+        description={t("admin.categories.confirm.archiveDescription")}
+        confirmLabel={t("admin.categories.actions.archive")}
+        destructive
+        loading={Boolean(busyId)}
+        onConfirm={() => pendingArchiveId ? handleArchive(pendingArchiveId) : undefined}
+      />
+      <Button onClick={() => setSelected({})}>+ {t("admin.categories.add")}</Button>
 
-      <CategoryDialog category={selected as any} locale={locale} onClose={() => setSelected(null)} />
+      <CategoryDialog category={selected as any} availableFeatures={availableFeatures} locale={locale} onClose={() => setSelected(null)} />
 
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
+        <Table className="bg-transparent">
           <TableHeader>
             <TableRow>
-              <TableHead><button type="button" onClick={() => toggleSort("name")}>Name{sortIndicator("name")}</button></TableHead>
-              <TableHead>Image</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Features</TableHead>
-              <TableHead><button type="button" onClick={() => toggleSort("dailyRate")}>Daily Rate{sortIndicator("dailyRate")}</button></TableHead>
-              <TableHead><button type="button" onClick={() => toggleSort("vehicles")}>Vehicles{sortIndicator("vehicles")}</button></TableHead>
-              <TableHead><button type="button" onClick={() => toggleSort("bookings")}>Bookings{sortIndicator("bookings")}</button></TableHead>
-              <TableHead><button type="button" onClick={() => toggleSort("status")}>Status{sortIndicator("status")}</button></TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("name")}>{t("admin.categories.name")}{sortIndicator("name")}</button></TableHead>
+              <TableHead>{t("admin.categories.table.image")}</TableHead>
+              <TableHead>{t("admin.categories.description")}</TableHead>
+              <TableHead>{t("admin.categories.table.features")}</TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("dailyRate")}>{t("admin.categories.dailyRate")}{sortIndicator("dailyRate")}</button></TableHead>
+              <TableHead>{t("admin.categories.table.fuelCharge")}</TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("vehicles")}>{t("admin.categories.table.vehicles")}{sortIndicator("vehicles")}</button></TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("bookings")}>{t("admin.categories.table.bookings")}{sortIndicator("bookings")}</button></TableHead>
+              <TableHead><button type="button" onClick={() => toggleSort("status")}>{t("admin.vehicles.table.status")}{sortIndicator("status")}</button></TableHead>
+              <TableHead>{t("admin.vehicles.table.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -130,28 +152,50 @@ export function CategoriesTable({
                     "-"
                   )}
                 </TableCell>
-                <TableCell>{category.description || "-"}</TableCell>
                 <TableCell>
-                  {(category.seats ?? 5)} seats • {category.transmission === "MANUAL" ? "Manual" : "Automatic"} • {category.hasAC === false ? "No A/C" : "A/C"}
+                  <CompactText text={category.description} expandedTitle={t("admin.categories.table.fullDescription")} />
+                </TableCell>
+                <TableCell>
+                  <div className="space-y-2">
+                    <p className="text-xs text-slate-500">
+                      {t("admin.categories.table.featuresSummary", {
+                        seats: category.seats ?? 5,
+                        transmission: category.transmission === "MANUAL" ? t("admin.categories.manual") : t("admin.categories.automatic"),
+                        features: "",
+                      }).replace(/\s•\s$/, "")}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {getCategoryFeatureNames(category).length > 0 ? (
+                        getCategoryFeatureNames(category).map((feature) => (
+                          <Badge key={feature} variant="secondary" className="rounded-full px-2.5 py-1 text-xs">
+                            {feature}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-sm text-slate-400">{t("admin.categories.table.noFeatures")}</span>
+                      )}
+                    </div>
+                  </div>
                 </TableCell>
                 <TableCell>${(category.dailyRate / 100).toFixed(2)}</TableCell>
+                <TableCell>{t("admin.categories.table.fuelChargeValue", { amount: ((category.fuelChargePerQuarter ?? 2500) / 100).toFixed(2) })}</TableCell>
                 <TableCell>{category._count?.vehicles ?? 0}</TableCell>
                 <TableCell>{category._count?.bookings ?? 0}</TableCell>
                 <TableCell>
                   <Badge className={category.isActive ? "bg-green-100 text-green-800" : "bg-slate-100 text-slate-700"}>
-                    {category.isActive ? "ACTIVE" : "ARCHIVED"}
+                    {category.isActive ? t("admin.categories.status.active") : t("admin.categories.status.archived")}
                   </Badge>
                 </TableCell>
                 <TableCell className="space-x-2">
-                  <Button size="sm" variant="outline" onClick={() => setSelected(category)}>Edit</Button>
+                  <Button size="sm" variant="outline" onClick={() => setSelected(category)}>{t("common.edit")}</Button>
                   {category.isActive && (
                     <Button
                       size="sm"
                       variant="destructive"
                       disabled={busyId === category.id}
-                      onClick={() => handleArchive(category.id)}
+                      onClick={() => setPendingArchiveId(category.id)}
                     >
-                      Archive
+                      {t("admin.categories.actions.archive")}
                     </Button>
                   )}
                 </TableCell>

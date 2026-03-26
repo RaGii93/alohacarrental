@@ -1,6 +1,28 @@
 import type { Metadata } from "next";
 import { routing } from "@/i18n/routing";
-import { getTenantConfig } from "@/lib/tenant";
+import type { TenantConfig } from "@/lib/tenant";
+
+export const allKeywords = [
+  "car rental",
+  "car hire",
+  "rental car",
+  "vehicle rental",
+  "airport pickup",
+  "daily car rental",
+  "weekly car rental",
+  "long term rental",
+  "economy car rental",
+  "suv rental",
+  "family car rental",
+  "premium car rental",
+  "transparent pricing",
+  "online booking",
+  "trusted car rental support",
+  "Curacao car rental",
+  "Curacao airport car rental",
+  "Willemstad car rental",
+  "Caribbean car rental",
+] as const;
 
 function defaultDescriptionByLocale(locale: string, tenantName: string): string {
   if (locale === "nl") return `Reserveer huurauto's snel en veilig met ${tenantName}.`;
@@ -34,10 +56,12 @@ export function buildMetadata(input: {
   path: string;
   title: string;
   description?: string;
+  keywords?: readonly string[];
   noIndex?: boolean;
+  tenant: TenantConfig;
 }): Metadata {
-  const tenant = getTenantConfig();
-  const siteName = tenant.tenantName || "Aloha Car Rental";
+  const tenant = input.tenant;
+  const siteName = tenant.tenantName || "EdgeRent Lite";
   const description =
     input.description ||
     defaultDescriptionByLocale(input.locale, siteName);
@@ -46,11 +70,13 @@ export function buildMetadata(input: {
   const logoUrl = tenant.logoUrl?.startsWith("http")
     ? tenant.logoUrl
     : `${getBaseUrl()}${tenant.logoUrl || "/logo.svg"}`;
+  const iconUrl = `${getBaseUrl()}/images/icon.png`;
 
   return {
     metadataBase: new URL(getBaseUrl()),
     title: input.title,
     description,
+    keywords: input.keywords ? [...input.keywords] : undefined,
     alternates: {
       canonical,
       languages: languageAlternates(input.path),
@@ -69,6 +95,11 @@ export function buildMetadata(input: {
       title: input.title,
       description,
       images: [logoUrl],
+    },
+    icons: {
+      icon: [{ url: iconUrl, type: "image/png" }],
+      shortcut: [{ url: iconUrl, type: "image/png" }],
+      apple: [{ url: iconUrl, type: "image/png" }],
     },
     robots: input.noIndex
       ? {

@@ -42,6 +42,7 @@ model Vehicle {
   notes         String?
   createdAt     DateTime  @default(now())
   bookings      Booking[]
+  blockouts     VehicleBlockout[]
 
   @@index([status])
   @@index([categoryId])
@@ -55,6 +56,19 @@ model Location {
   createdAt      DateTime  @default(now())
   pickupBookings Booking[] @relation("PickupLocation")
   dropoffBookings Booking[] @relation("DropoffLocation")
+}
+
+model VehicleBlockout {
+  id          String    @id @default(cuid())
+  vehicleId   String?
+  vehicle     Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  startDate   DateTime
+  endDate     DateTime
+  note        String?
+  createdAt   DateTime  @default(now())
+
+  @@index([vehicleId, startDate, endDate])
+  @@index([startDate, endDate])
 }
 
 enum VehicleStatus {
@@ -77,15 +91,43 @@ model VehicleCategory {
   seats       Int       @default(5)
   transmission TransmissionType @default(AUTOMATIC)
   hasAC       Boolean   @default(true)
+  hasCarPlay  Boolean   @default(false)
+  hasBackupCamera Boolean @default(false)
   dailyRate   Int       // stored in cents
+  fuelChargePerQuarter Int @default(2500) // stored in cents
   isActive    Boolean   @default(true)
   sortOrder   Int       @default(0)
   createdAt   DateTime  @default(now())
   vehicles    Vehicle[]
   bookings    Booking[]
+  features    VehicleCategoryFeature[]
 
   @@index([isActive])
   @@index([sortOrder])
+}
+
+model VehicleFeature {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  categories  VehicleCategoryFeature[]
+
+  @@index([isActive, sortOrder])
+  @@index([name])
+}
+
+model VehicleCategoryFeature {
+  categoryId   String
+  featureId    String
+  category     VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  feature      VehicleFeature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+
+  @@id([categoryId, featureId])
+  @@index([featureId])
 }
 
 model Booking {
@@ -97,6 +139,7 @@ model Booking {
   customerName        String
   customerEmail       String
   customerPhone       String
+  flightNumber        String?
   birthDate           DateTime?
   driverLicenseNumber String?
   licenseExpiryDate   DateTime?
@@ -115,12 +158,52 @@ model Booking {
   holdExpiresAt       DateTime  @default(dbgenerated("(now() + '02:00:00'::interval)"))
   paymentProofUrl     String?
   paymentReceivedAt   DateTime?
+  pickupOdometerKm    Int?
+  pickupFuelLevel     Int?
+  pickupHasDamage     Boolean   @default(false)
+  pickupDamageNotes   String?
+  pickupAcceptedBy    String?
+  pickupAcceptedAt    DateTime?
+  pickupAgentNotes    String?
+  deliveredAt         DateTime?
+  returnOdometerKm    Int?
+  returnFuelLevel     Int?
+  returnHasDamage     Boolean   @default(false)
+  returnDamageNotes   String?
+  returnAcceptedBy    String?
+  returnAcceptedAt    DateTime?
+  returnAgentNotes    String?
+  returnLateCharge    Int       @default(0)
+  returnFuelCharge    Int       @default(0)
+  returnDamageCharge  Int       @default(0)
+  returnedAt          DateTime?
   termsAcceptedAt     DateTime?
+  driverLicenseDeleteAfter DateTime?
+  driverLicenseDeletedAt DateTime?
   notes               String?
   invoiceUrl          String?
+  billingDocumentType BillingDocumentType?
+  quickBooksTransferStatus QuickBooksTransferStatus?
+  quickBooksDocumentType QuickBooksDocumentType?
+  quickBooksCustomerId String?
+  quickBooksInvoiceId String?
+  quickBooksSalesReceiptId String?
+  quickBooksPaymentId String?
+  quickBooksLastError String?
+  quickBooksSyncRequestedAt DateTime?
+  quickBooksSyncedAt DateTime?
+  zohoTransferStatus ZohoTransferStatus?
+  zohoDocumentType ZohoDocumentType?
+  zohoCustomerId String?
+  zohoInvoiceId String?
+  zohoPaymentId String?
+  zohoLastError String?
+  zohoSyncRequestedAt DateTime?
+  zohoSyncedAt DateTime?
   createdAt           DateTime  @default(now())
   bookingExtras       BookingExtra[]
   bookingDiscount     BookingDiscount?
+  inspectionPhotos    BookingInspectionPhoto[]
   review              Review?
   auditLogs           AuditLog[]
 
@@ -131,6 +214,10 @@ model Booking {
   @@index([status])
   @@index([bookingCode])
   @@index([createdAt])
+  @@index([billingDocumentType])
+  @@index([quickBooksTransferStatus])
+  @@index([zohoTransferStatus])
+  @@index([driverLicenseDeleteAfter, driverLicenseDeletedAt])
   adminUsers AdminUser[]
 }
 
@@ -160,6 +247,40 @@ enum BookingStatus {
   CONFIRMED
   DECLINED
   CANCELLED
+}
+
+enum BillingDocumentType {
+  INVOICE
+  SALES_RECEIPT
+}
+
+enum QuickBooksTransferStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum QuickBooksDocumentType {
+  INVOICE
+  SALES_RECEIPT
+  PAYMENT
+}
+
+enum ZohoTransferStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum ZohoDocumentType {
+  INVOICE
+  SALES_RECEIPT
+  PAYMENT
+}
+
+enum InspectionStage {
+  PICKUP
+  RETURN
 }
 
 model AuditLog {
@@ -206,6 +327,17 @@ model BookingExtra {
   @@unique([bookingId, extraId])
   @@index([bookingId])
   @@index([extraId])
+}
+
+model BookingInspectionPhoto {
+  id         String          @id @default(cuid())
+  bookingId  String
+  booking    Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  stage      InspectionStage
+  imageUrl   String
+  createdAt  DateTime        @default(now())
+
+  @@index([bookingId, stage, createdAt])
 }
 
 model DiscountCode {

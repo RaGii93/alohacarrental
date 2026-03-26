@@ -5,7 +5,13 @@ import { FinancialFilters } from "@/components/admin/FinancialFilters";
 import { formatDateTime } from "@/lib/datetime";
 import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
 import { getBlobProxyUrl } from "@/lib/blob";
-import { requireAdminSection } from "@/app/[locale]/admin/_lib";
+import {
+  ADMIN_PAGE_KICKER,
+  ADMIN_PAGE_META_TEXT,
+  ADMIN_PAGE_SHELL,
+  ADMIN_PAGE_STACK,
+  requireAdminSection,
+} from "@/app/[locale]/admin/_lib";
 
 export default async function AdminFinancialPage({
   params,
@@ -68,24 +74,26 @@ export default async function AdminFinancialPage({
     take: 12,
   });
   const currency = (amountCents: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
+  const statCard = "rounded-[1.6rem] border-0 bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]";
 
   return (
-    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
-      <h2 className="mb-4 text-xl font-semibold">{t("admin.dashboard.financial.title")}</h2>
+    <div className={ADMIN_PAGE_SHELL}>
+      <div className={ADMIN_PAGE_STACK}>
+      <p className={ADMIN_PAGE_KICKER}>{t("admin.dashboard.financial.title")}</p>
       <FinancialFilters initialStart={toInputDate(financialStartDate)} initialEnd={toInputDate(financialEndDate)} />
-      <p className="mb-4 text-xs text-muted-foreground">Filter range: {formatDateTime(financialStartDate)} to {formatDateTime(financialEndDate)}</p>
+      <p className={ADMIN_PAGE_META_TEXT}>Filter range: {formatDateTime(financialStartDate)} to {formatDateTime(financialEndDate)}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="p-4"><p className="text-sm text-muted-foreground">{t("admin.dashboard.financial.confirmedRevenue")}</p><p className="text-2xl font-bold">{currency(confirmedRevenueAgg._sum.totalAmount ?? 0)}</p></Card>
-        <Card className="p-4"><p className="text-sm text-muted-foreground">{t("admin.dashboard.financial.pendingPipeline")}</p><p className="text-2xl font-bold">{currency(pendingPipelineAgg._sum.totalAmount ?? 0)}</p></Card>
-        <Card className="p-4"><p className="text-sm text-muted-foreground">{t("admin.dashboard.financial.monthRevenue")}</p><p className="text-2xl font-bold">{currency(monthRevenueAgg._sum.totalAmount ?? 0)}</p></Card>
+        <Card className={statCard}><p className={ADMIN_PAGE_META_TEXT}>{t("admin.dashboard.financial.confirmedRevenue")}</p><p className="mt-2 text-2xl font-bold text-[hsl(var(--foreground))]">{currency(confirmedRevenueAgg._sum.totalAmount ?? 0)}</p></Card>
+        <Card className={statCard}><p className={ADMIN_PAGE_META_TEXT}>{t("admin.dashboard.financial.pendingPipeline")}</p><p className="mt-2 text-2xl font-bold text-[hsl(var(--foreground))]">{currency(pendingPipelineAgg._sum.totalAmount ?? 0)}</p></Card>
+        <Card className={statCard}><p className={ADMIN_PAGE_META_TEXT}>{t("admin.dashboard.financial.monthRevenue")}</p><p className="mt-2 text-2xl font-bold text-[hsl(var(--foreground))]">{currency(monthRevenueAgg._sum.totalAmount ?? 0)}</p></Card>
       </div>
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-4">
-        <Card className="p-4 bg-gradient-to-br from-emerald-50 to-white"><p className="text-sm text-muted-foreground">Collected Revenue</p><p className="text-xl font-bold">{currency(paidRevenueAgg._sum.totalAmount ?? 0)}</p></Card>
-        <Card className="p-4 bg-gradient-to-br from-amber-50 to-white"><p className="text-sm text-muted-foreground">Unpaid Confirmed</p><p className="text-xl font-bold">{unpaidConfirmedCount}</p></Card>
-        <Card className="p-4 bg-gradient-to-br from-blue-50 to-white"><p className="text-sm text-muted-foreground">Average Booking</p><p className="text-xl font-bold">{currency(avgConfirmedValue)}</p></Card>
-        <Card className="p-4 bg-gradient-to-br from-violet-50 to-white"><p className="text-sm text-muted-foreground">Pending→Confirmed</p><p className="text-xl font-bold">{conversionRate}%</p></Card>
+        <Card className={statCard}><p className={ADMIN_PAGE_META_TEXT}>Collected Revenue</p><p className="mt-2 text-xl font-bold text-[hsl(var(--foreground))]">{currency(paidRevenueAgg._sum.totalAmount ?? 0)}</p></Card>
+        <Card className={statCard}><p className={ADMIN_PAGE_META_TEXT}>Unpaid Confirmed</p><p className="mt-2 text-xl font-bold text-[hsl(var(--foreground))]">{unpaidConfirmedCount}</p></Card>
+        <Card className={statCard}><p className={ADMIN_PAGE_META_TEXT}>Average Booking</p><p className="mt-2 text-xl font-bold text-[hsl(var(--foreground))]">{currency(avgConfirmedValue)}</p></Card>
+        <Card className={statCard}><p className={ADMIN_PAGE_META_TEXT}>Pending→Confirmed</p><p className="mt-2 text-xl font-bold text-[hsl(var(--foreground))]">{conversionRate}%</p></Card>
       </div>
-      <Card className="mt-4 p-4">
+      <Card className={statCard}>
         <p className="mb-3 font-semibold">Recent Billing Documents</p>
         <div className="space-y-2">
           {recentInvoices.length === 0 && <p className="text-sm text-muted-foreground">No billing documents yet.</p>}
@@ -96,13 +104,14 @@ export default async function AdminFinancialPage({
                 <p className="text-xs text-muted-foreground">{currency(inv.totalAmount)} · {formatDateTime(inv.createdAt)}</p>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <a href={getBlobProxyUrl(inv.invoiceUrl, { download: true }) || undefined} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View PDF</a>
-                <SendBillingEmailButton bookingId={inv.id} locale={locale} label="Send by Email" className="h-auto p-0 text-blue-600 hover:text-blue-700 hover:underline" />
+                <a href={getBlobProxyUrl(inv.invoiceUrl, { download: true }) || undefined} target="_blank" rel="noopener noreferrer" className="text-slate-700 hover:text-slate-900 hover:underline">View PDF</a>
+                <SendBillingEmailButton bookingId={inv.id} locale={locale} label="Send by Email" className="h-auto p-0 text-slate-700 hover:text-slate-900 hover:underline" />
               </div>
             </div>
           ))}
         </div>
       </Card>
+      </div>
     </div>
   );
 }

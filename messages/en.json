@@ -5,11 +5,12 @@
     "admin": "Admin Panel",
     "logout": "Logout",
     "login": "Login",
+    "security": "Security",
     "faq": "FAQ",
     "fleetOverview": "Fleet Overview"
   },
   "common": {
-    "name": "Aloha Car Rental",
+    "name": "EdgeRent Lite",
     "phone": "Phone",
     "email": "Email",
     "currency": "$",
@@ -23,6 +24,10 @@
     "confirm": "Confirm",
     "decline": "Decline",
     "back": "Back",
+    "show": "Show",
+    "hide": "Hide",
+    "yes": "Yes",
+    "no": "No",
     "next": "Next",
     "previous": "Previous",
     "search": "Search",
@@ -38,8 +43,191 @@
     "declined": "Declined",
     "cancelled": "Cancelled"
   },
+  "homePage": {
+    "heroEyebrow": "Island-ready car rental",
+    "heroTitleLead": "Explore Curaçao",
+    "heroTitleTail": "with",
+    "heroDescription": "Luxury feel, straightforward pricing, and dependable service for every beach day, airport pickup, and island escape.",
+    "heroPrimary": "Reserve Your Car",
+    "heroSecondary": "View Fleet",
+    "heroCardTitle": "Airport-ready service",
+    "heroCardBody": "Fast confirmations, smooth pickup, and support when plans change.",
+    "fleetEyebrow": "Our rental fleet",
+    "fleetTitle": "Choose the perfect ride for your trip",
+    "fleetDescription": "Browse our most requested categories and lock in the vehicle that matches your style, group size, and budget.",
+    "fleetButton": "View All Vehicles",
+    "servicesEyebrow": "Why guests book with us",
+    "servicesTitle": "Premium convenience with island energy",
+    "promoEyebrow": "Why choose us",
+    "promoTitle": "Discover beautiful Curaçao in style",
+    "promoDescription": "From Willemstad waterfront mornings to beach sunsets on the west side, your rental should feel effortless, polished, and ready for the whole itinerary.",
+    "promoButton": "Learn More",
+    "stepsEyebrow": "How it works",
+    "stepsTitle": "Book your island drive in three easy steps",
+    "dayLabel": "day",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "locationLabel": "Location",
+    "manualLabel": "Manual",
+    "automaticLabel": "Automatic",
+    "acLabel": "A/C",
+    "noAcLabel": "No A/C",
+    "reviewsCountLabel": "approved reviews and counting.",
+    "contactLead": "Ready for an elegant island drive, a smooth airport arrival, or a quick last-minute reservation.",
+    "contactTitle": "Contact Us",
+    "reviewsSpotlight": "Customer Reviews",
+    "bookingCardLead": "Reserve online now, review the fleet, and use the same booking flow already connected to your site.",
+    "trust": [
+      "Best prices guaranteed",
+      "New and well-maintained vehicles",
+      "Free airport pickup and drop-off"
+    ],
+    "perks": [
+      {
+        "title": "Great Rates",
+        "description": "Clear day rates with no awkward surprises."
+      },
+      {
+        "title": "Easy Booking",
+        "description": "Reserve online in minutes from any device."
+      },
+      {
+        "title": "Full Comfort",
+        "description": "Clean interiors, cold A/C, and smooth handover."
+      },
+      {
+        "title": "24/7 Support",
+        "description": "Quick help before, during, and after pickup."
+      }
+    ],
+    "services": [
+      {
+        "title": "Easy airport arrivals",
+        "description": "Land, collect your keys, and get moving without wasting your first day in line."
+      },
+      {
+        "title": "Reliable modern fleet",
+        "description": "Vehicles are maintained, presentation-ready, and chosen for comfort in Caribbean heat."
+      },
+      {
+        "title": "Fast booking flow",
+        "description": "Availability, pricing, and booking confirmation are handled in one streamlined journey."
+      },
+      {
+        "title": "Real local support",
+        "description": "Questions, changes, and assistance are handled quickly by people who know the island."
+      }
+    ],
+    "steps": [
+      {
+        "step": "01",
+        "title": "Choose your vehicle",
+        "description": "Pick the category that fits your stay, passengers, and budget."
+      },
+      {
+        "step": "02",
+        "title": "Confirm your details",
+        "description": "Select dates, locations, and driver details through the booking flow."
+      },
+      {
+        "step": "03",
+        "title": "Pick up and explore",
+        "description": "Arrive, collect your car, and enjoy Curaçao with confidence."
+      }
+    ]
+  },
+  "faqPage": {
+    "heroTitle": "Answers built into the same polished experience as the rest of the site",
+    "heroDescription": "Find fast answers about booking, pickup, documents, payments, insurance, and support without digging through outdated blocks of text.",
+    "popularTopic": "Popular topic",
+    "helpCenterEyebrow": "Help Center",
+    "helpCenterTitle": "Frequently asked questions",
+    "helpCenterDescription": "Every answer below uses the same booking rules and support process shown across the rest of the project.",
+    "supportTitle": "Still need help?",
+    "supportDescription": "Reach {tenantName} directly for booking questions, schedule changes, pickup coordination, or urgent rental support.",
+    "openingHoursLabel": "Opening hours",
+    "openingHoursDays": "Monday to Saturday",
+    "openingHoursTime": "08:00 to 18:00"
+  },
+  "securityPage": {
+    "metaTitle": "Security and Data Handling",
+    "metaDescription": "Learn how EdgeRent Lite handles access control, file uploads, driver license retention, audit logging, and deployment-side operational practices.",
+    "eyebrow": "Security and Data Handling",
+    "title": "How EdgeRent Lite handles security, privacy, and operational controls",
+    "intro": "This page describes the controls that are implemented in the product today and the operational topics we discuss with clients during deployment. We avoid broad security claims and focus on what is actually in place.",
+    "pillars": {
+      "access": {
+        "title": "Controlled admin access",
+        "description": "Admin access is protected by authenticated sessions and role-based permissions for ROOT, OWNER, and STAFF users."
+      },
+      "uploads": {
+        "title": "Validated file uploads",
+        "description": "Driver-license uploads are limited by file type, file size, and basic file-signature validation before storage."
+      },
+      "retention": {
+        "title": "Retention controls",
+        "description": "Uploaded driver-license files are scheduled for deletion 30 days after the rental end date."
+      },
+      "audit": {
+        "title": "Operational audit trail",
+        "description": "Administrative actions can be written to audit logs so booking and management changes can be reviewed later."
+      }
+    },
+    "controlsEyebrow": "Verified Product Controls",
+    "controlsTitle": "Controls implemented in the current product",
+    "controls": {
+      "identity": {
+        "title": "Password handling",
+        "body": "Admin passwords are stored as bcrypt hashes. Plain-text passwords are not stored in the application database."
+      },
+      "sessions": {
+        "title": "Authenticated sessions",
+        "body": "Admin sessions are issued as signed tokens with a 24-hour expiration. Session cookies are httpOnly, use sameSite=lax, and are marked secure in production."
+      },
+      "uploads": {
+        "title": "Upload validation",
+        "body": "License uploads accept JPG, PNG, and PDF only, enforce an 8 MB size limit, and validate file signatures before the file is accepted."
+      },
+      "storage": {
+        "title": "Private file storage",
+        "body": "Sensitive uploaded files are stored in private blob storage and served through an application proxy instead of being exposed as public assets."
+      },
+      "retention": {
+        "title": "Driver-license retention",
+        "body": "Driver-license files are assigned a delete-after date and a protected cleanup job removes them after the retention window expires."
+      },
+      "audit": {
+        "title": "Audit and evidence",
+        "body": "The platform stores operational timestamps such as terms acceptance, pickup and return events, and can record admin actions in audit logs."
+      }
+    },
+    "operationsEyebrow": "Deployment Operations",
+    "operationsTitle": "Topics handled as part of deployment and business operations",
+    "operations": {
+      "backup": {
+        "title": "Backups",
+        "body": "Backup schedules and retention are deployment-specific. For each client environment, backup expectations should be agreed and documented at the infrastructure level."
+      },
+      "recovery": {
+        "title": "Recovery and restoration",
+        "body": "Recovery procedures, restore testing, and service-level expectations should be defined per deployment so the client knows the actual restore path for their environment."
+      }
+    },
+    "sidebar": {
+      "title": "Client-friendly security conversations",
+      "description": "When clients ask about cybersecurity, we recommend discussing verified controls, retention rules, access management, and the documented backup policy for their deployment.",
+      "points": {
+        "one": "Role-based admin access helps limit who can see and manage operational data.",
+        "two": "Sensitive uploads are private and have a defined retention rule.",
+        "three": "Terms acceptance and operational events are recorded for traceability.",
+        "four": "Backup and disaster-recovery commitments should be confirmed per environment in writing."
+      },
+      "primaryCta": "View Security Page",
+      "secondaryCta": "Book a Demo"
+    }
+  },
   "landing": {
-    "title": "Welcome to Aloha Car Rental",
+    "title": "Welcome to EdgeRent Lite",
     "subtitle": "Book your vehicle with ease",
     "tagline": "Drive Your Dreams",
     "badge": "🚗 Premium Vehicle Rental Service",
@@ -55,30 +243,8 @@
       "support": "24/7",
       "supportLabel": "Support"
     },
-    "hero": {
-      "headline": {
-        "line1": "Discover Bonaire",
-        "line2Prefix": "with",
-        "line2Highlight": "Aloha",
-        "line3": "Car Rental"
-      },
-      "featureLine": "Reliable · Affordable · Island Ready Vehicles",
-      "description": "Explore Bonaire's pink beaches, flamingo's and donkey sanctuary, and stunning salt flats at your own pace.",
-      "bookButton": "Book Your Car",
-      "viewFleetButton": "View Our Fleet",
-      "driverAge": "Driver Age",
-      "agePlaceholder": "Age...",
-      "completeFields": "Please complete all booking search fields.",
-      "searchComingSoon": "Search functionality coming soon!"
-    },
-    "fleet": {
-      "title": "Our Island Fleet",
-      "seats": "{count} seats",
-      "reserveNow": "Reserve Now",
-      "comingSoon": "Reservation functionality coming soon!"
-    },
     "whyChoose": {
-      "title": "Why Choose Aloha Car Rental Bonaire?",
+      "title": "Why Choose EdgeRent?",
       "subtitle": "Experience the best in vehicle rental with our premium services and unbeatable customer support.",
       "features": {
         "selection": {
@@ -104,11 +270,203 @@
       "subtitle": "Book your perfect vehicle today and experience the freedom of the road.",
       "button": "Book Now"
     },
+    "hero": {
+      "pill": "EdgeRent Lite for Car Rental Operators",
+      "featureLine": "Fast booking, clear pricing, and local support you can trust.",
+      "title": "Stop losing bookings",
+      "titleAccent": "and take control of your rental business.",
+      "description": "Manage bookings, vehicles, pickups, returns, and payments in one professional system. No more WhatsApp, Excel, or manual errors slowing down your team.",
+      "primaryCta": "Schedule Your Demo",
+      "secondaryCta": "See How It Works",
+      "dashboardAlt": "EdgeRent dashboard preview",
+      "bookingCard": {
+        "title": "Pickup and return tracked",
+        "detail": "Booking, vehicle, and handoff status in one place"
+      },
+      "quickbooksStatus": "Synced to QuickBooks",
+      "combinedStatus": "QuickBooks and Zoho ready",
+      "pricing": {
+        "setupLabel": "One-time setup",
+        "setupValue": "$500",
+        "subscriptionLabel": "Monthly subscription",
+        "subscriptionValue": "$100"
+      },
+      "highlights": {
+        "onlineBooking": "Online Booking Website",
+        "noDoubleBookings": "No Double Bookings",
+        "adminDashboard": "Full Admin Dashboard",
+        "pickupReturnTracking": "Pickup & Return Tracking",
+        "accountingIntegrations": "QuickBooks & Zoho Integration"
+      },
+      "integrationReadiness": {
+        "zoho": {
+          "title": "Zoho Invoice Ready",
+          "description": "Invoice workflows are ready for professional billing operations."
+        },
+        "quickbooks": {
+          "title": "QuickBooks Ready",
+          "description": "Keep accounting handoff cleaner with structured booking and payment data."
+        }
+      },
+      "trust": {
+        "noDoubleBookings": "No double bookings",
+        "quickbooksReady": "QuickBooks integration ready",
+        "zohoReady": "Zoho Invoice integration ready",
+        "multiLanguage": "Built for serious rental teams"
+      }
+    },
+    "statsStrip": {
+      "eyebrow": "Platform Snapshot",
+      "title": "Professional rental operations at a glance",
+      "items": {
+        "bookingAccuracy": {
+          "value": "100%",
+          "label": "Booking Accuracy"
+        },
+        "islandsSupported": {
+          "value": "3",
+          "label": "Islands Supported"
+        },
+        "onlineBooking": {
+          "value": "24/7",
+          "label": "Online Booking"
+        },
+        "languagesBuiltIn": {
+          "value": "3",
+          "label": "Languages Built-in"
+        }
+      }
+    },
+    "core": {
+      "eyebrow": "Core Platform",
+      "title": "Everything you need to run your rental business",
+      "description": "EdgeRent keeps bookings, fleet operations, pickups, returns, and billing under control in one professional system. From online reservations to QuickBooks Online and Zoho Invoice integrations, it is built for serious rental teams.",
+      "features": {
+        "onlineBooking": {
+          "title": "Online Booking Website",
+          "description": "Give customers a professional booking flow with live availability, pricing, and instant reservation capture from any device."
+        },
+        "noDoubleBooking": {
+          "title": "No Double Booking",
+          "description": "Real-time availability checks with transaction-based allocation. Every vehicle is booked only once per time slot."
+        },
+        "vehicleManagement": {
+          "title": "Vehicle Management",
+          "description": "Complete fleet dashboard with status tracking for active, on-rent, maintenance, and inactive vehicles."
+        },
+        "vehicleBlocking": {
+          "title": "Vehicle Blocking",
+          "description": "Block vehicles for maintenance, repairs, or reservations so unavailable units never appear in customer searches."
+        },
+        "pickupReturn": {
+          "title": "Pickup & Return Tracking",
+          "description": "Manage delivery dates, return dates, locations, and operational handoffs with the visibility your team needs every day."
+        },
+        "adminOperations": {
+          "title": "Full Admin Dashboard",
+          "description": "Track bookings, deliveries, returns, payments, reviews, and fleet activity from one operational control center."
+        },
+        "accounting": {
+          "title": "QuickBooks Online & Zoho Invoice",
+          "description": "Accounting integrations support invoice and customer sync so your finance workflow stays connected to daily rental operations.",
+          "badge": "Integrations"
+        }
+      }
+    },
+    "extended": {
+      "eyebrow": "Full Feature Set",
+      "title": "Built for real rental operations",
+      "description": "Every feature is designed around actual rental workflows in the Caribbean.",
+      "features": {
+        "pdfInvoices": {
+          "title": "PDF Invoices & Receipts",
+          "description": "Auto-generated, branded billing documents"
+        },
+        "licenseUpload": {
+          "title": "License Upload & Validation",
+          "description": "Secure private blob storage with expiry checks"
+        },
+        "automatedEmails": {
+          "title": "Automated Emails",
+          "description": "Booking confirmations, invoices, and reminders"
+        },
+        "multiLanguage": {
+          "title": "Multi-Language",
+          "description": "Built-in English, Dutch, and Spanish"
+        },
+        "mobileBooking": {
+          "title": "Mobile-First Booking",
+          "description": "Responsive 3-step wizard for customers"
+        },
+        "adminDashboard": {
+          "title": "Admin Dashboard",
+          "description": "Bookings, deliveries, returns, and financials"
+        },
+        "tenantBranding": {
+          "title": "Tenant Branding",
+          "description": "Your logo, colors, and contact info everywhere"
+        },
+        "flexiblePricing": {
+          "title": "Flexible Pricing",
+          "description": "Daily rates, extras, discount codes, and tax"
+        }
+      }
+    },
+    "whyUs": {
+      "eyebrow": "Why EdgeRent",
+      "title": "Built by operators,",
+      "titleAccent": "for operators",
+      "description": "We understand the unique challenges of running a rental business in the Dutch Caribbean. EdgeRent was designed from the ground up for this market.",
+      "imageAlt": "Caribbean rental business",
+      "islands": {
+        "curacao": "Curaçao",
+        "aruba": "Aruba",
+        "bonaire": "Bonaire"
+      },
+      "items": {
+        "caribbean": {
+          "title": "Built for the Caribbean",
+          "description": "Designed specifically for rental businesses in Curaçao, Aruba, and Bonaire with local workflows and multi-currency support."
+        },
+        "reliability": {
+          "title": "Reliability First",
+          "description": "Transaction-based booking prevents overbookings. Proper hold management and overlap checks protect your fleet."
+        },
+        "branding": {
+          "title": "Your Business, Your Brand",
+          "description": "Single-tenant architecture keeps your data isolated and your branding visible across every customer touchpoint."
+        },
+        "support": {
+          "title": "Dedicated Support",
+          "description": "Direct line to the development team with rental-specific product knowledge."
+        }
+      }
+    },
+    "steps": {
+      "eyebrow": "How It Works",
+      "title": "From setup to first booking in days",
+      "items": {
+        "configure": {
+          "step": "01",
+          "title": "Configure Your Fleet",
+          "description": "Add your vehicles, categories, extras, pricing, and locations. Set up your branding and business details."
+        },
+        "goLive": {
+          "step": "02",
+          "title": "Go Live",
+          "description": "Your customers can book online 24/7 with a focused 3-step flow for dates, details, and license upload."
+        },
+        "manage": {
+          "step": "03",
+          "title": "Manage & Invoice",
+          "description": "Confirm bookings, generate invoices, track payments, and optionally sync to QuickBooks Online or Zoho Invoice."
+        }
+      }
+    },
     "reviews": {
+      "eyebrow": "Customer Stories",
       "title": "Customer Reviews",
       "subtitle": "Latest published reviews from verified bookings.",
-      "faqPreview": "A quick FAQ preview for the most common booking, payment, and pickup questions.",
-      "viewAllFaq": "See all FAQ",
       "leaveButton": "Leave a Review",
       "empty": "No reviews are published yet.",
       "form": {
@@ -131,6 +489,39 @@
       "success": {
         "pendingApproval": "Review submitted. It will be visible after admin approval."
       }
+    },
+    "footer": {
+      "pill": "Curaçao • Aruba • Bonaire",
+      "title": "Ready to modernize your",
+      "titleAccent": "rental business?",
+      "description": "Get a personalized demo and see how EdgeRent can streamline your operations, prevent overbookings, and grow your business.",
+      "primaryCta": "Request a Demo",
+      "secondaryCta": "Contact Sales",
+      "note": "Single-tenant deployment • Your data stays yours • Full white-label branding"
+    },
+    "showcase": {
+      "eyebrow": "Caribbean Adoption",
+      "title": "Built for operators that need accounting-ready rental workflows",
+      "description": "{tenantName} is positioned as a professional operating system for Caribbean car rental teams, with invoice-ready processes and a client-facing experience that is ready to scale.",
+      "logosEyebrow": "Trusted Clients",
+      "logosTitle": "Car rental companies that trust EdgeRent",
+      "logosDescription": "Real operators in Bonaire and Curacao using EdgeRent in their business.",
+      "professionalEyebrow": "Why Teams Switch",
+      "professionalDescription": "Replace scattered WhatsApp messages, spreadsheets, and manual follow-up with a cleaner rental workflow your team can manage with confidence.",
+      "clients": {
+        "greatDeals": {
+          "status": "Active customer",
+          "detail": "Currently using the platform in day-to-day rental operations."
+        },
+        "sunFun": {
+          "status": "Active customer",
+          "detail": "Running bookings and operations from Bonaire on the platform."
+        },
+        "bonDrive": {
+          "status": "Starting soon",
+          "detail": "Preparing rollout for operational use in Bonaire."
+        }
+      }
     }
   },
   "booking": {
@@ -138,6 +529,7 @@
     "customerName": "Full Name",
     "customerEmail": "Email Address",
     "customerPhone": "Phone Number",
+    "flightNumber": "Flight Number",
     "birthDate": "Birth Date",
     "driverLicenseNumber": "Driver License Number",
     "licenseExpiryDate": "License Expiry Date",
@@ -150,11 +542,6 @@
     "dropoffLocation": "Dropoff Location",
     "notes": "Special Notes",
     "driverLicense": "Driver's License",
-    "termsOfService": "Terms of Service",
-    "identificationVerificationClause": "Users agree to provide valid identification for rental verification.",
-    "privacyPolicy": "Privacy Policy",
-    "personalDataRequestClause": "If you wish to access or delete your personal data, please contact: alohacarrental@gmail.com",
-    "identificationConsentLabel": "I understand my identification will be used for rental verification and stored temporarily in accordance with the Privacy Policy.",
     "paymentProof": "Payment Proof",
     "submit": "Submit Booking",
     "select": "Select",
@@ -176,8 +563,16 @@
     "pricePerDay": "Price per day",
     "extras": "Extras",
     "tax": "Tax ({percentage}%)",
+    "taxOnBooking": "Tax on booking ({percentage}%)",
+    "taxExtrasOnly": "Tax on extras ({percentage}%)",
     "reviewBooking": "Review Booking",
     "terms": "Terms & Conditions",
+    "termsOfService": "Terms of Service",
+    "identificationClause": "Users agree to provide valid identification for rental verification.",
+    "gdprNotice": "Identification documents are requested for rental verification and compliance requirements, including GDPR-related obligations.",
+    "privacyPolicy": "Privacy Policy",
+    "privacyDeletionNotice": "If you wish to delete your personal data, please contact: privacy@edgerentlite.com",
+    "privacyConsentCheckbox": "I understand my identification will be used for rental verification and stored temporarily in accordance with the Privacy Policy.",
     "viewTerms": "View Terms (PDF)",
     "acceptTerms": "I agree to the Terms and Conditions",
     "termsRequired": "You must accept the terms and conditions",
@@ -213,6 +608,7 @@
       "fileSize": "File size must not exceed 8MB",
       "fileType": "Only JPG, PNG, and PDF files are allowed",
       "uploadFailed": "File upload failed",
+      "privacyConsentRequired": "You must accept the privacy consent statement",
       "termsNotAccepted": "You must accept the terms and conditions",
       "birthLicenseRequired": "Birth date and license expiry date are required",
       "ageMinimum": "Renter must be at least 21 years old",
@@ -255,51 +651,16 @@
     "minPrice": "Min Price",
     "maxPrice": "Max Price"
   },
-  "fleetPage": {
-    "badge": "Transparent Fleet Overview",
-    "title": "Modern rental categories with clear daily pricing.",
-    "description": "Review our active vehicle categories, compare the essentials at a glance, and book with a clearer picture of pricing and fleet status before you start your reservation.",
-    "primaryCta": "Check Availability",
-    "secondaryCta": "Browse Categories",
-    "highlights": {
-      "pricing": "Transparent pricing",
-      "visibility": "Live fleet visibility"
-    },
-    "stats": {
-      "startingRate": "Starting daily rate",
-      "pricing": "Pricing model",
-      "pricingValue": "Clear",
-      "booking": "Booking flow",
-      "bookingValue": "Fast",
-      "support": "Pickup support",
-      "supportValue": "Direct"
-    },
-    "summary": {
-      "eyebrow": "Overview",
-      "title": "A clearer way to choose your vehicle",
-      "pricingTitle": "What the price includes",
-      "pricingBody": "Daily rates shown here are the base category prices before taxes, optional extras, or booking-specific adjustments.",
-      "availabilityTitle": "How availability is shown",
-      "availabilityBody": "This page is designed to help you compare categories quickly. Exact assignment depends on your selected dates, booking details, and final confirmation."
-    },
-    "card": {
-      "categoryLabel": "Fleet category",
-      "perDay": "Per day",
-      "defaultDescription": "Reliable, island-ready transport with a straightforward daily rate and category-level availability details.",
-      "seats": "{count} seats",
-      "automatic": "Automatic",
-      "manual": "Manual",
-      "ac": "Air conditioning",
-      "noAc": "No air conditioning",
-      "pricingTitle": "Category pricing",
-      "pricingNote": "Final booking totals may change when extras, taxes, or date-specific availability apply.",
-      "bookNow": "Reserve this category"
-    },
-    "emptyTitle": "Fleet categories will appear here soon.",
-    "emptyBody": "There are no active categories published right now. Once vehicles are available, this page will show pricing, specs, and live fleet visibility."
-  },
   "admin": {
     "title": "Admin Dashboard",
+    "filters": {
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "selectStartDate": "Select start date",
+      "selectEndDate": "Select end date",
+      "apply": "Apply Filter",
+      "reset": "Reset"
+    },
     "login": {
       "title": "Admin Login",
       "email": "Email",
@@ -320,7 +681,21 @@
       "title": "Bookings",
       "empty": "No bookings found",
       "actions": {
-        "view": "View"
+        "view": "View",
+        "markDelivered": "Mark Delivered",
+        "markReturned": "Mark Returned",
+        "delivered": "Delivered",
+        "returned": "Returned",
+        "awaitingPayment": "Awaiting payment",
+        "notDelivered": "Not delivered",
+        "deliverSuccess": "Booking marked as delivered.",
+        "returnSuccess": "Booking marked as returned.",
+        "deliverFailed": "Failed to mark as delivered",
+        "returnFailed": "Failed to mark as returned",
+        "deliverConfirmTitle": "Mark booking as delivered?",
+        "deliverConfirmDescription": "This will mark the selected booking as delivered.",
+        "returnConfirmTitle": "Mark booking as returned?",
+        "returnConfirmDescription": "This will mark the selected booking as returned."
       },
       "table": {
         "id": "ID",
@@ -337,15 +712,328 @@
         "bookingInfo": "Booking Information",
         "files": "Files",
         "notes": "Notes",
-        "actions": "Actions",
-        "confirm": "Confirm Booking",
+        "actions": {
+          "copyCode": "Copy Code",
+          "editBooking": "Edit Booking",
+          "openBillingDoc": "Open Billing Doc",
+          "processing": "Processing...",
+          "confirm": "Confirm",
+          "sendInvoice": "Send Invoice",
+          "resendInvoice": "Resend Invoice",
+          "salesReceipt": "Sales Receipt",
+          "createSalesReceipt": "Create Sales Receipt",
+          "receivePayment": "Receive Payment"
+        },
+        "confirm": {
+          "paymentTitle": "Receive invoice payment?",
+          "paymentDescription": "This records payment without creating a sales receipt.",
+          "deliverTitle": "Mark booking as delivered?",
+          "deliverDescription": "This marks the vehicle as delivered to the customer.",
+          "returnTitle": "Mark booking as returned?",
+          "returnDescription": "This closes the rental and marks the vehicle back in fleet."
+        },
         "decline": "Decline Booking",
         "addNote": "Add Note",
         "generateInvoice": "Generate Invoice",
         "declineReason": "Decline Reason",
         "confirmSuccess": "Booking confirmed successfully",
         "declineSuccess": "Booking declined successfully",
-        "invoiceGenerated": "Invoice generated and sent"
+        "invoiceGenerated": "Invoice generated and sent",
+        "header": {
+          "title": "Booking {code}",
+          "vehiclePending": "Vehicle pending",
+          "createdAt": "Created {date}"
+        },
+        "messages": {
+          "codeCopied": "Booking code copied",
+          "codeCopyFailed": "Unable to copy booking code",
+          "confirmSuccess": "Booking confirmed successfully",
+          "confirmError": "Error confirming booking",
+          "declineSuccess": "Booking declined successfully",
+          "declineError": "Error declining booking",
+          "invoiceResent": "Invoice resent to client.",
+          "invoiceSent": "Invoice sent to client for payment.",
+          "invoiceError": "Error sending invoice",
+          "salesReceiptDelivered": "Sales receipt created, payment recorded, and booking marked delivered.",
+          "salesReceiptCreated": "Sales receipt created and payment recorded.",
+          "salesReceiptError": "Error creating sales receipt",
+          "paymentReceived": "Invoice payment marked as received.",
+          "paymentReceivedError": "Error marking payment received",
+          "discountApplied": "Discount applied and totals refreshed.",
+          "discountError": "Failed to apply discount",
+          "extraAdded": "Extra added and totals refreshed.",
+          "extraError": "Failed to add extra",
+          "paymentReceivedBadge": "Payment received"
+        },
+        "declineDialog": {
+          "title": "Decline booking",
+          "description": "Provide a reason for declining this booking.",
+          "label": "Decline reason",
+          "placeholder": "Enter decline reason",
+          "confirm": "Decline Booking"
+        },
+        "salesReceipt": {
+          "description": "Record payment for this booking and optionally move it straight into delivered status.",
+          "deliverNow": "Mark this booking as delivered immediately after creating the sales receipt.",
+          "title": "Create sales receipt"
+        },
+        "operations": {
+          "title": "Booking Operations",
+          "description": "The main workflow controls stay pinned to the top of the overview.",
+          "deliverHint": "Mark Delivered appears after payment is received. First use Receive Payment or create a Sales Receipt."
+        },
+        "pendingAlert": "This booking is still pending confirmation and can expire automatically if the hold window closes.",
+        "customerProfile": {
+          "title": "Customer Profile",
+          "description": "Primary renter identity and license data.",
+          "fields": {
+            "flightNumber": "Flight Number",
+            "birthDate": "Birth Date",
+            "licenseNumber": "License Number",
+            "licenseExpiry": "License Expiry"
+          }
+        },
+        "trip": {
+          "title": "Trip & Logistics",
+          "description": "Rental timing, vehicle assignment, and pickup logistics.",
+          "openMap": "Open map",
+          "fields": {
+            "vehicle": "Vehicle",
+            "category": "Category",
+            "pickup": "Pickup",
+            "dropoff": "Dropoff",
+            "pickupLocation": "Pickup Location",
+            "dropoffLocation": "Dropoff Location"
+          }
+        },
+        "pricing": {
+          "title": "Pricing Adjustments",
+          "description": "Manage extra services and rental-only discounts from one place.",
+          "applyDiscount": "Apply discount code",
+          "discountHint": "Discount percentages apply to the rental portion only.",
+          "enterCode": "Enter code",
+          "apply": "Apply",
+          "activeDiscount": "Active discount: {code} ({percentage}%)",
+          "addExtra": "Add extra",
+          "extraHint": "Choose a daily or flat extra and push it straight into pricing.",
+          "selectExtra": "Select extra",
+          "add": "Add",
+          "currentExtras": "Current extras"
+        },
+        "billing": {
+          "title": "Billing Summary",
+          "description": "Clear breakdown of how this booking total is built.",
+          "baseRental": "Base rental",
+          "extras": "Extras",
+          "discount": "Discount",
+          "subtotalBeforeTax": "Subtotal before tax",
+          "subtotalBeforeExtraTax": "Subtotal before extra tax",
+          "taxOnExtras": "Tax on extras ({tax}%)",
+          "taxOnBooking": "Tax on booking ({tax}%)",
+          "totalAmount": "Total amount",
+          "lateReturnCharge": "Late return charge",
+          "fuelDifferenceCharge": "Fuel difference charge",
+          "returnDamageCharge": "Return damage charge",
+          "taxInline": "Tax: ${amount}",
+          "taxExtrasInline": "Tax on extras: ${amount}",
+          "taxBookingInline": "Tax on booking: ${amount}",
+          "fuelRateInline": "Fuel charge rate: ${amount} per 1/4 tank",
+          "liveLatePreview": "If returned now: ${amount} late fee ({days} extra day(s))"
+        },
+        "inspection": {
+          "title": {
+            "pickup": "Pickup Check-In",
+            "return": "Return Check-In"
+          },
+          "description": "Capture the vehicle condition, upload inspection photos, and collect client acceptance before closing the step.",
+          "steps": {
+            "condition": "Condition",
+            "photos": "Photos",
+            "acceptance": "Acceptance"
+          },
+          "vehicleState": "Vehicle state",
+          "fields": {
+            "odometer": "Odometer (km)",
+            "fuelLevel": "Fuel level",
+            "damageToggle": "Damage is present or needs to be recorded at this stage.",
+            "damageNotes": "Damage notes",
+            "damagePlaceholder": "Describe scratches, dents, missing items, or anything the client should acknowledge.",
+            "agentNotes": "Agent notes",
+            "agentNotesPlaceholder": "Optional operational notes for staff."
+          },
+          "summary": {
+            "title": "Summary",
+            "pickupFuel": "Pickup fuel",
+            "returnFuel": "Return fuel",
+            "missingQuarters": "Missing quarters",
+            "categoryRate": "Category rate",
+            "lateReturnCharge": "Late return charge",
+            "fuelChargePreview": "Fuel charge preview",
+            "damageCharge": "Damage charge",
+            "lateBannerTitle": "Late return detected",
+            "lateBannerDescription": "Scheduled dropoff was {scheduled}. The {graceHours}-hour grace window has passed, so an extra rental charge will be applied.",
+            "lateNotice": "Returned after the 4-hour grace period. Extra rental days: {days}.",
+            "pickupHelp": "Pickup inspection records the starting odometer, fuel level, and visible damage before the vehicle is handed over."
+          },
+          "photos": {
+            "title": "Inspection photos",
+            "description": "Images are compressed before upload and stored as small documentation snapshots.",
+            "uploading": "Uploading...",
+            "add": "Add photos",
+            "alt": "Inspection",
+            "remove": "Remove",
+            "empty": "No photos uploaded yet."
+          },
+          "acceptance": {
+            "title": "Acceptance",
+            "clientOverview": "Client overview",
+            "odometer": "Odometer",
+            "fuel": "Fuel",
+            "damageRecorded": "Damage recorded",
+            "category": "Category",
+            "fuelCharge": "Fuel charge",
+            "totalCloseout": "Total close-out charge",
+            "acceptedBy": "Accepted by client",
+            "acceptedByPlaceholder": "Client full name",
+            "checkbox": "I confirm the client reviewed this overview and accepted the recorded condition, fuel level, and charges if applicable."
+          },
+          "completePickup": "Complete Pickup",
+          "completeReturn": "Complete Return",
+          "validation": {
+            "odometer": "Enter the odometer in kilometers.",
+            "fuelLevel": "Select the fuel level.",
+            "damageNotes": "Describe the damage before continuing.",
+            "acceptedBy": "Enter the client name for acceptance.",
+            "acceptance": "Confirm client acceptance before completing the inspection."
+          },
+          "toasts": {
+            "uploadFailed": "Image upload failed",
+            "pickupCompleted": "Pickup inspection completed.",
+            "returnCompleted": "Return inspection completed. Additional charges {amount}.",
+            "completeFailed": {
+              "pickup": "Failed to complete pickup inspection",
+              "return": "Failed to complete return inspection"
+            }
+          }
+        },
+        "conditionLog": {
+          "title": "Vehicle Condition Log",
+          "description": "Pickup and return inspection records captured by your team.",
+          "pickupInspection": "Pickup inspection",
+          "returnInspection": "Return inspection",
+          "notCompleted": "Not completed",
+          "odometer": "Odometer",
+          "fuel": "Fuel",
+          "damageRecorded": "Damage recorded",
+          "acceptedBy": "Accepted by",
+          "scheduledDropoff": "Scheduled dropoff",
+          "actualReturn": "Actual return",
+          "pickupPhotoAlt": "Pickup inspection",
+          "returnPhotoAlt": "Return inspection"
+        },
+        "sync": {
+          "title": "Operations & Sync",
+          "description": "Payment state, delivery state, and downstream accounting data.",
+          "paymentReceived": "Payment received",
+          "billingDocument": "Billing document",
+          "quickbooksTransfer": "QuickBooks transfer",
+          "zohoTransfer": "Zoho Invoice transfer",
+          "notGenerated": "Not generated",
+          "notQueued": "Not queued",
+          "quickbooksError": "QuickBooks error",
+          "zohoError": "Zoho Invoice error",
+          "openQuickbooksTransfers": "Open QuickBooks transfers",
+          "openZohoTransfers": "Open Zoho Invoice transfers"
+        },
+        "filesActions": {
+          "sendByEmail": "Send by Email",
+          "sending": "Sending...",
+          "sent": "Billing document sent via email.",
+          "sendFailed": "Failed to send billing document email."
+        },
+        "notesCard": {
+          "title": "Internal Notes",
+          "description": "Operational context saved with the booking."
+        },
+        "summaryCards": {
+          "total": "Total",
+          "totalHint": "Base tax-included, extras taxed separately",
+          "billing": "Billing",
+          "rentalWindow": "Rental Window",
+          "rentalDays": "{count, plural, one {# day} other {# days}}",
+          "categoryInline": "{category} category",
+          "lifecycle": "Lifecycle",
+          "lifecyclePaid": "Paid",
+          "lifecycleOpen": "Open",
+          "awaitingNextAction": "Awaiting next action"
+        },
+        "filesCard": {
+          "description": "Customer documents and generated billing outputs.",
+          "openPaymentProof": "Open payment proof"
+        }
+      },
+      "edit": {
+        "messages": {
+          "completeRequired": "Complete the required booking fields before saving.",
+          "updateFailed": "Failed to update booking",
+          "updated": "Booking updated"
+        },
+        "sections": {
+          "customer": {
+            "title": "Customer Details",
+            "description": "Update the renter identity and contact record used for this booking."
+          },
+          "window": {
+            "description": "Changing timing or category will trigger a fresh availability check before saving."
+          },
+          "routing": {
+            "title": "Vehicle & Routing",
+            "description": "The system will keep the current vehicle if it still fits the updated schedule."
+          },
+          "notes": {
+            "description": "Keep concise operational context with the booking."
+          },
+          "extras": {
+            "description": "Add, remove, and adjust optional services before saving the booking."
+          }
+        },
+        "fields": {
+          "pickupDateTime": "Pickup Date & Time",
+          "dropoffDateTime": "Dropoff Date & Time",
+          "assignedVehicle": "Assigned Vehicle",
+          "selectVehicle": "Select vehicle",
+          "selectPickupLocation": "Select pickup location",
+          "selectDropoffLocation": "Select dropoff location",
+          "addExtra": "Add extra",
+          "dailyExtra": "Daily extra",
+          "flatExtra": "Flat extra",
+          "qty": "Qty",
+          "lineTotal": "Line total",
+          "removeExtra": "Remove",
+          "noExtras": "No extras selected for this booking."
+        },
+        "sidebar": {
+          "title": "Save Plan",
+          "description": "Review what happens before you commit the update.",
+          "booking": "Booking",
+          "points": {
+            "recalculate": "Saving recalculates totals using current extras, discounts, and the tax-on-extras rule.",
+            "availability": "The system rechecks availability and keeps the current vehicle only if it still fits.",
+            "history": "Existing billing and booking history stay attached to the same booking record.",
+            "invoice": "Saving sends a refreshed invoice/payment request to the client using the updated pricing."
+          }
+        },
+        "preview": {
+          "title": "Updated Pricing Preview",
+          "description": "This reflects what will be saved and invoiced.",
+          "rentalDays": "Rental days",
+          "discount": "Discount ({code})",
+          "projectedTotal": "Projected total",
+          "includedExtras": "Included extras"
+        },
+        "actions": {
+          "saveChanges": "Save Changes"
+        }
       }
     },
     "vehicles": {
@@ -368,7 +1056,9 @@
       "empty": "No vehicles found",
       "errors": {
         "delete": "Error deleting vehicle",
-        "updateStatus": "Error updating vehicle status"
+        "updateStatus": "Error updating vehicle status",
+        "create": "Error creating vehicle",
+        "update": "Error updating vehicle"
       },
       "table": {
         "name": "Name",
@@ -377,6 +1067,26 @@
         "rate": "Daily Rate",
         "status": "Status",
         "actions": "Actions"
+      },
+      "onRent": "On rent",
+      "placeholders": {
+        "name": "e.g., Kia Picanto #1",
+        "plate": "e.g., ABC-1234",
+        "selectCategory": "Select category",
+        "notes": "Optional notes"
+      },
+      "stepCounter": "Step {current} of {total}",
+      "steps": {
+        "identity": "Identity",
+        "identityDescription": "Vehicle name and plate number.",
+        "assignment": "Assignment",
+        "assignmentDescription": "Category and daily rate.",
+        "status": "Status",
+        "statusDescription": "Operational status and internal notes."
+      },
+      "confirm": {
+        "deleteTitle": "Delete vehicle?",
+        "deleteDescription": "This will permanently delete the selected vehicle."
       }
     },
     "billingRequired": {
@@ -396,11 +1106,16 @@
         "returns": "Returns",
         "financial": "Financial",
         "fleet": "Fleet",
+        "quickbooks": "QuickBooks",
+        "zoho": "Zoho Invoice",
+        "blockouts": "Availability Blocks",
         "vehicles": "Vehicle Management",
         "reviews": "Reviews",
         "settings": "Settings",
         "locations": "Locations",
-        "users": "Users"
+        "logs": "Logs",
+        "users": "Users",
+        "help": "Help Center"
       },
       "deliveries": {
         "title": "Upcoming Deliveries (Next 7 Days)"
@@ -426,11 +1141,149 @@
       },
       "vehicles": {
         "manage": "Manage Vehicles",
-        "pricing": "Pricing"
+        "pricing": "Pricing",
+        "features": "Features",
+        "categories": "Categories",
+        "extras": "Extras",
+        "discounts": "Discounts"
       },
       "reviews": {
         "title": "Reviews Moderation",
-        "subtitle": "Show or hide customer reviews on the home page."
+        "subtitle": "Show or hide customer reviews on the home page.",
+        "empty": "No reviews yet.",
+        "table": {
+          "booking": "Booking",
+          "customer": "Customer",
+          "rating": "Rating",
+          "review": "Review",
+          "status": "Status",
+          "date": "Date",
+          "actions": "Actions",
+          "fullReview": "Full review"
+        },
+        "visibility": {
+          "visible": "VISIBLE",
+          "hidden": "HIDDEN"
+        },
+        "messages": {
+          "visible": "Review is now visible",
+          "hidden": "Review is now hidden",
+          "updateFailed": "Failed to update review"
+        }
+      }
+    },
+    "blockouts": {
+      "deleteConfirmTitle": "Delete blockout?",
+      "deleteConfirmDescription": "This will remove the selected availability block.",
+      "form": {
+        "vehicleScope": "Vehicle scope",
+        "allVehicles": "All vehicles",
+        "start": "Start",
+        "end": "End",
+        "reason": "Reason",
+        "optionalNote": "Optional note",
+        "saving": "Saving...",
+        "create": "Create blockout"
+      },
+      "table": {
+        "scope": "Scope",
+        "start": "Start",
+        "end": "End",
+        "reason": "Reason",
+        "created": "Created",
+        "action": "Action",
+        "fullReason": "Full reason",
+        "deleting": "Deleting..."
+      },
+      "messages": {
+        "created": "Blockout created.",
+        "deleted": "Blockout deleted.",
+        "createFailed": "Failed to create blockout",
+        "deleteFailed": "Failed to delete blockout"
+      },
+      "title": "Availability Blocks",
+      "description": "Block all vehicles or one specific vehicle for a date range. These blocks are enforced in availability search and booking creation."
+    },
+    "quickbooks": {
+      "description": "Transfers are queued from billing actions and run separately from booking management.",
+      "actions": {
+        "refreshCache": "Refresh QB Cache",
+        "refreshing": "Refreshing...",
+        "syncPending": "Sync Pending",
+        "syncing": "Syncing...",
+        "sync": "Sync",
+        "resync": "Resync"
+      },
+      "table": {
+        "booking": "Booking",
+        "customer": "Customer",
+        "billing": "Billing",
+        "qbStatus": "QB Status",
+        "requested": "Requested",
+        "synced": "Synced",
+        "amount": "Amount",
+        "action": "Action",
+        "openBooking": "Open booking",
+        "none": "None",
+        "paymentReceived": "Payment received",
+        "awaitingPayment": "Awaiting payment",
+        "notQueued": "NOT_QUEUED",
+        "fullSyncError": "Full sync error"
+      },
+      "messages": {
+        "transferFailed": "QuickBooks transfer failed",
+        "transferCompleted": "QuickBooks transfer completed.",
+        "runFailed": "QuickBooks transfer run failed",
+        "runCompletedWithFailures": "Completed {completed}. Failed {failed}.",
+        "runCompleted": "Completed {completed} QuickBooks transfer(s).",
+        "cacheRefreshFailed": "QuickBooks cache refresh failed",
+        "cacheRefreshed": "QuickBooks name cache refreshed ({count})."
+      },
+      "title": "QuickBooks Transfers",
+      "pageDescription": "Billing documents queue here for external sync. Booking pages no longer call QuickBooks directly.",
+      "filters": {
+        "all": "All",
+        "failed": "Failed",
+        "completed": "Completed"
+      }
+    },
+    "zoho": {
+      "description": "Transfers are queued from billing actions and run separately from booking management.",
+      "actions": {
+        "syncPending": "Sync Pending",
+        "syncing": "Syncing...",
+        "sync": "Sync",
+        "resync": "Resync"
+      },
+      "table": {
+        "booking": "Booking",
+        "customer": "Customer",
+        "billing": "Billing",
+        "status": "Zoho Status",
+        "requested": "Requested",
+        "synced": "Synced",
+        "amount": "Amount",
+        "action": "Action",
+        "openBooking": "Open booking",
+        "none": "None",
+        "paymentReceived": "Payment received",
+        "awaitingPayment": "Awaiting payment",
+        "notQueued": "NOT_QUEUED",
+        "fullSyncError": "Full sync error"
+      },
+      "messages": {
+        "transferFailed": "Zoho Invoice transfer failed",
+        "transferCompleted": "Zoho Invoice transfer completed.",
+        "runFailed": "Zoho Invoice transfer run failed",
+        "runCompletedWithFailures": "Completed {completed}. Failed {failed}.",
+        "runCompleted": "Completed {completed} Zoho Invoice transfer(s)."
+      },
+      "title": "Zoho Invoice Transfers",
+      "pageDescription": "Billing documents queue here for Zoho Invoice sync. Booking pages no longer call accounting directly.",
+      "filters": {
+        "all": "All",
+        "failed": "Failed",
+        "completed": "Completed"
       }
     },
     "users": {
@@ -452,6 +1305,11 @@
       "empty": "No users found",
       "errors": {
         "delete": "Failed to delete user"
+      },
+      "passwordMin": "Password: minimum 8 characters",
+      "roles": {
+        "owner": "OWNER",
+        "staff": "STAFF"
       }
     },
     "locations": {
@@ -470,23 +1328,252 @@
       "empty": "No locations found",
       "errors": {
         "delete": "Failed to delete location"
-      }
+      },
+      "fullAddress": "Full address"
     },
     "settings": {
       "title": "System Settings",
       "subtitle": "Applies to booking totals, invoice PDFs, and sales receipts.",
       "taxPercentage": "Tax Percentage",
       "minimumBookingDays": "Minimum Booking Days",
+      "vehicleRatesTaxMode": {
+        "label": "Vehicle rate tax mode",
+        "description": "When enabled, car rental rates already include tax and only extras receive extra tax. When disabled, tax is added to both rental and extras.",
+        "included": "Vehicle rates already include tax",
+        "excluded": "Vehicle rates do not include tax"
+      },
       "saving": "Saving...",
       "errors": {
         "invalidTax": "Enter a valid tax percentage between 0 and 100.",
         "invalidMinDays": "Enter a valid minimum booking duration between 1 and 365 days.",
-        "updateFailed": "Failed to update settings."
+        "updateFailed": "Failed to update settings.",
+        "requiredTenantFields": "Tenant name, email, and currency are required."
       },
       "success": {
         "updated": "Settings updated. Tax: {tax}%, Minimum booking: {days} day(s)."
+      },
+      "branding": {
+        "title": "Tenant Branding",
+        "description": "Env provides defaults. Saving here overrides them at runtime for this tenant.",
+        "tenantName": "Tenant Name",
+        "logoUrl": "Logo URL",
+        "email": "Email",
+        "phone": "Phone",
+        "whatsappLabel": "WhatsApp Label",
+        "whatsappUrl": "WhatsApp URL",
+        "facebookUrl": "Facebook URL",
+        "instagramUrl": "Instagram URL",
+        "linkedinUrl": "LinkedIn URL",
+        "tiktokUrl": "TikTok URL",
+        "currency": "Currency",
+        "termsPdfUrl": "Terms PDF URL",
+        "address": "Address",
+        "paymentInstructions": "Payment Instructions"
+      },
+      "theme": {
+        "title": "Theme Tokens",
+        "description": "Use Tailwind-compatible HSL token values, for example 216 85% 34%.",
+        "primary": "Primary",
+        "primaryForeground": "Primary Foreground",
+        "accent": "Accent",
+        "accentForeground": "Accent Foreground",
+        "ring": "Ring",
+        "sidebarPrimary": "Sidebar Primary",
+        "sidebarPrimaryForeground": "Sidebar Primary Foreground",
+        "sidebarAccent": "Sidebar Accent",
+        "sidebarAccentForeground": "Sidebar Accent Foreground"
+      },
+      "integrations": {
+        "title": "Integrations",
+        "description": "Select one accounting provider at a time. The selected provider controls the sidebar tab and booking transfer queue.",
+        "invoiceProvider": "Invoice provider",
+        "providerNone": "None",
+        "providerQuickbooks": "QuickBooks",
+        "providerZoho": "Zoho Invoice",
+        "noneDescription": "Do not show an accounting tab and do not use provider sync.",
+        "quickbooksDescription": "Show only QuickBooks and use it as the active invoice provider.",
+        "zohoDescription": "Show only Zoho Invoice and use it as the active invoice provider.",
+        "showQuickbooks": "Show QuickBooks in admin",
+        "allowQuickbooks": "Allow QuickBooks sync/actions",
+        "quickbooksControls": "QuickBooks controls",
+        "zohoOrganizationId": "Zoho organization ID",
+        "zohoRefreshToken": "Zoho refresh token",
+        "envWarning": "QuickBooks env credentials are incomplete. Runtime toggle cannot enable it until env is configured.",
+        "zohoEnvWarning": "Zoho Invoice env credentials are incomplete. Add client id and client secret before using Zoho."
+      },
+      "messages": {
+        "updated": "Settings updated."
       }
     },
-    "logout": "Logout"
+    "logout": "Logout",
+    "shared": {
+      "showing": "Showing {start}-{end} of {total}",
+      "rows": "Rows:"
+    },
+    "categories": {
+      "title": "Categories",
+      "add": "Add Category",
+      "edit": "Edit Category",
+      "name": "Name",
+      "description": "Description",
+      "image": "Category Image",
+      "imageUrl": "Image URL",
+      "previewAlt": "Category preview",
+      "dailyRate": "Daily Rate ($)",
+      "fuelChargePerQuarter": "Fuel Charge Per 1/4 Tank ($)",
+      "sortOrder": "Sort Order",
+      "seats": "Seats",
+      "features": "Car Options",
+      "featuresHint": "Create options once in the Features tab, then assign them here.",
+      "featuresFlowTitle": "How options work",
+      "featuresFlowDescription": "Options are managed in the Features tab and then attached to categories here. Vehicles inherit those options from their assigned category.",
+      "stepCounter": "Step {current} of {total}",
+      "steps": {
+        "basics": "Basics",
+        "basicsDescription": "Name, description, and image.",
+        "pricing": "Pricing",
+        "pricingDescription": "Rates, order, and active status.",
+        "options": "Options",
+        "optionsDescription": "Seats, transmission, and assigned features."
+      },
+      "carPlay": "Apple CarPlay",
+      "carPlayShort": "CarPlay",
+      "backupCamera": "Backup Camera",
+      "transmission": "Transmission",
+      "automatic": "Automatic",
+      "manual": "Manual",
+      "acAvailable": "A/C available",
+      "acShort": "A/C",
+      "noAc": "No A/C",
+      "active": "Active",
+      "uploading": "Uploading...",
+      "actions": {
+        "archive": "Archive"
+      },
+      "confirm": {
+        "archiveTitle": "Archive category?",
+        "archiveDescription": "This will archive the selected category."
+      },
+      "status": {
+        "active": "ACTIVE",
+        "archived": "ARCHIVED"
+      },
+      "table": {
+        "image": "Image",
+        "features": "Features",
+        "fuelCharge": "Fuel Charge",
+        "vehicles": "Vehicles",
+        "bookings": "Bookings",
+        "fullDescription": "Full description",
+        "fullFeatures": "Full features",
+        "featuresSummary": "{seats} seats • {transmission} • {features}",
+        "noFeatures": "No options assigned",
+        "fuelChargeValue": "${amount}/1/4"
+      },
+      "pricingCard": {
+        "features": "{seats} seats • {transmission} • {features}",
+        "fuelRefill": "Fuel refill: {amount} per 1/4 tank"
+      },
+      "messages": {
+        "saveFailed": "Failed to save category",
+        "updated": "Category updated",
+        "created": "Category created",
+        "imageUploadFailed": "Image upload failed",
+        "imageUploaded": "Image uploaded",
+        "archiveFailed": "Failed to archive category",
+        "archived": "Category archived"
+      }
+    },
+    "features": {
+      "title": "Vehicle Features",
+      "pageHint": "Manage the option catalog once, then assign those options to categories. Public fleet cards and booking results read from this catalog.",
+      "createHint": "Create reusable options like Bluetooth, dashcam, or USB-C without another schema change.",
+      "assignHint": "After creating an option, open a category and attach it there so vehicles in that category show it automatically.",
+      "liveHint": "Active options are immediately available for category assignment and public display.",
+      "tableHint": "This list is the master feature catalog used by category assignment and public vehicle cards.",
+      "add": "Add Feature",
+      "edit": "Edit Feature",
+      "name": "Feature Name",
+      "slug": "Slug",
+      "sortOrder": "Sort Order",
+      "active": "Active",
+      "actions": {
+        "archive": "Archive"
+      },
+      "confirm": {
+        "archiveTitle": "Archive feature?",
+        "archiveDescription": "This will archive the selected feature."
+      },
+      "status": {
+        "active": "ACTIVE",
+        "archived": "ARCHIVED"
+      },
+      "table": {
+        "categories": "Categories"
+      },
+      "messages": {
+        "saveFailed": "Failed to save feature",
+        "updated": "Feature updated",
+        "created": "Feature created",
+        "archiveFailed": "Failed to archive feature",
+        "archived": "Feature archived"
+      }
+    },
+    "extras": {
+      "title": "Extras",
+      "add": "Add Extra",
+      "edit": "Edit Extra",
+      "name": "Name",
+      "description": "Description",
+      "flatRate": "Flat rate",
+      "dailyRate": "Daily rate",
+      "amount": "Amount",
+      "active": "Active",
+      "actions": {
+        "archive": "Archive"
+      },
+      "status": {
+        "active": "ACTIVE",
+        "archived": "ARCHIVED"
+      },
+      "table": {
+        "type": "Type"
+      },
+      "messages": {
+        "saveFailed": "Failed to save extra",
+        "updated": "Extra updated",
+        "created": "Extra created",
+        "archiveFailed": "Failed to archive extra",
+        "archived": "Extra archived"
+      }
+    },
+    "discounts": {
+      "title": "Discount Codes",
+      "add": "Add Discount Code",
+      "edit": "Edit Discount Code",
+      "code": "Code",
+      "description": "Description",
+      "percentage": "Percentage",
+      "maxUses": "Max uses (optional)",
+      "active": "Active",
+      "actions": {
+        "deactivate": "Deactivate"
+      },
+      "status": {
+        "active": "ACTIVE",
+        "inactive": "INACTIVE"
+      },
+      "table": {
+        "uses": "Uses",
+        "expires": "Expires"
+      },
+      "messages": {
+        "saveFailed": "Failed to save discount",
+        "updated": "Discount updated",
+        "created": "Discount created",
+        "deactivateFailed": "Failed to deactivate code",
+        "deactivated": "Discount deactivated"
+      }
+    }
   }
 }

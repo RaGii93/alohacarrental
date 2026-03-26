@@ -1,0 +1,656 @@
+{
+  "createdAt": "2026-03-26T18:10:53.855Z",
+  "tableCount": 13,
+  "tables": {
+    "AdminUser": [
+      {
+        "id": "cmmjpdjl80000logda49lmhd6",
+        "email": "support@endlessedgetechnology.com",
+        "passwordHash": "$2b$10$pWAnCr8KikHYjrFVl7Ir2enLb7AxHf6XpN/k25ykbUA7oZ.l6kWwW",
+        "role": "ROOT",
+        "createdAt": "2026-03-09T21:38:21.164Z"
+      },
+      {
+        "id": "cmmjpdk6g0001logdmov6o6t6",
+        "email": "alohaservicesbonaire@gmail.com ",
+        "passwordHash": "$2b$10$WUGB.tcjWEm4HLZRqHdWluTXCARtGxdXQubeglj./aVOYo0wo1qBS",
+        "role": "OWNER",
+        "createdAt": "2026-03-09T21:38:21.928Z"
+      }
+    ],
+    "AppSetting": [],
+    "AuditLog": [
+      {
+        "id": "cmmziwokz000083gdese6rmoo",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-20T23:21:35.603Z"
+      },
+      {
+        "id": "cmmziz32p000183gdxeo89gsb",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-20T23:23:27.697Z"
+      },
+      {
+        "id": "cmmzkxblv000004l4tv9jr9tu",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-21T00:18:04.675Z"
+      },
+      {
+        "id": "cmmzl1vaa000283gdjcyq27kc",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-21T00:21:36.802Z"
+      },
+      {
+        "id": "cmmzl4lh8000383gd29f5a2dv",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_OUT",
+        "bookingId": null,
+        "createdAt": "2026-03-21T00:23:44.060Z"
+      },
+      {
+        "id": "cmmzqaww7000483gd0h3cl2tm",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-21T02:48:36.871Z"
+      },
+      {
+        "id": "cmmzqcr0h000583gdqo21gt6f",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-21T02:50:02.561Z"
+      },
+      {
+        "id": "cmmzs210g000683gd0yr0l9eh",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-21T03:37:41.536Z"
+      },
+      {
+        "id": "cmmzs5wdb000783gdts14v17p",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-21T03:40:42.143Z"
+      },
+      {
+        "id": "cmn3kgsh4000004l8bwzxi0bp",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "ADMIN_LOGGED_IN",
+        "bookingId": null,
+        "createdAt": "2026-03-23T19:16:18.087Z"
+      },
+      {
+        "id": "cmn3khqua000004la1m6m9xuy",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "LOCATION_UPDATED",
+        "bookingId": null,
+        "createdAt": "2026-03-23T19:17:02.626Z"
+      },
+      {
+        "id": "cmn3ki0qi000004jy0yxbpqbm",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "LOCATION_DELETED",
+        "bookingId": null,
+        "createdAt": "2026-03-23T19:17:15.449Z"
+      },
+      {
+        "id": "cmn3ki7xy000104l8q0n5tske",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "LOCATION_UPDATED",
+        "bookingId": null,
+        "createdAt": "2026-03-23T19:17:24.790Z"
+      },
+      {
+        "id": "cmn3kiei9000004l5nzqay919",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "LOCATION_DELETED",
+        "bookingId": null,
+        "createdAt": "2026-03-23T19:17:33.297Z"
+      },
+      {
+        "id": "cmn3kigb2000104jyr78szr6l",
+        "adminUserId": "cmmjpdjl80000logda49lmhd6",
+        "action": "LOCATION_DELETED",
+        "bookingId": null,
+        "createdAt": "2026-03-23T19:17:35.630Z"
+      }
+    ],
+    "Booking": [
+      {
+        "id": "cmmjpdmgj000ulogdq63nbuy3",
+        "categoryId": "cat_pickup",
+        "vehicleId": "cmmjpdluw000nlogdn1rcpg77",
+        "customerName": "Jordan Bell",
+        "customerEmail": "jordan.bell@example.com",
+        "customerPhone": "+1-555-1004",
+        "birthDate": "2000-03-05T04:00:00.000Z",
+        "driverLicenseNumber": "DLD-1004",
+        "licenseExpiryDate": "2027-09-10T04:00:00.000Z",
+        "driverLicenseUrl": "https://example.com/licenses/sample-license.pdf",
+        "startDate": "2026-03-14T11:45:00.000Z",
+        "endDate": "2026-03-16T22:15:00.000Z",
+        "pickupLocationId": null,
+        "dropoffLocationId": "cmmjpdles000glogd7aiu17hi",
+        "pickupLocation": "North Hub",
+        "dropoffLocation": "South Hub",
+        "totalAmount": 12600,
+        "status": "DECLINED",
+        "bookingCode": "BK100004",
+        "holdExpiresAt": "2026-03-09T21:38:23.881Z",
+        "paymentProofUrl": null,
+        "paymentReceivedAt": null,
+        "termsAcceptedAt": "2026-03-09T21:38:24.881Z",
+        "notes": null,
+        "invoiceUrl": null,
+        "createdAt": "2026-03-09T21:38:24.883Z"
+      },
+      {
+        "id": "cmmjpdmit000vlogddwa9376y",
+        "categoryId": "cat_luxury",
+        "vehicleId": "cmmjpdlzd000plogdqar29qod",
+        "customerName": "Taylor Brooks",
+        "customerEmail": "taylor.brooks@example.com",
+        "customerPhone": "+1-555-1005",
+        "birthDate": "1997-06-09T04:00:00.000Z",
+        "driverLicenseNumber": "DLE-1005",
+        "licenseExpiryDate": "2028-05-17T04:00:00.000Z",
+        "driverLicenseUrl": "https://example.com/licenses/sample-license.pdf",
+        "startDate": "2026-03-15T16:00:00.000Z",
+        "endDate": "2026-03-18T18:00:00.000Z",
+        "pickupLocationId": "cmmjpdl63000clogd4zjg50pn",
+        "dropoffLocationId": null,
+        "pickupLocation": "Airport Terminal",
+        "dropoffLocation": "North Hub",
+        "totalAmount": 34000,
+        "status": "CONFIRMED",
+        "bookingCode": "BK100005",
+        "holdExpiresAt": "2026-03-09T21:38:23.961Z",
+        "paymentProofUrl": null,
+        "paymentReceivedAt": null,
+        "termsAcceptedAt": "2026-03-09T21:38:24.961Z",
+        "notes": null,
+        "invoiceUrl": null,
+        "createdAt": "2026-03-09T21:38:24.965Z"
+      },
+      {
+        "id": "cmmjpdme5000tlogdm49w4dgi",
+        "categoryId": "cat_suv",
+        "vehicleId": "cmmjpdlqg000llogd98i3h0jq",
+        "customerName": "Chris Lopez",
+        "customerEmail": "chris.lopez@example.com",
+        "customerPhone": "+1-555-1003",
+        "birthDate": "1998-10-22T04:00:00.000Z",
+        "driverLicenseNumber": "DLC-1003",
+        "licenseExpiryDate": "2027-12-19T04:00:00.000Z",
+        "driverLicenseUrl": "https://example.com/licenses/sample-license.pdf",
+        "startDate": "2026-03-13T12:00:00.000Z",
+        "endDate": "2026-03-17T12:00:00.000Z",
+        "pickupLocationId": null,
+        "dropoffLocationId": "cmmjpdl63000clogd4zjg50pn",
+        "pickupLocation": "Central Train Station",
+        "dropoffLocation": "Airport Terminal",
+        "totalAmount": 18000,
+        "status": "PENDING",
+        "bookingCode": "BK100003",
+        "holdExpiresAt": "2026-03-09T23:38:24.796Z",
+        "paymentProofUrl": null,
+        "paymentReceivedAt": null,
+        "termsAcceptedAt": "2026-03-09T21:38:24.796Z",
+        "notes": null,
+        "invoiceUrl": null,
+        "createdAt": "2026-03-09T21:38:24.797Z"
+      },
+      {
+        "id": "cmmjpdmbx000slogdo6wzv163",
+        "categoryId": "cat_compact",
+        "vehicleId": "cmmjpdlll000jlogdr6ifyb3f",
+        "customerName": "Maria Nguyen",
+        "customerEmail": "maria.nguyen@example.com",
+        "customerPhone": "+1-555-1002",
+        "birthDate": "1996-01-26T04:00:00.000Z",
+        "driverLicenseNumber": "DLB-1002",
+        "licenseExpiryDate": "2028-02-07T04:00:00.000Z",
+        "driverLicenseUrl": "https://example.com/licenses/sample-license.pdf",
+        "startDate": "2026-03-12T14:30:00.000Z",
+        "endDate": "2026-03-15T14:30:00.000Z",
+        "pickupLocationId": null,
+        "dropoffLocationId": null,
+        "pickupLocation": "Downtown Office",
+        "dropoffLocation": "Central Train Station",
+        "totalAmount": 9000,
+        "status": "CONFIRMED",
+        "bookingCode": "BK100002",
+        "holdExpiresAt": "2026-03-09T21:38:23.714Z",
+        "paymentProofUrl": null,
+        "paymentReceivedAt": null,
+        "termsAcceptedAt": "2026-03-09T21:38:24.715Z",
+        "notes": null,
+        "invoiceUrl": null,
+        "createdAt": "2026-03-09T21:38:24.717Z"
+      },
+      {
+        "id": "cmmjpdm9f000rlogdkeicxlwn",
+        "categoryId": "cat_economy",
+        "vehicleId": "cmmjpdlh6000hlogdr986kbk3",
+        "customerName": "Alex Carter",
+        "customerEmail": "alex.carter@example.com",
+        "customerPhone": "+1-555-1001",
+        "birthDate": "2001-07-18T04:00:00.000Z",
+        "driverLicenseNumber": "DLA-1001",
+        "licenseExpiryDate": "2027-07-22T04:00:00.000Z",
+        "driverLicenseUrl": "https://example.com/licenses/sample-license.pdf",
+        "startDate": "2026-03-11T13:00:00.000Z",
+        "endDate": "2026-03-14T15:00:00.000Z",
+        "pickupLocationId": "cmmjpdl63000clogd4zjg50pn",
+        "dropoffLocationId": null,
+        "pickupLocation": "Airport Terminal",
+        "dropoffLocation": "Downtown Office",
+        "totalAmount": 10000,
+        "status": "PENDING",
+        "bookingCode": "BK100001",
+        "holdExpiresAt": "2026-03-09T23:38:24.624Z",
+        "paymentProofUrl": null,
+        "paymentReceivedAt": null,
+        "termsAcceptedAt": "2026-03-09T21:38:24.624Z",
+        "notes": null,
+        "invoiceUrl": null,
+        "createdAt": "2026-03-09T21:38:24.627Z"
+      }
+    ],
+    "BookingDiscount": [],
+    "BookingExtra": [],
+    "DiscountCode": [
+      {
+        "id": "cmmjpdkv10007logdd8awd8j8",
+        "code": "WELCOME10",
+        "description": "Welcome discount",
+        "percentage": 10,
+        "isActive": true,
+        "maxUses": null,
+        "usedCount": 0,
+        "expiresAt": null,
+        "createdAt": "2026-03-09T21:38:22.813Z"
+      },
+      {
+        "id": "cmmjpdkxd0008logdphte9d8u",
+        "code": "WEEKEND15",
+        "description": "Weekend offer",
+        "percentage": 15,
+        "isActive": true,
+        "maxUses": null,
+        "usedCount": 0,
+        "expiresAt": null,
+        "createdAt": "2026-03-09T21:38:22.897Z"
+      },
+      {
+        "id": "cmmjpdkzl0009logdv7dxi0ju",
+        "code": "VIP20",
+        "description": "VIP customer",
+        "percentage": 20,
+        "isActive": true,
+        "maxUses": null,
+        "usedCount": 0,
+        "expiresAt": null,
+        "createdAt": "2026-03-09T21:38:22.977Z"
+      },
+      {
+        "id": "cmmjpdl1q000alogdwndqnnm2",
+        "code": "SPRING12",
+        "description": "Spring campaign",
+        "percentage": 12,
+        "isActive": true,
+        "maxUses": null,
+        "usedCount": 0,
+        "expiresAt": null,
+        "createdAt": "2026-03-09T21:38:23.054Z"
+      },
+      {
+        "id": "cmmjpdl3w000blogdbiwhedxp",
+        "code": "LOYAL5",
+        "description": "Loyalty discount",
+        "percentage": 5,
+        "isActive": true,
+        "maxUses": null,
+        "usedCount": 0,
+        "expiresAt": null,
+        "createdAt": "2026-03-09T21:38:23.132Z"
+      }
+    ],
+    "Extra": [
+      {
+        "id": "cmmjpdkjv0002logddecbkb51",
+        "name": "Fuel Service",
+        "description": "Fuel refill handling",
+        "pricingType": "FLAT",
+        "amount": 2500,
+        "isActive": true,
+        "createdAt": "2026-03-09T21:38:22.411Z"
+      },
+      {
+        "id": "cmmjpdkm50003logdkkf7ctu8",
+        "name": "Child Seat",
+        "description": "Safety child seat",
+        "pricingType": "DAILY",
+        "amount": 600,
+        "isActive": true,
+        "createdAt": "2026-03-09T21:38:22.493Z"
+      },
+      {
+        "id": "cmmjpdkod0004logdrkk0blec",
+        "name": "GPS Device",
+        "description": "Standalone GPS",
+        "pricingType": "DAILY",
+        "amount": 450,
+        "isActive": true,
+        "createdAt": "2026-03-09T21:38:22.573Z"
+      },
+      {
+        "id": "cmmjpdkqp0005logdwuyuo3ym",
+        "name": "Additional Driver",
+        "description": "Second authorized driver",
+        "pricingType": "DAILY",
+        "amount": 900,
+        "isActive": true,
+        "createdAt": "2026-03-09T21:38:22.657Z"
+      },
+      {
+        "id": "cmmjpdksw0006logdqag7pfrz",
+        "name": "Cleaning Package",
+        "description": "Post-rental deep cleaning",
+        "pricingType": "FLAT",
+        "amount": 1800,
+        "isActive": true,
+        "createdAt": "2026-03-09T21:38:22.736Z"
+      }
+    ],
+    "Location": [
+      {
+        "id": "cmmjpdles000glogd7aiu17hi",
+        "name": "Main Office",
+        "code": "MO",
+        "address": "45 South Ave, City",
+        "createdAt": "2026-03-09T21:38:23.524Z"
+      },
+      {
+        "id": "cmmjpdl63000clogd4zjg50pn",
+        "name": "Flamingo International Airport",
+        "code": "AIRPORT",
+        "address": "Airport Rd, City",
+        "createdAt": "2026-03-09T21:38:23.211Z"
+      }
+    ],
+    "Review": [
+      {
+        "id": "cmmjpdmnq000wlogddqmhuv1l",
+        "bookingId": "cmmjpdm9f000rlogdkeicxlwn",
+        "bookingCode": "BK100001",
+        "customerName": "Alex Carter",
+        "rating": 5,
+        "comment": "Great car and smooth pickup process.",
+        "isVisible": true,
+        "createdAt": "2026-03-09T21:38:25.142Z"
+      },
+      {
+        "id": "cmmjpdms6000xlogd1w6czmfb",
+        "bookingId": "cmmjpdmbx000slogdo6wzv163",
+        "bookingCode": "BK100002",
+        "customerName": "Maria Nguyen",
+        "rating": 4,
+        "comment": "Clean vehicle, quick support response.",
+        "isVisible": true,
+        "createdAt": "2026-03-09T21:38:25.302Z"
+      },
+      {
+        "id": "cmmjpdmwl000ylogd8ve0jzae",
+        "bookingId": "cmmjpdme5000tlogdm49w4dgi",
+        "bookingCode": "BK100003",
+        "customerName": "Chris Lopez",
+        "rating": 5,
+        "comment": "Very good experience, will book again.",
+        "isVisible": false,
+        "createdAt": "2026-03-09T21:38:25.461Z"
+      },
+      {
+        "id": "cmmjpdn1e000zlogdqty3tj3h",
+        "bookingId": "cmmjpdmgj000ulogdq63nbuy3",
+        "bookingCode": "BK100004",
+        "customerName": "Jordan Bell",
+        "rating": 3,
+        "comment": "Service was okay, expected faster delivery.",
+        "isVisible": false,
+        "createdAt": "2026-03-09T21:38:25.634Z"
+      },
+      {
+        "id": "cmmjpdn5t0010logd2wrq4vh0",
+        "bookingId": "cmmjpdmit000vlogddwa9376y",
+        "bookingCode": "BK100005",
+        "customerName": "Taylor Brooks",
+        "rating": 5,
+        "comment": "Excellent condition and friendly staff.",
+        "isVisible": true,
+        "createdAt": "2026-03-09T21:38:25.793Z"
+      }
+    ],
+    "Vehicle": [
+      {
+        "id": "cmmjpdlh6000hlogdr986kbk3",
+        "name": "Kia Picanto #1",
+        "plateNumber": "ECO-1001",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Kia+Picanto",
+        "categoryId": "cat_economy",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 2500,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:23.610Z"
+      },
+      {
+        "id": "cmmjpdljf000ilogd22m4turl",
+        "name": "Toyota Yaris #1",
+        "plateNumber": "ECO-1002",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Toyota+Yaris",
+        "categoryId": "cat_economy",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 2500,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:23.691Z"
+      },
+      {
+        "id": "cmmjpdlll000jlogdr6ifyb3f",
+        "name": "Honda City #1",
+        "plateNumber": "COM-2001",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Honda+City",
+        "categoryId": "cat_compact",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 3000,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:23.769Z"
+      },
+      {
+        "id": "cmmjpdlo9000klogdhslkt5rg",
+        "name": "Mazda 3 #1",
+        "plateNumber": "COM-2002",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Mazda+3",
+        "categoryId": "cat_compact",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 3000,
+        "status": "MAINTENANCE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:23.865Z"
+      },
+      {
+        "id": "cmmjpdlqg000llogd98i3h0jq",
+        "name": "Toyota RAV4 #1",
+        "plateNumber": "SUV-3001",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Toyota+RAV4",
+        "categoryId": "cat_suv",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 4500,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:23.944Z"
+      },
+      {
+        "id": "cmmjpdlsm000mlogd5n843drm",
+        "name": "Honda CR-V #1",
+        "plateNumber": "SUV-3002",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Honda+CR-V",
+        "categoryId": "cat_suv",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 4500,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:24.022Z"
+      },
+      {
+        "id": "cmmjpdluw000nlogdn1rcpg77",
+        "name": "Ford Ranger #1",
+        "plateNumber": "PUP-4001",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Ford+Ranger",
+        "categoryId": "cat_pickup",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 4200,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:24.104Z"
+      },
+      {
+        "id": "cmmjpdlwz000ologdinza418n",
+        "name": "Isuzu D-Max #1",
+        "plateNumber": "PUP-4002",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Isuzu+D-Max",
+        "categoryId": "cat_pickup",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 4200,
+        "status": "INACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:24.179Z"
+      },
+      {
+        "id": "cmmjpdlzd000plogdqar29qod",
+        "name": "BMW 3 Series #1",
+        "plateNumber": "LUX-5001",
+        "imageUrl": "https://via.placeholder.com/240x140?text=BMW+3+Series",
+        "categoryId": "cat_luxury",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 8500,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:24.265Z"
+      },
+      {
+        "id": "cmmjpdm1f000qlogd5igt9v73",
+        "name": "Mercedes C-Class #1",
+        "plateNumber": "LUX-5002",
+        "imageUrl": "https://via.placeholder.com/240x140?text=Mercedes+C-Class",
+        "categoryId": "cat_luxury",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 8500,
+        "status": "ACTIVE",
+        "notes": null,
+        "createdAt": "2026-03-09T21:38:24.339Z"
+      }
+    ],
+    "VehicleCategory": [
+      {
+        "id": "cat_economy",
+        "name": "Economy",
+        "description": "Compact and fuel-efficient vehicles",
+        "imageUrl": "https://via.placeholder.com/640x360?text=Economy",
+        "seats": 4,
+        "transmission": "MANUAL",
+        "hasAC": true,
+        "dailyRate": 2500,
+        "isActive": true,
+        "sortOrder": 1,
+        "createdAt": "2026-03-09T21:38:22.008Z"
+      },
+      {
+        "id": "cat_compact",
+        "name": "Compact",
+        "description": "Balanced city and highway option",
+        "imageUrl": "https://via.placeholder.com/640x360?text=Compact",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 3000,
+        "isActive": true,
+        "sortOrder": 2,
+        "createdAt": "2026-03-09T21:38:22.094Z"
+      },
+      {
+        "id": "cat_suv",
+        "name": "SUV",
+        "description": "Spacious vehicles for families and groups",
+        "imageUrl": "https://via.placeholder.com/640x360?text=SUV",
+        "seats": 7,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 4500,
+        "isActive": true,
+        "sortOrder": 3,
+        "createdAt": "2026-03-09T21:38:22.169Z"
+      },
+      {
+        "id": "cat_pickup",
+        "name": "Pickup",
+        "description": "Utility trucks for cargo and work",
+        "imageUrl": "https://via.placeholder.com/640x360?text=Pickup",
+        "seats": 5,
+        "transmission": "MANUAL",
+        "hasAC": false,
+        "dailyRate": 4200,
+        "isActive": true,
+        "sortOrder": 4,
+        "createdAt": "2026-03-09T21:38:22.251Z"
+      },
+      {
+        "id": "cat_luxury",
+        "name": "Luxury",
+        "description": "Premium comfort and performance",
+        "imageUrl": "https://via.placeholder.com/640x360?text=Luxury",
+        "seats": 5,
+        "transmission": "AUTOMATIC",
+        "hasAC": true,
+        "dailyRate": 8500,
+        "isActive": true,
+        "sortOrder": 5,
+        "createdAt": "2026-03-09T21:38:22.332Z"
+      }
+    ],
+    "_AdminUserToBooking": []
+  }
+}

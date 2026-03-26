@@ -1,4 +1,4 @@
-import { getTenantConfig } from "@/lib/tenant";
+import type { TenantConfig } from "@/lib/tenant";
 import { getBaseUrl, toLocalePath } from "@/lib/seo";
 
 function localeToLanguageTag(locale: string): string {
@@ -14,8 +14,7 @@ function parseCoordinates(address?: string): { latitude?: number; longitude?: nu
   return { latitude: Number(match[1]), longitude: Number(match[2]) };
 }
 
-export function getHomeJsonLd(locale: string) {
-  const tenant = getTenantConfig();
+export function getHomeJsonLd(locale: string, tenant: TenantConfig) {
   const baseUrl = getBaseUrl();
   const homeUrl = `${baseUrl}${toLocalePath(locale, "/") === "/" ? "" : toLocalePath(locale, "/")}`;
   const bookUrl = `${baseUrl}${toLocalePath(locale, "/book")}`;
@@ -97,8 +96,7 @@ export function getHomeJsonLd(locale: string) {
   return [organization, localBusiness, website, service];
 }
 
-export function getBookingJsonLd(locale: string) {
-  const tenant = getTenantConfig();
+export function getBookingJsonLd(locale: string, tenant: TenantConfig) {
   const baseUrl = getBaseUrl();
   const pageUrl = `${baseUrl}${toLocalePath(locale, "/book")}`;
   const lang = localeToLanguageTag(locale);
@@ -132,4 +130,3 @@ export function getBookingJsonLd(locale: string) {
     },
   ];
 }
-

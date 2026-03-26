@@ -4,11 +4,14 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { deleteLocationAction } from "@/actions/locations";
 import { LocationDialog } from "@/components/admin/LocationDialog";
+import { CompactText } from "@/components/shared/CompactText";
+import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
 
 type LocationRow = {
   id: string;
@@ -32,9 +35,9 @@ export function LocationsTable({
   const router = useRouter();
   const [selected, setSelected] = useState<LocationRow | Record<string, never> | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<"name" | "code" | "bookings">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-  const tOr = (key: string, fallback: string) => (t.has(key as any) ? t(key as any) : fallback);
 
   const toggleSort = (key: typeof sortKey) => {
     if (sortKey === key) {
@@ -72,47 +75,62 @@ export function LocationsTable({
   }, [locations, sortKey, sortDir]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm(tOr("admin.locations.deleteConfirm", "Delete this location?"))) return;
     setBusyId(id);
     const result = await deleteLocationAction(id, locale);
     setBusyId(null);
+    setPendingDeleteId(null);
     if (!result.success) {
-      toast.error(result.error || tOr("admin.locations.errors.delete", "Failed to delete location"));
+      toast.error(result.error || t("admin.locations.errors.delete"));
       return;
     }
-    toast.success(tOr("admin.locations.deleted", "Location deleted"));
+    toast.success(t("admin.locations.deleted"));
     router.refresh();
   };
 
   return (
     <div className="space-y-4">
-      <Button onClick={() => setSelected({})}>+ {tOr("admin.locations.add", "Add Location")}</Button>
+      <ConfirmActionDialog
+        open={Boolean(pendingDeleteId)}
+        onOpenChange={(open) => {
+          if (!open && !busyId) setPendingDeleteId(null);
+        }}
+        title={t("admin.locations.deleteTitle")}
+        description={t("admin.locations.deleteConfirm")}
+        confirmLabel={t("common.delete")}
+        destructive
+        loading={Boolean(busyId)}
+        onConfirm={() => pendingDeleteId ? handleDelete(pendingDeleteId) : undefined}
+      />
+      <Button onClick={() => setSelected({})}>
+        <Plus className="h-4 w-4" />
+        {t("admin.locations.add")}
+      </Button>
       <LocationDialog location={(selected as any) || null} locale={locale} onClose={() => setSelected(null)} />
 
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
+        <Table className="bg-transparent">
           <TableHeader>
             <TableRow>
               <TableHead>
                 <button type="button" onClick={() => toggleSort("name")}>
-                  {tOr("admin.locations.name", "Name")}
+                  {t("admin.locations.name")}
                   {sortIndicator("name")}
                 </button>
               </TableHead>
               <TableHead>
                 <button type="button" onClick={() => toggleSort("code")}>
-                  {tOr("admin.locations.code", "Code")}
+                  {t("admin.locations.code")}
                   {sortIndicator("code")}
                 </button>
               </TableHead>
-              <TableHead>{tOr("admin.locations.address", "Address")}</TableHead>
+              <TableHead>{t("admin.locations.address")}</TableHead>
               <TableHead>
                 <button type="button" onClick={() => toggleSort("bookings")}>
-                  {tOr("admin.locations.bookings", "Bookings")}
+                  {t("admin.locations.bookings")}
                   {sortIndicator("bookings")}
                 </button>
               </TableHead>
-              <TableHead>{tOr("admin.locations.actions", "Actions")}</TableHead>
+              <TableHead>{t("admin.locations.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -123,21 +141,25 @@ export function LocationsTable({
                 <TableRow key={location.id}>
                   <TableCell className="font-medium">{location.name}</TableCell>
                   <TableCell>{location.code || "-"}</TableCell>
-                  <TableCell>{location.address || "-"}</TableCell>
+                  <TableCell>
+                    <CompactText text={location.address} expandedTitle={t("admin.locations.fullAddress")} />
+                  </TableCell>
                   <TableCell>
                     <Badge className="bg-slate-100 text-slate-700">{pickupCount + dropoffCount}</Badge>
                   </TableCell>
                   <TableCell className="space-x-2">
                     <Button size="sm" variant="outline" onClick={() => setSelected(location)}>
-                      {tOr("common.edit", "Edit")}
+                      <Pencil className="h-4 w-4" />
+                      {t("common.edit")}
                     </Button>
                     <Button
                       size="sm"
                       variant="destructive"
                       disabled={busyId === location.id}
-                      onClick={() => handleDelete(location.id)}
+                      onClick={() => setPendingDeleteId(location.id)}
                     >
-                      {tOr("common.delete", "Delete")}
+                      <Trash2 className="h-4 w-4" />
+                      {t("common.delete")}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -148,8 +170,8 @@ export function LocationsTable({
       </div>
 
       {sorted.length === 0 && (
-        <div className="py-8 text-center text-sm text-muted-foreground">
-          {tOr("admin.locations.empty", "No locations found")}
+        <div className="rounded-[1.3rem] border border-dashed border-[hsl(var(--border))] bg-white/85 py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
+          {t("admin.locations.empty")}
         </div>
       )}
     </div>

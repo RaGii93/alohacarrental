@@ -137,7 +137,7 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
               </div>
 
               <div className="p-4 sm:p-5">
-                <Accordion type="single" collapsible className="space-y-3">
+                <Accordion collapsible className="space-y-3">
                   {faqItems.map((faq) => (
                     <AccordionItem
                       key={faq.id}

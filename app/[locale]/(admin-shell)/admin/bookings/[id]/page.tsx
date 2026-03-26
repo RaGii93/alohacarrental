@@ -1,8 +1,11 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { BookingDetailClient } from "@/components/admin/BookingDetailClient";
-import { getTaxPercentage } from "@/lib/settings";
+import { getInvoiceProvider, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { requireAdminSection } from "@/app/[locale]/admin/_lib";
+import { ensureQuickBooksBookingColumns } from "@/lib/quickbooks-bookings";
+import { ensureZohoBookingColumns } from "@/lib/zoho-bookings";
 
 export default async function BookingDetailPage({
   params,
@@ -10,7 +13,10 @@ export default async function BookingDetailPage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
-  await requireAdminSection(locale, "bookings");
+  const t = await getTranslations();
+  const auth = await requireAdminSection(locale, "bookings");
+  await ensureQuickBooksBookingColumns();
+  await ensureZohoBookingColumns();
 
   const booking = await db.booking.findUnique({
     where: { id },
@@ -19,13 +25,16 @@ export default async function BookingDetailPage({
       category: true,
       pickupLocationRef: true,
       dropoffLocationRef: true,
+      inspectionPhotos: {
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 
   if (!booking) {
     return (
-      <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
-        <p>Booking not found</p>
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+        <p>{t("errors.notFound")}</p>
       </div>
     );
   }
@@ -98,6 +107,69 @@ export default async function BookingDetailPage({
     operational = { deliveredAt: null, returnedAt: null };
   }
 
+  let quickBooksState: any = {
+    billingDocumentType: null,
+    quickBooksTransferStatus: null,
+    quickBooksDocumentType: null,
+    quickBooksLastError: null,
+    quickBooksSyncRequestedAt: null,
+    quickBooksSyncedAt: null,
+  };
+  try {
+    const rows = await db.$queryRaw<Array<any>>`
+      SELECT
+        "billingDocumentType",
+        "quickBooksTransferStatus",
+        "quickBooksDocumentType",
+        "quickBooksLastError",
+        "quickBooksSyncRequestedAt",
+        "quickBooksSyncedAt"
+      FROM "Booking"
+      WHERE id = ${id}
+      LIMIT 1
+    `;
+    if (rows[0]) quickBooksState = rows[0];
+  } catch {
+    quickBooksState = {
+      billingDocumentType: null,
+      quickBooksTransferStatus: null,
+      quickBooksDocumentType: null,
+      quickBooksLastError: null,
+      quickBooksSyncRequestedAt: null,
+      quickBooksSyncedAt: null,
+    };
+  }
+
+  let zohoState: any = {
+    zohoTransferStatus: null,
+    zohoDocumentType: null,
+    zohoLastError: null,
+    zohoSyncRequestedAt: null,
+    zohoSyncedAt: null,
+  };
+  try {
+    const rows = await db.$queryRaw<Array<any>>`
+      SELECT
+        "zohoTransferStatus",
+        "zohoDocumentType",
+        "zohoLastError",
+        "zohoSyncRequestedAt",
+        "zohoSyncedAt"
+      FROM "Booking"
+      WHERE id = ${id}
+      LIMIT 1
+    `;
+    if (rows[0]) zohoState = rows[0];
+  } catch {
+    zohoState = {
+      zohoTransferStatus: null,
+      zohoDocumentType: null,
+      zohoLastError: null,
+      zohoSyncRequestedAt: null,
+      zohoSyncedAt: null,
+    };
+  }
+
   let extras: any[] = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
     extras = await (db as any).extra.findMany({
@@ -137,20 +209,27 @@ export default async function BookingDetailPage({
       discountCodes = [];
     }
   }
-  const taxPercentage = await getTaxPercentage();
+  const [taxPercentage, vehicleRatesIncludeTax, invoiceProvider] = await Promise.all([
+    getTaxPercentage(),
+    getVehicleRatesIncludeTax(),
+    getInvoiceProvider(),
+  ]);
 
   return (
-    <div className="w-full px-4 py-12 sm:px-6 lg:px-8">
+    <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
       <Link href={`/${locale}/admin/bookings`}>
-        <button className="text-blue-600 hover:underline mb-6">← Back</button>
+        <button className="mb-6 text-slate-700 hover:text-slate-900 hover:underline">← {t("common.back")}</button>
       </Link>
 
       <BookingDetailClient
-        booking={{ ...bookingWithAdjustments, ...operational }}
+        booking={{ ...bookingWithAdjustments, ...operational, ...quickBooksState, ...zohoState }}
         locale={locale}
         extras={extras}
         discountCodes={discountCodes}
         taxPercentage={taxPercentage}
+        vehicleRatesIncludeTax={vehicleRatesIncludeTax}
+        accountingProvider={invoiceProvider}
+        role={auth.admin.role}
       />
     </div>
   );

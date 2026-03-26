@@ -9,7 +9,9 @@ import {
   CarFront,
   CheckCircle2,
   ClipboardList,
+  Cog,
   Clock3,
+  CircleHelp,
   CirclePlus,
   DollarSign,
   FileText,
@@ -27,9 +29,11 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -38,13 +42,19 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 export function AppSidebar({
   role,
-}: {
+  invoiceProvider,
+  className,
+  collapsible = "icon",
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
   userEmail: string;
   role: string;
   licenseActive: boolean;
+  invoiceProvider: "NONE" | "QUICKBOOKS" | "ZOHO";
 }) {
   const t = useTranslations();
   const pathname = usePathname();
@@ -64,21 +74,51 @@ export function AppSidebar({
     { key: "deliveries", label: tOr("admin.dashboard.tabs.deliveries", "Deliveries"), icon: Truck },
     { key: "returns", label: tOr("admin.dashboard.tabs.returns", "Returns"), icon: Undo2 },
     { key: "fleet", label: tOr("admin.dashboard.tabs.fleet", "Fleet"), icon: CarFront },
+    { key: "help", label: tOr("admin.dashboard.tabs.help", "Help Center"), icon: CircleHelp },
     ...(role === "ROOT" || role === "OWNER"
       ? [
           { key: "financial", label: tOr("admin.dashboard.tabs.financial", "Financial"), icon: DollarSign },
+          ...(invoiceProvider === "QUICKBOOKS"
+            ? [{ key: "quickbooks", label: tOr("admin.dashboard.tabs.quickbooks", "QuickBooks"), icon: FileText }]
+            : invoiceProvider === "ZOHO"
+              ? [{ key: "zoho", label: tOr("admin.dashboard.tabs.zoho", "Zoho Invoice"), icon: FileText }]
+              : []),
+          { key: "blockouts", label: tOr("admin.dashboard.tabs.blockouts", "Availability Blocks"), icon: Clock3 },
           { key: "vehicles", label: tOr("admin.dashboard.tabs.vehicles", "Vehicle Management"), icon: Car },
           { key: "reviews", label: tOr("admin.dashboard.tabs.reviews", "Reviews"), icon: Star },
           { key: "settings", label: tOr("admin.dashboard.tabs.settings", "Settings"), icon: Settings },
           { key: "locations", label: tOr("admin.dashboard.tabs.locations", "Locations"), icon: MapPin },
-          { key: "logs", label: "Logs", icon: FileText },
+          { key: "logs", label: tOr("admin.dashboard.tabs.logs", "Logs"), icon: FileText },
           { key: "users", label: tOr("admin.dashboard.tabs.users", "Users"), icon: Users },
         ]
       : []),
   ] as const;
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className="pt-16">
+    <Sidebar
+      collapsible={collapsible}
+      className={cn(
+        "h-svh bg-white shadow-[0_10px_28px_-18px_hsl(215_28%_17%/0.1)] ring-1 ring-[hsl(215_25%_27%/0.05)]",
+        className
+      )}
+      {...props}
+    >
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild className="h-auto justify-start px-2 py-2">
+              <Link href={`${base}/bookings`}>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]">
+                  <CarFront className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-semibold">
+                  {tOr("admin.dashboard.title", "Admin")}
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>{tOr("common.navigation", "Navigation")}</SidebarGroupLabel>
@@ -147,6 +187,14 @@ export function AppSidebar({
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={vehiclesSubtab === "features"}>
+                          <Link href={`${base}/vehicles?vehicles_subtab=features`}>
+                            <Cog className="h-4 w-4" />
+                            <span>{tOr("admin.dashboard.vehicles.features", "Features")}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild isActive={vehiclesSubtab === "extras"}>
                           <Link href={`${base}/vehicles?vehicles_subtab=extras`}>
                             <CirclePlus className="h-4 w-4" />
@@ -170,6 +218,11 @@ export function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <div className="rounded-xl bg-[hsl(220_33%_98%)] px-3 py-2 text-xs font-medium text-[hsl(var(--muted-foreground))]">
+          {tOr("admin.dashboard.title", "Admin")}
+        </div>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

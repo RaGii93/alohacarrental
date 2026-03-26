@@ -25,7 +25,7 @@ export function DocumentPreview({ url, title, openLabel, emptyLabel }: DocumentP
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium">{title}</p>
-      <div className="overflow-hidden rounded-md border bg-muted/10">
+      <div className="overflow-hidden rounded-[1.1rem] bg-muted/30">
         {pdf ? (
           <iframe
             src={previewUrl}

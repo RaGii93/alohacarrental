@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -17,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { VehicleDialog } from "./VehicleDialog";
 import { deleteVehicleAction, setVehicleStatusAction } from "@/actions/vehicles";
+import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
 
 interface Vehicle {
   id: string;
@@ -49,6 +51,7 @@ export function VehiclesTable({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Partial<Vehicle> | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<"name" | "plateNumber" | "category" | "dailyRate" | "status">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -113,13 +116,10 @@ export function VehiclesTable({
   };
 
   const handleDelete = async (vehicleId: string) => {
-    if (!window.confirm("Are you sure you want to delete this vehicle?")) {
-      return;
-    }
-
     setIsLoading(true);
     const result = await deleteVehicleAction(vehicleId, locale);
     setIsLoading(false);
+    setPendingDeleteId(null);
 
     if (result.success) {
       toast.success(t("admin.vehicles.deleted"));
@@ -147,8 +147,21 @@ export function VehiclesTable({
 
   return (
     <div className="space-y-4">
+      <ConfirmActionDialog
+        open={Boolean(pendingDeleteId)}
+        onOpenChange={(open) => {
+          if (!open && !isLoading) setPendingDeleteId(null);
+        }}
+        title={t("admin.vehicles.confirm.deleteTitle")}
+        description={t("admin.vehicles.confirm.deleteDescription")}
+        confirmLabel={t("common.delete")}
+        destructive
+        loading={isLoading}
+        onConfirm={() => pendingDeleteId ? handleDelete(pendingDeleteId) : undefined}
+      />
       <Button onClick={() => setSelectedVehicle({} as Partial<Vehicle>)}>
-        + {t("admin.vehicles.add")}
+        <Plus className="h-4 w-4" />
+        {t("admin.vehicles.add")}
       </Button>
 
       <VehicleDialog
@@ -158,8 +171,8 @@ export function VehiclesTable({
         onClose={() => setSelectedVehicle(null)}
       />
 
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
+        <Table className="bg-transparent">
           <TableHeader>
             <TableRow>
               <TableHead><button type="button" onClick={() => toggleSort("name")}>{t("admin.vehicles.table.name")}{sortIndicator("name")}</button></TableHead>
@@ -194,14 +207,16 @@ export function VehiclesTable({
                     variant="outline"
                     onClick={() => setSelectedVehicle(vehicle)}
                   >
+                    <Pencil className="h-4 w-4" />
                     {t("common.edit")}
                   </Button>
                   <Button
                     size="sm"
                     variant="destructive"
-                    onClick={() => handleDelete(vehicle.id)}
+                    onClick={() => setPendingDeleteId(vehicle.id)}
                     disabled={isLoading}
                   >
+                    <Trash2 className="h-4 w-4" />
                     {t("common.delete")}
                   </Button>
                 </TableCell>
@@ -212,7 +227,7 @@ export function VehiclesTable({
       </div>
 
       {vehicles.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="rounded-[1.3rem] border border-dashed border-[hsl(var(--border))] bg-white/85 py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
           {t("admin.vehicles.empty")}
         </div>
       )}

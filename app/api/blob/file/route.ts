@@ -1,5 +1,10 @@
 import { get } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import {
+  deleteDriverLicenseForBooking,
+  findDriverLicenseRecordByUrl,
+  isDriverLicenseExpired,
+} from "@/lib/driver-license-retention";
 
 function fileNameFromPath(pathname: string): string {
   const clean = pathname.split("?")[0];
@@ -15,6 +20,19 @@ export async function GET(request: Request) {
 
     if (!src) {
       return NextResponse.json({ error: "Missing src parameter" }, { status: 400 });
+    }
+
+    const driverLicenseRecord = await findDriverLicenseRecordByUrl(src);
+    if (driverLicenseRecord && isDriverLicenseExpired(driverLicenseRecord)) {
+      if (driverLicenseRecord.driverLicenseUrl && !driverLicenseRecord.driverLicenseDeletedAt) {
+        try {
+          await deleteDriverLicenseForBooking(driverLicenseRecord);
+        } catch {
+          // Best-effort cleanup. Access is still denied once retention is reached.
+        }
+      }
+
+      return NextResponse.json({ error: "File no longer available" }, { status: 410 });
     }
 
     const blob = await get(src, {
@@ -41,4 +59,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

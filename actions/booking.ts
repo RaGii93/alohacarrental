@@ -5,20 +5,90 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { uploadBuffer, uploadFile } from "@/lib/uploads";
-import { categoryBookingFormSchemaRefined } from "@/lib/validators";
+import { adminCategoryBookingUpdateSchemaRefined, categoryBookingFormSchemaRefined } from "@/lib/validators";
 import { bookingEmailHtml, sendEmail } from "@/lib/email";
 import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
-import { calculateTaxAmount, getMinBookingDays, getTaxPercentage } from "@/lib/settings";
+import { calculateDriverLicenseDeleteAfter } from "@/lib/driver-license-retention";
+import { getInvoiceProvider, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { logAdminAction } from "@/lib/audit";
+import { calculateBookingAmounts, calculateFuelDifferenceCharge, calculateLateReturnCharge, getFuelChargePerQuarterForCategory } from "@/lib/pricing";
+import { getTermsEmailAttachment } from "@/lib/terms";
 import {
-  receiveQuickBooksInvoicePayment,
-  syncQuickBooksInvoice,
-  syncQuickBooksSalesReceipt,
-} from "@/lib/quickbooks";
+  ensureQuickBooksBookingColumns,
+  markBookingBillingDocument,
+  queueBookingQuickBooksTransfer,
+} from "@/lib/quickbooks-bookings";
+import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
+import { ensureZohoBookingColumns, markBookingBillingDocumentZoho, queueBookingZohoTransfer } from "@/lib/zoho-bookings";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
+
+async function getCustomerTermsEmailData() {
+  const terms = await getTermsEmailAttachment();
+  return {
+    termsUrl: terms.url,
+    attachments: terms.attachment ? [terms.attachment] : [],
+  };
+}
+
+async function markBookingBillingDocumentForActiveProvider(bookingId: string, documentType: "INVOICE" | "SALES_RECEIPT") {
+  const invoiceProvider = await getInvoiceProvider();
+  if (invoiceProvider === "QUICKBOOKS") {
+    await ensureQuickBooksBookingColumns();
+    await markBookingBillingDocument(bookingId, documentType);
+    return invoiceProvider;
+  }
+  if (invoiceProvider === "ZOHO") {
+    await ensureZohoBookingColumns();
+    await markBookingBillingDocumentZoho(bookingId, documentType);
+    return invoiceProvider;
+  }
+  await db.booking.update({
+    where: { id: bookingId },
+    data: { billingDocumentType: documentType },
+  });
+  return invoiceProvider;
+}
+
+async function queuePaymentTransferForActiveProvider(bookingId: string) {
+  const invoiceProvider = await getInvoiceProvider();
+  if (invoiceProvider === "QUICKBOOKS") {
+    await ensureQuickBooksBookingColumns();
+    await queueBookingQuickBooksTransfer(bookingId, "PAYMENT");
+    return invoiceProvider;
+  }
+  if (invoiceProvider === "ZOHO") {
+    await ensureZohoBookingColumns();
+    await queueBookingZohoTransfer(bookingId, "PAYMENT");
+    return invoiceProvider;
+  }
+  return invoiceProvider;
+}
+
+type InspectionStageValue = "PICKUP" | "RETURN";
+
+type BookingInspectionInput = {
+  odometerKm: number;
+  fuelLevel: number;
+  hasDamage: boolean;
+  damageNotes?: string;
+  agentNotes?: string;
+  acceptedBy: string;
+  imageUrls: string[];
+  damageChargeCents?: number;
+};
+
+async function replaceInspectionPhotos(tx: typeof db, bookingId: string, stage: InspectionStageValue, imageUrls: string[]) {
+  await tx.$executeRaw`DELETE FROM "BookingInspectionPhoto" WHERE "bookingId" = ${bookingId} AND "stage" = ${stage}::"InspectionStage"`;
+  for (const imageUrl of imageUrls) {
+    await tx.$executeRaw`
+      INSERT INTO "BookingInspectionPhoto" (id, "bookingId", "stage", "imageUrl")
+      VALUES (${crypto.randomUUID()}, ${bookingId}, ${stage}::"InspectionStage", ${imageUrl})
+    `;
+  }
+}
 
 async function ensureBookingOperationalColumns(client: typeof db = db) {
   await client.$executeRawUnsafe(`
@@ -42,12 +112,28 @@ async function getBookingOperationalState(client: typeof db, bookingId: string) 
 }
 
 async function loadBookingAdjustments(bookingId: string) {
-  let extras: Array<{ id: string; quantity: number; lineTotal: number; extraName: string }> = [];
+  let extras: Array<{
+    id: string;
+    extraId: string;
+    quantity: number;
+    lineTotal: number;
+    extraName: string;
+    pricingType: "DAILY" | "FLAT";
+    amount: number;
+  }> = [];
   let discount: { id: string; percentage: number; amount: number; code: string } | null = null;
 
   try {
-    extras = await db.$queryRaw<Array<{ id: string; quantity: number; lineTotal: number; extraName: string }>>`
-      SELECT be.id, be.quantity, be."lineTotal", e.name as "extraName"
+    extras = await db.$queryRaw<Array<{
+      id: string;
+      extraId: string;
+      quantity: number;
+      lineTotal: number;
+      extraName: string;
+      pricingType: "DAILY" | "FLAT";
+      amount: number;
+    }>>`
+      SELECT be.id, be."extraId" as "extraId", be.quantity, be."lineTotal", e.name as "extraName", e."pricingType", e.amount
       FROM "BookingExtra" be
       JOIN "Extra" e ON e.id = be."extraId"
       WHERE be."bookingId" = ${bookingId}
@@ -73,26 +159,57 @@ async function loadBookingAdjustments(bookingId: string) {
   return { extras, discount };
 }
 
-function toQuickBooksPayload(generated: {
-  booking: {
-    bookingCode: string;
-    customerName: string;
-    customerEmail: string;
-    customerPhone: string;
-    startDate: Date;
-    endDate: Date;
-  };
-  totalAmount: number;
+function isPrivilegedAdminRole(role: string | null | undefined) {
+  return role === "ROOT" || role === "OWNER";
+}
+
+async function resolveActiveLocation(locationId: string | null | undefined) {
+  if (!locationId) return null;
+  return db.location.findUnique({
+    where: { id: locationId },
+    select: { id: true, name: true },
+  });
+}
+
+async function selectAvailableVehicleForBooking(params: {
+  tx: typeof db;
+  bookingIdToExclude?: string;
+  categoryId: string;
+  startDate: Date;
+  endDate: Date;
+  preferredVehicleId?: string | null;
+  specificVehicleId?: string | null;
 }) {
-  return {
-    bookingCode: generated.booking.bookingCode,
-    customerName: generated.booking.customerName,
-    customerEmail: generated.booking.customerEmail,
-    customerPhone: generated.booking.customerPhone,
-    totalAmountCents: generated.totalAmount,
-    startDate: generated.booking.startDate,
-    endDate: generated.booking.endDate,
-  };
+  const { tx, bookingIdToExclude, categoryId, startDate, endDate, preferredVehicleId, specificVehicleId } = params;
+  const vehicleRows = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT v.id
+    FROM "Vehicle" v
+    WHERE v."categoryId" = ${categoryId}
+      AND (v."status" = 'ACTIVE' OR v.id = ${preferredVehicleId || ""})
+      AND (${specificVehicleId || null}::text IS NULL OR v.id = ${specificVehicleId || null})
+      AND NOT EXISTS (
+        SELECT 1
+        FROM "Booking" b
+        WHERE b."vehicleId" = v.id
+          AND b.id <> ${bookingIdToExclude || ""}
+          AND b."startDate" < ${endDate}
+          AND b."endDate" > ${startDate}
+          AND (
+            b."status" = 'CONFIRMED'
+            OR (b."status" = 'PENDING' AND b."holdExpiresAt" > now())
+          )
+      )
+      AND NOT EXISTS (
+        SELECT 1
+        FROM "VehicleBlockout" vb
+        WHERE (vb."vehicleId" IS NULL OR vb."vehicleId" = v.id)
+          AND vb."startDate" < ${endDate}
+          AND vb."endDate" > ${startDate}
+      )
+    ORDER BY CASE WHEN v.id = ${preferredVehicleId || ""} THEN 0 ELSE 1 END, v.name ASC
+    LIMIT 1
+  `;
+  return vehicleRows[0]?.id || null;
 }
 
 export async function cancelExpiredHolds() {
@@ -157,19 +274,21 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
 
     try {
       const rentalAgreement = await buildAndUploadBookingDocument(bookingId, "RENTAL_AGREEMENT");
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: booking.customerEmail,
         subject: `Booking Confirmed - ${booking.bookingCode}`,
-        html: bookingEmailHtml({
+        html: await bookingEmailHtml({
           title: "Your booking has been confirmed",
           customerName: booking.customerName,
           bookingCode: booking.bookingCode,
           startDate: booking.startDate,
           endDate: booking.endDate,
           totalAmountCents: booking.totalAmount,
+          termsUrl: termsEmailData.termsUrl,
         }),
-        attachments:
-          rentalAgreement.success && rentalAgreement.pdfBuffer
+        attachments: [
+          ...(rentalAgreement.success && rentalAgreement.pdfBuffer
             ? [
                 {
                   filename: rentalAgreement.filename,
@@ -177,7 +296,9 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
                   contentType: "application/pdf",
                 },
               ]
-            : undefined,
+            : []),
+          ...termsEmailData.attachments,
+        ],
       });
     } catch {}
 
@@ -284,10 +405,17 @@ async function buildAndUploadBookingDocument(
   const baseRental = booking.category.dailyRate * rentalDays;
   const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
   const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
-  const subtotalBeforeTax = Math.max(0, baseRental - discountAmount + extrasTotal);
-  const taxAmount = Math.max(0, booking.totalAmount - subtotalBeforeTax);
-  const effectiveTaxPercentage =
-    subtotalBeforeTax > 0 ? Math.round((taxAmount * 10000) / subtotalBeforeTax) / 100 : 0;
+  const [taxPercentage, vehicleRatesIncludeTax] = await Promise.all([
+    getTaxPercentage(),
+    getVehicleRatesIncludeTax(),
+  ]);
+  const { taxAmount, totalAmount } = calculateBookingAmounts({
+    baseRentalCents: baseRental,
+    extrasCents: extrasTotal,
+    discountCents: discountAmount,
+    taxPercentage,
+    baseRentalIncludesTax: vehicleRatesIncludeTax,
+  });
 
   const invoiceBuffer = await generateInvoicePDF({
     documentType,
@@ -306,16 +434,16 @@ async function buildAndUploadBookingDocument(
     extrasAmount: extrasTotal,
     discountAmount,
     taxAmount,
-    taxPercentage: effectiveTaxPercentage,
-    totalAmount: booking.totalAmount,
+    taxPercentage,
+    totalAmount: totalAmount + (booking.returnLateCharge || 0) + (booking.returnFuelCharge || 0) + (booking.returnDamageCharge || 0),
     discountCode: bookingDiscount?.code,
     extras: adjustmentExtras.map((line) => ({
       name: line.extraName,
       quantity: line.quantity,
       lineTotal: line.lineTotal,
     })),
-    paymentInstructions: getTenantConfig().paymentInstructions,
-    tenantConfig: getTenantConfig(),
+    paymentInstructions: (await getTenantConfig()).paymentInstructions,
+    tenantConfig: await getTenantConfig(),
   });
   const signature = invoiceBuffer.subarray(0, 4).toString("utf8");
   if (signature !== "%PDF" || invoiceBuffer.length < 500) {
@@ -356,6 +484,11 @@ async function buildAndUploadBookingDocument(
     discountAmount,
     taxAmount,
     totalAmount: booking.totalAmount,
+    extras: adjustmentExtras.map((line) => ({
+      name: line.extraName,
+      quantity: line.quantity,
+      lineTotal: line.lineTotal,
+    })),
   };
 }
 
@@ -364,6 +497,7 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    await ensureQuickBooksBookingColumns();
 
     const generated = await buildAndUploadBookingDocument(bookingId, "INVOICE");
     if (!generated.success) return { success: false, error: generated.error };
@@ -384,37 +518,29 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
       });
       return updatedBooking;
     });
-
-    let quickBooksWarning: string | undefined;
-    const qbInvoiceResult = await syncQuickBooksInvoice(toQuickBooksPayload(generated));
-    if (!qbInvoiceResult.success) {
-      quickBooksWarning = qbInvoiceResult.error || "QuickBooks invoice sync failed";
-      await logAdminAction({
-        adminUserId: session.adminUserId,
-        action: "QUICKBOOKS_INVOICE_SYNC_FAILED",
-        bookingId,
-      });
-    } else if (!qbInvoiceResult.skipped) {
-      await logAdminAction({
-        adminUserId: session.adminUserId,
-        action: "QUICKBOOKS_INVOICE_UPSERTED",
-        bookingId,
-      });
-    }
+    const invoiceProvider = await markBookingBillingDocumentForActiveProvider(bookingId, "INVOICE");
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: invoiceProvider === "ZOHO" ? "ZOHO_TRANSFER_QUEUED_INVOICE" : invoiceProvider === "QUICKBOOKS" ? "QUICKBOOKS_TRANSFER_QUEUED_INVOICE" : "BILLING_DOCUMENT_MARKED_INVOICE",
+      bookingId,
+    });
 
     try {
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: updated.customerEmail,
         subject: `Invoice for Payment - ${updated.bookingCode}`,
-        html: bookingEmailHtml({
+        html: await bookingEmailHtml({
           title: "Your invoice is ready for payment",
           customerName: updated.customerName,
           bookingCode: updated.bookingCode,
           startDate: updated.startDate,
           endDate: updated.endDate,
           totalAmountCents: updated.totalAmount,
+          extras: generated.extras,
           invoiceUrl: generated.invoiceUrl,
           documentLabel: "Invoice",
+          termsUrl: termsEmailData.termsUrl,
         }),
         attachments: [
           {
@@ -422,11 +548,12 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
             content: generated.pdfBuffer,
             contentType: "application/pdf",
           },
+          ...termsEmailData.attachments,
         ],
       });
     } catch {}
 
-    return { success: true, booking: updated, quickBooksWarning };
+    return { success: true, booking: updated };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to send invoice" };
   }
@@ -456,20 +583,29 @@ export async function sendBillingDocumentEmailAction(bookingId: string, locale: 
     if (!booking.invoiceUrl) return { success: false, error: "No billing document available" };
 
     const billingDocumentUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true }) || booking.invoiceUrl;
+    const { extras: adjustmentExtras } = await loadBookingAdjustments(bookingId);
+    const termsEmailData = await getCustomerTermsEmailData();
 
     const mailResult = await sendEmail({
       to: booking.customerEmail,
       subject: `Billing Document - ${booking.bookingCode}`,
-      html: bookingEmailHtml({
+      html: await bookingEmailHtml({
         title: "Your billing document is ready",
         customerName: booking.customerName,
         bookingCode: booking.bookingCode,
         startDate: booking.startDate,
         endDate: booking.endDate,
         totalAmountCents: booking.totalAmount,
+        extras: adjustmentExtras.map((line) => ({
+          name: line.extraName,
+          quantity: line.quantity,
+          lineTotal: line.lineTotal,
+        })),
         invoiceUrl: billingDocumentUrl,
         documentLabel: "Billing document",
+        termsUrl: termsEmailData.termsUrl,
       }),
+      attachments: termsEmailData.attachments,
     });
 
     if (!mailResult.success) {
@@ -497,6 +633,7 @@ export async function createSalesReceiptAction(
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
     await ensureBookingOperationalColumns();
+    await ensureQuickBooksBookingColumns();
 
     const generated = await buildAndUploadBookingDocument(bookingId, "SALES_RECEIPT");
     if (!generated.success) return { success: false, error: generated.error };
@@ -547,37 +684,29 @@ export async function createSalesReceiptAction(
       });
       return updatedBooking;
     });
-
-    let quickBooksWarning: string | undefined;
-    const qbSalesReceiptResult = await syncQuickBooksSalesReceipt(toQuickBooksPayload(generated));
-    if (!qbSalesReceiptResult.success) {
-      quickBooksWarning = qbSalesReceiptResult.error || "QuickBooks sales receipt sync failed";
-      await logAdminAction({
-        adminUserId: session.adminUserId,
-        action: "QUICKBOOKS_SALES_RECEIPT_SYNC_FAILED",
-        bookingId,
-      });
-    } else if (!qbSalesReceiptResult.skipped) {
-      await logAdminAction({
-        adminUserId: session.adminUserId,
-        action: "QUICKBOOKS_SALES_RECEIPT_UPSERTED",
-        bookingId,
-      });
-    }
+    const invoiceProvider = await markBookingBillingDocumentForActiveProvider(bookingId, "SALES_RECEIPT");
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: invoiceProvider === "ZOHO" ? "ZOHO_TRANSFER_QUEUED_SALES_RECEIPT" : invoiceProvider === "QUICKBOOKS" ? "QUICKBOOKS_TRANSFER_QUEUED_SALES_RECEIPT" : "BILLING_DOCUMENT_MARKED_SALES_RECEIPT",
+      bookingId,
+    });
 
     try {
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: updated.customerEmail,
         subject: `Sales Receipt - ${updated.bookingCode}`,
-        html: bookingEmailHtml({
+        html: await bookingEmailHtml({
           title: "Payment received. Your sales receipt is ready",
           customerName: updated.customerName,
           bookingCode: updated.bookingCode,
           startDate: updated.startDate,
           endDate: updated.endDate,
           totalAmountCents: updated.totalAmount,
+          extras: generated.extras,
           invoiceUrl: generated.invoiceUrl,
           documentLabel: "Sales receipt",
+          termsUrl: termsEmailData.termsUrl,
         }),
         attachments: [
           {
@@ -585,11 +714,12 @@ export async function createSalesReceiptAction(
             content: generated.pdfBuffer,
             contentType: "application/pdf",
           },
+          ...termsEmailData.attachments,
         ],
       });
     } catch {}
 
-    return { success: true, booking: updated, quickBooksWarning };
+    return { success: true, booking: updated };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to create sales receipt" };
   }
@@ -600,6 +730,7 @@ export async function receiveInvoicePaymentAction(bookingId: string, locale: str
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    await ensureQuickBooksBookingColumns();
 
     const booking = await db.booking.findUnique({
       where: { id: bookingId },
@@ -632,53 +763,232 @@ export async function receiveInvoicePaymentAction(bookingId: string, locale: str
       });
       return updatedBooking;
     });
-
-    let quickBooksWarning: string | undefined;
-    const qbPaymentResult = await receiveQuickBooksInvoicePayment({
-      bookingCode: booking.bookingCode,
-      customerName: booking.customerName,
-      customerEmail: booking.customerEmail,
-      customerPhone: booking.customerPhone,
-      totalAmountCents: booking.totalAmount,
-      startDate: booking.startDate,
-      endDate: booking.endDate,
-      note: "Invoice paid without sales receipt generation",
+    const invoiceProvider = await queuePaymentTransferForActiveProvider(bookingId);
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: invoiceProvider === "ZOHO" ? "ZOHO_TRANSFER_QUEUED_PAYMENT" : invoiceProvider === "QUICKBOOKS" ? "QUICKBOOKS_TRANSFER_QUEUED_PAYMENT" : "PAYMENT_RECEIVED_NO_PROVIDER_QUEUE",
+      bookingId,
     });
-    if (!qbPaymentResult.success) {
-      quickBooksWarning = qbPaymentResult.error || "QuickBooks invoice payment sync failed";
-      await logAdminAction({
-        adminUserId: session.adminUserId,
-        action: "QUICKBOOKS_INVOICE_PAYMENT_SYNC_FAILED",
-        bookingId,
-      });
-    } else if (!qbPaymentResult.skipped) {
-      await logAdminAction({
-        adminUserId: session.adminUserId,
-        action: "QUICKBOOKS_INVOICE_PAYMENT_UPSERTED",
-        bookingId,
-      });
-    }
 
     try {
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: updated.customerEmail,
         subject: `Payment Received - ${updated.bookingCode}`,
-        html: bookingEmailHtml({
+        html: await bookingEmailHtml({
           title: "Payment received for your invoice",
           customerName: updated.customerName,
           bookingCode: updated.bookingCode,
           startDate: updated.startDate,
           endDate: updated.endDate,
           totalAmountCents: updated.totalAmount,
+          extras: (await loadBookingAdjustments(bookingId)).extras.map((line) => ({
+            name: line.extraName,
+            quantity: line.quantity,
+            lineTotal: line.lineTotal,
+          })),
           invoiceUrl: updated.invoiceUrl,
           documentLabel: "Invoice",
+          termsUrl: termsEmailData.termsUrl,
         }),
+        attachments: termsEmailData.attachments,
       });
     } catch {}
 
-    return { success: true, booking: updated, quickBooksWarning };
+    return { success: true, booking: updated };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to mark invoice payment as received" };
+  }
+}
+
+export async function uploadInspectionImageAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+
+    const file = formData.get("image") as File | null;
+    if (!file || file.size === 0) {
+      return { success: false, error: "No file provided" };
+    }
+    if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+      return { success: false, error: "Only JPG and PNG files are allowed" };
+    }
+
+    const upload = await uploadFile(file, "inspections");
+    if (!upload.success || !upload.url) {
+      return { success: false, error: upload.error || "Failed to upload image" };
+    }
+
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "BOOKING_INSPECTION_IMAGE_UPLOADED",
+    });
+
+    return { success: true, imageUrl: upload.url };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to upload inspection image" };
+  }
+}
+
+export async function completePickupInspectionAction(
+  bookingId: string,
+  input: BookingInspectionInput,
+  locale: string
+) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    await ensureBookingOperationalColumns();
+
+    const booking = await db.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        status: true,
+        vehicleId: true,
+        paymentReceivedAt: true,
+      },
+    });
+    if (!booking) return { success: false, error: "Booking not found" };
+    if (booking.status !== "CONFIRMED") return { success: false, error: "BOOKING_NOT_DELIVERABLE" };
+    if (!booking.paymentReceivedAt) return { success: false, error: "PAYMENT_REQUIRED_BEFORE_DELIVERY" };
+
+    const operational = await getBookingOperationalState(db, bookingId);
+    if (operational.deliveredAt) return { success: false, error: "BOOKING_ALREADY_DELIVERED" };
+
+    await db.$transaction(async (tx) => {
+      const now = new Date();
+      await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          pickupOdometerKm: Math.max(0, Math.round(input.odometerKm)),
+          pickupFuelLevel: Math.max(0, Math.min(4, Math.round(input.fuelLevel))),
+          pickupHasDamage: Boolean(input.hasDamage),
+          pickupDamageNotes: input.damageNotes?.trim() || null,
+          pickupAcceptedBy: input.acceptedBy.trim(),
+          pickupAcceptedAt: now,
+          pickupAgentNotes: input.agentNotes?.trim() || null,
+        } as any,
+      });
+      await tx.$executeRaw`
+        UPDATE "Booking"
+        SET "deliveredAt" = ${now}
+        WHERE id = ${bookingId}
+      `;
+      if (booking.vehicleId) {
+        await tx.vehicle.update({
+          where: { id: booking.vehicleId },
+          data: { status: "ON_RENT" },
+        });
+      }
+      await replaceInspectionPhotos(tx as typeof db, bookingId, "PICKUP", input.imageUrls);
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "BOOKING_PICKUP_INSPECTION_COMPLETED",
+          bookingId,
+        },
+      });
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to complete pickup inspection" };
+  }
+}
+
+export async function completeReturnInspectionAction(
+  bookingId: string,
+  input: BookingInspectionInput,
+  locale: string
+) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    await ensureBookingOperationalColumns();
+
+    const booking = await db.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        status: true,
+        vehicleId: true,
+        endDate: true,
+        pickupFuelLevel: true,
+        totalAmount: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+            dailyRate: true,
+            fuelChargePerQuarter: true,
+          },
+        },
+      },
+    });
+    if (!booking) return { success: false, error: "Booking not found" };
+    if (booking.status !== "CONFIRMED") return { success: false, error: "BOOKING_NOT_RETURNABLE" };
+
+    const operational = await getBookingOperationalState(db, bookingId);
+    if (!operational.deliveredAt) return { success: false, error: "BOOKING_NOT_DELIVERED" };
+    if (operational.returnedAt) return { success: false, error: "BOOKING_ALREADY_RETURNED" };
+
+    const returnedAt = new Date();
+
+    const fuelCharge = calculateFuelDifferenceCharge({
+      pickupFuelLevel: booking.pickupFuelLevel,
+      returnFuelLevel: input.fuelLevel,
+      chargePerQuarterCents: getFuelChargePerQuarterForCategory(booking.category),
+    }).chargeCents;
+    const lateReturn = calculateLateReturnCharge({
+      scheduledDropoffAt: booking.endDate,
+      actualReturnedAt: returnedAt,
+      dailyRateCents: booking.category?.dailyRate || 0,
+    });
+    const lateCharge = lateReturn.chargeCents;
+    const damageCharge = Math.max(0, Math.round(input.damageChargeCents || 0));
+    const totalAdjustment = lateCharge + fuelCharge + damageCharge;
+
+    await db.$transaction(async (tx) => {
+      await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          returnOdometerKm: Math.max(0, Math.round(input.odometerKm)),
+          returnFuelLevel: Math.max(0, Math.min(4, Math.round(input.fuelLevel))),
+          returnHasDamage: Boolean(input.hasDamage),
+          returnDamageNotes: input.damageNotes?.trim() || null,
+          returnAcceptedBy: input.acceptedBy.trim(),
+          returnAcceptedAt: returnedAt,
+          returnAgentNotes: input.agentNotes?.trim() || null,
+          returnLateCharge: lateCharge,
+          returnFuelCharge: fuelCharge,
+          returnDamageCharge: damageCharge,
+          totalAmount: booking.totalAmount + totalAdjustment,
+          returnedAt: returnedAt,
+        } as any,
+      });
+      if (booking.vehicleId) {
+        await tx.vehicle.update({
+          where: { id: booking.vehicleId },
+          data: { status: "ACTIVE" },
+        });
+      }
+      await replaceInspectionPhotos(tx as typeof db, bookingId, "RETURN", input.imageUrls);
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "BOOKING_RETURN_INSPECTION_COMPLETED",
+          bookingId,
+        },
+      });
+    });
+
+    return { success: true, lateCharge, lateDays: lateReturn.lateDays, fuelCharge, damageCharge, totalAdjustment };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to complete return inspection" };
   }
 }
 
@@ -800,10 +1110,17 @@ async function recomputeBookingTotals(bookingId: string) {
   const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
   const percentage = bookingDiscount?.percentage ?? 0;
   const discountAmount = Math.round((baseRental * percentage) / 100);
-  const subtotalBeforeTax = Math.max(0, baseRental - discountAmount + extrasTotal);
-  const taxPercentage = await getTaxPercentage();
-  const taxAmount = calculateTaxAmount(subtotalBeforeTax, taxPercentage);
-  const totalAmount = subtotalBeforeTax + taxAmount;
+  const [taxPercentage, vehicleRatesIncludeTax] = await Promise.all([
+    getTaxPercentage(),
+    getVehicleRatesIncludeTax(),
+  ]);
+  const { taxAmount, totalAmount } = calculateBookingAmounts({
+    baseRentalCents: baseRental,
+    extrasCents: extrasTotal,
+    discountCents: discountAmount,
+    taxPercentage,
+    baseRentalIncludesTax: vehicleRatesIncludeTax,
+  });
 
   await db.booking.update({ where: { id: bookingId }, data: { totalAmount } });
   if (bookingDiscount) {
@@ -958,6 +1275,7 @@ export async function createCategoryBookingAction(
     const customerName = formData.get("customerName") as string;
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
+    const flightNumber = ((formData.get("flightNumber") as string | null) || "").trim();
     const birthDate = new Date(formData.get("birthDate") as string);
     const driverLicenseNumber = formData.get("driverLicenseNumber") as string;
     const licenseExpiryDate = new Date(formData.get("licenseExpiryDate") as string);
@@ -970,7 +1288,15 @@ export async function createCategoryBookingAction(
     const notes = formData.get("notes") as string | null;
     const extrasPayload = (formData.get("selectedExtras") as string | null) || "[]";
     const driverLicenseUrl = formData.get("driverLicenseUrl") as string;
+    const bookingSource = (formData.get("bookingSource") as string | null) || "public";
+    const privacyConsentAccepted = formData.get("privacyConsentAccepted") === "true";
     const termsAccepted = formData.get("termsAccepted") === "true";
+
+    if (bookingSource === "admin") {
+      if (!session || !isPrivilegedAdminRole(session.role)) {
+        return { success: false, error: "Unauthorized" };
+      }
+    }
 
     // Basic validation
     if (
@@ -986,6 +1312,10 @@ export async function createCategoryBookingAction(
       !dropoffLocationId
     ) {
       return { success: false, error: "Missing required fields" };
+    }
+
+    if (!privacyConsentAccepted) {
+      return { success: false, error: "Privacy consent must be accepted" };
     }
 
     if (!termsAccepted) {
@@ -1004,6 +1334,7 @@ export async function createCategoryBookingAction(
       customerName,
       customerEmail,
       customerPhone,
+      flightNumber: flightNumber || undefined,
       birthDate,
       driverLicenseNumber,
       licenseExpiryDate,
@@ -1014,6 +1345,7 @@ export async function createCategoryBookingAction(
       pickupLocation: pickupLocation || undefined,
       dropoffLocation: dropoffLocation || undefined,
       driverLicenseUrl,
+      privacyConsentAccepted,
       termsAccepted,
       notes: notes || undefined,
     });
@@ -1112,37 +1444,54 @@ export async function createCategoryBookingAction(
       }
       extrasTotal = resolvedExtras.reduce((sum, line) => sum + line.lineTotal, 0);
     }
-    const subtotalBeforeTax = baseTotal + extrasTotal;
-    const taxPercentage = await getTaxPercentage();
-    const taxAmount = calculateTaxAmount(subtotalBeforeTax, taxPercentage);
-    const totalAmount = subtotalBeforeTax + taxAmount;
+    const [taxPercentage, vehicleRatesIncludeTax] = await Promise.all([
+      getTaxPercentage(),
+      getVehicleRatesIncludeTax(),
+    ]);
+    const { totalAmount } = calculateBookingAmounts({
+      baseRentalCents: baseTotal,
+      extrasCents: extrasTotal,
+      taxPercentage,
+      baseRentalIncludesTax: vehicleRatesIncludeTax,
+    });
 
 
     // Database transaction to allocate vehicle
     let booking;
     try {
+      const driverLicenseDeleteAfter = calculateDriverLicenseDeleteAfter(validated.endDate);
       booking = await db.$transaction(async (tx) =>  {
+        await ensureVehicleBlockoutsTable(tx as typeof db);
         // Find available vehicle in category for the date range
-        const availableVehicle = await tx.vehicle.findFirst({
-          where: {
-            categoryId,
-            status: "ACTIVE",
-            bookings: {
-              none: {
-                startDate: { lt: validated.endDate },
-                endDate: { gt: validated.startDate },
-                OR: [
-                  { status: "CONFIRMED" },
-                  {
-                    status: "PENDING",
-                    holdExpiresAt: { gt: new Date() },
-                  },
-                ],
-              },
-            },
-          },
-          orderBy: { name: "asc" },
-        });
+        const availableVehicleRows = await tx.$queryRaw<Array<{ id: string }>>`
+          SELECT v.id
+          FROM "Vehicle" v
+          WHERE v."categoryId" = ${categoryId}
+            AND v."status" = 'ACTIVE'
+            AND NOT EXISTS (
+              SELECT 1
+              FROM "Booking" b
+              WHERE b."vehicleId" = v.id
+                AND b."startDate" < ${validated.endDate}
+                AND b."endDate" > ${validated.startDate}
+                AND (
+                  b."status" = 'CONFIRMED'
+                  OR (b."status" = 'PENDING' AND b."holdExpiresAt" > now())
+                )
+            )
+            AND NOT EXISTS (
+              SELECT 1
+              FROM "VehicleBlockout" vb
+              WHERE (vb."vehicleId" IS NULL OR vb."vehicleId" = v.id)
+                AND vb."startDate" < ${validated.endDate}
+                AND vb."endDate" > ${validated.startDate}
+            )
+          ORDER BY v.name ASC
+          LIMIT 1
+        `;
+        const availableVehicle = availableVehicleRows[0]
+          ? await tx.vehicle.findUnique({ where: { id: availableVehicleRows[0].id } })
+          : null;
 
         if (!availableVehicle) {
           throw new Error("CATEGORY_UNAVAILABLE");
@@ -1163,6 +1512,7 @@ export async function createCategoryBookingAction(
           customerName: validated.customerName,
           customerEmail: validated.customerEmail,
           customerPhone: validated.customerPhone,
+          flightNumber: validated.flightNumber || null,
           driverLicenseNumber: validated.driverLicenseNumber,
           startDate: validated.startDate,
           endDate: validated.endDate,
@@ -1190,7 +1540,11 @@ export async function createCategoryBookingAction(
           });
         } catch (createError: any) {
           const message = String(createError?.message || "");
-          if (!message.includes("Unknown argument `birthDate`") && !message.includes("Unknown argument `licenseExpiryDate`")) {
+          if (
+            !message.includes("Unknown argument `birthDate`") &&
+            !message.includes("Unknown argument `licenseExpiryDate`") &&
+            !message.includes("Unknown argument `flightNumber`")
+          ) {
             throw createError;
           }
 
@@ -1199,7 +1553,10 @@ export async function createCategoryBookingAction(
           try {
             await tx.$executeRaw`
               UPDATE "Booking"
-              SET "birthDate" = ${validated.birthDate}, "licenseExpiryDate" = ${validated.licenseExpiryDate}
+              SET
+                "birthDate" = ${validated.birthDate},
+                "licenseExpiryDate" = ${validated.licenseExpiryDate},
+                "flightNumber" = ${validated.flightNumber || null}
               WHERE id = ${created.id}
             `;
           } catch {
@@ -1207,13 +1564,19 @@ export async function createCategoryBookingAction(
           }
         }
 
-        const persisted = await tx.$queryRaw<Array<{ birthDate: Date | null; licenseExpiryDate: Date | null }>>`
-          SELECT "birthDate", "licenseExpiryDate"
+        await tx.$executeRaw`
+          UPDATE "Booking"
+          SET "driverLicenseDeleteAfter" = ${driverLicenseDeleteAfter}
+          WHERE id = ${created.id}
+        `;
+
+        const persisted = await tx.$queryRaw<Array<{ birthDate: Date | null; licenseExpiryDate: Date | null; driverLicenseDeleteAfter: Date | null }>>`
+          SELECT "birthDate", "licenseExpiryDate", "driverLicenseDeleteAfter"
           FROM "Booking"
           WHERE id = ${created.id}
           LIMIT 1
         `;
-        if (!persisted[0]?.birthDate || !persisted[0]?.licenseExpiryDate) {
+        if (!persisted[0]?.birthDate || !persisted[0]?.licenseExpiryDate || !persisted[0]?.driverLicenseDeleteAfter) {
           throw new Error("BOOKING_FIELDS_NOT_SAVED");
         }
         if (resolvedExtras.length > 0) {
@@ -1249,20 +1612,29 @@ export async function createCategoryBookingAction(
     }
 
     try {
-      const tenant = getTenantConfig();
+      const tenant = await getTenantConfig();
       const subject = `New Booking Created - ${booking.bookingCode}`;
-      const customerHtml = bookingEmailHtml({
+      const createdExtras = await loadBookingAdjustments(booking.id);
+      const termsEmailData = await getCustomerTermsEmailData();
+      const customerHtml = await bookingEmailHtml({
         title: "Booking request received",
         customerName: booking.customerName,
         bookingCode: booking.bookingCode,
         startDate: booking.startDate,
         endDate: booking.endDate,
         totalAmountCents: booking.totalAmount,
+        extras: createdExtras.extras.map((line) => ({
+          name: line.extraName,
+          quantity: line.quantity,
+          lineTotal: line.lineTotal,
+        })),
+        termsUrl: termsEmailData.termsUrl,
       });
       await sendEmail({
         to: booking.customerEmail,
         subject,
         html: customerHtml,
+        attachments: termsEmailData.attachments,
       });
       await sendEmail({
         to: tenant.email,
@@ -1275,13 +1647,277 @@ export async function createCategoryBookingAction(
       success: true,
       bookingId: booking.id,
       bookingCode: booking.bookingCode,
-      redirectUrl: `/${locale}/book/success/${booking.bookingCode}`,
+      redirectUrl:
+        bookingSource === "admin"
+          ? `/${locale}/admin/bookings/${booking.id}`
+          : `/${locale}/book/success/${booking.bookingCode}`,
     };
   } catch (error: any) {
     console.error("Booking creation error:", error);
     return {
       success: false,
       error: error.message || "Failed to create booking",
+    };
+  }
+}
+
+export async function updateCategoryBookingAction(
+  bookingId: string,
+  formData: FormData,
+  locale: string
+) {
+  try {
+    const session = await getSession();
+    if (!session || !isPrivilegedAdminRole(session.role)) {
+      return { success: false, error: "Unauthorized" };
+    }
+    if (!isLicenseActive() && session.role !== "ROOT") {
+      return { success: false, error: "BOOKING_DISABLED" };
+    }
+
+    const existing = await db.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        vehicleId: true,
+        driverLicenseUrl: true,
+        status: true,
+      },
+    });
+    if (!existing) {
+      return { success: false, error: "Booking not found" };
+    }
+    const operational = await getBookingOperationalState(db, bookingId);
+    if (operational.returnedAt) {
+      return { success: false, error: "Returned bookings cannot be edited" };
+    }
+
+    const categoryId = String(formData.get("categoryId") || "");
+    const customerName = String(formData.get("customerName") || "");
+    const customerEmail = String(formData.get("customerEmail") || "");
+    const customerPhone = String(formData.get("customerPhone") || "");
+    const flightNumber = String(formData.get("flightNumber") || "").trim();
+    const birthDate = new Date(String(formData.get("birthDate") || ""));
+    const driverLicenseNumber = String(formData.get("driverLicenseNumber") || "");
+    const licenseExpiryDate = new Date(String(formData.get("licenseExpiryDate") || ""));
+    const startDate = new Date(String(formData.get("startDate") || ""));
+    const endDate = new Date(String(formData.get("endDate") || ""));
+    const vehicleId = String(formData.get("vehicleId") || "").trim();
+    const pickupLocationId = String(formData.get("pickupLocationId") || "");
+    const dropoffLocationId = String(formData.get("dropoffLocationId") || "");
+    const notes = String(formData.get("notes") || "");
+    const extrasPayload = String(formData.get("selectedExtras") || "[]");
+
+    const validated = await adminCategoryBookingUpdateSchemaRefined.parseAsync({
+      categoryId,
+      vehicleId: vehicleId || undefined,
+      customerName,
+      customerEmail,
+      customerPhone,
+      flightNumber: flightNumber || undefined,
+      birthDate,
+      driverLicenseNumber,
+      licenseExpiryDate,
+      startDate,
+      endDate,
+      pickupLocationId,
+      dropoffLocationId,
+      notes,
+    });
+
+    let selectedExtras: Array<{ extraId: string; quantity: number }> = [];
+    try {
+      const parsed = JSON.parse(extrasPayload);
+      if (Array.isArray(parsed)) {
+        selectedExtras = parsed
+          .map((entry: any) => ({
+            extraId: String(entry?.extraId || ""),
+            quantity: Math.max(1, Number(entry?.quantity || 1)),
+          }))
+          .filter((entry) => entry.extraId.length > 0);
+      }
+    } catch {
+      selectedExtras = [];
+    }
+
+    const [pickupLocationRecord, dropoffLocationRecord, category] = await Promise.all([
+      resolveActiveLocation(validated.pickupLocationId),
+      resolveActiveLocation(validated.dropoffLocationId),
+      db.vehicleCategory.findUnique({ where: { id: validated.categoryId } }),
+    ]);
+
+    if (!pickupLocationRecord || !dropoffLocationRecord) {
+      return { success: false, error: "Invalid pickup or dropoff location" };
+    }
+    if (!category || !category.isActive) {
+      return { success: false, error: "CATEGORY_UNAVAILABLE" };
+    }
+
+    const days = Math.max(1, Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24)));
+    const minimumBookingDays = await getMinBookingDays();
+    if (days < minimumBookingDays) {
+      return {
+        success: false,
+        error: `Minimum booking duration is ${minimumBookingDays} day${minimumBookingDays > 1 ? "s" : ""}`,
+      };
+    }
+
+    let refreshedExtras: Array<{
+      extraId: string;
+      quantity: number;
+      lineTotal: number;
+      pricingType: "DAILY" | "FLAT";
+      amount: number;
+    }> = [];
+    if (selectedExtras.length > 0) {
+      const extraRows: Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }> =
+        (db as any).extra && typeof (db as any).extra.findMany === "function"
+          ? await (db as any).extra.findMany({
+              where: { id: { in: selectedExtras.map((entry) => entry.extraId) }, isActive: true },
+              select: { id: true, pricingType: true, amount: true },
+            })
+          : await db.$queryRawUnsafe<Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }>>(
+              `SELECT id, "pricingType", amount FROM "Extra" WHERE "isActive" = true AND id IN (${selectedExtras.map((_, i) => `$${i + 1}`).join(",")})`,
+              ...selectedExtras.map((entry) => entry.extraId)
+            );
+      const extraMap = new Map(extraRows.map((row) => [row.id, row]));
+      refreshedExtras = selectedExtras
+        .map((line) => {
+          const extra = extraMap.get(line.extraId);
+          if (!extra) return null;
+          return {
+            extraId: line.extraId,
+            quantity: line.quantity,
+            pricingType: extra.pricingType,
+            amount: extra.amount,
+            lineTotal: extra.pricingType === "DAILY" ? extra.amount * days * line.quantity : extra.amount * line.quantity,
+          };
+        })
+        .filter(Boolean) as typeof refreshedExtras;
+    }
+    const { discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
+    const extrasTotal = refreshedExtras.reduce((sum, line) => sum + line.lineTotal, 0);
+    const baseRental = category.dailyRate * days;
+    const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
+    const [taxPercentage, vehicleRatesIncludeTax] = await Promise.all([
+      getTaxPercentage(),
+      getVehicleRatesIncludeTax(),
+    ]);
+    const { totalAmount } = calculateBookingAmounts({
+      baseRentalCents: baseRental,
+      extrasCents: extrasTotal,
+      discountCents: discountAmount,
+      taxPercentage,
+      baseRentalIncludesTax: vehicleRatesIncludeTax,
+    });
+    const driverLicenseDeleteAfter = calculateDriverLicenseDeleteAfter(validated.endDate);
+
+    await db.$transaction(async (tx) => {
+      await ensureVehicleBlockoutsTable(tx as typeof db);
+      const vehicleId = await selectAvailableVehicleForBooking({
+        tx: tx as typeof db,
+        bookingIdToExclude: bookingId,
+        categoryId: validated.categoryId,
+        startDate: validated.startDate,
+        endDate: validated.endDate,
+        preferredVehicleId: existing.vehicleId,
+        specificVehicleId: validated.vehicleId || null,
+      });
+
+      if (!vehicleId) {
+        throw new Error(validated.vehicleId ? "VEHICLE_UNAVAILABLE" : "CATEGORY_UNAVAILABLE");
+      }
+
+      await tx.booking.update({
+        where: { id: bookingId },
+        data: {
+          categoryId: validated.categoryId,
+          vehicleId,
+          customerName: validated.customerName,
+          customerEmail: validated.customerEmail,
+          customerPhone: validated.customerPhone,
+          flightNumber: validated.flightNumber || null,
+          birthDate: validated.birthDate,
+          driverLicenseNumber: validated.driverLicenseNumber,
+          licenseExpiryDate: validated.licenseExpiryDate,
+          startDate: validated.startDate,
+          endDate: validated.endDate,
+          pickupLocationId: pickupLocationRecord.id,
+          dropoffLocationId: dropoffLocationRecord.id,
+          pickupLocation: pickupLocationRecord.name,
+          dropoffLocation: dropoffLocationRecord.name,
+          totalAmount,
+          notes: validated.notes || null,
+          driverLicenseUrl: existing.driverLicenseUrl,
+        } as any,
+      });
+
+      if ((tx as any).bookingExtra && typeof (tx as any).bookingExtra.deleteMany === "function") {
+        await (tx as any).bookingExtra.deleteMany({ where: { bookingId } });
+        if (refreshedExtras.length > 0 && typeof (tx as any).bookingExtra.createMany === "function") {
+          await (tx as any).bookingExtra.createMany({
+            data: refreshedExtras.map((line) => ({
+              bookingId,
+              extraId: line.extraId,
+              quantity: line.quantity,
+              lineTotal: line.lineTotal,
+            })),
+          });
+        }
+      } else {
+        await tx.$executeRaw`DELETE FROM "BookingExtra" WHERE "bookingId" = ${bookingId}`;
+        for (const line of refreshedExtras) {
+          await tx.$executeRaw`
+            INSERT INTO "BookingExtra" ("bookingId", "extraId", quantity, "lineTotal")
+            VALUES (${bookingId}, ${line.extraId}, ${line.quantity}, ${line.lineTotal})
+          `;
+        }
+      }
+
+      await tx.$executeRaw`
+        UPDATE "Booking"
+        SET "driverLicenseDeleteAfter" = ${driverLicenseDeleteAfter}
+        WHERE id = ${bookingId}
+      `;
+
+      if (bookingDiscount) {
+        await tx.$executeRaw`
+          UPDATE "BookingDiscount"
+          SET amount = ${discountAmount}
+          WHERE "bookingId" = ${bookingId}
+        `;
+      }
+
+      await tx.auditLog.create({
+        data: {
+          adminUserId: session.adminUserId,
+          action: "BOOKING_UPDATED",
+          bookingId,
+        },
+      });
+    });
+
+    if (existing.status === "PENDING" || existing.status === "CONFIRMED") {
+      const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
+      if (!invoiceResult.success) {
+        return { success: false, error: invoiceResult.error || "Booking updated but invoice refresh failed" };
+      }
+    }
+
+    return {
+      success: true,
+      redirectUrl: `/${locale}/admin/bookings/${bookingId}`,
+    };
+  } catch (error: any) {
+    if (error?.message === "CATEGORY_UNAVAILABLE") {
+      return { success: false, error: "CATEGORY_UNAVAILABLE" };
+    }
+    if (error?.message === "VEHICLE_UNAVAILABLE") {
+      return { success: false, error: "Selected vehicle is not available for that booking window" };
+    }
+    return {
+      success: false,
+      error: error?.message || "Failed to update booking",
     };
   }
 }
