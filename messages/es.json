@@ -329,7 +329,8 @@
     "fleet": {
       "title": "Elige el vehiculo ideal para tus planes en la isla",
       "seats": "{count} asientos",
-      "reserveNow": "Reservar ahora"
+      "reserveNow": "Reservar ahora",
+      "seeMore": "Ver mas"
     },
     "statsStrip": {
       "eyebrow": "Resumen de la plataforma",

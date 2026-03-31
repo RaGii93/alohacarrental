@@ -123,7 +123,7 @@ export function Step1Search({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[1.75rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.76),hsl(var(--accent)/0.12)_62%,hsl(192_90%_75%/0.06)_100%)] p-6 shadow-[0_20px_44px_-30px_hsl(var(--foreground)/0.12)] ring-1 ring-white/60 backdrop-blur-xl">
+      <div className="public-glass-card rounded-[1.75rem] p-6">
         <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.selectDateRange")}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -251,7 +251,7 @@ export function Step1Search({
           <Button
             onClick={handleSearch}
             disabled={!hasValidRange || !!blockedMessage || isSearching || disabled}
-            className="h-12 w-full rounded-full bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(229_54%_28%))] font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] shadow-[0_20px_40px_-20px_hsl(var(--primary)/0.45)] hover:opacity-95"
+            className="public-primary-button h-12 w-full rounded-full font-extrabold uppercase tracking-[0.08em]"
           >
             <Search className="h-4 w-4" />
             {isSearching ? t("common.loading") : t("booking.searchAvailability")}
@@ -260,7 +260,7 @@ export function Step1Search({
       </div>
 
       {availability.length > 0 && (
-        <div className="rounded-[1.75rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),hsl(var(--primary)/0.08)_48%,hsl(var(--accent)/0.1)_100%)] p-6 shadow-[0_24px_55px_-38px_hsl(var(--foreground)/0.14)] ring-1 ring-white/60 backdrop-blur-xl">
+        <div className="public-glass-card rounded-[1.75rem] p-6">
           <h3 className="mb-4 text-lg font-black text-[hsl(var(--foreground))]">{t("booking.selectCategory")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {availability.map((cat) => {

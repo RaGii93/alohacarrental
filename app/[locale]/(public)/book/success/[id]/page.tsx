@@ -61,10 +61,10 @@ export default async function SuccessPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="overflow-hidden rounded-[2rem] border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),hsl(var(--primary)/0.08)_52%,hsl(var(--accent)/0.08)_100%)] p-8 text-center shadow-[0_30px_90px_-44px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+      <Card className="public-glass-card-strong overflow-hidden rounded-[2rem] p-8 text-center">
         <div className="mb-6 flex justify-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.76),hsl(var(--accent)/0.26))] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl">
-            <CheckCircle className="h-12 w-12 text-[hsl(var(--primary))]" />
+          <div className="public-accent-icon flex h-20 w-20 items-center justify-center rounded-[1.75rem]">
+            <CheckCircle className="h-12 w-12 text-[rgb(15,99,120)]" />
           </div>
         </div>
 
@@ -74,12 +74,12 @@ export default async function SuccessPage({
         <p className="mb-6 text-lg text-[hsl(var(--muted-foreground))]">
           {t("booking.success.message", { orderId: booking.bookingCode })}
         </p>
-        <div className="mb-6 rounded-[1.5rem] border border-white/60 bg-white/72 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] ring-1 ring-white/55 backdrop-blur-xl">
+        <div className="public-glass-card mb-6 rounded-[1.5rem] p-4">
           <p className="text-sm uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">{t("booking.bookingCode")}</p>
           <p className="text-xl font-semibold tracking-wide">{booking.bookingCode}</p>
         </div>
 
-        <div className="mb-6 rounded-[1.75rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(var(--accent)/0.12))] p-6 text-left shadow-[0_20px_50px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
+        <div className="public-glass-card mb-6 rounded-[1.75rem] p-6 text-left">
           <h2 className="mb-4 font-semibold text-[hsl(var(--foreground))]">{t("admin.bookings.detail.bookingInfo")}</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -159,13 +159,13 @@ export default async function SuccessPage({
 
         <div className="flex justify-center gap-4">
           <Link href={`/${locale}`}>
-            <Button variant="outline">
+            <Button variant="outline" className="public-outline-button rounded-full">
               <Home className="h-4 w-4" />
               {t("nav.home")}
             </Button>
           </Link>
           <Link href={`/${locale}/book`}>
-            <Button>
+            <Button className="public-primary-button rounded-full">
               <CarFront className="h-4 w-4" />
               {t("nav.booking")}
             </Button>

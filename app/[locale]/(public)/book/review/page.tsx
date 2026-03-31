@@ -67,10 +67,12 @@ export default async function BookingReviewPage({
     : null;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="overflow-hidden rounded-[2rem] border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),hsl(var(--accent)/0.14))] p-6 shadow-[0_30px_80px_-42px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+    <section className="public-shell-bg relative overflow-hidden pt-24 sm:pt-28">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(15,39,64,0.08),transparent_28%),radial-gradient(circle_at_85%_18%,rgba(23,184,197,0.1),transparent_24%)]" />
+      <div className="relative mx-auto max-w-3xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
+      <Card className="public-glass-card-strong overflow-hidden rounded-[2rem] p-6">
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/55 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),hsl(var(--accent)/0.24))] text-[hsl(var(--primary))] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+          <div className="public-accent-icon flex h-12 w-12 items-center justify-center rounded-2xl">
             <Ticket className="h-5 w-5" />
           </div>
           <div>
@@ -84,9 +86,9 @@ export default async function BookingReviewPage({
             name="code"
             defaultValue={lookupValue}
             placeholder={t("booking.reviewLookup.placeholder")}
-            className="h-11 w-full rounded-full border border-white/60 bg-white/82 px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] outline-none ring-1 ring-white/60 backdrop-blur-xl placeholder:text-[hsl(var(--muted-foreground))]"
+            className="h-11 w-full rounded-full border border-white/60 bg-white/90 px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] outline-none ring-1 ring-white/60 backdrop-blur-xl placeholder:text-[hsl(var(--muted-foreground))]"
           />
-          <Button type="submit">
+          <Button type="submit" className="public-primary-button rounded-full">
             <Search className="h-4 w-4" />
             {t("booking.reviewLookup.submit")}
           </Button>
@@ -94,19 +96,19 @@ export default async function BookingReviewPage({
       </Card>
 
       {lookupValue && !booking && (
-        <Card className="rounded-[1.75rem] border-red-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(254,226,226,0.88))] p-6 text-sm text-red-700 shadow-[0_24px_60px_-38px_rgba(127,29,29,0.15)] ring-1 ring-white/60 backdrop-blur-xl">
+        <Card className="rounded-[1.75rem] border-red-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(254,242,242,0.96))] p-6 text-sm text-red-700 shadow-[0_24px_60px_-38px_rgba(127,29,29,0.15)] ring-1 ring-white/60 backdrop-blur-xl">
           {t("booking.reviewLookup.notFound")}
         </Card>
       )}
 
       {booking && (
-        <Card className="space-y-5 rounded-[2rem] border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.8),hsl(var(--primary)/0.08)_52%,hsl(var(--accent)/0.08)_100%)] p-6 shadow-[0_30px_80px_-42px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+        <Card className="public-glass-card space-y-5 rounded-[2rem] p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">{t("booking.reviewLookup.detailsTitle")}</h2>
               <p className="text-sm text-[hsl(var(--muted-foreground))]">{t("booking.bookingCode")}: {booking.bookingCode}</p>
             </div>
-            <div className="rounded-full border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.68),hsl(var(--accent)/0.26))] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.58)] backdrop-blur-xl">
+            <div className="public-chip rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.16em]">
               {booking.status}
             </div>
           </div>
@@ -187,18 +189,19 @@ export default async function BookingReviewPage({
         </Card>
       )}
 
-      <div className="flex items-center justify-between gap-3 rounded-[1.5rem] border border-white/50 bg-white/52 p-4 shadow-[0_20px_50px_-36px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+      <div className="public-glass-card flex items-center justify-between gap-3 rounded-[1.5rem] p-4">
         <div className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))]">
           <CalendarClock className="h-4 w-4 text-[hsl(var(--primary))]" />
           <span>{t("booking.reviewLookup.subtitle")}</span>
         </div>
         <Link href={`/${locale}/book`}>
-          <Button variant="outline">
+          <Button variant="outline" className="public-outline-button rounded-full">
             <ArrowLeft className="h-4 w-4" />
             {t("booking.backToBooking")}
           </Button>
         </Link>
       </div>
-    </div>
+      </div>
+    </section>
   );
 }

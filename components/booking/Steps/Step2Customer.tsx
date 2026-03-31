@@ -121,7 +121,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[1.75rem] border border-[hsl(var(--border))] bg-white/90 p-6 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+      <div className="public-glass-card rounded-[1.75rem] p-6">
         <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.customerName")}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,7 +136,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ customerName: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
             />
           </div>
 
@@ -152,7 +152,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ customerEmail: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
             />
           </div>
 
@@ -167,7 +167,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 onValueChange={(value) => updatePhone(value, bookingData.customerPhoneLocalNumber)}
                 disabled={disabled}
               >
-                <SelectTrigger className="h-11 w-full rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]">
+                <SelectTrigger className="h-11 w-full rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55">
                   <SelectValue placeholder="Code" />
                 </SelectTrigger>
                 <SelectContent className="max-h-80">
@@ -185,7 +185,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 onChange={(e) => updatePhone(bookingData.customerPhoneCountryCode, e.target.value)}
                 disabled={disabled}
                 required
-                className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+                className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
               />
             </div>
           </div>
@@ -200,7 +200,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               value={bookingData.flightNumber}
               onChange={(e) => updateBookingData({ flightNumber: e.target.value })}
               disabled={disabled}
-              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
             />
           </div>
 
@@ -215,7 +215,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ driverLicenseNumber: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
             />
           </div>
 
@@ -235,7 +235,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 const minAdultDate = new Date(now.getFullYear() - 21, now.getMonth(), now.getDate());
                 return toDateInputValue(minAdultDate);
               })()}
-              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
             />
             {bookingData.birthDate && !isAtLeast21 && (
               <p className="text-xs text-red-600 mt-1">{t("booking.errors.ageMinimum")}</p>
@@ -271,7 +271,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
       <div>
         <h3 className="mb-4 text-lg font-black text-[hsl(var(--foreground))]">{t("booking.driverLicense")}</h3>
-        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.22))] shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+        <Card className="public-glass-card rounded-[1.75rem]">
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div>
@@ -287,11 +287,11 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                   />
                   <Label
                     htmlFor="driverLicense"
-                    className="flex h-32 w-full cursor-pointer items-center justify-center rounded-[1.25rem] border-2 border-dashed border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.25)] transition-colors hover:border-[hsl(var(--primary)/0.4)] hover:bg-white"
+                    className="flex h-32 w-full cursor-pointer items-center justify-center rounded-[1.25rem] border-2 border-dashed border-[rgba(15,39,64,0.14)] bg-[rgba(248,250,252,0.92)] transition-colors hover:border-[rgba(19,120,152,0.45)] hover:bg-white"
                   >
                     <div className="text-center">
-                      <Upload className="mx-auto mb-2 h-8 w-8 text-[hsl(var(--primary))]" />
-                      <p className="text-sm font-semibold text-[hsl(var(--accent-foreground))]">
+                      <Upload className="mx-auto mb-2 h-8 w-8 text-[rgb(19,120,152)]" />
+                      <p className="text-sm font-semibold text-[rgb(15,39,64)]">
                         {isUploading ? t("common.loading") : t("booking.driverLicense")}
                       </p>
                       <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
@@ -304,7 +304,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
               {bookingData.driverLicenseUrl && (
                 <div className="space-y-3">
-                  <div className="rounded-[1rem] border border-emerald-200 bg-emerald-50 p-3">
+                  <div className="rounded-[1rem] border border-emerald-200 bg-emerald-50/90 p-3">
                     <p className="text-sm font-semibold text-emerald-700">
                       ✓ {t("booking.driverLicense")} {t("common.success").toLowerCase()}
                     </p>
@@ -318,7 +318,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 </div>
               )}
 
-              <div className="rounded-[1rem] border border-[hsl(var(--border))] bg-white/80 p-4">
+              <div className="public-glass-card rounded-[1rem] p-4">
                 <p className="text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.termsOfService")}</p>
                 <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">{t("booking.identificationClause")}</p>
                 <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.gdprNotice")}</p>
@@ -341,7 +341,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
         </Card>
       </div>
 
-      <div className="rounded-[1.75rem] border border-[hsl(var(--border))] bg-white/90 p-6 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+      <div className="public-glass-card rounded-[1.75rem] p-6">
         <Label htmlFor="notes" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
           <ClipboardPenLine className="h-4 w-4 text-[hsl(var(--primary))]" />
           {t("booking.notes")}
@@ -352,16 +352,16 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           onChange={(e) => updateBookingData({ notes: e.target.value })}
           disabled={disabled}
           rows={3}
-          className="rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+          className="rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
         />
       </div>
 
       <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onPrev} className="h-12 rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]">
+        <Button variant="outline" onClick={onPrev} className="public-outline-button h-12 rounded-full">
           <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
-        <Button onClick={onNext} disabled={!canContinue || disabled} className="h-12 rounded-md bg-[hsl(var(--primary))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.9)]">
+        <Button onClick={onNext} disabled={!canContinue || disabled} className="public-primary-button h-12 rounded-full px-6 font-extrabold uppercase tracking-[0.08em]">
           <ArrowRight className="h-4 w-4" />
           {t("booking.continue")}
         </Button>

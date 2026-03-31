@@ -329,7 +329,8 @@
     "fleet": {
       "title": "Choose the vehicle that fits your island plans",
       "seats": "{count} seats",
-      "reserveNow": "Reserve now"
+      "reserveNow": "Reserve now",
+      "seeMore": "See more"
     },
     "statsStrip": {
       "eyebrow": "Platform Snapshot",

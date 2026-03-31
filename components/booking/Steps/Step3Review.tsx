@@ -187,7 +187,7 @@ export function Step3Review({
       <div>
         <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.reviewBooking")}</h2>
 
-        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.22))] shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+        <Card className="public-glass-card rounded-[1.75rem]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.summary")}</CardTitle>
           </CardHeader>
@@ -316,7 +316,7 @@ export function Step3Review({
         </Card>
       </div>
 
-      <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+      <Card className="public-glass-card rounded-[1.75rem]">
         <CardHeader>
           <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.customerName")}</CardTitle>
         </CardHeader>
@@ -333,7 +333,7 @@ export function Step3Review({
       </Card>
 
       {(bookingData.pickupLocationId || bookingData.dropoffLocationId) && (
-        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+        <Card className="public-glass-card rounded-[1.75rem]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.pickupLocation")}</CardTitle>
           </CardHeader>
@@ -369,7 +369,7 @@ export function Step3Review({
       )}
 
       {extras.length > 0 && (
-        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+        <Card className="public-glass-card rounded-[1.75rem]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.extras")}</CardTitle>
           </CardHeader>
@@ -378,7 +378,7 @@ export function Step3Review({
               const line = bookingData.selectedExtras.find((entry) => entry.extraId === extra.id);
               const checked = !!line;
               return (
-                <div key={extra.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.3)] p-3">
+                <div key={extra.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-[rgba(15,39,64,0.08)] bg-[rgba(248,250,252,0.92)] p-3">
                   <div>
                     <p className="font-medium">{extra.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -413,7 +413,7 @@ export function Step3Review({
                           ),
                         });
                       }}
-                      className="h-8 w-16 rounded-md border border-[hsl(var(--border))] bg-white px-2 text-sm text-[hsl(var(--foreground))]"
+                      className="h-8 w-16 rounded-md border border-[rgba(15,39,64,0.1)] bg-white px-2 text-sm text-[hsl(var(--foreground))]"
                     />
                   </div>
                 </div>
@@ -424,7 +424,7 @@ export function Step3Review({
       )}
 
       {bookingData.notes && (
-        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+        <Card className="public-glass-card rounded-[1.75rem]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.notes")}</CardTitle>
           </CardHeader>
@@ -434,7 +434,7 @@ export function Step3Review({
         </Card>
       )}
 
-      <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.22))] shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+      <Card className="public-glass-card rounded-[1.75rem]">
         <CardHeader>
           <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.terms")}</CardTitle>
           <CardDescription className="text-[hsl(var(--muted-foreground))]">
@@ -442,7 +442,7 @@ export function Step3Review({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-[1rem] border border-[hsl(var(--border))] bg-white/80 p-4">
+          <div className="public-glass-card rounded-[1rem] p-4">
             <p className="text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.termsOfService")}</p>
             <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">{t("booking.identificationClause")}</p>
             <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.gdprNotice")}</p>
@@ -477,7 +477,7 @@ export function Step3Review({
           <Button
             variant="outline"
             onClick={() => window.open(termsPdfUrl, "_blank")}
-            className="h-11 w-full rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]"
+            className="public-outline-button h-11 w-full rounded-full"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             {t("booking.viewTerms")}
@@ -486,14 +486,14 @@ export function Step3Review({
       </Card>
 
       <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onPrev} className="h-12 rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]">
+        <Button variant="outline" onClick={onPrev} className="public-outline-button h-12 rounded-full">
           <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
         <Button
           onClick={handleSubmit}
           disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled || !!pricing?.belowMinimumBlocked || !!pricing?.lastMinuteBlocked}
-          className="h-12 rounded-md bg-[hsl(var(--primary))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] shadow-[0_20px_40px_-20px_hsl(var(--primary)/0.55)] hover:bg-[hsl(var(--primary)/0.9)]"
+          className="public-primary-button h-12 rounded-full px-6 font-extrabold uppercase tracking-[0.08em]"
         >
           <CheckCircle2 className="h-4 w-4" />
           {isSubmitting ? t("common.loading") : t("booking.confirmBooking")}

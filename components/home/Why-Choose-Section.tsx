@@ -47,12 +47,12 @@ export default function WhyChooseSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#fbfdff_0%,#fffafd_48%,#f8fbff_100%)] px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_center,hsl(var(--accent)/0.2),transparent_34%),radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.1),transparent_28%),radial-gradient(circle_at_75%_85%,hsl(192_90%_72%/0.12),transparent_24%)]" />
+    <section className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_center,rgba(23,184,197,0.1),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(15,39,64,0.08),transparent_28%),radial-gradient(circle_at_75%_85%,rgba(194,178,128,0.1),transparent_24%)]" />
       <div className="relative mx-auto max-w-7xl">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <Reveal className="space-y-6">
-            <span className="inline-flex rounded-full border border-white/60 bg-white/66 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[hsl(var(--accent-foreground))] shadow-[0_12px_30px_-24px_hsl(var(--foreground)/0.14)] ring-1 ring-white/60 backdrop-blur-xl">
+            <span className="public-eyebrow inline-flex rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em]">
               Aloha Car Rental
             </span>
             <div className="space-y-4">
@@ -65,19 +65,19 @@ export default function WhyChooseSection() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-[1.5rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(var(--accent)/0.14))] p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
+              <div className="public-glass-card rounded-[1.5rem] p-5">
                 <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">24/7</div>
                 <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">
                   {t("landing.whyChoose.features.support.title")}
                 </div>
               </div>
-              <div className="rounded-[1.5rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(var(--primary)/0.12))] p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
+              <div className="public-glass-card rounded-[1.5rem] p-5">
                 <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">100%</div>
                 <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">
                   {t("landing.whyChoose.features.security.title")}
                 </div>
               </div>
-              <div className="rounded-[1.5rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(192_90%_75%/0.12))] p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
+              <div className="public-glass-card rounded-[1.5rem] p-5">
                 <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">4.9</div>
                 <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">
                   {t("landing.whyChoose.features.rating.title")}
@@ -85,7 +85,7 @@ export default function WhyChooseSection() {
               </div>
             </div>
 
-            <Button asChild size="lg" className="rounded-full px-8 font-bold">
+            <Button asChild size="lg" className="public-primary-button rounded-full px-8 font-bold">
               <Link href="/book">
                 {t("landing.ctaSection.button")}
                 <ArrowRightIcon className="h-4 w-4" />
@@ -96,7 +96,7 @@ export default function WhyChooseSection() {
           <div className="grid gap-5 sm:grid-cols-2">
             {features.map((feature, index) => (
               <Reveal key={feature.title} delay={index * 90}>
-                <div className="group h-full rounded-[1.75rem] border border-white/45 bg-[linear-gradient(160deg,rgba(255,255,255,0.7),hsl(var(--accent)/0.1)_50%,hsl(192_90%_75%/0.08)_100%)] p-6 shadow-[0_28px_65px_-42px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl transition-transform duration-300 hover:-translate-y-1.5 hover:bg-[linear-gradient(160deg,rgba(255,255,255,0.78),hsl(var(--accent)/0.16)_50%,hsl(192_90%_75%/0.12)_100%)]">
+                <div className="public-glass-card group h-full rounded-[1.75rem] p-6 transition-transform duration-300 hover:-translate-y-1.5">
                   <div
                     className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ${feature.bgColor} shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_16px_34px_-22px_hsl(var(--primary)/0.24)]`}
                   >
@@ -122,7 +122,7 @@ export default function WhyChooseSection() {
         >
           <path
             d="M0,30 C480,60 960,0 1440,40 L1440,60 L0,60 Z"
-            fill="hsl(var(--accent) / 0.45)"
+            fill="rgba(226,232,240,0.9)"
           />
         </svg>
       </div>

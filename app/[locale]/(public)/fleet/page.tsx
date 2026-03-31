@@ -46,11 +46,11 @@ export default async function FleetOverviewPage() {
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),#faf8fc)] px-4 pb-16 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-20 lg:pt-36">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.08),transparent_28%),radial-gradient(circle_at_bottom_left,hsl(var(--accent)/0.18),transparent_24%)]" />
+    <section className="public-shell-bg relative overflow-hidden px-4 pb-16 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-20 lg:pt-36">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(15,39,64,0.08),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(23,184,197,0.1),transparent_24%)]" />
       <div className="relative mx-auto w-full max-w-[1500px]">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-[hsl(var(--primary))]">{t("nav.fleetOverview")}</p>
+          <p className="text-sm font-black uppercase tracking-[0.25em] text-[rgb(19,120,152)]">{t("nav.fleetOverview")}</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight text-[hsl(var(--foreground))] sm:text-5xl">
             {t("nav.fleetOverview")}
           </h1>
@@ -61,9 +61,9 @@ export default async function FleetOverviewPage() {
           {categories.map((category) => (
             <article
               key={category.id}
-              className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.8),hsl(var(--accent)/0.12))] shadow-[0_25px_65px_-35px_hsl(var(--primary)/0.2)] ring-1 ring-white/45 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_80px_-40px_hsl(var(--primary)/0.28)]"
+              className="public-glass-card group flex h-full flex-col overflow-hidden rounded-[2rem] transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_80px_-40px_rgba(15,39,64,0.18)]"
             >
-              <div className="relative flex h-56 items-center justify-center overflow-hidden bg-[linear-gradient(180deg,hsl(var(--accent)/0.22),rgba(255,255,255,0.72))] p-6">
+              <div className="relative flex h-56 items-center justify-center overflow-hidden bg-[linear-gradient(180deg,rgba(240,249,255,0.92),rgba(255,255,255,0.86))] p-6">
                 {category.imageUrl ? (
                   <img
                     src={category.imageUrl.startsWith("/") ? category.imageUrl : getBlobProxyUrl(category.imageUrl) || category.imageUrl}
@@ -77,7 +77,7 @@ export default async function FleetOverviewPage() {
                 <div>
                   <div className="flex items-start justify-between gap-3 text-left">
                     <h2 className="text-2xl font-black leading-tight text-[hsl(var(--foreground))]">{category.name}</h2>
-                    <p className="shrink-0 text-base font-semibold text-[hsl(var(--primary))]">
+                    <p className="shrink-0 text-base font-semibold text-[rgb(19,120,152)]">
                       {currency(category.dailyRate)}
                       <span className="text-[hsl(var(--muted-foreground))]"> / day</span>
                     </p>
@@ -90,16 +90,16 @@ export default async function FleetOverviewPage() {
                 </div>
 
                 <ul className="mt-auto flex flex-wrap justify-center gap-2 pt-2 text-sm">
-                  <li className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary)/0.12)] bg-white/70 px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))] backdrop-blur-sm">
+                  <li className="public-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[rgb(19,120,152)] backdrop-blur-sm">
                     <Users className="h-4 w-4" />
                     <span>{category.seats} seats</span>
                   </li>
-                  <li className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary)/0.12)] bg-white/70 px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))] backdrop-blur-sm">
+                  <li className="public-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[rgb(19,120,152)] backdrop-blur-sm">
                     <Settings2 className="h-4 w-4" />
                     <span>{category.transmission === "MANUAL" ? "Manual" : "Automatic"}</span>
                   </li>
                   {getCategoryFeatureNames(category).map((feature) => (
-                    <li key={feature} className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary)/0.12)] bg-white/70 px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))] backdrop-blur-sm">
+                    <li key={feature} className="public-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[rgb(19,120,152)] backdrop-blur-sm">
                       <CheckCircle2 className="h-4 w-4" />
                       <span>{feature}</span>
                     </li>

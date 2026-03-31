@@ -21,20 +21,21 @@ const CARD_ACCENTS = [
 
 export default function FleetSection({ categories }: FleetSectionProps) {
   const t = useTranslations();
+  const featuredCategories = categories.slice(0, 4);
 
   return (
     <section
       id="fleet"
-      className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#fbf7ff_74%,#fff8fb_100%)] px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24"
+      className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24"
     >
-      <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.12),transparent_42%),radial-gradient(circle_at_top_right,hsl(var(--accent)/0.22),transparent_34%)]" />
-      <div className="absolute inset-y-0 left-0 w-72 bg-[radial-gradient(circle_at_left,hsl(192_85%_70%/0.12),transparent_60%)]" />
-      <div className="absolute inset-y-0 right-0 w-72 bg-[radial-gradient(circle_at_right,hsl(var(--primary)/0.12),transparent_60%)]" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top_left,rgba(19,120,152,0.12),transparent_42%),radial-gradient(circle_at_top_right,rgba(23,184,197,0.12),transparent_34%)]" />
+      <div className="absolute inset-y-0 left-0 w-72 bg-[radial-gradient(circle_at_left,rgba(23,184,197,0.08),transparent_60%)]" />
+      <div className="absolute inset-y-0 right-0 w-72 bg-[radial-gradient(circle_at_right,rgba(15,39,64,0.08),transparent_60%)]" />
 
       <div className="relative mx-auto max-w-7xl">
         <Reveal className="mb-12 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl space-y-4">
-            <span className="inline-flex w-fit rounded-full border border-white/60 bg-white/60 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[hsl(var(--accent-foreground))] shadow-[0_12px_30px_-22px_hsl(var(--foreground)/0.25)] ring-1 ring-white/65 backdrop-blur-xl">
+            <span className="public-eyebrow inline-flex w-fit rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em]">
               Aloha Car Rental
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))] sm:text-4xl lg:text-5xl">
@@ -44,15 +45,16 @@ export default function FleetSection({ categories }: FleetSectionProps) {
               {t("landing.whyChoose.subtitle")}
             </p>
           </div>
-          <div className="flex items-center gap-3 rounded-full border border-white/60 bg-white/58 px-5 py-3 text-sm font-semibold text-[hsl(var(--foreground))] shadow-[0_16px_40px_-24px_hsl(var(--foreground)/0.22)] ring-1 ring-white/65 backdrop-blur-xl">
-            <ShieldCheckIcon className="h-4 w-4 text-[hsl(var(--primary))]" />
+          <div className="public-chip flex items-center gap-3 rounded-full px-5 py-3 text-sm font-semibold">
+            <ShieldCheckIcon className="h-4 w-4 text-[rgb(19,120,152)]" />
             <span>{t("landing.hero.featureLine")}</span>
           </div>
         </Reveal>
 
-        {categories.length ? (
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {categories.map((category, index) => {
+        {featuredCategories.length ? (
+          <div className="space-y-8">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {featuredCategories.map((category, index) => {
               const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
               const imageSrc = category.imageUrl
                 ? category.imageUrl.startsWith("/")
@@ -62,12 +64,12 @@ export default function FleetSection({ categories }: FleetSectionProps) {
 
               return (
                 <Reveal key={category.id} delay={index * 90}>
-                  <Card className="group overflow-hidden rounded-[1.9rem] border-white/45 bg-white/56 p-0 shadow-[0_26px_70px_-42px_hsl(var(--foreground)/0.2)] ring-1 ring-white/60 backdrop-blur-xl transition-transform duration-300 hover:-translate-y-2">
+                  <Card className="public-glass-card group overflow-hidden rounded-[1.9rem] p-0 transition-transform duration-300 hover:-translate-y-2">
                     <div className={`relative overflow-hidden bg-linear-to-br ${accent}`}>
-                      <div className="absolute left-4 top-4 z-10 rounded-full border border-white/70 bg-white/78 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--accent-foreground))] shadow-[0_12px_28px_-20px_hsl(var(--foreground)/0.24)] backdrop-blur-xl">
+                      <div className="absolute left-4 top-4 z-10 rounded-full border border-[rgba(15,39,64,0.08)] bg-white/92 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[rgb(15,39,64)] shadow-[0_12px_28px_-20px_rgba(15,23,42,0.18)] backdrop-blur-xl">
                         {String(index + 1).padStart(2, "0")}
                       </div>
-                      <div className="absolute -right-10 top-10 h-28 w-28 rounded-full bg-[hsl(var(--accent)/0.18)] blur-3xl" />
+                      <div className="absolute -right-10 top-10 h-28 w-28 rounded-full bg-[rgba(23,184,197,0.12)] blur-3xl" />
                       <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-white/72 via-white/18 to-transparent" />
                       {imageSrc ? (
                         <div className="relative h-52 w-full">
@@ -79,7 +81,7 @@ export default function FleetSection({ categories }: FleetSectionProps) {
                         </div>
                       ) : (
                         <div className="flex h-52 w-full items-center justify-center p-6">
-                          <GaugeIcon className="h-12 w-12 text-[hsl(var(--muted-foreground))]" />
+                          <GaugeIcon className="h-12 w-12 text-[rgb(100,116,139)]" />
                         </div>
                       )}
                     </div>
@@ -88,20 +90,20 @@ export default function FleetSection({ categories }: FleetSectionProps) {
                       <div className="space-y-2">
                         <h3 className="text-xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">{category.name}</h3>
                         <div className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))]">
-                          <UsersIcon className="h-4 w-4 text-[hsl(var(--primary))]" />
+                          <UsersIcon className="h-4 w-4 text-[rgb(19,120,152)]" />
                           <span>{t("landing.fleet.seats", { count: category.seats })}</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between rounded-[1.15rem] border border-white/55 bg-[linear-gradient(135deg,rgba(255,255,255,0.62),hsl(var(--accent)/0.24))] px-4 py-3 text-sm text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-xl">
+                      <div className="flex items-center justify-between rounded-[1.15rem] border border-[rgba(15,39,64,0.08)] bg-[rgba(248,250,252,0.92)] px-4 py-3 text-sm text-[rgb(15,39,64)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-xl">
                         <div className="flex items-center gap-2">
-                          <CarFrontIcon className="h-4 w-4 text-[hsl(var(--primary))]" />
+                          <CarFrontIcon className="h-4 w-4 text-[rgb(19,120,152)]" />
                           <span className="font-semibold">{t("nav.fleetOverview")}</span>
                         </div>
-                        <ChevronRightIcon className="h-4 w-4 text-[hsl(var(--primary))]" />
+                        <ChevronRightIcon className="h-4 w-4 text-[rgb(19,120,152)]" />
                       </div>
 
-                      <Button asChild className="w-full rounded-full font-bold">
+                      <Button asChild className="public-primary-button w-full rounded-full font-bold">
                         <Link href="/book">{t("landing.fleet.reserveNow")}</Link>
                       </Button>
                     </div>
@@ -109,9 +111,19 @@ export default function FleetSection({ categories }: FleetSectionProps) {
                 </Reveal>
               );
             })}
+            </div>
+
+            <Reveal className="flex justify-center">
+              <Button asChild variant="outline" className="public-outline-button rounded-full px-8 font-bold">
+                <Link href="/fleet">
+                  {t("landing.fleet.seeMore")}
+                  <ChevronRightIcon className="h-4 w-4" />
+                </Link>
+              </Button>
+            </Reveal>
           </div>
         ) : (
-          <Card className="rounded-[1.75rem] border-white/45 bg-white/56 p-8 text-center shadow-[0_26px_70px_-42px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+          <Card className="public-glass-card rounded-[1.75rem] p-8 text-center">
             <p className="text-base font-semibold text-[hsl(var(--foreground))]">{t("fleetPage.emptyTitle")}</p>
           </Card>
         )}

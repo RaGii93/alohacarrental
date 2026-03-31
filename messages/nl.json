@@ -329,7 +329,8 @@
     "fleet": {
       "title": "Kies het voertuig dat past bij je plannen op het eiland",
       "seats": "{count} zitplaatsen",
-      "reserveNow": "Nu reserveren"
+      "reserveNow": "Nu reserveren",
+      "seeMore": "Meer bekijken"
     },
     "statsStrip": {
       "eyebrow": "Platformoverzicht",

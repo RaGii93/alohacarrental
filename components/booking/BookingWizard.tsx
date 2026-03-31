@@ -197,7 +197,7 @@ export function BookingWizard({
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <Card className="overflow-hidden rounded-[2rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.8),hsl(var(--accent)/0.12)_48%,hsl(192_90%_75%/0.06)_100%)] p-6 shadow-[0_30px_70px_-44px_hsl(var(--foreground)/0.16)] ring-1 ring-white/60 backdrop-blur-xl sm:p-8">
+        <Card className="public-glass-card-strong overflow-hidden rounded-[2rem] p-6 sm:p-8">
           <div className="mb-6 text-center">
             <p className="text-sm font-black uppercase tracking-[0.22em] text-[hsl(var(--primary))]">{t("nav.booking")}</p>
             <h1 className="mt-3 text-3xl font-black tracking-tight text-[hsl(var(--foreground))] sm:text-4xl">{t("booking.title")}</h1>
@@ -254,7 +254,7 @@ export function BookingWizard({
               <p className="mb-6 text-[hsl(var(--muted-foreground))]">{t("booking.nextSteps")}</p>
               <Button
                 onClick={() => window.location.href = `/${locale}`}
-                className="h-12 rounded-full bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(229_54%_28%))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] shadow-[0_20px_40px_-22px_hsl(var(--primary)/0.42)] hover:opacity-95"
+                className="public-primary-button h-12 rounded-full px-6 font-extrabold uppercase tracking-[0.08em]"
               >
                 <Home className="h-4 w-4" />
                 {t("nav.home")}
@@ -263,16 +263,16 @@ export function BookingWizard({
           )}
         </Card>
 
-        <Card className="h-fit rounded-[2rem] border border-[hsl(var(--border)/0.7)] bg-white p-5 text-[hsl(var(--foreground))] shadow-[0_30px_70px_-50px_hsl(var(--foreground)/0.12)] lg:sticky lg:top-24">
+        <Card className="public-glass-card h-fit rounded-[2rem] p-5 text-[hsl(var(--foreground))] lg:sticky lg:top-24">
           <h3 className="mb-3 text-lg font-black tracking-[0.04em] text-[hsl(var(--foreground))]">{t("booking.summary")}</h3>
           {selectedCategory?.imageUrl ? (
             <img
               src={selectedCategory.imageUrl.startsWith("/") ? selectedCategory.imageUrl : getBlobProxyUrl(selectedCategory.imageUrl) || selectedCategory.imageUrl}
               alt={selectedCategory.name}
-              className="mb-3 h-40 w-full rounded-[1.25rem] border border-[hsl(var(--border))] bg-white object-cover"
+              className="mb-3 h-40 w-full rounded-[1.25rem] border border-[rgba(15,39,64,0.08)] bg-white object-cover"
             />
           ) : (
-            <div className="mb-3 flex h-40 items-center justify-center rounded-[1.25rem] border border-[hsl(var(--border)/0.65)] bg-[hsl(var(--accent)/0.14)] text-sm text-[hsl(var(--muted-foreground))]">
+            <div className="mb-3 flex h-40 items-center justify-center rounded-[1.25rem] border border-[rgba(15,39,64,0.08)] bg-[rgba(248,250,252,0.92)] text-sm text-[hsl(var(--muted-foreground))]">
               {t("booking.selectCategory")}
             </div>
           )}
@@ -285,29 +285,29 @@ export function BookingWizard({
             ) : null}
             {selectedCategory ? (
               <div className="grid gap-2">
-                <div className="flex items-center gap-2 rounded-xl bg-[hsl(var(--accent)/0.2)] px-3 py-2 text-[hsl(var(--accent-foreground))]">
-                  <Sofa className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
+                <div className="public-chip flex items-center gap-2 rounded-xl px-3 py-2 text-[rgb(15,39,64)]">
+                  <Sofa className="h-3.5 w-3.5 text-[rgb(19,120,152)]" />
                   <span>{selectedCategory.seats} seats</span>
                 </div>
-                <div className="flex items-center gap-2 rounded-xl bg-[hsl(var(--accent)/0.2)] px-3 py-2 text-[hsl(var(--accent-foreground))]">
-                  <Settings2 className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
+                <div className="public-chip flex items-center gap-2 rounded-xl px-3 py-2 text-[rgb(15,39,64)]">
+                  <Settings2 className="h-3.5 w-3.5 text-[rgb(19,120,152)]" />
                   <span>{selectedCategory.transmission === "MANUAL" ? "Manual" : "Automatic"}</span>
                 </div>
                 {selectedCategory.features.slice(0, 4).map((feature) => (
-                  <div key={feature} className="flex items-center gap-2 rounded-xl bg-[hsl(var(--accent)/0.2)] px-3 py-2 text-[hsl(var(--accent-foreground))]">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
+                  <div key={feature} className="public-chip flex items-center gap-2 rounded-xl px-3 py-2 text-[rgb(15,39,64)]">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[rgb(19,120,152)]" />
                     <span>{feature}</span>
                   </div>
                 ))}
-                <div className="flex items-center gap-2 rounded-xl bg-[hsl(var(--accent)/0.2)] px-3 py-2 text-[hsl(var(--accent-foreground))]">
-                  <Gauge className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
+                <div className="public-chip flex items-center gap-2 rounded-xl px-3 py-2 text-[rgb(15,39,64)]">
+                  <Gauge className="h-3.5 w-3.5 text-[rgb(19,120,152)]" />
                   <span>Standard performance</span>
                 </div>
               </div>
             ) : (
               <p className="text-[hsl(var(--muted-foreground))]">-</p>
             )}
-            <div className="mt-4 space-y-2 rounded-[1.25rem] border border-[hsl(var(--border)/0.65)] bg-[hsl(var(--accent)/0.08)] p-4">
+            <div className="mt-4 space-y-2 rounded-[1.25rem] border border-[rgba(15,39,64,0.08)] bg-[rgba(248,250,252,0.92)] p-4">
               <div className="flex justify-between text-[hsl(var(--muted-foreground))]"><span>{t("booking.pricePerDay")}</span><span className="font-semibold text-[hsl(var(--foreground))]">{selectedCategory ? formatCurrency(selectedCategory.dailyRate) : "-"}</span></div>
               <div className="flex justify-between text-[hsl(var(--muted-foreground))]"><span>{t("booking.days")}</span><span className="font-semibold text-[hsl(var(--foreground))]">{days}</span></div>
               <div className="flex justify-between text-[hsl(var(--muted-foreground))]"><span>{t("booking.baseTotal")}</span><span className="font-semibold text-[hsl(var(--foreground))]">{formatCurrency(baseAmount)}</span></div>
@@ -321,7 +321,7 @@ export function BookingWizard({
               <div className="flex justify-between text-[hsl(var(--muted-foreground))]"><span>{t("booking.subtotal")}</span><span className="font-semibold text-[hsl(var(--foreground))]">{formatCurrency(subtotalBeforeTax)}</span></div>
               <div className="flex justify-between text-[hsl(var(--muted-foreground))]"><span>{vehicleRatesIncludeTax ? t("booking.taxExtrasOnly", { percentage: taxPercentage }) : t("booking.taxOnBooking", { percentage: taxPercentage })}</span><span className="font-semibold text-[hsl(var(--foreground))]">{formatCurrency(taxAmount)}</span></div>
             </div>
-            <div className="mt-3 flex justify-between rounded-[1rem] bg-[hsl(var(--primary))] px-4 py-3 font-black text-[hsl(var(--primary-foreground))]"><span>{t("booking.total")}</span><span>{formatCurrency(totalAmount)}</span></div>
+            <div className="public-primary-button mt-3 flex justify-between rounded-[1rem] px-4 py-3 font-black text-white"><span>{t("booking.total")}</span><span>{formatCurrency(totalAmount)}</span></div>
           </div>
         </Card>
       </div>

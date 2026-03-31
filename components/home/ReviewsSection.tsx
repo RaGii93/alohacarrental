@@ -53,11 +53,11 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
     : "5.0";
 
   return (
-    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f9fbff_0%,#ffffff_42%,#fdf8ff_72%,#fff8fc_100%)] px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,hsl(var(--primary)/0.12),transparent_30%),radial-gradient(circle_at_85%_15%,hsl(var(--accent)/0.2),transparent_24%),radial-gradient(circle_at_10%_85%,hsl(192_90%_72%/0.1),transparent_26%)]" />
+    <section className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(15,39,64,0.08),transparent_30%),radial-gradient(circle_at_85%_15%,rgba(23,184,197,0.12),transparent_24%),radial-gradient(circle_at_10%_85%,rgba(194,178,128,0.1),transparent_26%)]" />
       <div className="relative mx-auto max-w-7xl">
         <Reveal className="mb-12 max-w-3xl space-y-4">
-          <span className="inline-flex w-fit rounded-full border border-white/60 bg-white/60 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[hsl(var(--accent-foreground))] shadow-[0_12px_30px_-22px_hsl(var(--foreground)/0.25)] ring-1 ring-white/65 backdrop-blur-xl">
+          <span className="public-eyebrow inline-flex w-fit rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em]">
             Aloha Car Rental
           </span>
           <h2 className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))] sm:text-4xl lg:text-5xl">
@@ -72,17 +72,17 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
           <div className="space-y-5">
             <Reveal>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="rounded-[1.5rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.74),hsl(var(--primary)/0.08))] p-5 shadow-[0_24px_60px_-38px_hsl(var(--foreground)/0.16)] ring-1 ring-white/60 backdrop-blur-xl">
+                <div className="public-glass-card rounded-[1.5rem] p-5">
                   <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">{averageRating}</div>
                   <div className="mt-2">
                     <StarRating count={Math.round(Number(averageRating))} />
                   </div>
                 </div>
-                <div className="rounded-[1.5rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.74),hsl(var(--accent)/0.14))] p-5 shadow-[0_24px_60px_-38px_hsl(var(--foreground)/0.16)] ring-1 ring-white/60 backdrop-blur-xl">
+                <div className="public-glass-card rounded-[1.5rem] p-5">
                   <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">{visibleReviews.length || 0}</div>
                   <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">{t("landing.reviews.title")}</div>
                 </div>
-                <div className="rounded-[1.5rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.76),hsl(192_90%_75%/0.12))] p-5 shadow-[0_24px_60px_-38px_hsl(var(--foreground)/0.16)] ring-1 ring-white/60 backdrop-blur-xl">
+                <div className="public-glass-card rounded-[1.5rem] p-5">
                   <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">{faqItems.length}</div>
                   <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">{t("nav.faq")}</div>
                 </div>
@@ -90,27 +90,27 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
             </Reveal>
 
             {loading ? (
-              <Card className="rounded-[1.75rem] border-white/50 bg-white/58 p-6 text-center text-[hsl(var(--muted-foreground))] shadow-[0_24px_60px_-38px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
-                {t("common.loading")}
+              <Card className="public-glass-card rounded-[1.75rem] p-6 text-center text-[hsl(var(--muted-foreground))]">
+                We are gathering recent guest feedback.
               </Card>
             ) : visibleReviews.length === 0 ? (
-              <Card className="rounded-[1.75rem] border-white/50 bg-white/58 p-6 text-center text-[hsl(var(--muted-foreground))] shadow-[0_24px_60px_-38px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
-                {t("landing.reviews.empty")}
+              <Card className="public-glass-card rounded-[1.75rem] p-6 text-center text-[hsl(var(--muted-foreground))]">
+                Guest reviews will appear here as new bookings are completed.
               </Card>
             ) : (
               visibleReviews.map((review, index) => (
                 <Reveal key={review.id} delay={index * 80}>
-                  <Card className="rounded-[1.85rem] border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.76),hsl(var(--accent)/0.08))] p-0 shadow-[0_28px_70px_-40px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+                  <Card className="public-glass-card rounded-[1.85rem] p-0">
                     <div className="space-y-4 p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2 text-[hsl(var(--foreground))]">
-                            <MessageCircleMoreIcon className="h-5 w-5 text-[hsl(var(--primary))]" />
+                            <MessageCircleMoreIcon className="h-5 w-5 text-[rgb(19,120,152)]" />
                             <span className="font-bold">{review.customerName}</span>
                           </div>
                           <StarRating count={review.rating} />
                         </div>
-                        <span className="rounded-full border border-white/55 bg-[linear-gradient(135deg,rgba(255,255,255,0.66),hsl(var(--accent)/0.24))] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-xl">
+                        <span className="public-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]">
                           {formatDate(review.createdAt)}
                         </span>
                       </div>
@@ -123,14 +123,14 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
           </div>
 
           <Reveal className="lg:self-start">
-            <div className="overflow-hidden rounded-[2rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),hsl(var(--accent)/0.18)_58%,hsl(192_90%_75%/0.08)_100%)] text-[hsl(var(--foreground))] shadow-[0_30px_90px_-48px_hsl(var(--foreground)/0.16)] ring-1 ring-white/60 backdrop-blur-xl">
-              <div className="border-b border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.5),rgba(255,255,255,0.18))] p-6 sm:p-8">
+            <div className="overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.12)] bg-[linear-gradient(180deg,rgba(11,31,51,0.98),rgba(18,50,75,0.97)_58%,rgba(15,95,114,0.92)_100%)] text-white shadow-[0_34px_90px_-44px_rgba(15,23,42,0.45)] ring-1 ring-white/8 backdrop-blur-xl">
+              <div className="border-b border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-6 sm:p-8">
                 <div className="mb-6 space-y-3">
-                    <span className="inline-flex rounded-full border border-white/60 bg-white/68 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[hsl(var(--primary))] ring-1 ring-white/55 backdrop-blur-xl">
-                      Aloha Car Rental
-                    </span>
+                  <span className="inline-flex rounded-full border border-white/14 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/88 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    Aloha Car Rental
+                  </span>
                   <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("nav.faq")}</h3>
-                  <p className="max-w-lg text-sm leading-6 text-[hsl(var(--muted-foreground))]">
+                  <p className="max-w-lg text-sm leading-6 text-white/72">
                     {t("landing.reviews.faqPreview")}
                   </p>
                 </div>
@@ -142,12 +142,12 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
                     <AccordionItem
                       key={faq.id}
                       value={`item-${faq.id}`}
-                      className="rounded-2xl border border-[hsl(var(--border)/0.8)] bg-white/74 px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]"
+                      className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.08)] px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
                     >
-                      <AccordionTrigger className="text-left font-semibold text-[hsl(var(--foreground))] hover:no-underline">
+                      <AccordionTrigger className="text-left font-semibold text-white hover:bg-white/6 hover:no-underline">
                         {faq.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-[hsl(var(--muted-foreground))]">
+                      <AccordionContent className="border-white/10 text-white/72">
                         {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
@@ -155,11 +155,11 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
                 </Accordion>
               </div>
 
-              <div className="border-t border-[hsl(var(--border)/0.75)] p-5 sm:p-6">
+              <div className="border-t border-white/10 p-5 sm:p-6">
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full rounded-full border-[hsl(var(--border))] bg-white/80 font-bold text-[hsl(var(--foreground))] hover:bg-white hover:text-[hsl(var(--foreground))]"
+                  className="w-full rounded-full border-white/14 bg-white/10 font-bold text-white hover:bg-white/14 hover:text-white"
                 >
                   <Link href="/faq">{t("landing.reviews.viewAllFaq")}</Link>
                 </Button>
