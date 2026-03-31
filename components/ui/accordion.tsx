@@ -71,8 +71,8 @@ export function AccordionItem({
       <div
         data-state={open ? "open" : "closed"}
         className={cn(
-          "overflow-hidden rounded-[1.6rem] border border-[hsl(var(--primary)/0.14)] bg-white/92 shadow-[0_18px_48px_-32px_hsl(var(--foreground)/0.22)] backdrop-blur-sm transition-all",
-          open && "border-[hsl(var(--primary)/0.28)] shadow-[0_24px_64px_-34px_hsl(var(--primary)/0.35)]",
+          "overflow-hidden rounded-[1.6rem] border border-[hsl(var(--border)/0.8)] bg-white/72 shadow-[0_18px_48px_-32px_hsl(var(--foreground)/0.14)] ring-1 ring-white/45 backdrop-blur-md transition-all",
+          open && "border-[hsl(var(--primary)/0.24)] bg-white/82 shadow-[0_24px_64px_-34px_hsl(var(--primary)/0.18)]",
           className
         )}
       >
@@ -102,14 +102,14 @@ export function AccordionTrigger({
       aria-expanded={item.open}
       onClick={() => accordion.setValue(item.value)}
       className={cn(
-        "flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition-colors hover:bg-[hsl(var(--primary)/0.04)] sm:px-7",
+        "flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition-colors hover:bg-white/28 sm:px-7",
         className
       )}
     >
       <span className="text-base font-semibold text-[hsl(var(--foreground))] sm:text-lg">{children}</span>
       <span
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-full border border-[hsl(var(--primary)/0.16)] bg-[hsl(var(--primary)/0.08)] text-[hsl(var(--primary))] transition-transform duration-200",
+          "flex size-10 shrink-0 items-center justify-center rounded-full border border-[hsl(var(--primary)/0.16)] bg-[linear-gradient(180deg,hsl(var(--accent)/0.22),white)] text-[hsl(var(--primary))] shadow-[0_12px_24px_-20px_hsl(var(--primary)/0.25)] transition-transform duration-200",
           item.open && "rotate-180 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
         )}
       >
@@ -137,7 +137,7 @@ export function AccordionContent({
   }
 
   return (
-    <div className={cn("border-t border-[hsl(var(--primary)/0.1)] px-6 pb-6 pt-4 sm:px-7", className)}>
+    <div className={cn("border-t border-[hsl(var(--border)/0.7)] px-6 pb-6 pt-4 sm:px-7", className)}>
       {children}
     </div>
   );

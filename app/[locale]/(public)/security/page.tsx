@@ -119,7 +119,7 @@ export default async function SecurityPage({
       <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_360px] lg:items-start">
           <div className="space-y-8">
-            <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-white/76 p-8 shadow-[0_30px_90px_-46px_hsl(var(--foreground)/0.12)] ring-1 ring-white/45 backdrop-blur-md sm:p-10">
+            <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(135deg,rgba(255,255,255,0.78),hsl(var(--accent)/0.14))] p-8 shadow-[0_30px_90px_-46px_hsl(var(--foreground)/0.12)] ring-1 ring-white/50 backdrop-blur-xl sm:p-10">
               <div className="inline-flex items-center gap-2 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.28)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[hsl(var(--primary))]">
                 <ShieldCheck className="size-4" />
                 {t("eyebrow")}
@@ -137,7 +137,7 @@ export default async function SecurityPage({
                 {pillars.map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-[1.5rem] border border-[hsl(var(--border))] bg-[linear-gradient(180deg,hsl(var(--accent)/0.2),#ffffff)] p-5 shadow-[0_16px_40px_-28px_hsl(var(--primary)/0.18)]"
+                    className="rounded-[1.5rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),hsl(var(--accent)/0.18))] p-5 shadow-[0_16px_40px_-28px_hsl(var(--primary)/0.14)] ring-1 ring-white/45 backdrop-blur-md"
                   >
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[hsl(var(--accent)/0.4)] text-[hsl(var(--primary))]">
                       <item.icon className="size-5" />
@@ -149,7 +149,7 @@ export default async function SecurityPage({
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-white/76 p-6 shadow-[0_30px_90px_-48px_hsl(var(--foreground)/0.16)] ring-1 ring-white/45 backdrop-blur-md sm:p-7">
+            <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(135deg,rgba(255,255,255,0.76),rgba(255,255,255,0.62))] p-6 shadow-[0_30px_90px_-48px_hsl(var(--foreground)/0.16)] ring-1 ring-white/50 backdrop-blur-xl sm:p-7">
               <div className="mb-6">
                 <div className="text-sm font-semibold uppercase tracking-[0.28em] text-[hsl(var(--primary))]">
                   {t("controlsEyebrow")}
@@ -163,7 +163,7 @@ export default async function SecurityPage({
                 {controls.map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-[1.5rem] border border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.18)] p-5"
+                    className="rounded-[1.5rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.7),hsl(var(--accent)/0.18))] p-5 ring-1 ring-white/40 backdrop-blur-md"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-[hsl(var(--primary))] shadow-[0_14px_28px_-24px_hsl(var(--primary)/0.35)]">
@@ -177,7 +177,7 @@ export default async function SecurityPage({
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),hsl(var(--accent)/0.14))] p-6 shadow-[0_28px_72px_-44px_hsl(var(--foreground)/0.14)] ring-1 ring-white/45 backdrop-blur-md sm:p-7">
+            <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),hsl(var(--accent)/0.14))] p-6 shadow-[0_28px_72px_-44px_hsl(var(--foreground)/0.14)] ring-1 ring-white/50 backdrop-blur-xl sm:p-7">
               <div className="mb-6">
                 <div className="text-sm font-semibold uppercase tracking-[0.28em] text-[hsl(var(--primary))]">
                   {t("operationsEyebrow")}
@@ -191,7 +191,7 @@ export default async function SecurityPage({
                 {operations.map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-[1.5rem] border border-[hsl(var(--border))] bg-white p-5"
+                    className="rounded-[1.5rem] border border-[hsl(var(--border)/0.75)] bg-white/72 p-5 ring-1 ring-white/40 backdrop-blur-md"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[hsl(var(--accent)/0.4)] text-[hsl(var(--primary))]">
@@ -208,7 +208,7 @@ export default async function SecurityPage({
 
           <aside className="lg:sticky lg:top-24">
             <div className="space-y-6">
-              <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-white/76 p-7 shadow-[0_28px_72px_-44px_hsl(var(--foreground)/0.16)] ring-1 ring-white/45 backdrop-blur-md">
+              <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(135deg,rgba(255,255,255,0.8),hsl(var(--accent)/0.14))] p-7 shadow-[0_28px_72px_-44px_hsl(var(--foreground)/0.16)] ring-1 ring-white/50 backdrop-blur-xl">
                 <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--primary))] text-white shadow-[0_18px_40px_-24px_hsl(var(--primary)/0.5)]">
                   <ShieldCheck className="size-7" />
                 </div>
@@ -228,7 +228,7 @@ export default async function SecurityPage({
                   ].map((point) => (
                     <div
                       key={point}
-                      className="rounded-[1.4rem] border border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.18)] px-4 py-4 text-sm leading-7 text-[hsl(var(--accent-foreground))]"
+                      className="rounded-[1.4rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(var(--accent)/0.16))] px-4 py-4 text-sm leading-7 text-[hsl(var(--accent-foreground))] ring-1 ring-white/40 backdrop-blur-md"
                     >
                       {point}
                     </div>

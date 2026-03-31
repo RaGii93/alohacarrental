@@ -61,9 +61,9 @@ export default async function FleetOverviewPage() {
           {categories.map((category) => (
             <article
               key={category.id}
-              className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-white shadow-[0_25px_65px_-35px_hsl(var(--primary)/0.28)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_80px_-40px_hsl(var(--primary)/0.38)]"
+              className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.75)] bg-[linear-gradient(180deg,rgba(255,255,255,0.8),hsl(var(--accent)/0.12))] shadow-[0_25px_65px_-35px_hsl(var(--primary)/0.2)] ring-1 ring-white/45 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_40px_80px_-40px_hsl(var(--primary)/0.28)]"
             >
-              <div className="relative flex h-56 items-center justify-center overflow-hidden bg-[linear-gradient(180deg,hsl(var(--accent)/0.18),white)] p-6">
+              <div className="relative flex h-56 items-center justify-center overflow-hidden bg-[linear-gradient(180deg,hsl(var(--accent)/0.22),rgba(255,255,255,0.72))] p-6">
                 {category.imageUrl ? (
                   <img
                     src={category.imageUrl.startsWith("/") ? category.imageUrl : getBlobProxyUrl(category.imageUrl) || category.imageUrl}
@@ -90,16 +90,16 @@ export default async function FleetOverviewPage() {
                 </div>
 
                 <ul className="mt-auto flex flex-wrap justify-center gap-2 pt-2 text-sm">
-                  <li className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--accent)/0.35)] px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))]">
+                  <li className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary)/0.12)] bg-white/70 px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))] backdrop-blur-sm">
                     <Users className="h-4 w-4" />
                     <span>{category.seats} seats</span>
                   </li>
-                  <li className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--accent)/0.35)] px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))]">
+                  <li className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary)/0.12)] bg-white/70 px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))] backdrop-blur-sm">
                     <Settings2 className="h-4 w-4" />
                     <span>{category.transmission === "MANUAL" ? "Manual" : "Automatic"}</span>
                   </li>
                   {getCategoryFeatureNames(category).map((feature) => (
-                    <li key={feature} className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--accent)/0.35)] px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))]">
+                    <li key={feature} className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--primary)/0.12)] bg-white/70 px-3 py-1.5 font-bold uppercase tracking-[0.08em] text-[hsl(var(--primary))] backdrop-blur-sm">
                       <CheckCircle2 className="h-4 w-4" />
                       <span>{feature}</span>
                     </li>
