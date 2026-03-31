@@ -114,7 +114,11 @@ export default function FleetSection({ categories }: FleetSectionProps) {
             </div>
 
             <Reveal className="flex justify-center">
-              <Button asChild variant="outline" className="public-outline-button rounded-full px-8 font-bold">
+              <Button
+                asChild
+                size="lg"
+                className="h-13 rounded-full bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] px-10 text-base font-bold text-[hsl(var(--primary-foreground))] shadow-[0_20px_44px_-24px_hsl(var(--primary)/0.45)] hover:opacity-95"
+              >
                 <Link href="/fleet">
                   {t("landing.fleet.seeMore")}
                   <ChevronRightIcon className="h-4 w-4" />
