@@ -129,7 +129,7 @@ export default async function AdminLogsPage({
   return (
     <div className={ADMIN_PAGE_SHELL}>
       <div className={ADMIN_PAGE_STACK}>
-        <section className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff_0%,#f6f9ff_42%,#eef5ff_100%)] shadow-[0_30px_80px_-48px_rgba(12,74,160,0.45)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff_0%,hsl(var(--accent)/0.22)_42%,hsl(var(--primary)/0.08)_100%)] shadow-[0_30px_80px_-48px_hsl(var(--primary)/0.2)]">
           <div className="grid gap-6 p-6 lg:grid-cols-[1.5fr_1fr] lg:p-8">
             <div>
               <p className={ADMIN_PAGE_KICKER}>{t("admin.logs.page.kicker")}</p>
@@ -139,11 +139,11 @@ export default async function AdminLogsPage({
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-700">
-                  <Search className="h-4 w-4 text-sky-600" />
+                  <Search className="h-4 w-4 text-[hsl(var(--primary))]" />
                   {t("admin.logs.page.searchHint")}
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-700">
-                  <Filter className="h-4 w-4 text-sky-600" />
+                  <Filter className="h-4 w-4 text-[hsl(var(--primary))]" />
                   {t("admin.logs.page.filterHint")}
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default async function AdminLogsPage({
               <Card className="rounded-2xl border-0 bg-slate-950 p-4 text-white shadow-[0_20px_45px_-28px_rgba(15,23,42,0.9)]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/55">{t("admin.logs.cards.filtered")}</span>
-                  <Activity className="h-4 w-4 text-sky-300" />
+                  <Activity className="h-4 w-4 text-[hsl(var(--accent))]" />
                 </div>
                 <p className="mt-4 text-3xl font-black">{total}</p>
                 <p className="mt-1 text-xs text-white/60">{t("admin.logs.cards.matchingEvents")}</p>
@@ -161,7 +161,7 @@ export default async function AdminLogsPage({
               <Card className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_16px_36px_-28px_rgba(15,23,42,0.35)]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{t("admin.logs.cards.activity24h")}</span>
-                  <CalendarClock className="h-4 w-4 text-sky-600" />
+                  <CalendarClock className="h-4 w-4 text-[hsl(var(--primary))]" />
                 </div>
                 <p className="mt-4 text-3xl font-black text-slate-950">{totalToday}</p>
                 <p className="mt-1 text-xs text-slate-500">{t("admin.logs.cards.eventsToday")}</p>
@@ -169,7 +169,7 @@ export default async function AdminLogsPage({
               <Card className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_16px_36px_-28px_rgba(15,23,42,0.35)]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{t("admin.logs.cards.bookingLinked")}</span>
-                  <ShieldCheck className="h-4 w-4 text-sky-600" />
+                  <ShieldCheck className="h-4 w-4 text-[hsl(var(--primary))]" />
                 </div>
                 <p className="mt-4 text-3xl font-black text-slate-950">{linkedBookings}</p>
                 <p className="mt-1 text-xs text-slate-500">{t("admin.logs.cards.linkedDescription")}</p>

@@ -508,7 +508,7 @@ export function BookingEditForm({
                 <span className="text-slate-600">{vehicleRatesIncludeTax ? t("admin.bookings.detail.billing.taxOnExtras", { tax: taxPercentage }) : t("admin.bookings.detail.billing.taxOnBooking", { tax: taxPercentage })}</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(taxAmount)}</span>
               </div>
-              <div className="flex items-center justify-between rounded-2xl bg-[linear-gradient(135deg,#0f57b2,#0c3e88)] px-4 py-4 text-white shadow-[0_16px_32px_-20px_rgba(12,74,160,0.7)]">
+              <div className="flex items-center justify-between rounded-2xl bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] px-4 py-4 text-white shadow-[0_16px_32px_-20px_hsl(var(--primary)/0.55)]">
                 <span className="font-semibold">{t("admin.bookings.edit.preview.projectedTotal")}</span>
                 <span className="text-lg font-black">{formatCurrency(totalAmount)}</span>
               </div>
@@ -534,7 +534,7 @@ export function BookingEditForm({
             <Button variant="outline" onClick={() => router.push(`/${locale}/admin/bookings/${booking.id}`)} disabled={isSaving} className="rounded-xl border-slate-300 bg-white hover:bg-slate-50">
               {t("common.cancel")}
             </Button>
-            <Button onClick={handleSubmit} disabled={isSaving} className="rounded-xl bg-[linear-gradient(135deg,#0f57b2,#0c3e88)] text-white shadow-[0_16px_30px_-18px_rgba(12,74,160,0.72)] hover:opacity-95">
+            <Button onClick={handleSubmit} disabled={isSaving} className="rounded-xl bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] text-white shadow-[0_16px_30px_-18px_hsl(var(--primary)/0.55)] hover:opacity-95">
               {isSaving ? t("admin.settings.saving") : t("admin.bookings.edit.actions.saveChanges")}
             </Button>
           </div>

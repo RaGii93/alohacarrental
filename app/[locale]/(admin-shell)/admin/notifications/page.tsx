@@ -44,7 +44,7 @@ export default async function AdminNotificationsPage({
   return (
     <div className={ADMIN_PAGE_SHELL}>
       <div className={ADMIN_PAGE_STACK}>
-        <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff,#f6f9ff_45%,#eef6ff)] p-8 shadow-[0_28px_72px_-40px_hsl(215_28%_17%/0.14)]">
+        <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff,hsl(var(--accent)/0.24)_45%,hsl(var(--primary)/0.08))] p-8 shadow-[0_28px_72px_-40px_hsl(var(--primary)/0.14)]">
           <p className={ADMIN_PAGE_KICKER}>
             {t.has("admin.dashboard.tabs.notifications" as any)
               ? t("admin.dashboard.tabs.notifications" as any)
@@ -52,7 +52,7 @@ export default async function AdminNotificationsPage({
           </p>
           <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[hsl(var(--primary))]">
                 <Bell className="size-4" />
                 {t("admin.notifications.center.title")}
               </div>
@@ -64,9 +64,9 @@ export default async function AdminNotificationsPage({
               </p>
             </div>
 
-            <Card className="rounded-[1.6rem] border-slate-200 bg-white/90 p-5 shadow-none">
+            <Card className="rounded-[1.6rem] border-[hsl(var(--border))] bg-white/90 p-5 shadow-none">
               <div className="flex items-start gap-3">
-                <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--primary))]">
                   <Trash2 className="size-5" />
                 </div>
                 <div className="space-y-1">

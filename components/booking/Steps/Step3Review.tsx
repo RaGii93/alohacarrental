@@ -185,11 +185,11 @@ export function Step3Review({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-4 text-xl font-black text-[#0c3e88]">{t("booking.reviewBooking")}</h2>
+        <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.reviewBooking")}</h2>
 
-        <Card className="rounded-[1.75rem] border-[#d3e1f8] bg-[linear-gradient(180deg,#ffffff,#f3f8ff)] shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.22))] shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
           <CardHeader>
-            <CardTitle className="text-[#0c3e88]">{t("booking.summary")}</CardTitle>
+            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.summary")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {pricing?.belowMinimumBlocked ? (
@@ -316,9 +316,9 @@ export function Step3Review({
         </Card>
       </div>
 
-      <Card className="rounded-[1.75rem] border-[#d3e1f8] bg-white/90 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+      <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
         <CardHeader>
-          <CardTitle className="text-[#0c3e88]">{t("booking.customerName")}</CardTitle>
+          <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.customerName")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /><strong>{t("booking.customerName")}:</strong> {bookingData.customerName}</p>
@@ -333,9 +333,9 @@ export function Step3Review({
       </Card>
 
       {(bookingData.pickupLocationId || bookingData.dropoffLocationId) && (
-        <Card className="rounded-[1.75rem] border-[#d3e1f8] bg-white/90 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
           <CardHeader>
-            <CardTitle className="text-[#0c3e88]">{t("booking.pickupLocation")}</CardTitle>
+            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.pickupLocation")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {bookingData.pickupLocationId && (
@@ -344,7 +344,7 @@ export function Step3Review({
                 {pickupLocationMapUrl && (
                   <>
                     {" "}
-                    <a href={pickupLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[#0f57b2] hover:text-[#0b4a97] hover:underline">
+                    <a href={pickupLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:text-[hsl(var(--accent-foreground))] hover:underline">
                       <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
@@ -357,7 +357,7 @@ export function Step3Review({
                 {dropoffLocationMapUrl && (
                   <>
                     {" "}
-                    <a href={dropoffLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[#0f57b2] hover:text-[#0b4a97] hover:underline">
+                    <a href={dropoffLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:text-[hsl(var(--accent-foreground))] hover:underline">
                       <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
@@ -369,16 +369,16 @@ export function Step3Review({
       )}
 
       {extras.length > 0 && (
-        <Card className="rounded-[1.75rem] border-[#d3e1f8] bg-white/90 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
           <CardHeader>
-            <CardTitle className="text-[#0c3e88]">{t("booking.extras")}</CardTitle>
+            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.extras")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {extras.map((extra) => {
               const line = bookingData.selectedExtras.find((entry) => entry.extraId === extra.id);
               const checked = !!line;
               return (
-                <div key={extra.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-[#d7e4f8] bg-[#f8fbff] p-3">
+                <div key={extra.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.3)] p-3">
                   <div>
                     <p className="font-medium">{extra.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -413,7 +413,7 @@ export function Step3Review({
                           ),
                         });
                       }}
-                      className="h-8 w-16 rounded-md border border-[#c7daf9] bg-white px-2 text-sm text-[#0c3e88]"
+                      className="h-8 w-16 rounded-md border border-[hsl(var(--border))] bg-white px-2 text-sm text-[hsl(var(--foreground))]"
                     />
                   </div>
                 </div>
@@ -424,9 +424,9 @@ export function Step3Review({
       )}
 
       {bookingData.notes && (
-        <Card className="rounded-[1.75rem] border-[#d3e1f8] bg-white/90 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-white/90 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
           <CardHeader>
-            <CardTitle className="text-[#0c3e88]">{t("booking.notes")}</CardTitle>
+            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.notes")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p>{bookingData.notes}</p>
@@ -434,20 +434,20 @@ export function Step3Review({
         </Card>
       )}
 
-      <Card className="rounded-[1.75rem] border-[#d3e1f8] bg-[linear-gradient(180deg,#ffffff,#f3f8ff)] shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+      <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.22))] shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
         <CardHeader>
-          <CardTitle className="text-[#0c3e88]">{t("booking.terms")}</CardTitle>
-          <CardDescription className="text-[#5b79a5]">
+          <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.terms")}</CardTitle>
+          <CardDescription className="text-[hsl(var(--muted-foreground))]">
             {t("booking.termsRequired")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-[1rem] border border-[#c7daf9] bg-white/80 p-4">
-            <p className="text-sm font-bold text-[#0c3e88]">{t("booking.termsOfService")}</p>
-            <p className="mt-2 text-sm text-[#5b79a5]">{t("booking.identificationClause")}</p>
-            <p className="mt-2 text-xs text-[#6b88b2]">{t("booking.gdprNotice")}</p>
-            <p className="mt-3 text-sm font-bold text-[#0c3e88]">{t("booking.privacyPolicy")}</p>
-            <p className="mt-2 text-xs text-[#6b88b2]">{t("booking.privacyDeletionNotice")}</p>
+          <div className="rounded-[1rem] border border-[hsl(var(--border))] bg-white/80 p-4">
+            <p className="text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.termsOfService")}</p>
+            <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">{t("booking.identificationClause")}</p>
+            <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.gdprNotice")}</p>
+            <p className="mt-3 text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.privacyPolicy")}</p>
+            <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.privacyDeletionNotice")}</p>
           </div>
 
           <div className="flex items-start space-x-2">
@@ -477,7 +477,7 @@ export function Step3Review({
           <Button
             variant="outline"
             onClick={() => window.open(termsPdfUrl, "_blank")}
-            className="h-11 w-full rounded-md border-[#c7daf9] bg-white text-[#0f57b2] hover:bg-[#edf4ff] hover:text-[#0b4a97]"
+            className="h-11 w-full rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             {t("booking.viewTerms")}
@@ -486,14 +486,14 @@ export function Step3Review({
       </Card>
 
       <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onPrev} className="h-12 rounded-md border-[#c7daf9] bg-white text-[#0f57b2] hover:bg-[#edf4ff] hover:text-[#0b4a97]">
+        <Button variant="outline" onClick={onPrev} className="h-12 rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]">
           <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
         <Button
           onClick={handleSubmit}
           disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled || !!pricing?.belowMinimumBlocked || !!pricing?.lastMinuteBlocked}
-          className="h-12 rounded-md bg-[#ffc93b] px-6 font-extrabold uppercase tracking-[0.08em] text-[#0d4aa0] shadow-[0_20px_40px_-20px_rgba(255,201,59,0.9)] hover:bg-[#ffd65f]"
+          className="h-12 rounded-md bg-[hsl(var(--primary))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] shadow-[0_20px_40px_-20px_hsl(var(--primary)/0.55)] hover:bg-[hsl(var(--primary)/0.9)]"
         >
           <CheckCircle2 className="h-4 w-4" />
           {isSubmitting ? t("common.loading") : t("booking.confirmBooking")}

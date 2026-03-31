@@ -102,11 +102,11 @@ export default async function BookingPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-      <section className="bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(236,244,255,0.98))]">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <section className="bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(236,244,255,0.98))] pt-24 sm:pt-28">
+        <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-14">
           <div className="mb-8 flex justify-end">
             <Link href={`/${locale}/book/review`}>
-              <Button variant="outline" className="h-11 rounded-md border-[#c7daf9] bg-white text-[#0f57b2] shadow-[0_16px_36px_-28px_rgba(12,74,160,0.45)] hover:bg-[#edf4ff] hover:text-[#0b4a97]">
+              <Button variant="outline" className="h-11 rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] shadow-[0_16px_36px_-28px_hsl(var(--primary)/0.35)] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]">
               <SearchCode className="h-4 w-4" />
               {t("booking.reviewLookup.cta")}
               </Button>

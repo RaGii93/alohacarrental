@@ -181,7 +181,7 @@ export default async function AdminFinancialPage({
           initialTransferState={selectedTransferState || "all"}
         />
 
-        <Card className="rounded-[1.8rem] border-slate-200 bg-[linear-gradient(180deg,#ffffff,#f8fbff)] p-5 shadow-[0_26px_60px_-34px_rgba(15,23,42,0.18)]">
+        <Card className="rounded-[1.8rem] border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.18))] p-5 shadow-[0_26px_60px_-34px_hsl(var(--primary)/0.16)]">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <p className={ADMIN_PAGE_META_TEXT}>
               {t("admin.financial.page.filterRange", { start: formatDateTime(financialStartDate), end: formatDateTime(financialEndDate) })}
@@ -190,7 +190,7 @@ export default async function AdminFinancialPage({
               {activeFilterPills.length === 0 ? (
                 <span className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-600">{t("admin.financial.page.noExtraFilters")}</span>
               ) : activeFilterPills.map((pill) => (
-                <span key={pill} className="rounded-full bg-sky-50 px-3 py-1 font-medium text-sky-700">
+                <span key={pill} className="rounded-full bg-[hsl(var(--accent)/0.45)] px-3 py-1 font-medium text-[hsl(var(--accent-foreground))]">
                   {pill}
                 </span>
               ))}

@@ -92,32 +92,29 @@ export default function HeroSection({ locations }: HeroSectionProps) {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#071a36]/85 via-[#071a36]/55 to-[#071a36]/20" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,26,54,0.9)_0%,rgba(7,26,54,0.72)_34%,hsl(var(--primary)/0.34)_62%,rgba(7,26,54,0.12)_100%)]" />
+        <div className="absolute inset-y-0 left-0 w-[58%] bg-[radial-gradient(circle_at_left_center,rgba(7,26,54,0.38),transparent_72%)]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-20 lg:pt-36">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="space-y-6 text-white">
-            <h1 className="text-5xl font-extrabold italic leading-[1.08] tracking-tight sm:text-6xl">
-              <span className="block">Discover Bonaire</span>
-              <span className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <span className="inline-flex rounded-[1.5rem] bg-white/14 px-4 py-3 backdrop-blur-sm">
-                  <Image
-                    src={HERO_LOGO}
-                    alt="Aloha Car Rental"
-                    width={280}
-                    height={72}
-                    className="h-10 w-auto sm:h-12"
-                  />
-                </span>
-                <span>with</span>
+            <h1 className="text-5xl font-extrabold italic leading-[1.08] tracking-tight drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
+              <span className="block">Discover Bonaire with,</span>
+              <span className="mt-4 inline-flex rounded-[1.5rem] bg-white/14 px-4 py-3 backdrop-blur-sm">
+                <Image
+                  src={HERO_LOGO}
+                  alt="Aloha Car Rental"
+                  width={280}
+                  height={72}
+                  className="h-10 w-auto sm:h-12"
+                />
               </span>
-              <span className="mt-3 block text-[#f7bf00]">Car Rental</span>
             </h1>
-            <p className="text-[2rem] font-semibold text-white/90">
+            <p className="text-[2rem] font-semibold text-white/94 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
               Reliable • Affordable • Island Ready Vehicles
             </p>
-            <p className="max-w-3xl text-2xl text-white/75">
+            <p className="max-w-3xl text-2xl text-white/86 drop-shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
               Explore Bonaire&apos;s pink beaches, flamingos and donkey sanctuary, and stunning salt flats at your own pace.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -142,7 +139,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white/95 p-6 shadow-2xl backdrop-blur-sm">
+          <div className="rounded-2xl border border-white/28 bg-white/92 p-6 shadow-[0_30px_80px_-40px_rgba(7,26,54,0.45)] backdrop-blur-md">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -246,7 +243,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
         >
           <path
             d="M0,20 C240,55 480,5 720,35 C960,65 1200,10 1440,25 L1440,60 L0,60 Z"
-            fill="#e0f4ff"
+            fill="hsl(var(--accent) / 0.6)"
           />
         </svg>
       </div>

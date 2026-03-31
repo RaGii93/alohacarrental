@@ -212,8 +212,8 @@ export default async function AdminBookingsPage({
               <Link
                 key={item.key}
                 href={buildStatusHref(item.key as "pending" | "confirmed" | "declined")}
-                className={`rounded-[1.7rem] border p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] transition ${
-                  isActive ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white hover:border-slate-300"
+              className={`rounded-[1.7rem] border p-5 shadow-[0_24px_56px_-32px_hsl(var(--primary)/0.14)] transition ${
+                  isActive ? "border-[hsl(var(--primary))] bg-[linear-gradient(135deg,hsl(var(--foreground)),hsl(var(--primary)))] text-white" : "border-[hsl(var(--border))] bg-white hover:border-[hsl(var(--primary)/0.25)]"
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -236,7 +236,7 @@ export default async function AdminBookingsPage({
           initialQuery={searchTerm}
         />
 
-        <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#ffffff,#f8fbff)] p-4 shadow-[0_20px_48px_-30px_rgba(15,23,42,0.12)]">
+        <div className="rounded-[1.6rem] border border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.18))] p-4 shadow-[0_20px_48px_-30px_hsl(var(--primary)/0.14)]">
           <div className={ADMIN_PAGE_META_ROW}>
             <div className={ADMIN_PAGE_META_TEXT}>
               {t("admin.bookings.list.showingStatus", { status: statusLabel, start: startRow, end: endRow, total })}

@@ -121,13 +121,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[1.75rem] border border-[#d3e1f8] bg-white/90 p-6 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
-        <h2 className="mb-4 text-xl font-black text-[#0c3e88]">{t("booking.customerName")}</h2>
+      <div className="rounded-[1.75rem] border border-[hsl(var(--border))] bg-white/90 p-6 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+        <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.customerName")}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="customerName" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <User className="h-4 w-4 text-[#0f57b2]" />
+            <Label htmlFor="customerName" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <User className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.customerName")}
             </Label>
             <Input
@@ -136,13 +136,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ customerName: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
             />
           </div>
 
           <div>
-            <Label htmlFor="customerEmail" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <Mail className="h-4 w-4 text-[#0f57b2]" />
+            <Label htmlFor="customerEmail" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <Mail className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.customerEmail")}
             </Label>
             <Input
@@ -152,13 +152,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ customerEmail: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
             />
           </div>
 
           <div>
-            <Label htmlFor="customerPhone" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <Phone className="h-4 w-4 text-[#0f57b2]" />
+            <Label htmlFor="customerPhone" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <Phone className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.customerPhone")}
             </Label>
             <div className="grid grid-cols-[180px_minmax(0,1fr)] gap-2">
@@ -167,7 +167,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 onValueChange={(value) => updatePhone(value, bookingData.customerPhoneLocalNumber)}
                 disabled={disabled}
               >
-                <SelectTrigger className="h-11 w-full rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]">
+                <SelectTrigger className="h-11 w-full rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]">
                   <SelectValue placeholder="Code" />
                 </SelectTrigger>
                 <SelectContent className="max-h-80">
@@ -185,14 +185,14 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 onChange={(e) => updatePhone(bookingData.customerPhoneCountryCode, e.target.value)}
                 disabled={disabled}
                 required
-                className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+                className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="flightNumber" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <Plane className="h-4 w-4 text-[#0f57b2]" />
+            <Label htmlFor="flightNumber" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <Plane className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.flightNumber")}
             </Label>
             <Input
@@ -200,13 +200,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               value={bookingData.flightNumber}
               onChange={(e) => updateBookingData({ flightNumber: e.target.value })}
               disabled={disabled}
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
             />
           </div>
 
           <div>
-            <Label htmlFor="driverLicenseNumber" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <FileBadge2 className="h-4 w-4 text-[#0f57b2]" />
+            <Label htmlFor="driverLicenseNumber" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <FileBadge2 className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.driverLicenseNumber")}
             </Label>
             <Input
@@ -215,13 +215,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ driverLicenseNumber: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
             />
           </div>
 
           <div>
-            <Label htmlFor="birthDate" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <CalendarDays className="h-4 w-4 text-[#0f57b2]" />
+            <Label htmlFor="birthDate" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.birthDate")}
             </Label>
             <Input
@@ -235,7 +235,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 const minAdultDate = new Date(now.getFullYear() - 21, now.getMonth(), now.getDate());
                 return toDateInputValue(minAdultDate);
               })()}
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
             />
             {bookingData.birthDate && !isAtLeast21 && (
               <p className="text-xs text-red-600 mt-1">{t("booking.errors.ageMinimum")}</p>
@@ -243,8 +243,8 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           </div>
 
           <div>
-            <Label htmlFor="licenseExpiryDate" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <CalendarDays className="h-4 w-4 text-[#0f57b2]" />
+            <Label htmlFor="licenseExpiryDate" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.licenseExpiryDate")}
             </Label>
             <Input
@@ -260,7 +260,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 return toDateInputValue(tomorrow);
               })()}
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
             />
             {bookingData.licenseExpiryDate && !isLicenseValid && (
               <p className="text-xs text-red-600 mt-1">{t("booking.errors.licenseInvalid")}</p>
@@ -270,8 +270,8 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
       </div>
 
       <div>
-        <h3 className="mb-4 text-lg font-black text-[#0c3e88]">{t("booking.driverLicense")}</h3>
-        <Card className="rounded-[1.75rem] border-[#d3e1f8] bg-[linear-gradient(180deg,#ffffff,#f3f8ff)] shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
+        <h3 className="mb-4 text-lg font-black text-[hsl(var(--foreground))]">{t("booking.driverLicense")}</h3>
+        <Card className="rounded-[1.75rem] border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.22))] shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div>
@@ -287,14 +287,14 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                   />
                   <Label
                     htmlFor="driverLicense"
-                    className="flex h-32 w-full cursor-pointer items-center justify-center rounded-[1.25rem] border-2 border-dashed border-[#b9d2f6] bg-[#f8fbff] transition-colors hover:border-[#0f57b2]/40 hover:bg-white"
+                    className="flex h-32 w-full cursor-pointer items-center justify-center rounded-[1.25rem] border-2 border-dashed border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.25)] transition-colors hover:border-[hsl(var(--primary)/0.4)] hover:bg-white"
                   >
                     <div className="text-center">
-                      <Upload className="mx-auto mb-2 h-8 w-8 text-[#0f57b2]" />
-                      <p className="text-sm font-semibold text-[#164d9b]">
+                      <Upload className="mx-auto mb-2 h-8 w-8 text-[hsl(var(--primary))]" />
+                      <p className="text-sm font-semibold text-[hsl(var(--accent-foreground))]">
                         {isUploading ? t("common.loading") : t("booking.driverLicense")}
                       </p>
-                      <p className="mt-1 text-xs text-[#6b88b2]">
+                      <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
                         JPG, PNG, PDF (max 8MB)
                       </p>
                     </div>
@@ -304,8 +304,8 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
               {bookingData.driverLicenseUrl && (
                 <div className="space-y-3">
-                  <div className="rounded-[1rem] border border-[#bad8a7] bg-[#eef9e7] p-3">
-                    <p className="text-sm font-semibold text-[#2e6b19]">
+                  <div className="rounded-[1rem] border border-emerald-200 bg-emerald-50 p-3">
+                    <p className="text-sm font-semibold text-emerald-700">
                       ✓ {t("booking.driverLicense")} {t("common.success").toLowerCase()}
                     </p>
                   </div>
@@ -318,12 +318,12 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 </div>
               )}
 
-              <div className="rounded-[1rem] border border-[#c7daf9] bg-white/80 p-4">
-                <p className="text-sm font-bold text-[#0c3e88]">{t("booking.termsOfService")}</p>
-                <p className="mt-2 text-sm text-[#5b79a5]">{t("booking.identificationClause")}</p>
-                <p className="mt-2 text-xs text-[#6b88b2]">{t("booking.gdprNotice")}</p>
-                <p className="mt-3 text-sm font-bold text-[#0c3e88]">{t("booking.privacyPolicy")}</p>
-                <p className="mt-2 text-xs text-[#6b88b2]">{t("booking.privacyDeletionNotice")}</p>
+              <div className="rounded-[1rem] border border-[hsl(var(--border))] bg-white/80 p-4">
+                <p className="text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.termsOfService")}</p>
+                <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">{t("booking.identificationClause")}</p>
+                <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.gdprNotice")}</p>
+                <p className="mt-3 text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.privacyPolicy")}</p>
+                <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.privacyDeletionNotice")}</p>
                 <div className="mt-4 flex items-start space-x-2">
                   <Checkbox
                     id="privacyConsent"
@@ -331,7 +331,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                     onCheckedChange={(checked) => updateBookingData({ privacyConsentAccepted: checked as boolean })}
                     disabled={disabled}
                   />
-                  <label htmlFor="privacyConsent" className="text-sm text-[#0c3e88]">
+                  <label htmlFor="privacyConsent" className="text-sm text-[hsl(var(--foreground))]">
                     {t("booking.privacyConsentCheckbox")}
                   </label>
                 </div>
@@ -341,9 +341,9 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
         </Card>
       </div>
 
-      <div className="rounded-[1.75rem] border border-[#d3e1f8] bg-white/90 p-6 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
-        <Label htmlFor="notes" className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-          <ClipboardPenLine className="h-4 w-4 text-[#0f57b2]" />
+      <div className="rounded-[1.75rem] border border-[hsl(var(--border))] bg-white/90 p-6 shadow-[0_24px_55px_-40px_hsl(var(--primary)/0.25)]">
+        <Label htmlFor="notes" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+          <ClipboardPenLine className="h-4 w-4 text-[hsl(var(--primary))]" />
           {t("booking.notes")}
         </Label>
         <Textarea
@@ -352,16 +352,16 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           onChange={(e) => updateBookingData({ notes: e.target.value })}
           disabled={disabled}
           rows={3}
-          className="rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+          className="rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
         />
       </div>
 
       <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onPrev} className="h-12 rounded-md border-[#c7daf9] bg-white text-[#0f57b2] hover:bg-[#edf4ff] hover:text-[#0b4a97]">
+        <Button variant="outline" onClick={onPrev} className="h-12 rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]">
           <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
-        <Button onClick={onNext} disabled={!canContinue || disabled} className="h-12 rounded-md bg-[#0f57b2] px-6 font-extrabold uppercase tracking-[0.08em] text-white hover:bg-[#0b4a97]">
+        <Button onClick={onNext} disabled={!canContinue || disabled} className="h-12 rounded-md bg-[hsl(var(--primary))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.9)]">
           <ArrowRight className="h-4 w-4" />
           {t("booking.continue")}
         </Button>

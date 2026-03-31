@@ -165,12 +165,12 @@ export default async function AdminDeliveriesPage({
           pageParam="deliveries_page"
         />
 
-        <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#ffffff,#f8fbff)] p-4 shadow-[0_20px_48px_-30px_rgba(15,23,42,0.12)]">
+        <div className="rounded-[1.6rem] border border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.18))] p-4 shadow-[0_20px_48px_-30px_hsl(var(--primary)/0.14)]">
           <div className={ADMIN_PAGE_META_ROW}>
             <div className={ADMIN_PAGE_META_TEXT}>{t("admin.activities.showing", { start: startRow, end: endRow, total })}</div>
             <div className={ADMIN_PAGE_ROWS_WRAP}>
               {pills.map((pill) => (
-                <span key={pill} className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700">
+                <span key={pill} className="rounded-full bg-[hsl(var(--accent)/0.45)] px-3 py-1 text-xs font-medium text-[hsl(var(--accent-foreground))]">
                   {pill}
                 </span>
               ))}

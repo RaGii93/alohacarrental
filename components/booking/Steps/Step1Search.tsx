@@ -123,13 +123,13 @@ export function Step1Search({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[1.75rem] border border-[#d3e1f8] bg-white/90 p-6 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
-        <h2 className="mb-4 text-xl font-black text-[#0c3e88]">{t("booking.selectDateRange")}</h2>
+      <div className="rounded-[1.75rem] border border-[hsl(var(--border)/0.75)] bg-white/72 p-6 shadow-[0_20px_44px_-36px_hsl(var(--foreground)/0.08)] ring-1 ring-white/50 backdrop-blur-md">
+        <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.selectDateRange")}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
-              <CalendarDays className="h-4 w-4 text-[#0f57b2]" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+              <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.startDate")}
             </label>
             <Input
@@ -138,13 +138,13 @@ export function Step1Search({
               onChange={(e) => updateBookingData({ startDate: fromDateInputValue(e.target.value) })}
               disabled={disabled}
               min={toDateInputValue(today)}
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border)/0.65)] bg-white text-[hsl(var(--foreground))] shadow-none"
             />
           </div>
 
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
-              <CalendarDays className="h-4 w-4 text-[#0f57b2]" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+              <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.endDate")}
             </label>
             <Input
@@ -153,15 +153,15 @@ export function Step1Search({
               onChange={(e) => updateBookingData({ endDate: fromDateInputValue(e.target.value) })}
               disabled={disabled}
               min={toDateInputValue(minimumEndDate ?? today)}
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border)/0.65)] bg-white text-[hsl(var(--foreground))] shadow-none"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
-              <Clock3 className="h-4 w-4 text-[#0f57b2]" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+              <Clock3 className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.pickupTime")}
             </label>
             <Input
@@ -169,12 +169,12 @@ export function Step1Search({
               value={bookingData.pickupTime}
               onChange={(e) => updateBookingData({ pickupTime: e.target.value })}
               disabled={disabled}
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border)/0.65)] bg-white text-[hsl(var(--foreground))] shadow-none"
             />
           </div>
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[#164d9b]">
-              <Clock3 className="h-4 w-4 text-[#0f57b2]" />
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+              <Clock3 className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.dropoffTime")}
             </label>
             <Input
@@ -182,15 +182,15 @@ export function Step1Search({
               value={bookingData.dropoffTime}
               onChange={(e) => updateBookingData({ dropoffTime: e.target.value })}
               disabled={disabled}
-              className="h-11 rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]"
+              className="h-11 rounded-xl border-[hsl(var(--border)/0.65)] bg-white text-[hsl(var(--foreground))] shadow-none"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <Label className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <MapPin className="h-4 w-4 text-[#0f57b2]" />
+            <Label className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <MapPin className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.pickupLocation")}
             </Label>
             <Select
@@ -198,7 +198,7 @@ export function Step1Search({
               onValueChange={(value) => updateBookingData({ pickupLocationId: value })}
               disabled={disabled}
             >
-              <SelectTrigger className="h-11 w-full rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]">
+              <SelectTrigger className="h-11 w-full rounded-xl border-[hsl(var(--border)/0.65)] bg-white text-[hsl(var(--foreground))] shadow-none">
                 <SelectValue placeholder={t("booking.selectLocation")} />
               </SelectTrigger>
               <SelectContent>
@@ -212,8 +212,8 @@ export function Step1Search({
           </div>
 
           <div>
-            <Label className="mb-2 flex items-center gap-2 font-bold text-[#164d9b]">
-              <MapPin className="h-4 w-4 text-[#0f57b2]" />
+            <Label className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
+              <MapPin className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.dropoffLocation")}
             </Label>
             <Select
@@ -221,7 +221,7 @@ export function Step1Search({
               onValueChange={(value) => updateBookingData({ dropoffLocationId: value })}
               disabled={disabled}
             >
-              <SelectTrigger className="h-11 w-full rounded-xl border-[#c7daf9] bg-[#f8fbff] text-[#0c3e88]">
+              <SelectTrigger className="h-11 w-full rounded-xl border-[hsl(var(--border)/0.65)] bg-white text-[hsl(var(--foreground))] shadow-none">
                 <SelectValue placeholder={t("booking.selectLocation")} />
               </SelectTrigger>
               <SelectContent>
@@ -251,7 +251,7 @@ export function Step1Search({
           <Button
             onClick={handleSearch}
             disabled={!hasValidRange || !!blockedMessage || isSearching || disabled}
-            className="h-12 w-full rounded-md bg-[#ffc93b] font-extrabold uppercase tracking-[0.08em] text-[#0d4aa0] shadow-[0_20px_40px_-20px_rgba(255,201,59,0.9)] hover:bg-[#ffd65f]"
+            className="h-12 w-full rounded-md bg-[hsl(var(--primary))] font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] shadow-[0_20px_40px_-20px_hsl(var(--primary)/0.55)] hover:bg-[hsl(var(--primary)/0.9)]"
           >
             <Search className="h-4 w-4" />
             {isSearching ? t("common.loading") : t("booking.searchAvailability")}
@@ -260,8 +260,8 @@ export function Step1Search({
       </div>
 
       {availability.length > 0 && (
-        <div className="rounded-[1.75rem] border border-[#d3e1f8] bg-[linear-gradient(180deg,#ffffff,#f3f8ff)] p-6 shadow-[0_24px_55px_-40px_rgba(12,74,160,0.45)]">
-          <h3 className="mb-4 text-lg font-black text-[#0c3e88]">{t("booking.selectCategory")}</h3>
+        <div className="rounded-[1.75rem] border border-[hsl(var(--border)/0.75)] bg-white/76 p-6 shadow-[0_24px_55px_-44px_hsl(var(--foreground)/0.12)] ring-1 ring-white/45 backdrop-blur-md">
+          <h3 className="mb-4 text-lg font-black text-[hsl(var(--foreground))]">{t("booking.selectCategory")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {availability.map((cat) => {
               const isSelected = bookingData.categoryId === cat.categoryId;
@@ -277,8 +277,8 @@ export function Step1Search({
                 <Card
                   key={cat.categoryId}
                   className={cn(
-                    "cursor-pointer overflow-hidden rounded-[1.5rem] border-[#c7daf9] bg-white shadow-[0_20px_50px_-40px_rgba(12,74,160,0.55)] transition-all hover:-translate-y-1 hover:shadow-[0_28px_60px_-42px_rgba(12,74,160,0.7)]",
-                    isSelected && "border-[#0f57b2] ring-2 ring-[#0f57b2]/20",
+                    "cursor-pointer overflow-hidden rounded-[1.5rem] border-[hsl(var(--border)/0.7)] bg-white shadow-[0_20px_50px_-44px_hsl(var(--foreground)/0.1)] transition-all hover:-translate-y-1 hover:shadow-[0_28px_60px_-46px_hsl(var(--foreground)/0.14)]",
+                    isSelected && "border-[hsl(var(--primary)/0.55)] ring-2 ring-[hsl(var(--primary)/0.12)]",
                     !isAvailable && "opacity-50"
                   )}
                   onClick={() => isAvailable && handleCategorySelect(cat.categoryId)}
@@ -291,8 +291,8 @@ export function Step1Search({
                     />
                   ) : null}
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-black text-[#0c3e88]">{cat.categoryName}</CardTitle>
-                    <CardDescription className="font-semibold text-[#164d9b]">
+                    <CardTitle className="text-lg font-black text-[hsl(var(--foreground))]">{cat.categoryName}</CardTitle>
+                    <CardDescription className="font-semibold text-[hsl(var(--accent-foreground))]">
                       {formatCurrency(cat.dailyRate)} / {t("booking.days").toLowerCase()}
                     </CardDescription>
                   </CardHeader>
@@ -304,42 +304,42 @@ export function Step1Search({
                         </div>
                       ) : null}
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-[#5f7ead]">{t("booking.baseTotal")}:</span>
-                        <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.baseTotalForRange)}</span>
+                        <span className="text-sm text-[hsl(var(--muted-foreground))]">{t("booking.baseTotal")}:</span>
+                        <span className="font-bold text-[hsl(var(--foreground))]">{formatCurrency(cat.baseTotalForRange)}</span>
                       </div>
                       {cat.belowMinimumSurcharge > 0 && (
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#5f7ead]">{t("booking.belowMinimumSurcharge")}:</span>
-                          <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.belowMinimumSurcharge)}</span>
+                          <span className="text-sm text-[hsl(var(--muted-foreground))]">{t("booking.belowMinimumSurcharge")}:</span>
+                          <span className="font-bold text-[hsl(var(--foreground))]">{formatCurrency(cat.belowMinimumSurcharge)}</span>
                         </div>
                       )}
                       {cat.lastMinuteSurcharge > 0 && (
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#5f7ead]">{t("booking.lastMinuteSurcharge")}:</span>
-                          <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.lastMinuteSurcharge)}</span>
+                          <span className="text-sm text-[hsl(var(--muted-foreground))]">{t("booking.lastMinuteSurcharge")}:</span>
+                          <span className="font-bold text-[hsl(var(--foreground))]">{formatCurrency(cat.lastMinuteSurcharge)}</span>
                         </div>
                       )}
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-[#5f7ead]">{t("booking.total")}:</span>
-                        <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.totalForRange)}</span>
+                        <span className="text-sm text-[hsl(var(--muted-foreground))]">{t("booking.total")}:</span>
+                        <span className="font-bold text-[hsl(var(--foreground))]">{formatCurrency(cat.totalForRange)}</span>
                       </div>
-                      <div className="space-y-1 text-xs text-[#5f7ead]">
+                      <div className="space-y-1 text-xs text-[hsl(var(--muted-foreground))]">
                         <p className="flex items-center gap-1.5">
-                          <Sofa className="h-3.5 w-3.5 text-[#0f57b2]" />
+                          <Sofa className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
                           {(cat.seats ?? 5)} seats
                         </p>
                         <p className="flex items-center gap-1.5">
-                          <Settings2 className="h-3.5 w-3.5 text-[#0f57b2]" />
+                          <Settings2 className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
                           {cat.transmission === "MANUAL" ? "Manual" : "Automatic"}
                         </p>
                         {(cat.features || []).slice(0, 4).map((feature) => (
                           <p key={feature} className="flex items-center gap-1.5">
-                            <CheckCircle2 className="h-3.5 w-3.5 text-[#0f57b2]" />
+                            <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
                             {feature}
                           </p>
                         ))}
                         <p className="flex items-center gap-1.5">
-                          <Gauge className="h-3.5 w-3.5 text-[#0f57b2]" />
+                          <Gauge className="h-3.5 w-3.5 text-[hsl(var(--primary))]" />
                           Standard performance
                         </p>
                       </div>
@@ -356,7 +356,7 @@ export function Step1Search({
         <Button
           onClick={onNext}
           disabled={!canContinue || disabled}
-          className="h-12 rounded-md bg-[#0f57b2] px-6 font-extrabold uppercase tracking-[0.08em] text-white hover:bg-[#0b4a97]"
+          className="h-12 rounded-md bg-[hsl(var(--primary))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.9)]"
         >
           <ArrowRight className="h-4 w-4" />
           {t("booking.continue")}

@@ -53,7 +53,7 @@ export default async function AdminHelpPage({
   return (
     <div className={ADMIN_PAGE_SHELL}>
       <div className={ADMIN_PAGE_STACK}>
-        <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff,#f2f7ff_48%,#ffffff)] p-8 shadow-[0_28px_72px_-40px_hsl(215_28%_17%/0.14)]">
+        <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff,hsl(var(--accent)/0.24)_48%,#ffffff)] p-8 shadow-[0_28px_72px_-40px_hsl(var(--primary)/0.14)]">
           <p className={ADMIN_PAGE_KICKER}>{t("admin.dashboard.tabs.help")}</p>
           <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl space-y-4">
