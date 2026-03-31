@@ -224,7 +224,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
 
               <Button
                 size="lg"
-                className="w-full rounded-full py-6 text-base font-bold shadow-lg"
+                className="w-full rounded-full bg-[linear-gradient(135deg,#d946ef,#ec4899)] py-6 text-base font-bold text-white shadow-[0_24px_44px_-24px_rgba(217,70,239,0.6)] hover:opacity-95"
                 onClick={goToBookingPage}
               >
                 {t("booking.searchAvailability")}
