@@ -172,14 +172,14 @@ export function BookingWizard({
         <div key={step} className="flex items-center">
           <div className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-black shadow-sm transition-colors ${
             currentStep >= step
-              ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
-              : "border-[hsl(var(--border))] bg-white text-[hsl(var(--muted-foreground))]"
+              ? "border-transparent bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(229_54%_28%))] text-[hsl(var(--primary-foreground))] shadow-[0_16px_34px_-22px_hsl(var(--primary)/0.42)]"
+              : "border-white/60 bg-white/72 text-[hsl(var(--muted-foreground))] ring-1 ring-white/60 backdrop-blur-xl"
           }`}>
             {step}
           </div>
           {step < 4 && (
             <div className={`mx-2 h-1 w-10 rounded-full sm:w-14 ${
-              currentStep > step ? "bg-[hsl(var(--accent-foreground))]" : "bg-[hsl(var(--accent))]"
+              currentStep > step ? "bg-[linear-gradient(90deg,hsl(var(--primary)),hsl(var(--accent-foreground)))]" : "bg-[linear-gradient(90deg,rgba(255,255,255,0.68),hsl(var(--accent)/0.42))]"
             }`} />
           )}
         </div>
@@ -197,7 +197,7 @@ export function BookingWizard({
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <Card className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border)/0.7)] bg-white p-6 shadow-[0_30px_70px_-50px_hsl(var(--foreground)/0.12)] sm:p-8">
+        <Card className="overflow-hidden rounded-[2rem] border border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.8),hsl(var(--accent)/0.12)_48%,hsl(192_90%_75%/0.06)_100%)] p-6 shadow-[0_30px_70px_-44px_hsl(var(--foreground)/0.16)] ring-1 ring-white/60 backdrop-blur-xl sm:p-8">
           <div className="mb-6 text-center">
             <p className="text-sm font-black uppercase tracking-[0.22em] text-[hsl(var(--primary))]">{t("nav.booking")}</p>
             <h1 className="mt-3 text-3xl font-black tracking-tight text-[hsl(var(--foreground))] sm:text-4xl">{t("booking.title")}</h1>
@@ -254,7 +254,7 @@ export function BookingWizard({
               <p className="mb-6 text-[hsl(var(--muted-foreground))]">{t("booking.nextSteps")}</p>
               <Button
                 onClick={() => window.location.href = `/${locale}`}
-                className="h-12 rounded-md bg-[hsl(var(--primary))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.9)]"
+                className="h-12 rounded-full bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(229_54%_28%))] px-6 font-extrabold uppercase tracking-[0.08em] text-[hsl(var(--primary-foreground))] shadow-[0_20px_40px_-22px_hsl(var(--primary)/0.42)] hover:opacity-95"
               >
                 <Home className="h-4 w-4" />
                 {t("nav.home")}

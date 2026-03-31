@@ -102,11 +102,12 @@ export default async function BookingPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-      <section className="bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(236,244,255,0.98))] pt-24 sm:pt-28">
-        <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-14">
+      <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_42%,#fff8fc_76%,#f8fbff_100%)] pt-24 sm:pt-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,hsl(var(--primary)/0.12),transparent_32%),radial-gradient(circle_at_85%_18%,hsl(var(--accent)/0.18),transparent_26%),radial-gradient(circle_at_12%_82%,hsl(229_54%_28%/0.08),transparent_26%),radial-gradient(circle_at_72%_88%,hsl(192_90%_72%/0.1),transparent_24%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-14">
           <div className="mb-8 flex justify-end">
             <Link href={`/${locale}/book/review`}>
-              <Button variant="outline" className="h-11 rounded-md border-[hsl(var(--border))] bg-white text-[hsl(var(--primary))] shadow-[0_16px_36px_-28px_hsl(var(--primary)/0.35)] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--accent-foreground))]">
+              <Button variant="outline" className="h-11 rounded-full border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.78),hsl(var(--accent)/0.16))] text-[hsl(var(--primary))] shadow-[0_18px_40px_-28px_hsl(var(--primary)/0.28)] ring-1 ring-white/60 backdrop-blur-xl hover:bg-white hover:text-[hsl(var(--primary))]">
               <SearchCode className="h-4 w-4" />
               {t("booking.reviewLookup.cta")}
               </Button>
