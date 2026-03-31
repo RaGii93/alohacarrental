@@ -123,8 +123,8 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
           </div>
 
           <Reveal className="lg:self-start">
-            <div className="overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.12)] bg-[linear-gradient(180deg,rgba(11,31,51,0.98),rgba(18,50,75,0.97)_58%,rgba(15,95,114,0.92)_100%)] text-white shadow-[0_34px_90px_-44px_rgba(15,23,42,0.45)] ring-1 ring-white/8 backdrop-blur-xl">
-              <div className="border-b border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-6 sm:p-8">
+            <div className="overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.1)] bg-[#0c2238] text-white shadow-[0_34px_90px_-44px_rgba(15,23,42,0.5)] ring-1 ring-white/8">
+              <div className="border-b border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.01))] p-6 sm:p-8">
                 <div className="mb-6 space-y-3">
                   <span className="inline-flex rounded-full border border-white/14 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/88 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
                     Aloha Car Rental
@@ -142,7 +142,7 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
                     <AccordionItem
                       key={faq.id}
                       value={`item-${faq.id}`}
-                      className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.08)] px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                      className="rounded-2xl border border-white/8 bg-[#12324b] px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                     >
                       <AccordionTrigger className="text-left font-semibold text-white hover:bg-white/6 hover:no-underline">
                         {faq.question}
