@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -8,10 +8,8 @@ import {
   Car,
   CarFront,
   Bell,
-  CheckCircle2,
   ClipboardList,
   Cog,
-  Clock3,
   CircleHelp,
   CirclePlus,
   DollarSign,
@@ -28,7 +26,6 @@ import {
   Truck,
   Undo2,
   Users,
-  XCircle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -62,13 +59,11 @@ export function AppSidebar({
 }) {
   const t = useTranslations();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const parts = pathname.split("/").filter(Boolean);
   const hasLocalePrefix = routing.locales.includes(parts[0] as any);
   const section = hasLocalePrefix ? (parts[2] || "bookings") : (parts[1] || "bookings");
   const base = "/admin";
   const activeTab = section;
-  const bookingsStatus = searchParams.get("bookings_status") || "pending";
   const vehiclesSubtab = searchParams.get("vehicles_subtab") || "manage";
   const tOr = (key: string, fallback: string, values?: Record<string, any>) =>
     t.has(key as any) ? t(key as any, values as any) : fallback;
@@ -140,34 +135,6 @@ export function AppSidebar({
                       <span>{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
-                  {item.key === "bookings" && activeTab === "bookings" && (
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={bookingsStatus === "pending"}>
-                          <Link href={`${base}/bookings?bookings_status=pending`}>
-                            <Clock3 className="h-4 w-4" />
-                            <span>{tOr("admin.tabs.pending", "Pending")}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={bookingsStatus === "confirmed"}>
-                          <Link href={`${base}/bookings?bookings_status=confirmed`}>
-                            <CheckCircle2 className="h-4 w-4" />
-                            <span>{tOr("admin.tabs.confirmed", "Confirmed")}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton asChild isActive={bookingsStatus === "declined"}>
-                          <Link href={`${base}/bookings?bookings_status=declined`}>
-                            <XCircle className="h-4 w-4" />
-                            <span>{tOr("admin.tabs.declined", "Declined")}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  )}
                   {item.key === "vehicles" && activeTab === "vehicles" && (
                     <SidebarMenuSub>
                       <SidebarMenuSubItem>
