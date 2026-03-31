@@ -138,7 +138,7 @@ export function InventoryOverviewClient({
           { label: t("admin.inventory.cards.unitsOnHand"), value: summary.stockUnits, icon: PackagePlus, tone: "text-emerald-600 bg-emerald-50" },
           { label: t("admin.inventory.cards.stockValue"), value: formatCurrency(summary.stockValue), icon: CircleDollarSign, tone: "text-violet-600 bg-violet-50" },
         ].map((item) => (
-          <Card key={item.label} className="rounded-[1.6rem] border-slate-200 p-5">
+          <Card key={item.label} className="admin-surface-soft rounded-[1.6rem] border-transparent p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm text-slate-500">{item.label}</p>
@@ -152,7 +152,7 @@ export function InventoryOverviewClient({
         ))}
       </div>
 
-      <Card className="rounded-[1.8rem] border-slate-200 p-6">
+      <Card className="admin-surface rounded-[1.8rem] border-transparent p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-black tracking-tight text-slate-900">{t("admin.inventory.workspace.title")}</h2>
@@ -195,7 +195,7 @@ export function InventoryOverviewClient({
 
             <Dialog open={transactionDialogOpen} onOpenChange={setTransactionDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="rounded-xl">{t("admin.inventory.actions.addStockMovement")}</Button>
+                <Button variant="outline" className="admin-outline-button rounded-xl border-transparent">{t("admin.inventory.actions.addStockMovement")}</Button>
               </DialogTrigger>
               <DialogContent className="max-w-xl">
                 <DialogHeader>
@@ -231,7 +231,7 @@ export function InventoryOverviewClient({
       </Card>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]">
-        <Card className="rounded-[1.8rem] border-slate-200 p-6">
+        <Card className="admin-surface rounded-[1.8rem] border-transparent p-6">
           <h3 className="text-lg font-bold text-slate-900">{t("admin.inventory.tables.partsCatalog")}</h3>
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200 text-sm">

@@ -142,7 +142,7 @@ export default async function AdminDeliveriesPage({
             { label: t("admin.deliveries.cards.today"), value: todayCount, icon: Clock3, tone: "bg-amber-50 text-amber-700" },
             { label: t("admin.deliveries.cards.range"), value: t("admin.activities.range", { start: toInputDate(rangeStart), end: toInputDate(rangeEnd) }), icon: CalendarDays, tone: "bg-slate-100 text-slate-700" },
           ].map((item) => (
-            <div key={item.label} className="rounded-[1.7rem] border border-slate-200 bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)]">
+            <div key={item.label} className="admin-surface-soft rounded-[1.7rem] border-transparent p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm text-slate-500">{item.label}</p>
@@ -165,12 +165,12 @@ export default async function AdminDeliveriesPage({
           pageParam="deliveries_page"
         />
 
-        <div className="rounded-[1.6rem] border border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.18))] p-4 shadow-[0_20px_48px_-30px_hsl(var(--primary)/0.14)]">
+        <div className="admin-surface rounded-[1.6rem] border-transparent p-4">
           <div className={ADMIN_PAGE_META_ROW}>
             <div className={ADMIN_PAGE_META_TEXT}>{t("admin.activities.showing", { start: startRow, end: endRow, total })}</div>
             <div className={ADMIN_PAGE_ROWS_WRAP}>
               {pills.map((pill) => (
-                <span key={pill} className="rounded-full bg-[hsl(var(--accent)/0.45)] px-3 py-1 text-xs font-medium text-[hsl(var(--accent-foreground))]">
+                <span key={pill} className="admin-pill rounded-full px-3 py-1 text-xs font-medium">
                   {pill}
                 </span>
               ))}

@@ -273,7 +273,7 @@ export function MaintenanceOverviewClient({
           { label: t("admin.maintenance.cards.vehicleRevenue"), value: formatCurrency(summary.totalRevenue), icon: HandCoins, tone: "text-violet-600 bg-violet-50" },
           { label: t("admin.maintenance.cards.netContribution"), value: formatCurrency(summary.netContribution), icon: ShieldCheck, tone: "text-emerald-600 bg-emerald-50" },
         ].map((item) => (
-          <Card key={item.label} className="rounded-[1.6rem] border-slate-200 p-5">
+          <Card key={item.label} className="admin-surface-soft rounded-[1.6rem] border-transparent p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm text-slate-500">{item.label}</p>
@@ -288,7 +288,7 @@ export function MaintenanceOverviewClient({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-        <Card className="rounded-[1.8rem] border-slate-200 p-6">
+        <Card className="admin-surface rounded-[1.8rem] border-transparent p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">{t("admin.maintenance.workspace.kicker")}</p>

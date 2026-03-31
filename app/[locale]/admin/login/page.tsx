@@ -84,8 +84,8 @@ export default function AdminLoginPage({
           </div>
           <div className="mt-8">
             <Image
-              src="/logo.png"
-              alt="edgeRent Lite"
+              src="/home/logo.png"
+              alt="Aloha Car Rental"
               width={320}
               height={88}
               priority
@@ -119,8 +119,8 @@ export default function AdminLoginPage({
         <Card className="w-full rounded-[2rem] border-[hsl(var(--primary)/0.14)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,249,255,0.96))] p-8 shadow-[0_32px_90px_-48px_hsl(var(--foreground)/0.28)] sm:p-10">
           <div className="flex flex-col items-center text-center">
             <Image
-              src="/logo.png"
-              alt="edgeRent Lite"
+              src="/home/logo.png"
+              alt="Aloha Car Rental"
               width={260}
               height={72}
               priority

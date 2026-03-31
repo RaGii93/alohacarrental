@@ -176,7 +176,7 @@ export default async function AdminBookingsPage({
           {(auth.admin.role === "ROOT" || auth.admin.role === "OWNER") && (
             <Link
               href={`/${locale}/admin/bookings/new`}
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+              className="inline-flex h-11 items-center justify-center rounded-xl bg-[linear-gradient(135deg,hsl(var(--foreground)),hsl(var(--primary)))] px-5 text-sm font-semibold text-white shadow-[0_18px_42px_-24px_hsl(var(--primary)/0.4)] transition-all hover:opacity-95"
             >
               {tOr("admin.bookings.create", {}, "New booking")}
             </Link>
@@ -212,16 +212,16 @@ export default async function AdminBookingsPage({
               <Link
                 key={item.key}
                 href={buildStatusHref(item.key as "pending" | "confirmed" | "declined")}
-              className={`rounded-[1.7rem] border p-5 shadow-[0_24px_56px_-32px_hsl(var(--primary)/0.14)] transition ${
-                  isActive ? "border-[hsl(var(--primary))] bg-[linear-gradient(135deg,hsl(var(--foreground)),hsl(var(--primary)))] text-white" : "border-[hsl(var(--border))] bg-white hover:border-[hsl(var(--primary)/0.25)]"
+              className={`rounded-[1.7rem] p-5 shadow-[0_24px_56px_-32px_hsl(var(--primary)/0.14)] transition ${
+                  isActive ? "border border-[hsl(var(--primary)/0.22)] bg-[linear-gradient(135deg,hsl(var(--foreground)),hsl(var(--primary)))] text-white" : "admin-surface-soft border-transparent hover:border-[hsl(var(--primary)/0.14)]"
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className={`text-sm ${isActive ? "text-slate-300" : "text-slate-500"}`}>{item.label}</p>
-                    <p className="mt-2 text-3xl font-black tracking-tight">{item.total}</p>
+                    <p className={`text-sm font-medium ${isActive ? "text-white/88" : "text-slate-500"}`}>{item.label}</p>
+                    <p className={`mt-2 text-3xl font-black tracking-tight ${isActive ? "text-white" : "text-slate-900"}`}>{item.total}</p>
                   </div>
-                  <div className={`inline-flex size-12 items-center justify-center rounded-2xl ${isActive ? "bg-white/10 text-white" : item.tone}`}>
+                  <div className={`inline-flex size-12 items-center justify-center rounded-2xl ${isActive ? "bg-white/18 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" : item.tone}`}>
                     <item.icon className="size-5" />
                   </div>
                 </div>
@@ -236,14 +236,14 @@ export default async function AdminBookingsPage({
           initialQuery={searchTerm}
         />
 
-        <div className="rounded-[1.6rem] border border-[hsl(var(--border))] bg-[linear-gradient(180deg,#ffffff,hsl(var(--accent)/0.18))] p-4 shadow-[0_20px_48px_-30px_hsl(var(--primary)/0.14)]">
+        <div className="admin-surface rounded-[1.6rem] border-transparent p-4">
           <div className={ADMIN_PAGE_META_ROW}>
             <div className={ADMIN_PAGE_META_TEXT}>
               {t("admin.bookings.list.showingStatus", { status: statusLabel, start: startRow, end: endRow, total })}
             </div>
             <div className={ADMIN_PAGE_ROWS_WRAP}>
               {activeFilterPills.map((pill) => (
-                <span key={pill} className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700">
+                <span key={pill} className="admin-pill rounded-full px-3 py-1 text-xs font-medium">
                   {pill}
                 </span>
               ))}

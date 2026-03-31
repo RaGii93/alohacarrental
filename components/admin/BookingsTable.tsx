@@ -128,7 +128,7 @@ export function BookingsTable({
   };
 
   return (
-    <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
+    <div className="admin-surface overflow-hidden rounded-[1.6rem] border-transparent">
       <Table className="bg-transparent">
         <TableHeader>
           <TableRow>
