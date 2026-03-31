@@ -8,7 +8,7 @@ import { DocumentPreview } from "@/components/shared/DocumentPreview";
 import { buildMetadata } from "@/lib/seo";
 import { getTenantConfig } from "@/lib/tenant";
 import { formatDateTime } from "@/lib/datetime";
-import { ArrowLeft, MapPin, Search } from "lucide-react";
+import { ArrowLeft, CalendarClock, MapPin, Search, Ticket } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -67,17 +67,24 @@ export default async function BookingReviewPage({
     : null;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
-      <Card className="p-6">
-        <h1 className="text-2xl font-bold mb-2">{t("booking.reviewLookup.title")}</h1>
-        <p className="text-muted-foreground mb-4">{t("booking.reviewLookup.subtitle")}</p>
+    <div className="mx-auto max-w-3xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
+      <Card className="overflow-hidden rounded-[2rem] border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),hsl(var(--accent)/0.14))] p-6 shadow-[0_30px_80px_-42px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/55 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),hsl(var(--accent)/0.24))] text-[hsl(var(--primary))] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+            <Ticket className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{t("booking.reviewLookup.title")}</h1>
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">{t("booking.reviewLookup.subtitle")}</p>
+          </div>
+        </div>
         <form className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             name="code"
             defaultValue={lookupValue}
             placeholder={t("booking.reviewLookup.placeholder")}
-            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            className="h-11 w-full rounded-full border border-white/60 bg-white/82 px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] outline-none ring-1 ring-white/60 backdrop-blur-xl placeholder:text-[hsl(var(--muted-foreground))]"
           />
           <Button type="submit">
             <Search className="h-4 w-4" />
@@ -87,19 +94,19 @@ export default async function BookingReviewPage({
       </Card>
 
       {lookupValue && !booking && (
-        <Card className="p-6 text-sm text-red-700">
+        <Card className="rounded-[1.75rem] border-red-200/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(254,226,226,0.88))] p-6 text-sm text-red-700 shadow-[0_24px_60px_-38px_rgba(127,29,29,0.15)] ring-1 ring-white/60 backdrop-blur-xl">
           {t("booking.reviewLookup.notFound")}
         </Card>
       )}
 
       {booking && (
-        <Card className="p-6 space-y-5">
+        <Card className="space-y-5 rounded-[2rem] border-white/50 bg-[linear-gradient(180deg,rgba(255,255,255,0.8),hsl(var(--primary)/0.08)_52%,hsl(var(--accent)/0.08)_100%)] p-6 shadow-[0_30px_80px_-42px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold">{t("booking.reviewLookup.detailsTitle")}</h2>
-              <p className="text-sm text-muted-foreground">{t("booking.bookingCode")}: {booking.bookingCode}</p>
+              <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">{t("booking.reviewLookup.detailsTitle")}</h2>
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">{t("booking.bookingCode")}: {booking.bookingCode}</p>
             </div>
-            <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+            <div className="rounded-full border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.68),hsl(var(--accent)/0.26))] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.58)] backdrop-blur-xl">
               {booking.status}
             </div>
           </div>
@@ -140,7 +147,7 @@ export default async function BookingReviewPage({
                 {pickupMapUrl && (
                   <>
                     {" "}
-                    <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:underline">
                       <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
@@ -154,7 +161,7 @@ export default async function BookingReviewPage({
                 {dropoffMapUrl && (
                   <>
                     {" "}
-                    <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:underline">
                       <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
@@ -180,7 +187,11 @@ export default async function BookingReviewPage({
         </Card>
       )}
 
-      <div>
+      <div className="flex items-center justify-between gap-3 rounded-[1.5rem] border border-white/50 bg-white/52 p-4 shadow-[0_20px_50px_-36px_hsl(var(--foreground)/0.18)] ring-1 ring-white/60 backdrop-blur-xl">
+        <div className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))]">
+          <CalendarClock className="h-4 w-4 text-[hsl(var(--primary))]" />
+          <span>{t("booking.reviewLookup.subtitle")}</span>
+        </div>
         <Link href={`/${locale}/book`}>
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4" />

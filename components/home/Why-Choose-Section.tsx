@@ -20,39 +20,39 @@ export default function WhyChooseSection() {
       icon: ShieldCheckIcon,
       title: t("landing.whyChoose.features.selection.title"),
       description: t("landing.whyChoose.features.selection.description"),
-      bgColor: "bg-[hsl(var(--accent)/0.55)]",
+      bgColor: "bg-[linear-gradient(135deg,hsl(var(--accent)/0.42),rgba(255,255,255,0.72))]",
       iconColor: "text-[hsl(var(--primary))]",
     },
     {
       icon: ZapIcon,
       title: t("landing.whyChoose.features.security.title"),
       description: t("landing.whyChoose.features.security.description"),
-      bgColor: "bg-[hsl(var(--primary)/0.14)]",
+      bgColor: "bg-[linear-gradient(135deg,hsl(var(--primary)/0.22),rgba(255,255,255,0.72))]",
       iconColor: "text-[hsl(var(--accent-foreground))]",
     },
     {
       icon: DollarSignIcon,
       title: t("landing.whyChoose.features.support.title"),
       description: t("landing.whyChoose.features.support.description"),
-      bgColor: "bg-[hsl(var(--accent)/0.45)]",
+      bgColor: "bg-[linear-gradient(135deg,hsl(192_90%_75%/0.22),hsl(var(--accent)/0.28))]",
       iconColor: "text-[hsl(var(--primary))]",
     },
     {
       icon: HeadphonesIcon,
       title: t("landing.whyChoose.features.rating.title"),
       description: t("landing.whyChoose.features.rating.description"),
-      bgColor: "bg-[hsl(var(--primary)/0.14)]",
+      bgColor: "bg-[linear-gradient(135deg,hsl(var(--primary)/0.22),rgba(255,255,255,0.72))]",
       iconColor: "text-[hsl(var(--accent-foreground))]",
     },
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#ffffff_0%,#fcfbfd_100%)] px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_center,hsl(var(--accent)/0.18),transparent_34%),radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.08),transparent_28%)]" />
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#fbfdff_0%,#fffafd_48%,#f8fbff_100%)] px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_center,hsl(var(--accent)/0.2),transparent_34%),radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.1),transparent_28%),radial-gradient(circle_at_75%_85%,hsl(192_90%_72%/0.12),transparent_24%)]" />
       <div className="relative mx-auto max-w-7xl">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <Reveal className="space-y-6">
-            <span className="inline-flex rounded-full border border-[hsl(var(--primary)/0.14)] bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[hsl(var(--accent-foreground))] shadow-[0_12px_30px_-24px_hsl(var(--foreground)/0.14)] ring-1 ring-white/50 backdrop-blur-md">
+            <span className="inline-flex rounded-full border border-white/60 bg-white/66 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[hsl(var(--accent-foreground))] shadow-[0_12px_30px_-24px_hsl(var(--foreground)/0.14)] ring-1 ring-white/60 backdrop-blur-xl">
               Aloha Car Rental
             </span>
             <div className="space-y-4">
@@ -65,19 +65,19 @@ export default function WhyChooseSection() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-[1.5rem] border border-white/45 bg-white/58 p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
+              <div className="rounded-[1.5rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(var(--accent)/0.14))] p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
                 <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">24/7</div>
                 <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">
                   {t("landing.whyChoose.features.support.title")}
                 </div>
               </div>
-              <div className="rounded-[1.5rem] border border-white/45 bg-white/58 p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
+              <div className="rounded-[1.5rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(var(--primary)/0.12))] p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
                 <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">100%</div>
                 <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">
                   {t("landing.whyChoose.features.security.title")}
                 </div>
               </div>
-              <div className="rounded-[1.5rem] border border-white/45 bg-white/58 p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
+              <div className="rounded-[1.5rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),hsl(192_90%_75%/0.12))] p-5 shadow-[0_24px_48px_-36px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl">
                 <div className="text-3xl font-extrabold tracking-tight text-[hsl(var(--foreground))]">4.9</div>
                 <div className="mt-1 text-sm font-medium text-[hsl(var(--muted-foreground))]">
                   {t("landing.whyChoose.features.rating.title")}
@@ -96,7 +96,7 @@ export default function WhyChooseSection() {
           <div className="grid gap-5 sm:grid-cols-2">
             {features.map((feature, index) => (
               <Reveal key={feature.title} delay={index * 90}>
-                <div className="group h-full rounded-[1.75rem] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.62),rgba(255,255,255,0.42))] p-6 shadow-[0_28px_65px_-42px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl transition-transform duration-300 hover:-translate-y-1.5 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,255,255,0.5))]">
+                <div className="group h-full rounded-[1.75rem] border border-white/45 bg-[linear-gradient(160deg,rgba(255,255,255,0.7),hsl(var(--accent)/0.1)_50%,hsl(192_90%_75%/0.08)_100%)] p-6 shadow-[0_28px_65px_-42px_hsl(var(--foreground)/0.14)] ring-1 ring-white/55 backdrop-blur-xl transition-transform duration-300 hover:-translate-y-1.5 hover:bg-[linear-gradient(160deg,rgba(255,255,255,0.78),hsl(var(--accent)/0.16)_50%,hsl(192_90%_75%/0.12)_100%)]">
                   <div
                     className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ${feature.bgColor} shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_16px_34px_-22px_hsl(var(--primary)/0.24)]`}
                   >
