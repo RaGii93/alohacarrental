@@ -2,6 +2,9 @@
 
 import { getSession } from "@/lib/session";
 import {
+  getBookingRuleSettings,
+  getFleetOperationsSettings,
+  getBookingHoldDays,
   getMinBookingDays,
   getInvoiceProvider,
   getQuickBooksFeatureSettings,
@@ -15,6 +18,9 @@ import {
   setQuickBooksSetupSettings,
   setTenantSettings,
   setInvoiceProvider,
+  setBookingHoldDays,
+  setBookingRuleSettings,
+  setFleetOperationsSettings,
   getTaxPercentage,
   setMinBookingDays,
   setTaxPercentage,
@@ -22,6 +28,8 @@ import {
   setZohoInvoiceOrganizationId,
   setZohoInvoiceRefreshToken,
   setZohoSetupSettings,
+  type BookingRuleSettings,
+  type FleetOperationsSettings,
 } from "@/lib/settings";
 import { logAdminAction } from "@/lib/audit";
 
@@ -80,9 +88,12 @@ export async function updateVehicleRatesIncludeTaxAction(vehicleRatesIncludeTax:
 
 export async function getSystemSettingsAction() {
   try {
-    const [taxPercentage, minimumBookingDays, tenant, quickBooks, quickBooksSetup, vehicleRatesIncludeTax, invoiceProvider, zoho, zohoOrganizationId, zohoSetup] = await Promise.all([
+    const [taxPercentage, minimumBookingDays, bookingHoldDays, bookingRules, fleetOperations, tenant, quickBooks, quickBooksSetup, vehicleRatesIncludeTax, invoiceProvider, zoho, zohoOrganizationId, zohoSetup] = await Promise.all([
       getTaxPercentage(),
       getMinBookingDays(),
+      getBookingHoldDays(),
+      getBookingRuleSettings(),
+      getFleetOperationsSettings(),
       getTenantSettings(),
       getQuickBooksFeatureSettings(),
       getQuickBooksSetupSettings(),
@@ -96,6 +107,9 @@ export async function getSystemSettingsAction() {
       success: true as const,
       taxPercentage,
       minimumBookingDays,
+      bookingHoldDays,
+      bookingRules,
+      fleetOperations,
       tenant,
       quickBooks,
       quickBooksSetup,
@@ -107,6 +121,44 @@ export async function getSystemSettingsAction() {
     };
   } catch (error: any) {
     return { success: false as const, error: error?.message || "Failed to load settings" };
+  }
+}
+
+export async function updateFleetOperationsSettingsAction(
+  input: FleetOperationsSettings,
+  _locale: string
+) {
+  try {
+    const auth = await requireSettingsAdmin();
+    if (!auth.ok) return { success: false as const, error: auth.error };
+
+    const fleetOperations = await setFleetOperationsSettings(input);
+    await logAdminAction({
+      adminUserId: auth.session.adminUserId,
+      action: "SETTINGS_FLEET_OPERATIONS_UPDATED",
+    });
+    return { success: true as const, fleetOperations };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "Failed to update fleet operations settings" };
+  }
+}
+
+export async function updateBookingRuleSettingsAction(
+  input: BookingRuleSettings,
+  _locale: string
+) {
+  try {
+    const auth = await requireSettingsAdmin();
+    if (!auth.ok) return { success: false as const, error: auth.error };
+
+    const bookingRules = await setBookingRuleSettings(input);
+    await logAdminAction({
+      adminUserId: auth.session.adminUserId,
+      action: "SETTINGS_BOOKING_RULES_UPDATED",
+    });
+    return { success: true as const, bookingRules };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "Failed to update booking rules" };
   }
 }
 
@@ -123,6 +175,22 @@ export async function updateMinimumBookingDaysAction(minimumBookingDays: number,
     return { success: true as const, minimumBookingDays: value };
   } catch (error: any) {
     return { success: false as const, error: error?.message || "Failed to update minimum booking days" };
+  }
+}
+
+export async function updateBookingHoldDaysAction(bookingHoldDays: number, _locale: string) {
+  try {
+    const auth = await requireSettingsAdmin();
+    if (!auth.ok) return { success: false as const, error: auth.error };
+
+    const value = await setBookingHoldDays(bookingHoldDays);
+    await logAdminAction({
+      adminUserId: auth.session.adminUserId,
+      action: "SETTINGS_BOOKING_HOLD_DAYS_UPDATED",
+    });
+    return { success: true as const, bookingHoldDays: value };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "Failed to update booking hold days" };
   }
 }
 

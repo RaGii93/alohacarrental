@@ -10,7 +10,7 @@
     "fleetOverview": "Fleet Overview"
   },
   "common": {
-    "name": "EdgeRent Lite",
+    "name": "Aloha Car Rental",
     "phone": "Phone",
     "email": "Email",
     "currency": "$",
@@ -151,9 +151,9 @@
   },
   "securityPage": {
     "metaTitle": "Security and Data Handling",
-    "metaDescription": "Learn how EdgeRent Lite handles access control, file uploads, driver license retention, audit logging, and deployment-side operational practices.",
+    "metaDescription": "Learn how Aloha Car Rental handles access control, file uploads, driver license retention, audit logging, and deployment-side operational practices.",
     "eyebrow": "Security and Data Handling",
-    "title": "How EdgeRent Lite handles security, privacy, and operational controls",
+    "title": "How Aloha Car Rental handles security, privacy, and operational controls",
     "intro": "This page describes the controls that are implemented in the product today and the operational topics we discuss with clients during deployment. We avoid broad security claims and focus on what is actually in place.",
     "pillars": {
       "access": {
@@ -227,7 +227,7 @@
     }
   },
   "landing": {
-    "title": "Welcome to EdgeRent Lite",
+    "title": "Welcome to Aloha Car Rental",
     "subtitle": "Book your vehicle with ease",
     "tagline": "Drive Your Dreams",
     "badge": "🚗 Premium Vehicle Rental Service",
@@ -244,7 +244,7 @@
       "supportLabel": "Support"
     },
     "whyChoose": {
-      "title": "Why Choose EdgeRent?",
+      "title": "Why Choose Aloha Car Rental?",
       "subtitle": "Experience the best in vehicle rental with our premium services and unbeatable customer support.",
       "features": {
         "selection": {
@@ -271,14 +271,25 @@
       "button": "Book Now"
     },
     "hero": {
-      "pill": "EdgeRent Lite for Car Rental Operators",
+      "pill": "Aloha Car Rental",
       "featureLine": "Fast booking, clear pricing, and local support you can trust.",
+      "completeFields": "Please complete all booking fields before continuing.",
+      "headline": {
+        "line1": "Discover Bonaire with",
+        "line2Prefix": "the freedom of",
+        "line2Highlight": "the right ride",
+        "line3": "waiting for you."
+      },
       "title": "Stop losing bookings",
       "titleAccent": "and take control of your rental business.",
       "description": "Manage bookings, vehicles, pickups, returns, and payments in one professional system. No more WhatsApp, Excel, or manual errors slowing down your team.",
+      "bookButton": "Book Your Vehicle",
+      "viewFleetButton": "View Fleet",
+      "driverAge": "Driver age",
+      "agePlaceholder": "Select age range",
       "primaryCta": "Schedule Your Demo",
       "secondaryCta": "See How It Works",
-      "dashboardAlt": "EdgeRent dashboard preview",
+      "dashboardAlt": "Aloha Car Rental dashboard preview",
       "bookingCard": {
         "title": "Pickup and return tracked",
         "detail": "Booking, vehicle, and handoff status in one place"
@@ -315,6 +326,11 @@
         "multiLanguage": "Built for serious rental teams"
       }
     },
+    "fleet": {
+      "title": "Choose the vehicle that fits your island plans",
+      "seats": "{count} seats",
+      "reserveNow": "Reserve now"
+    },
     "statsStrip": {
       "eyebrow": "Platform Snapshot",
       "title": "Professional rental operations at a glance",
@@ -340,7 +356,7 @@
     "core": {
       "eyebrow": "Core Platform",
       "title": "Everything you need to run your rental business",
-      "description": "EdgeRent keeps bookings, fleet operations, pickups, returns, and billing under control in one professional system. From online reservations to QuickBooks Online and Zoho Invoice integrations, it is built for serious rental teams.",
+      "description": "Aloha Car Rental keeps bookings, fleet operations, pickups, returns, and billing under control in one professional system. From online reservations to QuickBooks Online and Zoho Invoice integrations, it is built for serious rental teams.",
       "features": {
         "onlineBooking": {
           "title": "Online Booking Website",
@@ -413,10 +429,10 @@
       }
     },
     "whyUs": {
-      "eyebrow": "Why EdgeRent",
+      "eyebrow": "Why Aloha Car Rental",
       "title": "Built by operators,",
       "titleAccent": "for operators",
-      "description": "We understand the unique challenges of running a rental business in the Dutch Caribbean. EdgeRent was designed from the ground up for this market.",
+      "description": "We understand the unique challenges of running a rental business in the Dutch Caribbean. Aloha Car Rental was designed from the ground up for this market.",
       "imageAlt": "Caribbean rental business",
       "islands": {
         "curacao": "Curaçao",
@@ -469,6 +485,8 @@
       "subtitle": "Latest published reviews from verified bookings.",
       "leaveButton": "Leave a Review",
       "empty": "No reviews are published yet.",
+      "faqPreview": "Quick answers for renters before they book, all in one place.",
+      "viewAllFaq": "View all frequently asked questions",
       "form": {
         "title": "Leave a Review",
         "subtitle": "Enter your booking code to submit one review.",
@@ -494,7 +512,7 @@
       "pill": "Curaçao • Aruba • Bonaire",
       "title": "Ready to modernize your",
       "titleAccent": "rental business?",
-      "description": "Get a personalized demo and see how EdgeRent can streamline your operations, prevent overbookings, and grow your business.",
+      "description": "Get a personalized demo and see how Aloha Car Rental can streamline your operations, prevent overbookings, and grow your business.",
       "primaryCta": "Request a Demo",
       "secondaryCta": "Contact Sales",
       "note": "Single-tenant deployment • Your data stays yours • Full white-label branding"
@@ -504,8 +522,8 @@
       "title": "Built for operators that need accounting-ready rental workflows",
       "description": "{tenantName} is positioned as a professional operating system for Caribbean car rental teams, with invoice-ready processes and a client-facing experience that is ready to scale.",
       "logosEyebrow": "Trusted Clients",
-      "logosTitle": "Car rental companies that trust EdgeRent",
-      "logosDescription": "Real operators in Bonaire and Curacao using EdgeRent in their business.",
+      "logosTitle": "Car rental companies that trust Aloha Car Rental",
+      "logosDescription": "Real operators in Bonaire and Curacao using Aloha Car Rental in their business.",
       "professionalEyebrow": "Why Teams Switch",
       "professionalDescription": "Replace scattered WhatsApp messages, spreadsheets, and manual follow-up with a cleaner rental workflow your team can manage with confidence.",
       "clients": {
@@ -520,6 +538,27 @@
         "bonDrive": {
           "status": "Starting soon",
           "detail": "Preparing rollout for operational use in Bonaire."
+        }
+      }
+    },
+    "updates": {
+      "eyebrow": "New Updates",
+      "title": "Recent improvements now visible in the public experience",
+      "description": "We’re surfacing the newest booking, partner-rental, and fleet-planning improvements so visitors immediately see what changed and what is now supported.",
+      "primaryCta": "View updated FAQ",
+      "secondaryCta": "Explore features",
+      "items": {
+        "pricingRules": {
+          "title": "Smarter booking pricing rules",
+          "description": "Minimum-rental and last-minute booking rules can now shape the public booking flow with clearer pricing and guardrails."
+        },
+        "partnerRentals": {
+          "title": "Partner rentals handled separately",
+          "description": "Outside-company vehicles can be managed operationally without mixing them into the normal saved fleet shown to the public."
+        },
+        "fleetCalendar": {
+          "title": "Better fleet planning visibility",
+          "description": "The admin fleet calendar and shared date filters make it easier to coordinate bookings, availability, and operational timing."
         }
       }
     }
@@ -571,7 +610,7 @@
     "identificationClause": "Users agree to provide valid identification for rental verification.",
     "gdprNotice": "Identification documents are requested for rental verification and compliance requirements, including GDPR-related obligations.",
     "privacyPolicy": "Privacy Policy",
-    "privacyDeletionNotice": "If you wish to delete your personal data, please contact: privacy@edgerentlite.com",
+    "privacyDeletionNotice": "If you wish to delete your personal data, please contact: privacy@alohacarrental.com",
     "privacyConsentCheckbox": "I understand my identification will be used for rental verification and stored temporarily in accordance with the Privacy Policy.",
     "viewTerms": "View Terms (PDF)",
     "acceptTerms": "I agree to the Terms and Conditions",
@@ -613,13 +652,19 @@
       "birthLicenseRequired": "Birth date and license expiry date are required",
       "ageMinimum": "Renter must be at least 21 years old",
       "licenseInvalid": "License must be valid at pickup date",
-      "minimumDuration": "Minimum booking duration is {days} day(s)."
+      "minimumDuration": "Minimum booking duration is {days} day(s).",
+      "minimumDurationAdminOnly": "Bookings under {days} day(s) are only available through admin.",
+      "lastMinuteAdminOnly": "Bookings starting within {hours} hour(s) are only available through admin."
     },
     "success": {
       "title": "Booking Submitted!",
       "message": "Your booking reference is: {{orderId}}",
       "next": "We will contact you shortly to confirm."
-    }
+    },
+    "baseTotal": "Base total",
+    "subtotal": "Subtotal",
+    "belowMinimumSurcharge": "Short-rental surcharge",
+    "lastMinuteSurcharge": "Last-minute surcharge"
   },
   "continue": "Continue",
   "summary": "Summary",
@@ -704,7 +749,8 @@
         "dates": "Dates",
         "total": "Total",
         "status": "Status",
-        "actions": "Actions"
+        "actions": "Actions",
+        "noVehicle": "—"
       },
       "detail": {
         "title": "Booking Details",
@@ -1034,6 +1080,23 @@
         "actions": {
           "saveChanges": "Save Changes"
         }
+      },
+      "filters": {
+        "kicker": "Booking filters",
+        "title": "Current work first, history when needed",
+        "description": "Pending, confirmed, and declined bookings start from today by default so live work stays visible, while filters let you move back into history any time.",
+        "searchPlaceholder": "Booking code, customer, email, phone, or vehicle"
+      },
+      "list": {
+        "title": "Bookings pipeline",
+        "description": "Pending, confirmed, and declined bookings now default to today forward so current work stays visible first, while filters let you open the full history whenever you need it.",
+        "showingStatus": "{status}: showing {start}-{end} of {total}",
+        "rowsPerPage": "Rows per page",
+        "pills": {
+          "search": "Search: {value}",
+          "from": "From: {value}",
+          "to": "To: {value}"
+        }
       }
     },
     "vehicles": {
@@ -1115,7 +1178,8 @@
         "locations": "Locations",
         "logs": "Logs",
         "users": "Users",
-        "help": "Help Center"
+        "help": "Help Center",
+        "notifications": "Notifications"
       },
       "deliveries": {
         "title": "Upcoming Deliveries (Next 7 Days)"
@@ -1347,7 +1411,11 @@
         "invalidTax": "Enter a valid tax percentage between 0 and 100.",
         "invalidMinDays": "Enter a valid minimum booking duration between 1 and 365 days.",
         "updateFailed": "Failed to update settings.",
-        "requiredTenantFields": "Tenant name, email, and currency are required."
+        "requiredTenantFields": "Tenant name, email, and currency are required.",
+        "invalidBookingHoldDays": "Enter a valid booking hold period between 1 and 30 days.",
+        "invalidBelowMinimumSurcharge": "Enter a valid below-minimum surcharge value.",
+        "invalidLastMinuteThreshold": "Enter a valid last-minute threshold between 1 and 720 hours.",
+        "invalidLastMinutePercent": "Enter a valid last-minute extra percentage."
       },
       "success": {
         "updated": "Settings updated. Tax: {tax}%, Minimum booking: {days} day(s)."
@@ -1403,6 +1471,34 @@
       },
       "messages": {
         "updated": "Settings updated."
+      },
+      "bookingHoldDays": "Booking Hold Days",
+      "bookingRules": {
+        "title": "Booking Rule Controls",
+        "description": "Control who can create shorter or last-minute bookings and whether pricing surcharges apply.",
+        "minimumSectionTitle": "Minimum rental rules",
+        "minimumSectionDescription": "Use the minimum rental days as the base requirement, then decide whether admin can override it and how the surcharge is calculated.",
+        "lastMinuteSectionTitle": "Last-minute booking rules",
+        "lastMinuteSectionDescription": "Define when a booking becomes last-minute, whether public users are blocked, and how much extra percentage is added.",
+        "belowMinimumRentalAdminOnly": "Below-minimum bookings are admin only",
+        "belowMinimumRentalAdminOnlyDescription": "Public customers are blocked when the rental is shorter than the minimum days. Admins can still create the booking.",
+        "belowMinimumRentalPricingEnabled": "Apply a below-minimum surcharge",
+        "belowMinimumRentalPricingEnabledDescription": "Add an extra charge when a rental is shorter than the minimum days.",
+        "belowMinimumRentalSurchargeMode": "Below-minimum surcharge mode",
+        "belowMinimumRentalSurchargeValue": "Below-minimum surcharge value",
+        "lastMinuteBookingEnabled": "Enable last-minute pricing rules",
+        "lastMinuteBookingEnabledDescription": "Detect bookings that start within the configured threshold and apply the extra percent.",
+        "lastMinuteBookingAdminOnly": "Last-minute bookings are admin only",
+        "lastMinuteBookingAdminOnlyDescription": "Public customers cannot book inside the last-minute window, but admins can still create the booking.",
+        "lastMinuteBookingThresholdHours": "Last-minute threshold in hours",
+        "lastMinuteBookingExtraPercent": "Last-minute extra percent",
+        "adminOnly": "Admin only",
+        "publicAllowed": "Public allowed",
+        "surchargeModes": {
+          "percentage_on_base_total": "Percentage on base total",
+          "percentage_on_current_total": "Percentage on current subtotal",
+          "fixed_amount": "Fixed amount"
+        }
       }
     },
     "logout": "Logout",
@@ -1573,6 +1669,624 @@
         "created": "Discount created",
         "deactivateFailed": "Failed to deactivate code",
         "deactivated": "Discount deactivated"
+      }
+    },
+    "activities": {
+      "range": "{start} to {end}",
+      "showing": "Showing {start}-{end} of {total}",
+      "rowsPerPage": "Rows per page",
+      "pills": {
+        "search": "Search: {value}",
+        "from": "From: {value}",
+        "to": "To: {value}"
+      },
+      "filters": {
+        "kicker": "Daily activity filters",
+        "searchPlaceholder": "Booking code, customer, email, phone, or vehicle"
+      }
+    },
+    "deliveries": {
+      "title": "Delivery board",
+      "description": "Dispatch-focused delivery tracking with today-forward defaults, server-side search, and date filters for quick scheduling decisions.",
+      "cards": {
+        "visible": "Visible deliveries",
+        "today": "Due today",
+        "range": "Active range"
+      },
+      "filters": {
+        "title": "Deliveries from today forward",
+        "description": "Keep upcoming handovers in front of the team by default, then expand the range only when you need past or farther-future activity."
+      }
+    },
+    "returns": {
+      "title": "Return board",
+      "description": "Keep upcoming returns visible first with today-forward server filters, and expand the range only when you need older return activity.",
+      "cards": {
+        "visible": "Visible returns",
+        "today": "Due today",
+        "range": "Active range"
+      },
+      "filters": {
+        "title": "Returns from today forward",
+        "description": "Surface upcoming drop-offs first for the operations team, then widen the date range whenever historical return activity is needed."
+      }
+    },
+    "notifications": {
+      "center": {
+        "title": "Notification Center",
+        "subtitle": "Recent system updates and alerts"
+      },
+      "page": {
+        "title": "Stay on top of bookings, alerts, and admin activity",
+        "description": "Dismiss any notification once it has been handled. Dismissed items are deleted immediately, and notifications older than {days} days are cleaned up automatically.",
+        "cleanupTitle": "Auto-cleanup enabled",
+        "cleanupDescription": "The list stays tidy without extra maintenance. Old notifications are removed automatically."
+      },
+      "actions": {
+        "viewAll": "View all",
+        "dismiss": "Dismiss",
+        "openRelated": "Open related page"
+      },
+      "empty": {
+        "compact": "No notifications right now.",
+        "page": "No notifications available."
+      },
+      "messages": {
+        "dismissed": "Notification dismissed",
+        "dismissFailed": "Failed to dismiss notification"
+      }
+    },
+    "financial": {
+      "page": {
+        "title": "Financial control workspace",
+        "description": "Review booking revenue, billing coverage, and partner rental transfers from one finance-ready dashboard with URL-based server filters.",
+        "filterRange": "Filter range: {start} to {end}",
+        "noExtraFilters": "No extra filters applied"
+      },
+      "filters": {
+        "kicker": "Finance filters",
+        "title": "Revenue, billing, and transfer controls",
+        "description": "Search bookings and partner rentals, isolate billing state, and keep the finance view shareable through URL-based filters.",
+        "searchPlaceholder": "Booking code, customer, email, supplier, or vehicle",
+        "bookingState": "Booking state",
+        "billingState": "Billing state",
+        "transferState": "Transfer state",
+        "allBookings": "All bookings",
+        "allBillingStates": "All billing states",
+        "allTransfers": "All transfers",
+        "invoiced": "Invoiced",
+        "uninvoiced": "Uninvoiced",
+        "pendingTransfer": "Pending transfer",
+        "transferred": "Transferred"
+      },
+      "pills": {
+        "search": "Search: {value}",
+        "booking": "Booking: {value}",
+        "billing": "Billing: {value}",
+        "transfer": "Transfer: {value}"
+      },
+      "cards": {
+        "confirmedRevenue": "Confirmed revenue",
+        "invoicedRevenue": "Invoiced revenue",
+        "pendingPipeline": "Pending pipeline",
+        "partnerRentalProfit": "Partner rental profit",
+        "uninvoicedConfirmed": "Uninvoiced confirmed",
+        "averageConfirmedBooking": "Average confirmed booking",
+        "pendingToConfirmed": "Pending to confirmed",
+        "partnerTransfersPending": "Partner transfers pending"
+      },
+      "sections": {
+        "billingDocumentsDescription": "Latest invoiced bookings inside the active financial filters.",
+        "visibleCount": "{count} visible",
+        "noBillingDocuments": "No billing documents match the current filters.",
+        "partnerLedgerTitle": "Partner rental transfer ledger",
+        "partnerLedgerDescription": "Income, expense, and payout visibility for outside-supplier bookings.",
+        "noPartnerRentals": "No partner rentals match the current filters.",
+        "partnerLedgerLine": "Income {income} · Expense {expense} · Profit {profit}",
+        "createdAt": "Created {date}"
+      },
+      "actions": {
+        "viewPdf": "View PDF",
+        "sendByEmail": "Send by Email"
+      }
+    },
+    "partnerRentals": {
+      "page": {
+        "kicker": "Partner Rentals",
+        "filterRange": "Filter range: {start} to {end}"
+      },
+      "cards": {
+        "income": "Income",
+        "expenses": "Expenses",
+        "profit": "What You Made",
+        "pendingTransfer": "Pending Transfer"
+      },
+      "bucket": {
+        "title": "Partner Rental Bucket",
+        "description": "Keep occasional outside-company rentals separate from your public fleet, while still tracking payment, pickup, return, and transfer flow."
+      },
+      "steps": {
+        "supplier": "Supplier",
+        "customer": "Customer & Trip",
+        "payment": "Payment",
+        "review": "Review"
+      },
+      "sections": {
+        "supplierTitle": "Supplier & Vehicle",
+        "supplierDescription": "Start with the partner company and the exact vehicle you are arranging.",
+        "customerTitle": "Customer & Trip",
+        "customerDescription": "Enter the customer details and the rental dates and locations.",
+        "pricingTitle": "Pricing & Payment",
+        "pricingDescription": "Use day prices only. The system calculates totals automatically from the rental duration.",
+        "reviewTitle": "Review & Notes",
+        "reviewDescription": "Final review before the booking is created and the customer email is sent."
+      },
+      "fields": {
+        "supplierCompany": "Supplier company",
+        "vehicleDetails": "Vehicle details",
+        "customerName": "Customer name",
+        "customerPhone": "Customer phone",
+        "customerEmail": "Customer email",
+        "pickupDateTime": "Pickup date & time",
+        "dropoffDateTime": "Dropoff date & time",
+        "pickupLocation": "Pickup location",
+        "dropoffLocation": "Dropoff location",
+        "clientDayPrice": "Client day price",
+        "supplierDayPrice": "Supplier day price",
+        "paymentStatus": "Payment status",
+        "paymentMethod": "Payment method",
+        "paymentReference": "Payment reference",
+        "internalNotes": "Internal notes",
+        "pickupNotes": "Pickup notes",
+        "dropoffNotes": "Dropoff notes"
+      },
+      "placeholders": {
+        "supplierCompany": "Island Partner Cars",
+        "vehicleDetails": "Toyota Rush · Plate ABC-123",
+        "clientDayPrice": "95.00",
+        "supplierDayPrice": "70.00",
+        "paymentMethod": "Cash, card, bank transfer",
+        "paymentReference": "Optional receipt or transfer reference",
+        "operationalNotes": "Optional operational notes"
+      },
+      "summary": {
+        "title": "Booking Summary",
+        "description": "This mirrors what the team needs operationally.",
+        "ready": "{percent}% ready",
+        "supplierVehicle": "Supplier vehicle",
+        "vehiclePending": "Vehicle not entered yet",
+        "supplierPending": "Supplier not entered yet",
+        "tripPlan": "Trip plan",
+        "range": "{start} to {end}",
+        "chooseDates": "Choose valid pickup and dropoff dates",
+        "rentalDays": "{count} rental day(s)",
+        "dayCountAuto": "The day count is calculated automatically",
+        "pickup": "Pickup",
+        "dropoff": "Dropoff",
+        "financeSnapshot": "Finance snapshot",
+        "clientDayPrice": "Client day price",
+        "supplierDayPrice": "Supplier day price",
+        "estimatedProfit": "Estimated profit",
+        "initialPaymentState": "Initial payment state",
+        "paymentMethodPending": "Payment method not entered yet",
+        "paymentReferencePending": "No payment reference yet"
+      },
+      "statuses": {
+        "paid": "Paid",
+        "unpaid": "Unpaid",
+        "transferred": "Transferred",
+        "pendingTransfer": "Pending transfer"
+      },
+      "actions": {
+        "new": "New Partner Rental",
+        "continue": "Continue",
+        "create": "Create Partner Rental",
+        "creating": "Creating...",
+        "emailCustomer": "Email customer",
+        "markPaid": "Mark paid",
+        "markPickup": "Mark pickup",
+        "markDropoff": "Mark dropoff",
+        "markTransferred": "Mark transferred",
+        "saving": "Saving...",
+        "saveUpdate": "Save update"
+      },
+      "dialogs": {
+        "createTitle": "Create Partner Rental",
+        "createDescription": "A step-by-step mobile-friendly flow for outside-company rentals. Pricing is calculated from day rate × rental days."
+      },
+      "flow": {
+        "markPaidTitle": "Mark {code} as paid",
+        "markPickupTitle": "Mark {code} as picked up",
+        "markDropoffTitle": "Mark {code} as dropped off",
+        "updateTitle": "Update partner rental",
+        "description": "Save the next operational step without mixing this booking into your normal fleet records."
+      },
+      "row": {
+        "payment": "Payment: {value}",
+        "pickup": "Pickup: {value}",
+        "dropoff": "Dropoff: {value}",
+        "notReceived": "Not received yet",
+        "notMarked": "Not marked yet"
+      },
+      "messages": {
+        "completeSupplier": "Please complete the supplier and vehicle details.",
+        "completeCustomer": "Please complete the customer and trip details with valid pickup and dropoff dates.",
+        "completePricing": "Please enter the daily price for the client and the supplier.",
+        "paymentMethodRequired": "Please enter a payment method.",
+        "createFailed": "Failed to create partner rental.",
+        "created": "Partner rental {code} created and customer email sent.",
+        "transferFailed": "Failed to update transfer bucket.",
+        "transferred": "Marked as transferred.",
+        "updateFailed": "Failed to update the partner rental flow.",
+        "updated": "Partner rental updated."
+      },
+      "empty": "No partner rentals found in this range."
+    },
+    "logs": {
+      "page": {
+        "kicker": "Admin Audit Logs",
+        "title": "Operational activity feed",
+        "description": "Review admin actions, trace booking-related changes, and narrow results by user, role, or action from one place.",
+        "searchHint": "Keyword search across action, admin email, and booking code",
+        "filterHint": "Role and action filters"
+      },
+      "cards": {
+        "filtered": "Filtered",
+        "matchingEvents": "Matching audit events",
+        "activity24h": "24h Activity",
+        "eventsToday": "Events created today",
+        "bookingLinked": "Booking Linked",
+        "linkedDescription": "Logs tied to a booking record"
+      },
+      "filters": {
+        "searchPlaceholder": "Search action, admin email, or booking code",
+        "allRoles": "All roles",
+        "allActions": "All actions",
+        "apply": "Apply",
+        "clear": "Clear"
+      },
+      "pills": {
+        "search": "Search: {value}",
+        "role": "Role: {value}",
+        "action": "Action: {value}"
+      },
+      "meta": {
+        "showing": "Showing {start}-{end} of {total}",
+        "rows": "Rows:"
+      },
+      "empty": {
+        "title": "No audit logs found",
+        "description": "Try a broader search term or clear one of the active filters to see more operational history."
+      },
+      "entry": {
+        "booking": "Booking {code}",
+        "logId": "Log ID"
+      },
+      "roles": {
+        "root": "Root",
+        "owner": "Owner",
+        "staff": "Staff"
+      }
+    },
+    "fleetOps": {
+      "filtersTitle": "Filters",
+      "builtFor": "Built for",
+      "search": "Search",
+      "apply": "Apply filters",
+      "reset": "Reset",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "startPlaceholder": "Select start date",
+      "endPlaceholder": "Select end date"
+    },
+    "fleet": {
+      "workspace": {
+        "kicker": "Fleet workspace",
+        "comparedWindow": "Compared with the previous {days}-day window."
+      },
+      "tabs": {
+        "calendar": "Calendar",
+        "operations": "Operations",
+        "forecast": "Forecast",
+        "calendarHint": "Live schedule",
+        "operationsHint": "Current movement",
+        "forecastHint": "Demand outlook"
+      },
+      "cards": {
+        "activeFleet": "Active fleet",
+        "onRentNow": "On rent now",
+        "utilization": "Fleet utilization",
+        "pickups": "Pickups ({days}d)",
+        "returns": "Returns ({days}d)",
+        "returnsToday": "Returns due today",
+        "overdueReturns": "Overdue returns",
+        "expectedDemand": "Expected demand ({days}d)",
+        "topDemand": "Top demand category"
+      },
+      "statuses": {
+        "active": "Active",
+        "completed": "Completed",
+        "blockout": "Blockout"
+      },
+      "calendar": {
+        "title": "Fleet calendar",
+        "description": "Bookings, active rentals, pending requests, and maintenance are mapped across the selected range.",
+        "maintenanceBlock": "Vehicle in maintenance",
+        "vehicleBlockout": "Vehicle blockout",
+        "globalBlockout": "Global blockout",
+        "unavailableRange": "Unavailable across the visible range",
+        "licensePlate": "License plate",
+        "noPlate": "NO-PLATE"
+      },
+      "operations": {
+        "snapshotDescription": "Bookings overlapping the current range.",
+        "visibleCount": "{count} visible",
+        "emptySnapshot": "No bookings overlap this date range.",
+        "bookingWindow": "{start} to {end}",
+        "notesTitle": "Operational notes",
+        "selectedRange": "Selected range",
+        "todayMarker": "Today marker",
+        "todayVisible": "Visible in the calendar tab for easier dispatch coordination.",
+        "todayOutside": "Outside the selected range.",
+        "bestPractice": "Best practice",
+        "bestPracticeDescription": "Keep the range focused to one to three weeks when planning pickups and returns. Wider ranges work best for forecast review."
+      },
+      "forecast": {
+        "title": "Expected demand by category",
+        "description": "The selected range highlights where reservations are concentrating.",
+        "bookingsCount": "{count} bookings",
+        "empty": "No expected demand in this range."
+      }
+    },
+    "maintenance": {
+      "page": {
+        "title": "Fleet maintenance, compliance, and cost control",
+        "description": "Keep service work, repairs, inspection reminders, insurance renewals, and vehicle cost tracking inside the same admin operation."
+      },
+      "audiences": {
+        "financialClerk": "Financial clerk",
+        "mechanic": "Mechanic",
+        "administration": "Administration",
+        "rentalAgent": "Rental agent"
+      },
+      "filters": {
+        "title": "Maintenance filters for workshop, finance, and operations",
+        "description": "Filter by vehicle, urgency, service type, and service dates so each team can move between compliance follow-up, cost review, and day-to-day rental readiness without extra exports.",
+        "resultSummary": "{overdue} overdue, {dueSoon} due soon, {records} matching records",
+        "searchPlaceholder": "Search vehicle, plate, record title, or vendor",
+        "allVehicles": "All vehicles",
+        "attention": "Attention",
+        "allStatuses": "All statuses",
+        "actionRequired": "Action required",
+        "serviceType": "Service type",
+        "allServiceTypes": "All service types"
+      },
+      "cards": {
+        "overdueVehicles": "Overdue vehicles",
+        "dueSoon": "Due soon",
+        "trackedCosts": "Tracked costs",
+        "vehicleRevenue": "Vehicle revenue",
+        "netContribution": "Net contribution"
+      },
+      "workspace": {
+        "kicker": "Operations",
+        "title": "Maintenance and compliance workspace",
+        "description": "Log service work, register insurance renewals, and keep inspection dates visible from one admin flow."
+      },
+      "actions": {
+        "logMaintenance": "Log maintenance",
+        "saveRecord": "Save record",
+        "addInsurance": "Add insurance",
+        "saveInsurance": "Save insurance",
+        "addInspection": "Add inspection",
+        "saveInspection": "Save inspection",
+        "exportHistory": "Export history CSV",
+        "exportReminders": "Export reminders CSV"
+      },
+      "dialogs": {
+        "maintenance": {
+          "title": "Log maintenance record",
+          "description": "This modal is built for quick admin use on desktop and mobile. Add the service details, any parts used, and optional downtime in one save."
+        },
+        "insurance": {
+          "title": "Add insurance renewal",
+          "description": "Track provider, premium, coverage dates, and notes so reminders and costs stay accurate."
+        },
+        "inspection": {
+          "title": "Add inspection / keurings record",
+          "description": "Keep the latest inspection date, expiry, vendor, and cost on file for reminders and compliance checks."
+        }
+      },
+      "form": {
+        "vehicle": "Vehicle",
+        "selectVehicle": "Select a vehicle",
+        "currentOdometer": "Current odometer: {value} km",
+        "notRecorded": "Not recorded",
+        "template": "Template",
+        "optionalTemplate": "Optional template",
+        "noTemplate": "No template",
+        "recordType": "Record type",
+        "serviceDate": "Service date",
+        "title": "Title",
+        "titlePlaceholder": "Example: Small service at 52,000 km",
+        "vendor": "Garage / vendor",
+        "vendorPlaceholder": "Napa, local garage, dealer...",
+        "odometerKm": "Odometer (km)",
+        "laborCost": "Labor cost",
+        "notes": "Notes",
+        "notesPlaceholder": "Invoice notes, repair details, tire brand, compressor replacement notes...",
+        "markUnavailable": "Mark this vehicle unavailable while the work is in progress.",
+        "notSet": "Not set"
+      },
+      "serviceTypes": {
+        "small": "Small service",
+        "big": "Big service",
+        "repair": "Repair",
+        "custom": "Custom maintenance",
+        "inspectionPrep": "Inspection related",
+        "insuranceRelated": "Insurance related"
+      },
+      "parts": {
+        "title": "Parts used",
+        "description": "Track inventory-managed or one-off parts on the same job.",
+        "addLine": "Add part line",
+        "inventoryPart": "Inventory part",
+        "customNotInStock": "Custom / not in stock",
+        "customPartName": "Custom part name",
+        "qty": "Qty",
+        "unitCost": "Unit cost"
+      },
+      "costSummary": {
+        "title": "Cost summary",
+        "parts": "Parts",
+        "labor": "Labor",
+        "total": "Total"
+      },
+      "insurance": {
+        "provider": "Insurance provider",
+        "policyNumber": "Policy number",
+        "coverageType": "Coverage type",
+        "premiumAmount": "Premium amount",
+        "notes": "Optional insurance notes"
+      },
+      "inspection": {
+        "type": "Inspection type",
+        "vendor": "Authority or vendor",
+        "cost": "Cost",
+        "notes": "Optional inspection notes"
+      },
+      "reminderSnapshot": {
+        "title": "Reminder snapshot",
+        "description": "{overdue} overdue vehicles and {count} low-stock parts need attention."
+      },
+      "tables": {
+        "overdueItems": "Overdue items",
+        "dueSoon": "Due soon",
+        "recentHistory": "Recent maintenance and repair history"
+      },
+      "table": {
+        "date": "Date",
+        "vehicle": "Vehicle",
+        "record": "Record",
+        "vendor": "Vendor",
+        "cost": "Cost"
+      },
+      "empty": {
+        "noOverdue": "No overdue maintenance or compliance items right now.",
+        "nothingDueSoon": "Nothing is due soon at the moment."
+      },
+      "badges": {
+        "overdue": "Overdue",
+        "dueSoon": "Due soon"
+      },
+      "statusLine": "Insurance: {insurance} · Inspection: {inspection} · Maintenance: {maintenance}",
+      "expiryLine": "Insurance expiry: {insurance} · Inspection expiry: {inspection}",
+      "messages": {
+        "saveRecordFailed": "Failed to save maintenance record",
+        "recordSaved": "Maintenance record saved",
+        "saveInsuranceFailed": "Failed to save insurance record",
+        "insuranceSaved": "Insurance record saved",
+        "saveInspectionFailed": "Failed to save inspection record",
+        "inspectionSaved": "Inspection record saved"
+      }
+    },
+    "inventory": {
+      "page": {
+        "title": "Parts inventory and stock transactions",
+        "description": "Monitor parts on hand, tire-related stock, supplier pricing, and purchase or usage movements that feed maintenance records and cost tracking."
+      },
+      "audiences": {
+        "financialClerk": "Financial clerk",
+        "mechanic": "Mechanic",
+        "administration": "Administration",
+        "rentalAgent": "Rental agent"
+      },
+      "filters": {
+        "title": "Inventory filters for purchasing, workshop, and rental readiness",
+        "description": "Search stock, isolate low-stock and tire-related items, and trace movement dates so finance can review value, mechanics can find the right parts, and admin teams can keep rentals moving.",
+        "resultSummary": "{parts} matching parts and {movements} stock movements",
+        "searchPlaceholder": "Search part, SKU, supplier, notes, or brand",
+        "stockStatus": "Stock status",
+        "allStockStatuses": "All stock statuses",
+        "lowStock": "Low stock",
+        "outOfStock": "Out of stock",
+        "inStock": "In stock",
+        "allCategories": "All categories",
+        "movementType": "Movement type",
+        "allMovements": "All movements",
+        "tireStock": "Tire stock",
+        "allParts": "All parts",
+        "tireOnly": "Tire-related only"
+      },
+      "cards": {
+        "activeParts": "Active parts",
+        "lowStock": "Low stock",
+        "unitsOnHand": "Units on hand",
+        "stockValue": "Stock value"
+      },
+      "workspace": {
+        "title": "Inventory and stock movement",
+        "description": "Track purchase stock, tire sets, ad-hoc parts, and usage deductions from maintenance jobs without leaving the admin area."
+      },
+      "actions": {
+        "newPart": "New part",
+        "createPart": "Create part",
+        "addStockMovement": "Add stock movement",
+        "saveMovement": "Save movement",
+        "exportParts": "Export parts CSV",
+        "exportMovements": "Export movements CSV"
+      },
+      "dialogs": {
+        "part": {
+          "title": "Create inventory part",
+          "description": "Add a reusable stock item for future maintenance templates, purchases, and part usage deductions."
+        },
+        "transaction": {
+          "title": "Record stock movement",
+          "description": "Use this for purchases, manual adjustments, returns, or usage not tied to a maintenance modal."
+        }
+      },
+      "form": {
+        "partName": "Part name",
+        "sku": "SKU",
+        "category": "Category",
+        "brand": "Brand",
+        "unit": "Unit",
+        "defaultSupplier": "Default supplier",
+        "openingStock": "Opening stock",
+        "reorderThreshold": "Reorder threshold",
+        "averageUnitCost": "Average unit cost",
+        "tireBrandModel": "Tire brand/model",
+        "tireRelatedHint": "Mark this part as tire-related so tire costs and replacement history stay visible.",
+        "inventoryPart": "Inventory part",
+        "quantity": "Quantity",
+        "unitCost": "Unit cost",
+        "transactionNotes": "Supplier, invoice, stock correction reason..."
+      },
+      "tables": {
+        "partsCatalog": "Parts catalog",
+        "recentStockMovements": "Recent stock movements"
+      },
+      "table": {
+        "part": "Part",
+        "stock": "Stock",
+        "threshold": "Threshold",
+        "avgCost": "Avg cost",
+        "uncategorized": "Uncategorized",
+        "tireRelated": "Tire-related",
+        "qty": "Qty"
+      },
+      "transactionTypes": {
+        "purchase": "Purchase",
+        "return": "Return",
+        "adjustment": "Adjustment",
+        "usage": "Usage"
+      },
+      "messages": {
+        "createPartFailed": "Failed to create inventory part",
+        "partCreated": "Inventory part created",
+        "saveTransactionFailed": "Failed to save inventory transaction",
+        "transactionSaved": "Inventory transaction saved"
       }
     }
   }

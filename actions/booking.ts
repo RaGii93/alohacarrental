@@ -11,9 +11,10 @@ import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { calculateDriverLicenseDeleteAfter } from "@/lib/driver-license-retention";
-import { getInvoiceProvider, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
+import { getBookingHoldDays, getBookingRuleSettings, getInvoiceProvider, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { logAdminAction } from "@/lib/audit";
-import { calculateBookingAmounts, calculateFuelDifferenceCharge, calculateLateReturnCharge, getFuelChargePerQuarterForCategory } from "@/lib/pricing";
+import { calculateBookingAmounts, calculateFuelDifferenceCharge, calculateLateReturnCharge, evaluateBookingRules, getFuelChargePerQuarterForCategory } from "@/lib/pricing";
+import { createNotification } from "@/lib/notifications";
 import { getTermsEmailAttachment } from "@/lib/terms";
 import {
   ensureQuickBooksBookingColumns,
@@ -65,6 +66,34 @@ async function queuePaymentTransferForActiveProvider(bookingId: string) {
     return invoiceProvider;
   }
   return invoiceProvider;
+}
+
+function buildDeclineEmailContent(params: {
+  reason?: string | null;
+  automatic?: boolean;
+}) {
+  const trimmedReason = String(params.reason || "").trim();
+
+  if (params.automatic) {
+    return {
+      subject: "We’re Sorry, Your Booking Request Has Expired",
+      title: "We’re sorry, your booking request has expired",
+      introText:
+        "We sincerely apologize, but your booking request was not completed before the reservation hold period ended, so it has now been declined automatically.",
+      outroText:
+        "We understand this may be disappointing. If you would still like to reserve a vehicle, please contact us and we will gladly help you arrange a new booking as quickly as possible.",
+    };
+  }
+
+  return {
+    subject: "We’re Sorry, We’re Unable to Approve Your Booking",
+    title: "We’re sorry, we’re unable to approve your booking",
+    introText:
+      "We sincerely apologize, but we’re unable to approve your booking request at this time.",
+    outroText: trimmedReason
+      ? `Reason provided: ${trimmedReason} If you would like help finding another option or making a new reservation, please contact us and our team will be happy to assist.`
+      : "If you would like help finding another option or making a new reservation, please contact us and our team will be happy to assist.",
+  };
 }
 
 type InspectionStageValue = "PICKUP" | "RETURN";
@@ -171,6 +200,47 @@ async function resolveActiveLocation(locationId: string | null | undefined) {
   });
 }
 
+async function evaluateBookingPricingRules(params: {
+  startDate: Date;
+  endDate: Date;
+  basePriceCents: number;
+  extrasCents: number;
+  taxPercentage: number;
+  baseRentalIncludesTax: boolean;
+  bookingSource: "public" | "admin";
+}) {
+  const settings = await getBookingRuleSettings();
+  const evaluation = evaluateBookingRules({
+    startDate: params.startDate,
+    endDate: params.endDate,
+    basePriceCents: params.basePriceCents,
+    extrasCents: params.extrasCents,
+    taxPercentage: params.taxPercentage,
+    baseRentalIncludesTax: params.baseRentalIncludesTax,
+    bookingSource: params.bookingSource,
+    settings,
+  });
+
+  if (evaluation.belowMinimumBlocked) {
+    return {
+      ok: false as const,
+      error: `This booking is below the ${settings.minimumRentalDays}-day minimum and can only be created by an admin.`,
+    };
+  }
+
+  if (evaluation.lastMinuteBlocked) {
+    return {
+      ok: false as const,
+      error: `This booking starts within ${settings.lastMinuteBookingThresholdHours} hour(s) and can only be created by an admin.`,
+    };
+  }
+
+  return {
+    ok: true as const,
+    evaluation,
+  };
+}
+
 async function selectAvailableVehicleForBooking(params: {
   tx: typeof db;
   bookingIdToExclude?: string;
@@ -213,20 +283,61 @@ async function selectAvailableVehicleForBooking(params: {
 }
 
 export async function cancelExpiredHolds() {
-  // Cancel PENDING bookings where holdExpiresAt < now
-  const result = await db.booking.updateMany({
+  const expiredBookings = await db.booking.findMany({
     where: {
       status: "PENDING",
       holdExpiresAt: {
         lt: new Date(),
       },
     },
-    data: {
-      status: "CANCELLED",
+    select: {
+      id: true,
+      customerEmail: true,
+      customerName: true,
+      bookingCode: true,
+      startDate: true,
+      endDate: true,
+      totalAmount: true,
     },
   });
 
-  return result.count;
+  if (expiredBookings.length === 0) return 0;
+
+  await db.booking.updateMany({
+    where: {
+      id: {
+        in: expiredBookings.map((booking) => booking.id),
+      },
+    },
+    data: {
+      status: "DECLINED",
+      notes: "Booking automatically declined after the hold period expired.",
+    },
+  });
+
+  await Promise.all(
+    expiredBookings.map(async (booking) => {
+      try {
+        const emailContent = buildDeclineEmailContent({ automatic: true });
+        await sendEmail({
+          to: booking.customerEmail,
+          subject: `${emailContent.subject} - ${booking.bookingCode}`,
+          html: await bookingEmailHtml({
+            title: emailContent.title,
+            customerName: booking.customerName,
+            bookingCode: booking.bookingCode,
+            startDate: booking.startDate,
+            endDate: booking.endDate,
+            totalAmountCents: booking.totalAmount,
+            introText: emailContent.introText,
+            outroText: emailContent.outroText,
+          }),
+        });
+      } catch {}
+    })
+  );
+
+  return expiredBookings.length;
 }
 
 export async function confirmBookingAction(bookingId: string, locale: string) {
@@ -340,6 +451,24 @@ export async function declineBookingAction(
         bookingId,
       },
     });
+
+    try {
+      const emailContent = buildDeclineEmailContent({ reason });
+      await sendEmail({
+        to: booking.customerEmail,
+        subject: `${emailContent.subject} - ${booking.bookingCode}`,
+        html: await bookingEmailHtml({
+          title: emailContent.title,
+          customerName: booking.customerName,
+          bookingCode: booking.bookingCode,
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          totalAmountCents: booking.totalAmount,
+          introText: emailContent.introText,
+          outroText: emailContent.outroText,
+        }),
+      });
+    } catch {}
 
     return { success: true, booking };
   } catch (error: any) {
@@ -1393,13 +1522,6 @@ export async function createCategoryBookingAction(
 
     // Calculate days and total
     const days = Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const minimumBookingDays = await getMinBookingDays();
-    if (days < minimumBookingDays) {
-      return {
-        success: false,
-        error: `Minimum booking duration is ${minimumBookingDays} day${minimumBookingDays > 1 ? "s" : ""}`,
-      };
-    }
     const baseTotal = category.dailyRate * Math.max(1, days);
     let extrasTotal = 0;
     let resolvedExtras: Array<{ extraId: string; quantity: number; lineTotal: number }> = [];
@@ -1448,12 +1570,19 @@ export async function createCategoryBookingAction(
       getTaxPercentage(),
       getVehicleRatesIncludeTax(),
     ]);
-    const { totalAmount } = calculateBookingAmounts({
-      baseRentalCents: baseTotal,
+    const pricingRules = await evaluateBookingPricingRules({
+      startDate: validated.startDate,
+      endDate: validated.endDate,
+      basePriceCents: category.dailyRate,
       extrasCents: extrasTotal,
       taxPercentage,
       baseRentalIncludesTax: vehicleRatesIncludeTax,
+      bookingSource: bookingSource === "admin" ? "admin" : "public",
     });
+    if (!pricingRules.ok) {
+      return { success: false, error: pricingRules.error };
+    }
+    const totalAmount = pricingRules.evaluation.totalAmountCents;
 
 
     // Database transaction to allocate vehicle
@@ -1506,6 +1635,8 @@ export async function createCategoryBookingAction(
           if (attempts > 10) throw new Error("Failed to generate unique booking code");
         } while (await tx.booking.findUnique({ where: { bookingCode } }));
 
+        const bookingHoldDays = await getBookingHoldDays();
+
         const baseData = {
           categoryId,
           vehicleId: availableVehicle.id,
@@ -1523,7 +1654,7 @@ export async function createCategoryBookingAction(
           totalAmount,
           status: "PENDING" as const,
           bookingCode,
-          holdExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+          holdExpiresAt: new Date(Date.now() + bookingHoldDays * 24 * 60 * 60 * 1000),
           driverLicenseUrl,
           termsAcceptedAt: new Date(),
           notes: validated.notes,
@@ -1610,6 +1741,16 @@ export async function createCategoryBookingAction(
       }
       throw error;
     }
+
+    try {
+      await createNotification({
+        type: "BOOKING_CREATED",
+        title: "New booking request received",
+        message: `${booking.customerName} requested ${category.name} from ${booking.startDate.toLocaleDateString()} to ${booking.endDate.toLocaleDateString()}.`,
+        href: `/${locale}/admin/bookings/${booking.id}`,
+        severity: "INFO",
+      });
+    } catch {}
 
     try {
       const tenant = await getTenantConfig();
@@ -1754,13 +1895,6 @@ export async function updateCategoryBookingAction(
     }
 
     const days = Math.max(1, Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24)));
-    const minimumBookingDays = await getMinBookingDays();
-    if (days < minimumBookingDays) {
-      return {
-        success: false,
-        error: `Minimum booking duration is ${minimumBookingDays} day${minimumBookingDays > 1 ? "s" : ""}`,
-      };
-    }
 
     let refreshedExtras: Array<{
       extraId: string;
@@ -1803,8 +1937,20 @@ export async function updateCategoryBookingAction(
       getTaxPercentage(),
       getVehicleRatesIncludeTax(),
     ]);
+    const pricingRules = await evaluateBookingPricingRules({
+      startDate: validated.startDate,
+      endDate: validated.endDate,
+      basePriceCents: category.dailyRate,
+      extrasCents: extrasTotal,
+      taxPercentage,
+      baseRentalIncludesTax: vehicleRatesIncludeTax,
+      bookingSource: "admin",
+    });
+    if (!pricingRules.ok) {
+      return { success: false, error: pricingRules.error };
+    }
     const { totalAmount } = calculateBookingAmounts({
-      baseRentalCents: baseRental,
+      baseRentalCents: baseRental + pricingRules.evaluation.belowMinimumSurchargeCents + pricingRules.evaluation.lastMinuteSurchargeCents,
       extrasCents: extrasTotal,
       discountCents: discountAmount,
       taxPercentage,

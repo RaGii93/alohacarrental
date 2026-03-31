@@ -49,6 +49,12 @@ interface CategoryOption {
   name: string;
 }
 
+const MANUAL_VEHICLE_STATUS_OPTIONS = [
+  { value: "ACTIVE", labelKey: "admin.vehicles.active" },
+  { value: "MAINTENANCE", labelKey: "admin.vehicles.maintenance" },
+  { value: "INACTIVE", labelKey: "admin.vehicles.inactive" },
+] as const;
+
 export function VehicleDialog({
   vehicle,
   categories,
@@ -280,19 +286,23 @@ export function VehicleDialog({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t("admin.vehicles.status")}</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value === "ON_RENT" ? "ACTIVE" : field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="ACTIVE">{t("admin.vehicles.active")}</SelectItem>
-                            <SelectItem value="ON_RENT">{t("admin.vehicles.onRent")}</SelectItem>
-                            <SelectItem value="MAINTENANCE">{t("admin.vehicles.maintenance")}</SelectItem>
-                            <SelectItem value="INACTIVE">{t("admin.vehicles.inactive")}</SelectItem>
+                            {MANUAL_VEHICLE_STATUS_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {t(option.labelKey as any)}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
+                        <p className="text-xs text-slate-500">
+                          On-rent status is controlled by the booking and return flow, so it is not set manually here.
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}

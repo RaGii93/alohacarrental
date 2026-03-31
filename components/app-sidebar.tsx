@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import {
   Car,
   CarFront,
+  Bell,
   CheckCircle2,
   ClipboardList,
   Cog,
@@ -16,8 +17,11 @@ import {
   DollarSign,
   FileText,
   Grid2X2,
+  Handshake,
   MapPin,
+  Package,
   Percent,
+  ShieldAlert,
   Settings,
   Star,
   Tag,
@@ -74,10 +78,14 @@ export function AppSidebar({
     { key: "deliveries", label: tOr("admin.dashboard.tabs.deliveries", "Deliveries"), icon: Truck },
     { key: "returns", label: tOr("admin.dashboard.tabs.returns", "Returns"), icon: Undo2 },
     { key: "fleet", label: tOr("admin.dashboard.tabs.fleet", "Fleet"), icon: CarFront },
+    { key: "notifications", label: tOr("admin.dashboard.tabs.notifications", "Notifications"), icon: Bell },
     { key: "help", label: tOr("admin.dashboard.tabs.help", "Help Center"), icon: CircleHelp },
     ...(role === "ROOT" || role === "OWNER"
       ? [
           { key: "financial", label: tOr("admin.dashboard.tabs.financial", "Financial"), icon: DollarSign },
+          { key: "maintenance", label: tOr("admin.dashboard.tabs.maintenance", "Maintenance"), icon: ShieldAlert },
+          { key: "inventory", label: tOr("admin.dashboard.tabs.inventory", "Inventory"), icon: Package },
+          { key: "partner-rentals", label: tOr("admin.dashboard.tabs.partnerRentals", "Partner Rentals"), icon: Handshake },
           ...(invoiceProvider === "QUICKBOOKS"
             ? [{ key: "quickbooks", label: tOr("admin.dashboard.tabs.quickbooks", "QuickBooks"), icon: FileText }]
             : invoiceProvider === "ZOHO"

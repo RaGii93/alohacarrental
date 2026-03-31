@@ -19,6 +19,7 @@ import { formatDateTime, formatDateTimeRange } from "@/lib/datetime";
 
 interface Booking {
   id: string;
+  bookingCode: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -64,6 +65,20 @@ export function BookingsTable({
   };
 
   const sortIndicator = (key: typeof sortKey) => (sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "");
+  const getStatusLabel = (bookingStatus: string) => {
+    switch (bookingStatus) {
+      case "PENDING":
+        return t("common.pending");
+      case "CONFIRMED":
+        return t("common.confirmed");
+      case "DECLINED":
+        return t("common.declined");
+      case "CANCELLED":
+        return t("common.cancelled");
+      default:
+        return bookingStatus;
+    }
+  };
 
   const sorted = useMemo(() => {
     const rows = [...bookings];
@@ -140,9 +155,9 @@ export function BookingsTable({
             <TableRow key={booking.id}>
               <TableCell>
                 <div className="font-medium">{booking.customerName}</div>
-                <div className="text-sm text-gray-500">{booking.customerEmail}</div>
+                <div className="text-sm text-gray-500">{booking.bookingCode} · {booking.customerEmail}</div>
               </TableCell>
-              <TableCell>{booking.vehicle?.name ?? "—"}</TableCell>
+              <TableCell>{booking.vehicle?.name ?? t("admin.bookings.table.noVehicle")}</TableCell>
               <TableCell>
                 <div className="text-sm">
                   {dateMode === "pickup"
@@ -157,7 +172,7 @@ export function BookingsTable({
               </TableCell>
               <TableCell>
                 <Badge className={getStatusColor(booking.status)}>
-                  {booking.status}
+                  {getStatusLabel(booking.status)}
                 </Badge>
               </TableCell>
               <TableCell>

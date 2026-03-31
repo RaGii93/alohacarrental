@@ -2,6 +2,43 @@ import { db } from "@/lib/db";
 
 const TAX_KEY = "tax_percentage";
 const MIN_BOOKING_DAYS_KEY = "minimum_booking_days";
+const BOOKING_HOLD_DAYS_KEY = "booking_hold_days";
+const BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY = "below_minimum_rental_admin_only";
+const BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY = "below_minimum_rental_pricing_enabled";
+const BELOW_MINIMUM_RENTAL_SURCHARGE_MODE_KEY = "below_minimum_rental_surcharge_mode";
+const BELOW_MINIMUM_RENTAL_SURCHARGE_VALUE_KEY = "below_minimum_rental_surcharge_value";
+const LAST_MINUTE_BOOKING_ENABLED_KEY = "last_minute_booking_enabled";
+const LAST_MINUTE_BOOKING_ADMIN_ONLY_KEY = "last_minute_booking_admin_only";
+const LAST_MINUTE_BOOKING_THRESHOLD_HOURS_KEY = "last_minute_booking_threshold_hours";
+const LAST_MINUTE_BOOKING_EXTRA_PERCENT_KEY = "last_minute_booking_extra_percent";
+const MAINTENANCE_MODULE_ENABLED_KEY = "maintenance_module_enabled";
+const INVENTORY_MODULE_ENABLED_KEY = "inventory_module_enabled";
+const VEHICLE_FINANCIAL_TRACKING_ENABLED_KEY = "vehicle_financial_tracking_enabled";
+const REMINDERS_MODULE_ENABLED_KEY = "reminders_module_enabled";
+const DEFAULT_SMALL_SERVICE_INTERVAL_KM_KEY = "default_small_service_interval_km";
+const DEFAULT_BIG_SERVICE_INTERVAL_KM_KEY = "default_big_service_interval_km";
+const SERVICE_DUE_SOON_THRESHOLD_KM_KEY = "service_due_soon_threshold_km";
+const ALLOW_CATEGORY_LEVEL_MAINTENANCE_TEMPLATES_KEY = "allow_category_level_maintenance_templates";
+const ALLOW_VEHICLE_LEVEL_MAINTENANCE_OVERRIDES_KEY = "allow_vehicle_level_maintenance_overrides";
+const VEHICLE_MAINTENANCE_AVAILABILITY_BLOCK_ENABLED_KEY = "vehicle_maintenance_availability_block_enabled";
+const LOW_STOCK_THRESHOLD_ENABLED_KEY = "low_stock_threshold_enabled";
+const DEFAULT_LOW_STOCK_THRESHOLD_KEY = "default_low_stock_threshold";
+const INSURANCE_FEATURE_ENABLED_KEY = "insurance_feature_enabled";
+const INSURANCE_REMINDER_ENABLED_KEY = "insurance_reminder_enabled";
+const INSURANCE_REMINDER_DAYS_BEFORE_KEY = "insurance_reminder_days_before";
+const INSURANCE_GRACE_PERIOD_DAYS_KEY = "insurance_grace_period_days";
+const INSPECTION_FEATURE_ENABLED_KEY = "inspection_feature_enabled";
+const INSPECTION_REMINDER_ENABLED_KEY = "inspection_reminder_enabled";
+const INSPECTION_REMINDER_DAYS_BEFORE_KEY = "inspection_reminder_days_before";
+const INSPECTION_GRACE_PERIOD_DAYS_KEY = "inspection_grace_period_days";
+const INSPECTION_LABEL_KEY = "inspection_label";
+const INSPECTION_LOCALIZED_LABEL_NL_KEY = "inspection_localized_label_nl";
+const DASHBOARD_REMINDER_WIDGETS_ENABLED_KEY = "dashboard_reminder_widgets_enabled";
+const REMINDER_SEVERITY_DUE_SOON_DAYS_KEY = "reminder_severity_due_soon_days";
+const REMINDER_SEVERITY_DUE_SOON_KM_KEY = "reminder_severity_due_soon_km";
+const BLOCK_VEHICLE_BOOKING_IF_INSURANCE_EXPIRED_KEY = "block_vehicle_booking_if_insurance_expired";
+const BLOCK_VEHICLE_BOOKING_IF_INSPECTION_EXPIRED_KEY = "block_vehicle_booking_if_inspection_expired";
+const BLOCK_VEHICLE_BOOKING_IF_MAINTENANCE_OVERDUE_KEY = "block_vehicle_booking_if_maintenance_overdue";
 const VEHICLE_RATES_INCLUDE_TAX_KEY = "vehicle_rates_include_tax";
 const QUICKBOOKS_REFRESH_TOKEN_KEY = "quickbooks_refresh_token";
 const QUICKBOOKS_REALM_ID_KEY = "quickbooks_realm_id";
@@ -94,6 +131,53 @@ export type QuickBooksSetupSettings = {
 };
 
 export type InvoiceProvider = "NONE" | "QUICKBOOKS" | "ZOHO";
+export type BelowMinimumRentalSurchargeMode =
+  | "percentage_on_base_total"
+  | "percentage_on_current_total"
+  | "fixed_amount";
+
+export type BookingRuleSettings = {
+  minimumRentalDays: number;
+  belowMinimumRentalAdminOnly: boolean;
+  belowMinimumRentalPricingEnabled: boolean;
+  belowMinimumRentalSurchargeMode: BelowMinimumRentalSurchargeMode;
+  belowMinimumRentalSurchargeValue: number;
+  lastMinuteBookingEnabled: boolean;
+  lastMinuteBookingAdminOnly: boolean;
+  lastMinuteBookingThresholdHours: number;
+  lastMinuteBookingExtraPercent: number;
+};
+
+export type FleetOperationsSettings = {
+  maintenanceModuleEnabled: boolean;
+  inventoryModuleEnabled: boolean;
+  vehicleFinancialTrackingEnabled: boolean;
+  remindersModuleEnabled: boolean;
+  defaultSmallServiceIntervalKm: number;
+  defaultBigServiceIntervalKm: number;
+  serviceDueSoonThresholdKm?: number;
+  allowCategoryLevelMaintenanceTemplates: boolean;
+  allowVehicleLevelMaintenanceOverrides: boolean;
+  vehicleMaintenanceAvailabilityBlockEnabled: boolean;
+  lowStockThresholdEnabled: boolean;
+  defaultLowStockThreshold: number;
+  insuranceFeatureEnabled: boolean;
+  insuranceReminderEnabled: boolean;
+  insuranceReminderDaysBefore: number;
+  insuranceGracePeriodDays?: number;
+  inspectionFeatureEnabled: boolean;
+  inspectionReminderEnabled: boolean;
+  inspectionReminderDaysBefore: number;
+  inspectionGracePeriodDays?: number;
+  inspectionLabel: string;
+  inspectionLocalizedLabelNl?: string;
+  dashboardReminderWidgetsEnabled: boolean;
+  reminderSeverityDueSoonDays?: number;
+  reminderSeverityDueSoonKm?: number;
+  blockVehicleBookingIfInsuranceExpired: boolean;
+  blockVehicleBookingIfInspectionExpired: boolean;
+  blockVehicleBookingIfMaintenanceOverdue: boolean;
+};
 
 export type ZohoInvoiceFeatureSettings = {
   envConfigured: boolean;
@@ -191,10 +275,10 @@ function primaryForegroundFor(lightToken: string) {
 function buildThemeFallbacks() {
   const primaryHex = sanitizeOptionalText(process.env.TENANT_PRIMARY_COLOR);
   const primaryFromHex = primaryHex ? hexToRgb(primaryHex) : null;
-  const primary = primaryFromHex ? rgbToHslToken(primaryFromHex.r, primaryFromHex.g, primaryFromHex.b) : "0 0% 9%";
+  const primary = primaryFromHex ? rgbToHslToken(primaryFromHex.r, primaryFromHex.g, primaryFromHex.b) : "294 64% 46%";
   const primaryForeground = primaryForegroundFor(primary);
-  const accent = primaryFromHex ? `${primary.split(" ")[0]} 100% 97%` : "0 0% 96.1%";
-  const accentForeground = primaryFromHex ? primary : "0 0% 9%";
+  const accent = primaryFromHex ? `${primary.split(" ")[0]} 100% 97%` : "314 100% 97%";
+  const accentForeground = primaryFromHex ? primary : "304 42% 24%";
 
   return {
     primary,
@@ -241,6 +325,92 @@ function clampMinBookingDays(input: number): number {
 
 function defaultMinBookingDays(): number {
   return clampMinBookingDays(Number(process.env.DEFAULT_MIN_BOOKING_DAYS || 1));
+}
+
+function clampBookingHoldDays(input: number): number {
+  if (!Number.isFinite(input)) return 1;
+  return Math.max(1, Math.min(30, Math.round(input)));
+}
+
+function defaultBookingHoldDays(): number {
+  return clampBookingHoldDays(Number(process.env.DEFAULT_BOOKING_HOLD_DAYS || 1));
+}
+
+function normalizeBelowMinimumRentalSurchargeMode(
+  value: string | null | undefined
+): BelowMinimumRentalSurchargeMode {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (
+    normalized === "percentage_on_base_total" ||
+    normalized === "percentage_on_current_total" ||
+    normalized === "fixed_amount"
+  ) {
+    return normalized;
+  }
+  return "percentage_on_base_total";
+}
+
+function clampPercentage(input: number): number {
+  if (!Number.isFinite(input)) return 0;
+  return Math.max(0, Math.min(1000, Math.round(input * 100) / 100));
+}
+
+function clampCurrencyAmount(input: number): number {
+  if (!Number.isFinite(input)) return 0;
+  return Math.max(0, Math.min(1_000_000, Math.round(input)));
+}
+
+function clampLastMinuteThresholdHours(input: number): number {
+  if (!Number.isFinite(input)) return 24;
+  return Math.max(1, Math.min(720, Math.round(input)));
+}
+
+function defaultBelowMinimumRentalAdminOnly(): boolean {
+  return parseBool(process.env.DEFAULT_BELOW_MINIMUM_RENTAL_ADMIN_ONLY, true);
+}
+
+function defaultBelowMinimumRentalPricingEnabled(): boolean {
+  return parseBool(process.env.DEFAULT_BELOW_MINIMUM_RENTAL_PRICING_ENABLED, false);
+}
+
+function defaultBelowMinimumRentalSurchargeMode(): BelowMinimumRentalSurchargeMode {
+  return normalizeBelowMinimumRentalSurchargeMode(process.env.DEFAULT_BELOW_MINIMUM_RENTAL_SURCHARGE_MODE);
+}
+
+function defaultBelowMinimumRentalSurchargeValue(): number {
+  return clampCurrencyAmount(Number(process.env.DEFAULT_BELOW_MINIMUM_RENTAL_SURCHARGE_VALUE || 0));
+}
+
+function defaultLastMinuteBookingEnabled(): boolean {
+  return parseBool(process.env.DEFAULT_LAST_MINUTE_BOOKING_ENABLED, false);
+}
+
+function defaultLastMinuteBookingAdminOnly(): boolean {
+  return parseBool(process.env.DEFAULT_LAST_MINUTE_BOOKING_ADMIN_ONLY, false);
+}
+
+function defaultLastMinuteBookingThresholdHours(): number {
+  return clampLastMinuteThresholdHours(Number(process.env.DEFAULT_LAST_MINUTE_BOOKING_THRESHOLD_HOURS || 24));
+}
+
+function defaultLastMinuteBookingExtraPercent(): number {
+  return clampPercentage(Number(process.env.DEFAULT_LAST_MINUTE_BOOKING_EXTRA_PERCENT || 0));
+}
+
+function clampDistanceKm(input: number, fallback = 0, max = 1_000_000): number {
+  if (!Number.isFinite(input)) return fallback;
+  return Math.max(0, Math.min(max, Math.round(input)));
+}
+
+function clampReminderDays(input: number, fallback = 0, max = 365): number {
+  if (!Number.isFinite(input)) return fallback;
+  return Math.max(0, Math.min(max, Math.round(input)));
+}
+
+function parseNullableInt(value: string | null | undefined, clamp: (value: number) => number): number | undefined {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return undefined;
+  return clamp(Number(trimmed));
 }
 
 export function calculateTaxAmount(subtotalCents: number, taxPercentage: number): number {
@@ -371,6 +541,228 @@ export async function setMinBookingDays(nextMinBookingDays: number): Promise<num
     ON CONFLICT (key)
     DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
   `;
+
+  return normalized;
+}
+
+export async function getBookingHoldDays(): Promise<number> {
+  const value = await getAppSettingValue(BOOKING_HOLD_DAYS_KEY);
+  if (!value) return defaultBookingHoldDays();
+  return clampBookingHoldDays(Number(value));
+}
+
+export async function setBookingHoldDays(nextBookingHoldDays: number): Promise<number> {
+  await ensureSettingsTable();
+
+  const normalized = clampBookingHoldDays(nextBookingHoldDays);
+  await db.$executeRaw`
+    INSERT INTO "AppSetting" (key, value, "updatedAt")
+    VALUES (${BOOKING_HOLD_DAYS_KEY}, ${String(normalized)}, NOW())
+    ON CONFLICT (key)
+    DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
+  `;
+
+  return normalized;
+}
+
+export async function getBookingRuleSettings(): Promise<BookingRuleSettings> {
+  const values = await getAppSettingsMap([
+    MIN_BOOKING_DAYS_KEY,
+    BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY,
+    BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY,
+    BELOW_MINIMUM_RENTAL_SURCHARGE_MODE_KEY,
+    BELOW_MINIMUM_RENTAL_SURCHARGE_VALUE_KEY,
+    LAST_MINUTE_BOOKING_ENABLED_KEY,
+    LAST_MINUTE_BOOKING_ADMIN_ONLY_KEY,
+    LAST_MINUTE_BOOKING_THRESHOLD_HOURS_KEY,
+    LAST_MINUTE_BOOKING_EXTRA_PERCENT_KEY,
+  ]);
+
+  return {
+    minimumRentalDays: values[MIN_BOOKING_DAYS_KEY]
+      ? clampMinBookingDays(Number(values[MIN_BOOKING_DAYS_KEY]))
+      : defaultMinBookingDays(),
+    belowMinimumRentalAdminOnly: values[BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY]
+      ? parseBool(values[BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY], defaultBelowMinimumRentalAdminOnly())
+      : defaultBelowMinimumRentalAdminOnly(),
+    belowMinimumRentalPricingEnabled: values[BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY]
+      ? parseBool(values[BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY], defaultBelowMinimumRentalPricingEnabled())
+      : defaultBelowMinimumRentalPricingEnabled(),
+    belowMinimumRentalSurchargeMode: values[BELOW_MINIMUM_RENTAL_SURCHARGE_MODE_KEY]
+      ? normalizeBelowMinimumRentalSurchargeMode(values[BELOW_MINIMUM_RENTAL_SURCHARGE_MODE_KEY])
+      : defaultBelowMinimumRentalSurchargeMode(),
+    belowMinimumRentalSurchargeValue: values[BELOW_MINIMUM_RENTAL_SURCHARGE_VALUE_KEY]
+      ? clampCurrencyAmount(Number(values[BELOW_MINIMUM_RENTAL_SURCHARGE_VALUE_KEY]))
+      : defaultBelowMinimumRentalSurchargeValue(),
+    lastMinuteBookingEnabled: values[LAST_MINUTE_BOOKING_ENABLED_KEY]
+      ? parseBool(values[LAST_MINUTE_BOOKING_ENABLED_KEY], defaultLastMinuteBookingEnabled())
+      : defaultLastMinuteBookingEnabled(),
+    lastMinuteBookingAdminOnly: values[LAST_MINUTE_BOOKING_ADMIN_ONLY_KEY]
+      ? parseBool(values[LAST_MINUTE_BOOKING_ADMIN_ONLY_KEY], defaultLastMinuteBookingAdminOnly())
+      : defaultLastMinuteBookingAdminOnly(),
+    lastMinuteBookingThresholdHours: values[LAST_MINUTE_BOOKING_THRESHOLD_HOURS_KEY]
+      ? clampLastMinuteThresholdHours(Number(values[LAST_MINUTE_BOOKING_THRESHOLD_HOURS_KEY]))
+      : defaultLastMinuteBookingThresholdHours(),
+    lastMinuteBookingExtraPercent: values[LAST_MINUTE_BOOKING_EXTRA_PERCENT_KEY]
+      ? clampPercentage(Number(values[LAST_MINUTE_BOOKING_EXTRA_PERCENT_KEY]))
+      : defaultLastMinuteBookingExtraPercent(),
+  };
+}
+
+export async function setBookingRuleSettings(input: BookingRuleSettings): Promise<BookingRuleSettings> {
+  const normalized: BookingRuleSettings = {
+    minimumRentalDays: clampMinBookingDays(input.minimumRentalDays),
+    belowMinimumRentalAdminOnly: Boolean(input.belowMinimumRentalAdminOnly),
+    belowMinimumRentalPricingEnabled: Boolean(input.belowMinimumRentalPricingEnabled),
+    belowMinimumRentalSurchargeMode: normalizeBelowMinimumRentalSurchargeMode(input.belowMinimumRentalSurchargeMode),
+    belowMinimumRentalSurchargeValue: clampCurrencyAmount(input.belowMinimumRentalSurchargeValue),
+    lastMinuteBookingEnabled: Boolean(input.lastMinuteBookingEnabled),
+    lastMinuteBookingAdminOnly: Boolean(input.lastMinuteBookingAdminOnly),
+    lastMinuteBookingThresholdHours: clampLastMinuteThresholdHours(input.lastMinuteBookingThresholdHours),
+    lastMinuteBookingExtraPercent: clampPercentage(input.lastMinuteBookingExtraPercent),
+  };
+
+  await setAppSettingValues({
+    [MIN_BOOKING_DAYS_KEY]: String(normalized.minimumRentalDays),
+    [BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY]: normalized.belowMinimumRentalAdminOnly ? "true" : "false",
+    [BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY]: normalized.belowMinimumRentalPricingEnabled ? "true" : "false",
+    [BELOW_MINIMUM_RENTAL_SURCHARGE_MODE_KEY]: normalized.belowMinimumRentalSurchargeMode,
+    [BELOW_MINIMUM_RENTAL_SURCHARGE_VALUE_KEY]: String(normalized.belowMinimumRentalSurchargeValue),
+    [LAST_MINUTE_BOOKING_ENABLED_KEY]: normalized.lastMinuteBookingEnabled ? "true" : "false",
+    [LAST_MINUTE_BOOKING_ADMIN_ONLY_KEY]: normalized.lastMinuteBookingAdminOnly ? "true" : "false",
+    [LAST_MINUTE_BOOKING_THRESHOLD_HOURS_KEY]: String(normalized.lastMinuteBookingThresholdHours),
+    [LAST_MINUTE_BOOKING_EXTRA_PERCENT_KEY]: String(normalized.lastMinuteBookingExtraPercent),
+  });
+
+  return normalized;
+}
+
+export async function getFleetOperationsSettings(): Promise<FleetOperationsSettings> {
+  const values = await getAppSettingsMap([
+    MAINTENANCE_MODULE_ENABLED_KEY,
+    INVENTORY_MODULE_ENABLED_KEY,
+    VEHICLE_FINANCIAL_TRACKING_ENABLED_KEY,
+    REMINDERS_MODULE_ENABLED_KEY,
+    DEFAULT_SMALL_SERVICE_INTERVAL_KM_KEY,
+    DEFAULT_BIG_SERVICE_INTERVAL_KM_KEY,
+    SERVICE_DUE_SOON_THRESHOLD_KM_KEY,
+    ALLOW_CATEGORY_LEVEL_MAINTENANCE_TEMPLATES_KEY,
+    ALLOW_VEHICLE_LEVEL_MAINTENANCE_OVERRIDES_KEY,
+    VEHICLE_MAINTENANCE_AVAILABILITY_BLOCK_ENABLED_KEY,
+    LOW_STOCK_THRESHOLD_ENABLED_KEY,
+    DEFAULT_LOW_STOCK_THRESHOLD_KEY,
+    INSURANCE_FEATURE_ENABLED_KEY,
+    INSURANCE_REMINDER_ENABLED_KEY,
+    INSURANCE_REMINDER_DAYS_BEFORE_KEY,
+    INSURANCE_GRACE_PERIOD_DAYS_KEY,
+    INSPECTION_FEATURE_ENABLED_KEY,
+    INSPECTION_REMINDER_ENABLED_KEY,
+    INSPECTION_REMINDER_DAYS_BEFORE_KEY,
+    INSPECTION_GRACE_PERIOD_DAYS_KEY,
+    INSPECTION_LABEL_KEY,
+    INSPECTION_LOCALIZED_LABEL_NL_KEY,
+    DASHBOARD_REMINDER_WIDGETS_ENABLED_KEY,
+    REMINDER_SEVERITY_DUE_SOON_DAYS_KEY,
+    REMINDER_SEVERITY_DUE_SOON_KM_KEY,
+    BLOCK_VEHICLE_BOOKING_IF_INSURANCE_EXPIRED_KEY,
+    BLOCK_VEHICLE_BOOKING_IF_INSPECTION_EXPIRED_KEY,
+    BLOCK_VEHICLE_BOOKING_IF_MAINTENANCE_OVERDUE_KEY,
+  ]);
+
+  return {
+    maintenanceModuleEnabled: parseBool(values[MAINTENANCE_MODULE_ENABLED_KEY], true),
+    inventoryModuleEnabled: parseBool(values[INVENTORY_MODULE_ENABLED_KEY], true),
+    vehicleFinancialTrackingEnabled: parseBool(values[VEHICLE_FINANCIAL_TRACKING_ENABLED_KEY], true),
+    remindersModuleEnabled: parseBool(values[REMINDERS_MODULE_ENABLED_KEY], true),
+    defaultSmallServiceIntervalKm: clampDistanceKm(Number(values[DEFAULT_SMALL_SERVICE_INTERVAL_KM_KEY] || 5000), 5000),
+    defaultBigServiceIntervalKm: clampDistanceKm(Number(values[DEFAULT_BIG_SERVICE_INTERVAL_KM_KEY] || 10000), 10000),
+    serviceDueSoonThresholdKm: parseNullableInt(values[SERVICE_DUE_SOON_THRESHOLD_KM_KEY], (value) => clampDistanceKm(value, 0)),
+    allowCategoryLevelMaintenanceTemplates: parseBool(values[ALLOW_CATEGORY_LEVEL_MAINTENANCE_TEMPLATES_KEY], true),
+    allowVehicleLevelMaintenanceOverrides: parseBool(values[ALLOW_VEHICLE_LEVEL_MAINTENANCE_OVERRIDES_KEY], true),
+    vehicleMaintenanceAvailabilityBlockEnabled: parseBool(values[VEHICLE_MAINTENANCE_AVAILABILITY_BLOCK_ENABLED_KEY], true),
+    lowStockThresholdEnabled: parseBool(values[LOW_STOCK_THRESHOLD_ENABLED_KEY], true),
+    defaultLowStockThreshold: clampDistanceKm(Number(values[DEFAULT_LOW_STOCK_THRESHOLD_KEY] || 2), 2, 100_000),
+    insuranceFeatureEnabled: parseBool(values[INSURANCE_FEATURE_ENABLED_KEY], false),
+    insuranceReminderEnabled: parseBool(values[INSURANCE_REMINDER_ENABLED_KEY], true),
+    insuranceReminderDaysBefore: clampReminderDays(Number(values[INSURANCE_REMINDER_DAYS_BEFORE_KEY] || 14), 14),
+    insuranceGracePeriodDays: parseNullableInt(values[INSURANCE_GRACE_PERIOD_DAYS_KEY], (value) => clampReminderDays(value, 0)),
+    inspectionFeatureEnabled: parseBool(values[INSPECTION_FEATURE_ENABLED_KEY], false),
+    inspectionReminderEnabled: parseBool(values[INSPECTION_REMINDER_ENABLED_KEY], true),
+    inspectionReminderDaysBefore: clampReminderDays(Number(values[INSPECTION_REMINDER_DAYS_BEFORE_KEY] || 14), 14),
+    inspectionGracePeriodDays: parseNullableInt(values[INSPECTION_GRACE_PERIOD_DAYS_KEY], (value) => clampReminderDays(value, 0)),
+    inspectionLabel: String(values[INSPECTION_LABEL_KEY] || "Inspection").trim() || "Inspection",
+    inspectionLocalizedLabelNl: sanitizeOptionalText(values[INSPECTION_LOCALIZED_LABEL_NL_KEY]) || "Keurings datum",
+    dashboardReminderWidgetsEnabled: parseBool(values[DASHBOARD_REMINDER_WIDGETS_ENABLED_KEY], true),
+    reminderSeverityDueSoonDays: parseNullableInt(values[REMINDER_SEVERITY_DUE_SOON_DAYS_KEY], (value) => clampReminderDays(value, 0)),
+    reminderSeverityDueSoonKm: parseNullableInt(values[REMINDER_SEVERITY_DUE_SOON_KM_KEY], (value) => clampDistanceKm(value, 0)),
+    blockVehicleBookingIfInsuranceExpired: parseBool(values[BLOCK_VEHICLE_BOOKING_IF_INSURANCE_EXPIRED_KEY], false),
+    blockVehicleBookingIfInspectionExpired: parseBool(values[BLOCK_VEHICLE_BOOKING_IF_INSPECTION_EXPIRED_KEY], false),
+    blockVehicleBookingIfMaintenanceOverdue: parseBool(values[BLOCK_VEHICLE_BOOKING_IF_MAINTENANCE_OVERDUE_KEY], false),
+  };
+}
+
+export async function setFleetOperationsSettings(input: FleetOperationsSettings): Promise<FleetOperationsSettings> {
+  const normalized: FleetOperationsSettings = {
+    maintenanceModuleEnabled: Boolean(input.maintenanceModuleEnabled),
+    inventoryModuleEnabled: Boolean(input.inventoryModuleEnabled),
+    vehicleFinancialTrackingEnabled: Boolean(input.vehicleFinancialTrackingEnabled),
+    remindersModuleEnabled: Boolean(input.remindersModuleEnabled),
+    defaultSmallServiceIntervalKm: clampDistanceKm(input.defaultSmallServiceIntervalKm, 5000),
+    defaultBigServiceIntervalKm: clampDistanceKm(input.defaultBigServiceIntervalKm, 10000),
+    serviceDueSoonThresholdKm: input.serviceDueSoonThresholdKm === undefined ? undefined : clampDistanceKm(input.serviceDueSoonThresholdKm, 0),
+    allowCategoryLevelMaintenanceTemplates: Boolean(input.allowCategoryLevelMaintenanceTemplates),
+    allowVehicleLevelMaintenanceOverrides: Boolean(input.allowVehicleLevelMaintenanceOverrides),
+    vehicleMaintenanceAvailabilityBlockEnabled: Boolean(input.vehicleMaintenanceAvailabilityBlockEnabled),
+    lowStockThresholdEnabled: Boolean(input.lowStockThresholdEnabled),
+    defaultLowStockThreshold: clampDistanceKm(input.defaultLowStockThreshold, 2, 100_000),
+    insuranceFeatureEnabled: Boolean(input.insuranceFeatureEnabled),
+    insuranceReminderEnabled: Boolean(input.insuranceReminderEnabled),
+    insuranceReminderDaysBefore: clampReminderDays(input.insuranceReminderDaysBefore, 14),
+    insuranceGracePeriodDays: input.insuranceGracePeriodDays === undefined ? undefined : clampReminderDays(input.insuranceGracePeriodDays, 0),
+    inspectionFeatureEnabled: Boolean(input.inspectionFeatureEnabled),
+    inspectionReminderEnabled: Boolean(input.inspectionReminderEnabled),
+    inspectionReminderDaysBefore: clampReminderDays(input.inspectionReminderDaysBefore, 14),
+    inspectionGracePeriodDays: input.inspectionGracePeriodDays === undefined ? undefined : clampReminderDays(input.inspectionGracePeriodDays, 0),
+    inspectionLabel: sanitizeRequiredText(input.inspectionLabel, "Inspection"),
+    inspectionLocalizedLabelNl: sanitizeOptionalText(input.inspectionLocalizedLabelNl) || "Keurings datum",
+    dashboardReminderWidgetsEnabled: Boolean(input.dashboardReminderWidgetsEnabled),
+    reminderSeverityDueSoonDays: input.reminderSeverityDueSoonDays === undefined ? undefined : clampReminderDays(input.reminderSeverityDueSoonDays, 0),
+    reminderSeverityDueSoonKm: input.reminderSeverityDueSoonKm === undefined ? undefined : clampDistanceKm(input.reminderSeverityDueSoonKm, 0),
+    blockVehicleBookingIfInsuranceExpired: Boolean(input.blockVehicleBookingIfInsuranceExpired),
+    blockVehicleBookingIfInspectionExpired: Boolean(input.blockVehicleBookingIfInspectionExpired),
+    blockVehicleBookingIfMaintenanceOverdue: Boolean(input.blockVehicleBookingIfMaintenanceOverdue),
+  };
+
+  await setAppSettingValues({
+    [MAINTENANCE_MODULE_ENABLED_KEY]: normalized.maintenanceModuleEnabled ? "true" : "false",
+    [INVENTORY_MODULE_ENABLED_KEY]: normalized.inventoryModuleEnabled ? "true" : "false",
+    [VEHICLE_FINANCIAL_TRACKING_ENABLED_KEY]: normalized.vehicleFinancialTrackingEnabled ? "true" : "false",
+    [REMINDERS_MODULE_ENABLED_KEY]: normalized.remindersModuleEnabled ? "true" : "false",
+    [DEFAULT_SMALL_SERVICE_INTERVAL_KM_KEY]: String(normalized.defaultSmallServiceIntervalKm),
+    [DEFAULT_BIG_SERVICE_INTERVAL_KM_KEY]: String(normalized.defaultBigServiceIntervalKm),
+    [SERVICE_DUE_SOON_THRESHOLD_KM_KEY]: normalized.serviceDueSoonThresholdKm === undefined ? "" : String(normalized.serviceDueSoonThresholdKm),
+    [ALLOW_CATEGORY_LEVEL_MAINTENANCE_TEMPLATES_KEY]: normalized.allowCategoryLevelMaintenanceTemplates ? "true" : "false",
+    [ALLOW_VEHICLE_LEVEL_MAINTENANCE_OVERRIDES_KEY]: normalized.allowVehicleLevelMaintenanceOverrides ? "true" : "false",
+    [VEHICLE_MAINTENANCE_AVAILABILITY_BLOCK_ENABLED_KEY]: normalized.vehicleMaintenanceAvailabilityBlockEnabled ? "true" : "false",
+    [LOW_STOCK_THRESHOLD_ENABLED_KEY]: normalized.lowStockThresholdEnabled ? "true" : "false",
+    [DEFAULT_LOW_STOCK_THRESHOLD_KEY]: String(normalized.defaultLowStockThreshold),
+    [INSURANCE_FEATURE_ENABLED_KEY]: normalized.insuranceFeatureEnabled ? "true" : "false",
+    [INSURANCE_REMINDER_ENABLED_KEY]: normalized.insuranceReminderEnabled ? "true" : "false",
+    [INSURANCE_REMINDER_DAYS_BEFORE_KEY]: String(normalized.insuranceReminderDaysBefore),
+    [INSURANCE_GRACE_PERIOD_DAYS_KEY]: normalized.insuranceGracePeriodDays === undefined ? "" : String(normalized.insuranceGracePeriodDays),
+    [INSPECTION_FEATURE_ENABLED_KEY]: normalized.inspectionFeatureEnabled ? "true" : "false",
+    [INSPECTION_REMINDER_ENABLED_KEY]: normalized.inspectionReminderEnabled ? "true" : "false",
+    [INSPECTION_REMINDER_DAYS_BEFORE_KEY]: String(normalized.inspectionReminderDaysBefore),
+    [INSPECTION_GRACE_PERIOD_DAYS_KEY]: normalized.inspectionGracePeriodDays === undefined ? "" : String(normalized.inspectionGracePeriodDays),
+    [INSPECTION_LABEL_KEY]: normalized.inspectionLabel,
+    [INSPECTION_LOCALIZED_LABEL_NL_KEY]: normalized.inspectionLocalizedLabelNl,
+    [DASHBOARD_REMINDER_WIDGETS_ENABLED_KEY]: normalized.dashboardReminderWidgetsEnabled ? "true" : "false",
+    [REMINDER_SEVERITY_DUE_SOON_DAYS_KEY]: normalized.reminderSeverityDueSoonDays === undefined ? "" : String(normalized.reminderSeverityDueSoonDays),
+    [REMINDER_SEVERITY_DUE_SOON_KM_KEY]: normalized.reminderSeverityDueSoonKm === undefined ? "" : String(normalized.reminderSeverityDueSoonKm),
+    [BLOCK_VEHICLE_BOOKING_IF_INSURANCE_EXPIRED_KEY]: normalized.blockVehicleBookingIfInsuranceExpired ? "true" : "false",
+    [BLOCK_VEHICLE_BOOKING_IF_INSPECTION_EXPIRED_KEY]: normalized.blockVehicleBookingIfInspectionExpired ? "true" : "false",
+    [BLOCK_VEHICLE_BOOKING_IF_MAINTENANCE_OVERDUE_KEY]: normalized.blockVehicleBookingIfMaintenanceOverdue ? "true" : "false",
+  });
 
   return normalized;
 }

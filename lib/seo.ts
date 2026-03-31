@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { routing } from "@/i18n/routing";
+import { getProfileDefaultDescription } from "@/lib/public-metadata-profiles";
 import type { TenantConfig } from "@/lib/tenant";
 
 export const allKeywords = [
@@ -25,9 +26,7 @@ export const allKeywords = [
 ] as const;
 
 function defaultDescriptionByLocale(locale: string, tenantName: string): string {
-  if (locale === "nl") return `Reserveer huurauto's snel en veilig met ${tenantName}.`;
-  if (locale === "es") return `Reserva vehículos de alquiler de forma rápida y segura con ${tenantName}.`;
-  return `Book rental vehicles quickly and securely with ${tenantName}.`;
+  return getProfileDefaultDescription("rental", locale, tenantName);
 }
 
 export function getBaseUrl(): string {
@@ -61,7 +60,7 @@ export function buildMetadata(input: {
   tenant: TenantConfig;
 }): Metadata {
   const tenant = input.tenant;
-  const siteName = tenant.tenantName || "EdgeRent Lite";
+  const siteName = tenant.tenantName || "Aloha Car Rental";
   const description =
     input.description ||
     defaultDescriptionByLocale(input.locale, siteName);

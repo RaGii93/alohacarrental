@@ -17,6 +17,12 @@ model AdminUser {
   createdAt     DateTime  @default(now())
   bookings      Booking[]
   auditLogs     AuditLog[]
+  maintenanceRecordsCreated VehicleMaintenanceRecord[] @relation("MaintenanceRecordCreatedBy")
+  inventoryTransactionsCreated InventoryTransaction[] @relation("InventoryTransactionCreatedBy")
+  odometerLogsCreated VehicleOdometerLog[] @relation("VehicleOdometerLogCreatedBy")
+  vehicleAttachmentsUploaded VehicleAttachment[] @relation("VehicleAttachmentUploadedBy")
+  vehicleUnavailabilityCreated VehicleUnavailabilityRecord[] @relation("VehicleUnavailabilityCreatedBy")
+  notificationsCreated Notification[] @relation("NotificationCreatedBy")
 
   @@index([email])
 }
@@ -39,13 +45,33 @@ model Vehicle {
   hasAC         Boolean   @default(true)
   dailyRate     Int       // stored in cents
   status        VehicleStatus @default(ACTIVE)
+  currentOdometerKm Int?
+  purchaseDate  DateTime?
+  purchasePrice Int?
+  insurancePolicyNumber String?
+  insuranceProviderName String?
+  insuranceStartDate DateTime?
+  insuranceEndDate DateTime?
+  inspectionDate DateTime?
+  inspectionExpiryDate DateTime?
+  insuranceNotes String?
+  inspectionNotes String?
   notes         String?
   createdAt     DateTime  @default(now())
   bookings      Booking[]
   blockouts     VehicleBlockout[]
+  maintenanceRecords VehicleMaintenanceRecord[]
+  odometerLogs VehicleOdometerLog[]
+  insuranceRecords VehicleInsuranceRecord[]
+  inspectionRecords VehicleInspectionRecord[]
+  attachments VehicleAttachment[]
+  unavailabilityRecords VehicleUnavailabilityRecord[]
+  inventoryTransactions InventoryTransaction[]
 
   @@index([status])
   @@index([categoryId])
+  @@index([insuranceEndDate])
+  @@index([inspectionExpiryDate])
 }
 
 model Location {
@@ -101,9 +127,303 @@ model VehicleCategory {
   vehicles    Vehicle[]
   bookings    Booking[]
   features    VehicleCategoryFeature[]
+  maintenanceTemplates MaintenanceTemplate[]
 
   @@index([isActive])
   @@index([sortOrder])
+}
+
+enum MaintenanceTemplateType {
+  SMALL
+  BIG
+  CUSTOM
+}
+
+enum VehicleMaintenanceServiceType {
+  SMALL
+  BIG
+  CUSTOM
+  REPAIR
+  INSPECTION_PREP
+  INSURANCE_RELATED
+}
+
+enum VehicleMaintenanceCategoryKind {
+  MAINTENANCE
+  REPAIR
+  TIRES
+  BATTERY
+  AC
+  BRAKES
+  ENGINE
+  SUSPENSION
+  BODYWORK
+  ELECTRICAL
+  INSPECTION
+  INSURANCE
+  OTHER
+}
+
+enum InventoryTransactionType {
+  PURCHASE
+  USAGE
+  ADJUSTMENT
+  RETURN
+}
+
+enum OdometerLogSource {
+  MANUAL_UPDATE
+  BOOKING_RETURN
+  MAINTENANCE
+  IMPORT
+}
+
+enum VehicleUnavailabilityType {
+  MAINTENANCE
+  REPAIR
+  INSPECTION
+  INSURANCE_HOLD
+  MANUAL
+}
+
+model MaintenanceTemplate {
+  id            String   @id @default(cuid())
+  name          String
+  type          MaintenanceTemplateType
+  description   String?
+  intervalKm    Int?
+  isActive      Boolean  @default(true)
+  appliesToVehicleCategoryId String?
+  appliesToVehicleCategory VehicleCategory? @relation(fields: [appliesToVehicleCategoryId], references: [id], onDelete: SetNull)
+  parts         MaintenanceTemplatePart[]
+  records       VehicleMaintenanceRecord[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([type])
+  @@index([appliesToVehicleCategoryId])
+}
+
+model MaintenanceTemplatePart {
+  id                   String   @id @default(cuid())
+  maintenanceTemplateId String
+  maintenanceTemplate  MaintenanceTemplate @relation(fields: [maintenanceTemplateId], references: [id], onDelete: Cascade)
+  inventoryPartId      String
+  inventoryPart        InventoryPart @relation(fields: [inventoryPartId], references: [id], onDelete: Cascade)
+  quantityRequired     Float
+  notes                String?
+
+  @@index([maintenanceTemplateId])
+  @@index([inventoryPartId])
+}
+
+model VehicleMaintenanceRecord {
+  id                  String   @id @default(cuid())
+  vehicleId           String
+  vehicle             Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  maintenanceTemplateId String?
+  maintenanceTemplate MaintenanceTemplate? @relation(fields: [maintenanceTemplateId], references: [id], onDelete: SetNull)
+  serviceType         VehicleMaintenanceServiceType
+  title               String
+  description         String?
+  serviceDate         DateTime
+  odometerKm          Int?
+  nextDueKm           Int?
+  vendorName          String?
+  invoiceNumber       String?
+  laborCost           Int      @default(0)
+  partsCost           Int      @default(0)
+  totalCost           Int      @default(0)
+  maintenanceCategory VehicleMaintenanceCategoryKind?
+  isIncidentRelated   Boolean  @default(false)
+  notes               String?
+  createdByUserId     String?
+  createdByUser       AdminUser? @relation("MaintenanceRecordCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  partUsages          VehicleMaintenancePartUsage[]
+  attachments         VehicleAttachment[]
+  downtimeRecords     VehicleUnavailabilityRecord[]
+  inventoryTransactions InventoryTransaction[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([vehicleId, serviceDate])
+  @@index([maintenanceTemplateId])
+  @@index([serviceType])
+  @@index([maintenanceCategory])
+  @@index([createdByUserId])
+}
+
+model VehicleMaintenancePartUsage {
+  id                  String   @id @default(cuid())
+  maintenanceRecordId String
+  maintenanceRecord   VehicleMaintenanceRecord @relation(fields: [maintenanceRecordId], references: [id], onDelete: Cascade)
+  inventoryPartId     String?
+  inventoryPart       InventoryPart? @relation(fields: [inventoryPartId], references: [id], onDelete: SetNull)
+  customPartName      String?
+  quantity            Float
+  unitCost            Int      @default(0)
+  totalCost           Int      @default(0)
+  supplierName        String?
+  purchasedAt         DateTime?
+  notes               String?
+
+  @@index([maintenanceRecordId])
+  @@index([inventoryPartId])
+}
+
+model InventoryPart {
+  id                  String   @id @default(cuid())
+  name                String
+  sku                 String?  @unique
+  category            String?
+  brand               String?
+  unit                String?
+  quantityInStock     Float    @default(0)
+  reorderThreshold    Float?
+  averageUnitCost     Int?
+  defaultSupplierName String?
+  isTireRelated       Boolean  @default(false)
+  tireBrandModel      String?
+  isActive            Boolean  @default(true)
+  templateParts       MaintenanceTemplatePart[]
+  maintenanceUsages   VehicleMaintenancePartUsage[]
+  transactions        InventoryTransaction[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([category])
+  @@index([isTireRelated])
+}
+
+model InventoryTransaction {
+  id                       String   @id @default(cuid())
+  inventoryPartId          String
+  inventoryPart            InventoryPart @relation(fields: [inventoryPartId], references: [id], onDelete: Cascade)
+  type                     InventoryTransactionType
+  quantity                 Float
+  unitCost                 Int?
+  totalCost                Int?
+  relatedVehicleId         String?
+  relatedVehicle           Vehicle? @relation(fields: [relatedVehicleId], references: [id], onDelete: SetNull)
+  relatedMaintenanceRecordId String?
+  relatedMaintenanceRecord VehicleMaintenanceRecord? @relation(fields: [relatedMaintenanceRecordId], references: [id], onDelete: SetNull)
+  transactionDate          DateTime
+  notes                    String?
+  createdByUserId          String?
+  createdByUser            AdminUser? @relation("InventoryTransactionCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt                DateTime @default(now())
+
+  @@index([inventoryPartId, transactionDate])
+  @@index([type])
+  @@index([relatedVehicleId])
+  @@index([relatedMaintenanceRecordId])
+  @@index([createdByUserId])
+}
+
+model VehicleOdometerLog {
+  id              String   @id @default(cuid())
+  vehicleId       String
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  readingKm       Int
+  readingDate     DateTime
+  source          OdometerLogSource
+  notes           String?
+  createdByUserId String?
+  createdByUser   AdminUser? @relation("VehicleOdometerLogCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+
+  @@index([vehicleId, readingDate])
+  @@index([source])
+  @@index([createdByUserId])
+}
+
+model VehicleInsuranceRecord {
+  id               String   @id @default(cuid())
+  vehicleId        String
+  vehicle          Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  providerName     String
+  policyNumber     String?
+  coverageType     String?
+  startDate        DateTime
+  endDate          DateTime
+  premiumAmount    Int?
+  paymentFrequency String?
+  notes            String?
+  isActive         Boolean  @default(true)
+  attachments      VehicleAttachment[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([vehicleId, endDate])
+  @@index([isActive])
+}
+
+model VehicleInspectionRecord {
+  id                    String   @id @default(cuid())
+  vehicleId             String
+  vehicle               Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  inspectionType        String?
+  inspectionDate        DateTime
+  expiryDate            DateTime?
+  passed                Boolean?
+  authorityOrVendorName String?
+  cost                  Int?
+  notes                 String?
+  isActive              Boolean  @default(true)
+  attachments           VehicleAttachment[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([vehicleId, inspectionDate])
+  @@index([expiryDate])
+  @@index([isActive])
+}
+
+model VehicleAttachment {
+  id                 String   @id @default(cuid())
+  vehicleId          String?
+  vehicle            Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  maintenanceRecordId String?
+  maintenanceRecord  VehicleMaintenanceRecord? @relation(fields: [maintenanceRecordId], references: [id], onDelete: Cascade)
+  insuranceRecordId  String?
+  insuranceRecord    VehicleInsuranceRecord? @relation(fields: [insuranceRecordId], references: [id], onDelete: Cascade)
+  inspectionRecordId String?
+  inspectionRecord   VehicleInspectionRecord? @relation(fields: [inspectionRecordId], references: [id], onDelete: Cascade)
+  fileName           String
+  fileUrl            String
+  mimeType           String?
+  uploadedAt         DateTime @default(now())
+  uploadedByUserId   String?
+  uploadedByUser     AdminUser? @relation("VehicleAttachmentUploadedBy", fields: [uploadedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([vehicleId])
+  @@index([maintenanceRecordId])
+  @@index([insuranceRecordId])
+  @@index([inspectionRecordId])
+  @@index([uploadedByUserId])
+}
+
+model VehicleUnavailabilityRecord {
+  id                     String   @id @default(cuid())
+  vehicleId              String
+  vehicle                Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  type                   VehicleUnavailabilityType
+  startDate              DateTime
+  endDate                DateTime?
+  reason                 String?
+  relatedMaintenanceRecordId String?
+  relatedMaintenanceRecord VehicleMaintenanceRecord? @relation(fields: [relatedMaintenanceRecordId], references: [id], onDelete: SetNull)
+  createdByUserId        String?
+  createdByUser          AdminUser? @relation("VehicleUnavailabilityCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([vehicleId, startDate, endDate])
+  @@index([type])
+  @@index([relatedMaintenanceRecordId])
+  @@index([createdByUserId])
 }
 
 model VehicleFeature {
@@ -283,6 +603,13 @@ enum InspectionStage {
   RETURN
 }
 
+enum NotificationSeverity {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
 model AuditLog {
   id            String    @id @default(cuid())
   adminUserId   String
@@ -294,6 +621,22 @@ model AuditLog {
 
   @@index([adminUserId])
   @@index([createdAt])
+}
+
+model Notification {
+  id              String   @id @default(cuid())
+  type            String
+  title           String
+  message         String
+  href            String?
+  severity        NotificationSeverity @default(INFO)
+  createdByUserId String?
+  createdByUser   AdminUser? @relation("NotificationCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([severity])
+  @@index([type])
 }
 
 enum ExtraPricingType {

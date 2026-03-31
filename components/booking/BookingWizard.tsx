@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2, Gauge, Home, Settings2, Sofa } from "lucide-react";
 import { isLicenseActive } from "@/lib/license";
 import { getBlobProxyUrl } from "@/lib/blob";
-import { calculateBookingAmounts, calculateDays, formatCurrency } from "@/lib/pricing";
+import { calculateDays, evaluateBookingRules, formatCurrency } from "@/lib/pricing";
 import { Step1Search } from "./Steps/Step1Search";
 import { Step2Customer } from "./Steps/Step2Customer";
 import { Step3Review } from "./Steps/Step3Review";
 import { AvailabilityResult } from "@/actions/availability";
+import type { BookingRuleSettings } from "@/lib/settings";
 
 export interface BookingData {
   startDate: Date | null;
@@ -47,6 +47,7 @@ export function BookingWizard({
   taxPercentage,
   vehicleRatesIncludeTax,
   minimumBookingDays,
+  bookingRuleSettings,
   termsPdfUrl,
   bookingSource = "public",
 }: {
@@ -65,6 +66,7 @@ export function BookingWizard({
   taxPercentage: number;
   vehicleRatesIncludeTax: boolean;
   minimumBookingDays: number;
+  bookingRuleSettings: BookingRuleSettings;
   termsPdfUrl: string;
   bookingSource?: "public" | "admin";
 }) {
@@ -105,7 +107,7 @@ export function BookingWizard({
         const nextStartDate = updates.startDate ?? null;
         const currentEndDate = updates.endDate ?? prev.endDate;
 
-        if (nextStartDate) {
+        if (nextStartDate && bookingSource === "public" && bookingRuleSettings.belowMinimumRentalAdminOnly) {
           const minimumDropoffDate = new Date(nextStartDate);
           minimumDropoffDate.setHours(0, 0, 0, 0);
           minimumDropoffDate.setDate(minimumDropoffDate.getDate() + minimumBookingDays);
@@ -140,12 +142,26 @@ export function BookingWizard({
     if (!extra) return sum;
     return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
   }, 0);
-  const { taxAmount, totalAmount } = calculateBookingAmounts({
-    baseRentalCents: baseAmount,
-    extrasCents: extrasAmount,
-    taxPercentage,
-    baseRentalIncludesTax: vehicleRatesIncludeTax,
-  });
+  const pricing = pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime
+    ? evaluateBookingRules({
+        startDate: pickupDateTime,
+        endDate: dropoffDateTime,
+        basePriceCents: selectedCategory?.dailyRate || 0,
+        extrasCents: extrasAmount,
+        taxPercentage,
+        baseRentalIncludesTax: vehicleRatesIncludeTax,
+        bookingSource,
+        settings: bookingRuleSettings,
+      })
+    : null;
+  const taxAmount = pricing?.taxAmountCents ?? 0;
+  const totalAmount = pricing?.totalAmountCents ?? 0;
+  const subtotalBeforeTax = pricing?.subtotalBeforeTaxCents ?? (baseAmount + extrasAmount);
+  const summaryBlockedMessage = pricing?.belowMinimumBlocked
+    ? t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })
+    : pricing?.lastMinuteBlocked
+      ? t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })
+      : null;
 
   const nextStep = () => setCurrentStep(prev => prev + 1);
   const prevStep = () => setCurrentStep(prev => prev - 1);
@@ -199,6 +215,8 @@ export function BookingWizard({
               availability={availability}
               locations={locations}
               minimumBookingDays={minimumBookingDays}
+              bookingSource={bookingSource}
+              bookingRuleSettings={bookingRuleSettings}
             />
           )}
 
@@ -226,6 +244,7 @@ export function BookingWizard({
               vehicleRatesIncludeTax={vehicleRatesIncludeTax}
               termsPdfUrl={termsPdfUrl}
               bookingSource={bookingSource}
+              bookingRuleSettings={bookingRuleSettings}
             />
           )}
 
@@ -259,6 +278,11 @@ export function BookingWizard({
           )}
           <div className="space-y-2 text-sm">
             <p className="font-bold text-[#0c3e88]">{selectedCategory?.name || "-"}</p>
+            {summaryBlockedMessage ? (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+                {summaryBlockedMessage}
+              </div>
+            ) : null}
             {selectedCategory ? (
               <div className="grid gap-2">
                 <div className="flex items-center gap-2 rounded-xl bg-[#edf4ff] px-3 py-2 text-[#325889]">
@@ -286,7 +310,15 @@ export function BookingWizard({
             <div className="mt-4 space-y-2 rounded-[1.25rem] border border-[#d7e4f8] bg-white p-4">
               <div className="flex justify-between text-[#5b79a5]"><span>{t("booking.pricePerDay")}</span><span className="font-semibold text-[#0c3e88]">{selectedCategory ? formatCurrency(selectedCategory.dailyRate) : "-"}</span></div>
               <div className="flex justify-between text-[#5b79a5]"><span>{t("booking.days")}</span><span className="font-semibold text-[#0c3e88]">{days}</span></div>
+              <div className="flex justify-between text-[#5b79a5]"><span>{t("booking.baseTotal")}</span><span className="font-semibold text-[#0c3e88]">{formatCurrency(baseAmount)}</span></div>
+              {pricing?.belowMinimumSurchargeCents ? (
+                <div className="flex justify-between text-[#5b79a5]"><span>{t("booking.belowMinimumSurcharge")}</span><span className="font-semibold text-[#0c3e88]">{formatCurrency(pricing.belowMinimumSurchargeCents)}</span></div>
+              ) : null}
+              {pricing?.lastMinuteSurchargeCents ? (
+                <div className="flex justify-between text-[#5b79a5]"><span>{t("booking.lastMinuteSurcharge")}</span><span className="font-semibold text-[#0c3e88]">{formatCurrency(pricing.lastMinuteSurchargeCents)}</span></div>
+              ) : null}
               <div className="flex justify-between text-[#5b79a5]"><span>{t("booking.extras")}</span><span className="font-semibold text-[#0c3e88]">{formatCurrency(extrasAmount)}</span></div>
+              <div className="flex justify-between text-[#5b79a5]"><span>{t("booking.subtotal")}</span><span className="font-semibold text-[#0c3e88]">{formatCurrency(subtotalBeforeTax)}</span></div>
               <div className="flex justify-between text-[#5b79a5]"><span>{vehicleRatesIncludeTax ? t("booking.taxExtrasOnly", { percentage: taxPercentage }) : t("booking.taxOnBooking", { percentage: taxPercentage })}</span><span className="font-semibold text-[#0c3e88]">{formatCurrency(taxAmount)}</span></div>
             </div>
             <div className="mt-3 flex justify-between rounded-[1rem] bg-[#ffc93b] px-4 py-3 font-black text-[#0d4aa0]"><span>{t("booking.total")}</span><span>{formatCurrency(totalAmount)}</span></div>

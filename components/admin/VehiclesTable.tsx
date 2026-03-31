@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ClipboardList, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -145,6 +146,8 @@ export function VehiclesTable({
     }
   };
 
+  const vehicleHistoryHref = (vehicleId: string) => `/${locale}/admin/maintenance/vehicles/${vehicleId}`;
+
   return (
     <div className="space-y-4">
       <ConfirmActionDialog
@@ -186,7 +189,11 @@ export function VehiclesTable({
           <TableBody>
             {pageRows.map((vehicle) => (
               <TableRow key={vehicle.id}>
-                <TableCell className="font-medium">{vehicle.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link href={vehicleHistoryHref(vehicle.id)} className="hover:text-sky-700 hover:underline">
+                    {vehicle.name}
+                  </Link>
+                </TableCell>
                 <TableCell>{vehicle.plateNumber || "-"}</TableCell>
                 <TableCell>{
                   typeof vehicle.category === "string"
@@ -202,6 +209,16 @@ export function VehiclesTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    asChild
+                  >
+                    <Link href={vehicleHistoryHref(vehicle.id)}>
+                      <ClipboardList className="h-4 w-4" />
+                      History
+                    </Link>
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"

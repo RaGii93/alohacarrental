@@ -10,12 +10,18 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  updateFleetOperationsSettingsAction,
+  updateBookingRuleSettingsAction,
+  updateBookingHoldDaysAction,
   updateMinimumBookingDaysAction,
   updateSaasSettingsAction,
   updateTaxPercentageAction,
   updateVehicleRatesIncludeTaxAction,
 } from "@/actions/settings";
 import type {
+  BookingRuleSettings,
+  BelowMinimumRentalSurchargeMode,
+  FleetOperationsSettings,
   InvoiceProvider,
   QuickBooksFeatureSettings,
   QuickBooksSetupSettings,
@@ -29,6 +35,9 @@ type Props = {
   initialTaxPercentage: number;
   initialVehicleRatesIncludeTax: boolean;
   initialMinimumBookingDays: number;
+  initialBookingHoldDays: number;
+  initialBookingRules: BookingRuleSettings;
+  initialFleetOperations: FleetOperationsSettings;
   initialTenant: TenantSettings;
   initialQuickBooks: QuickBooksFeatureSettings;
   initialQuickBooksSetup: QuickBooksSetupSettings;
@@ -55,6 +64,9 @@ export function TaxSettingsCard({
   initialTaxPercentage,
   initialVehicleRatesIncludeTax,
   initialMinimumBookingDays,
+  initialBookingHoldDays,
+  initialBookingRules,
+  initialFleetOperations,
   initialTenant,
   initialQuickBooks,
   initialQuickBooksSetup,
@@ -70,6 +82,31 @@ export function TaxSettingsCard({
   const [taxPercentage, setTaxPercentage] = useState(String(initialTaxPercentage));
   const [vehicleRatesIncludeTax, setVehicleRatesIncludeTax] = useState(initialVehicleRatesIncludeTax);
   const [minimumBookingDays, setMinimumBookingDays] = useState(String(initialMinimumBookingDays));
+  const [bookingHoldDays, setBookingHoldDays] = useState(String(initialBookingHoldDays));
+  const [belowMinimumRentalAdminOnly, setBelowMinimumRentalAdminOnly] = useState(initialBookingRules.belowMinimumRentalAdminOnly);
+  const [belowMinimumRentalPricingEnabled, setBelowMinimumRentalPricingEnabled] = useState(initialBookingRules.belowMinimumRentalPricingEnabled);
+  const [belowMinimumRentalSurchargeMode, setBelowMinimumRentalSurchargeMode] = useState<BelowMinimumRentalSurchargeMode>(initialBookingRules.belowMinimumRentalSurchargeMode);
+  const [belowMinimumRentalSurchargeValue, setBelowMinimumRentalSurchargeValue] = useState(String(initialBookingRules.belowMinimumRentalSurchargeValue));
+  const [lastMinuteBookingEnabled, setLastMinuteBookingEnabled] = useState(initialBookingRules.lastMinuteBookingEnabled);
+  const [lastMinuteBookingAdminOnly, setLastMinuteBookingAdminOnly] = useState(initialBookingRules.lastMinuteBookingAdminOnly);
+  const [lastMinuteBookingThresholdHours, setLastMinuteBookingThresholdHours] = useState(String(initialBookingRules.lastMinuteBookingThresholdHours));
+  const [lastMinuteBookingExtraPercent, setLastMinuteBookingExtraPercent] = useState(String(initialBookingRules.lastMinuteBookingExtraPercent));
+  const [maintenanceModuleEnabled, setMaintenanceModuleEnabled] = useState(initialFleetOperations.maintenanceModuleEnabled);
+  const [inventoryModuleEnabled, setInventoryModuleEnabled] = useState(initialFleetOperations.inventoryModuleEnabled);
+  const [vehicleFinancialTrackingEnabled, setVehicleFinancialTrackingEnabled] = useState(initialFleetOperations.vehicleFinancialTrackingEnabled);
+  const [remindersModuleEnabled, setRemindersModuleEnabled] = useState(initialFleetOperations.remindersModuleEnabled);
+  const [defaultSmallServiceIntervalKm, setDefaultSmallServiceIntervalKm] = useState(String(initialFleetOperations.defaultSmallServiceIntervalKm));
+  const [defaultBigServiceIntervalKm, setDefaultBigServiceIntervalKm] = useState(String(initialFleetOperations.defaultBigServiceIntervalKm));
+  const [serviceDueSoonThresholdKm, setServiceDueSoonThresholdKm] = useState(String(initialFleetOperations.serviceDueSoonThresholdKm ?? ""));
+  const [insuranceFeatureEnabled, setInsuranceFeatureEnabled] = useState(initialFleetOperations.insuranceFeatureEnabled);
+  const [insuranceReminderDaysBefore, setInsuranceReminderDaysBefore] = useState(String(initialFleetOperations.insuranceReminderDaysBefore));
+  const [inspectionFeatureEnabled, setInspectionFeatureEnabled] = useState(initialFleetOperations.inspectionFeatureEnabled);
+  const [inspectionReminderDaysBefore, setInspectionReminderDaysBefore] = useState(String(initialFleetOperations.inspectionReminderDaysBefore));
+  const [inspectionLabel, setInspectionLabel] = useState(initialFleetOperations.inspectionLabel);
+  const [inspectionLocalizedLabelNl, setInspectionLocalizedLabelNl] = useState(initialFleetOperations.inspectionLocalizedLabelNl || "");
+  const [blockVehicleBookingIfInsuranceExpired, setBlockVehicleBookingIfInsuranceExpired] = useState(initialFleetOperations.blockVehicleBookingIfInsuranceExpired);
+  const [blockVehicleBookingIfInspectionExpired, setBlockVehicleBookingIfInspectionExpired] = useState(initialFleetOperations.blockVehicleBookingIfInspectionExpired);
+  const [blockVehicleBookingIfMaintenanceOverdue, setBlockVehicleBookingIfMaintenanceOverdue] = useState(initialFleetOperations.blockVehicleBookingIfMaintenanceOverdue);
   const [tenantName, setTenantName] = useState(initialTenant.tenantName);
   const [logoUrl, setLogoUrl] = useState(initialTenant.logoUrl);
   const [phone, setPhone] = useState(initialTenant.phone);
@@ -129,6 +166,23 @@ export function TaxSettingsCard({
       label: t("admin.settings.minimumBookingDays"),
       value: minimumBookingDays || "1",
       tone: "from-emerald-50 to-white text-emerald-700 border-emerald-200",
+    },
+    {
+      label: t("admin.settings.bookingRules.minimumSectionTitle"),
+      value: belowMinimumRentalAdminOnly ? t("admin.settings.bookingRules.adminOnly") : t("admin.settings.bookingRules.publicAllowed"),
+      tone: "from-teal-50 to-white text-teal-700 border-teal-200",
+    },
+    {
+      label: t("admin.settings.bookingRules.lastMinuteSectionTitle"),
+      value: lastMinuteBookingEnabled
+        ? `${lastMinuteBookingThresholdHours || "24"}h · +${lastMinuteBookingExtraPercent || "0"}%`
+        : t("common.no"),
+      tone: "from-fuchsia-50 to-white text-fuchsia-700 border-fuchsia-200",
+    },
+    {
+      label: t("admin.settings.bookingHoldDays"),
+      value: bookingHoldDays || "1",
+      tone: "from-rose-50 to-white text-rose-700 border-rose-200",
     },
     {
       label: t("admin.settings.vehicleRatesTaxMode.label"),
@@ -261,6 +315,46 @@ export function TaxSettingsCard({
       toast.error(t("admin.settings.errors.invalidMinDays"));
       return;
     }
+    const parsedBookingHoldDays = Number(bookingHoldDays);
+    if (!Number.isFinite(parsedBookingHoldDays) || parsedBookingHoldDays < 1 || parsedBookingHoldDays > 30) {
+      toast.error(t("admin.settings.errors.invalidBookingHoldDays"));
+      return;
+    }
+    const parsedBelowMinimumSurchargeValue = Number(belowMinimumRentalSurchargeValue);
+    if (!Number.isFinite(parsedBelowMinimumSurchargeValue) || parsedBelowMinimumSurchargeValue < 0 || parsedBelowMinimumSurchargeValue > 1000000) {
+      toast.error(t("admin.settings.errors.invalidBelowMinimumSurcharge"));
+      return;
+    }
+    const parsedLastMinuteThresholdHours = Number(lastMinuteBookingThresholdHours);
+    if (!Number.isFinite(parsedLastMinuteThresholdHours) || parsedLastMinuteThresholdHours < 1 || parsedLastMinuteThresholdHours > 720) {
+      toast.error(t("admin.settings.errors.invalidLastMinuteThreshold"));
+      return;
+    }
+    const parsedLastMinuteExtraPercent = Number(lastMinuteBookingExtraPercent);
+    if (!Number.isFinite(parsedLastMinuteExtraPercent) || parsedLastMinuteExtraPercent < 0 || parsedLastMinuteExtraPercent > 1000) {
+      toast.error(t("admin.settings.errors.invalidLastMinutePercent"));
+      return;
+    }
+    const parsedSmallServiceKm = Number(defaultSmallServiceIntervalKm);
+    const parsedBigServiceKm = Number(defaultBigServiceIntervalKm);
+    const parsedInsuranceReminderDays = Number(insuranceReminderDaysBefore);
+    const parsedInspectionReminderDays = Number(inspectionReminderDaysBefore);
+    if (!Number.isFinite(parsedSmallServiceKm) || parsedSmallServiceKm < 0) {
+      toast.error("Enter a valid default small service interval.");
+      return;
+    }
+    if (!Number.isFinite(parsedBigServiceKm) || parsedBigServiceKm < 0) {
+      toast.error("Enter a valid default big service interval.");
+      return;
+    }
+    if (!Number.isFinite(parsedInsuranceReminderDays) || parsedInsuranceReminderDays < 0) {
+      toast.error("Enter a valid insurance reminder period.");
+      return;
+    }
+    if (!Number.isFinite(parsedInspectionReminderDays) || parsedInspectionReminderDays < 0) {
+      toast.error("Enter a valid inspection reminder period.");
+      return;
+    }
     if (!tenantName.trim() || !email.trim() || !currency.trim()) {
       toast.error(t("admin.settings.errors.requiredTenantFields"));
       return;
@@ -275,10 +369,58 @@ export function TaxSettingsCard({
     }
 
     setIsSaving(true);
-    const [taxResult, vehicleTaxModeResult, minDaysResult, saasResult] = await Promise.all([
+    const [taxResult, vehicleTaxModeResult, minDaysResult, bookingHoldDaysResult, bookingRulesResult, fleetOperationsResult, saasResult] = await Promise.all([
       updateTaxPercentageAction(parsedTax, locale),
       updateVehicleRatesIncludeTaxAction(vehicleRatesIncludeTax, locale),
       updateMinimumBookingDaysAction(parsedMinimumDays, locale),
+      updateBookingHoldDaysAction(parsedBookingHoldDays, locale),
+      updateBookingRuleSettingsAction(
+        {
+          minimumRentalDays: parsedMinimumDays,
+          belowMinimumRentalAdminOnly,
+          belowMinimumRentalPricingEnabled,
+          belowMinimumRentalSurchargeMode,
+          belowMinimumRentalSurchargeValue: parsedBelowMinimumSurchargeValue,
+          lastMinuteBookingEnabled,
+          lastMinuteBookingAdminOnly,
+          lastMinuteBookingThresholdHours: parsedLastMinuteThresholdHours,
+          lastMinuteBookingExtraPercent: parsedLastMinuteExtraPercent,
+        },
+        locale
+      ),
+      updateFleetOperationsSettingsAction(
+        {
+          maintenanceModuleEnabled,
+          inventoryModuleEnabled,
+          vehicleFinancialTrackingEnabled,
+          remindersModuleEnabled,
+          defaultSmallServiceIntervalKm: parsedSmallServiceKm,
+          defaultBigServiceIntervalKm: parsedBigServiceKm,
+          serviceDueSoonThresholdKm: serviceDueSoonThresholdKm ? Number(serviceDueSoonThresholdKm) : undefined,
+          allowCategoryLevelMaintenanceTemplates: true,
+          allowVehicleLevelMaintenanceOverrides: true,
+          vehicleMaintenanceAvailabilityBlockEnabled: true,
+          lowStockThresholdEnabled: true,
+          defaultLowStockThreshold: 2,
+          insuranceFeatureEnabled,
+          insuranceReminderEnabled: true,
+          insuranceReminderDaysBefore: parsedInsuranceReminderDays,
+          insuranceGracePeriodDays: undefined,
+          inspectionFeatureEnabled,
+          inspectionReminderEnabled: true,
+          inspectionReminderDaysBefore: parsedInspectionReminderDays,
+          inspectionGracePeriodDays: undefined,
+          inspectionLabel,
+          inspectionLocalizedLabelNl,
+          dashboardReminderWidgetsEnabled: true,
+          reminderSeverityDueSoonDays: undefined,
+          reminderSeverityDueSoonKm: serviceDueSoonThresholdKm ? Number(serviceDueSoonThresholdKm) : undefined,
+          blockVehicleBookingIfInsuranceExpired,
+          blockVehicleBookingIfInspectionExpired,
+          blockVehicleBookingIfMaintenanceOverdue,
+        },
+        locale
+      ),
       updateSaasSettingsAction(
         {
           tenantName,
@@ -325,11 +467,14 @@ export function TaxSettingsCard({
     ]);
     setIsSaving(false);
 
-    if (!taxResult.success || !vehicleTaxModeResult.success || !minDaysResult.success || !saasResult.success) {
+    if (!taxResult.success || !vehicleTaxModeResult.success || !minDaysResult.success || !bookingHoldDaysResult.success || !bookingRulesResult.success || !fleetOperationsResult.success || !saasResult.success) {
       toast.error(
         taxResult.error ||
           vehicleTaxModeResult.error ||
           minDaysResult.error ||
+          bookingHoldDaysResult.error ||
+          bookingRulesResult.error ||
+          fleetOperationsResult.error ||
           saasResult.error ||
           t("admin.settings.errors.updateFailed")
       );
@@ -339,6 +484,31 @@ export function TaxSettingsCard({
     setTaxPercentage(String(taxResult.taxPercentage));
     setVehicleRatesIncludeTax(vehicleTaxModeResult.vehicleRatesIncludeTax);
     setMinimumBookingDays(String(minDaysResult.minimumBookingDays));
+    setBookingHoldDays(String(bookingHoldDaysResult.bookingHoldDays));
+    setBelowMinimumRentalAdminOnly(bookingRulesResult.bookingRules.belowMinimumRentalAdminOnly);
+    setBelowMinimumRentalPricingEnabled(bookingRulesResult.bookingRules.belowMinimumRentalPricingEnabled);
+    setBelowMinimumRentalSurchargeMode(bookingRulesResult.bookingRules.belowMinimumRentalSurchargeMode);
+    setBelowMinimumRentalSurchargeValue(String(bookingRulesResult.bookingRules.belowMinimumRentalSurchargeValue));
+    setLastMinuteBookingEnabled(bookingRulesResult.bookingRules.lastMinuteBookingEnabled);
+    setLastMinuteBookingAdminOnly(bookingRulesResult.bookingRules.lastMinuteBookingAdminOnly);
+    setLastMinuteBookingThresholdHours(String(bookingRulesResult.bookingRules.lastMinuteBookingThresholdHours));
+    setLastMinuteBookingExtraPercent(String(bookingRulesResult.bookingRules.lastMinuteBookingExtraPercent));
+    setMaintenanceModuleEnabled(fleetOperationsResult.fleetOperations.maintenanceModuleEnabled);
+    setInventoryModuleEnabled(fleetOperationsResult.fleetOperations.inventoryModuleEnabled);
+    setVehicleFinancialTrackingEnabled(fleetOperationsResult.fleetOperations.vehicleFinancialTrackingEnabled);
+    setRemindersModuleEnabled(fleetOperationsResult.fleetOperations.remindersModuleEnabled);
+    setDefaultSmallServiceIntervalKm(String(fleetOperationsResult.fleetOperations.defaultSmallServiceIntervalKm));
+    setDefaultBigServiceIntervalKm(String(fleetOperationsResult.fleetOperations.defaultBigServiceIntervalKm));
+    setServiceDueSoonThresholdKm(String(fleetOperationsResult.fleetOperations.serviceDueSoonThresholdKm ?? ""));
+    setInsuranceFeatureEnabled(fleetOperationsResult.fleetOperations.insuranceFeatureEnabled);
+    setInsuranceReminderDaysBefore(String(fleetOperationsResult.fleetOperations.insuranceReminderDaysBefore));
+    setInspectionFeatureEnabled(fleetOperationsResult.fleetOperations.inspectionFeatureEnabled);
+    setInspectionReminderDaysBefore(String(fleetOperationsResult.fleetOperations.inspectionReminderDaysBefore));
+    setInspectionLabel(fleetOperationsResult.fleetOperations.inspectionLabel);
+    setInspectionLocalizedLabelNl(fleetOperationsResult.fleetOperations.inspectionLocalizedLabelNl || "");
+    setBlockVehicleBookingIfInsuranceExpired(fleetOperationsResult.fleetOperations.blockVehicleBookingIfInsuranceExpired);
+    setBlockVehicleBookingIfInspectionExpired(fleetOperationsResult.fleetOperations.blockVehicleBookingIfInspectionExpired);
+    setBlockVehicleBookingIfMaintenanceOverdue(fleetOperationsResult.fleetOperations.blockVehicleBookingIfMaintenanceOverdue);
     setQuickBooksEnabled(saasResult.quickBooks.dbEnabled);
     setQuickBooksVisible(saasResult.quickBooks.dbVisible);
     setQuickBooksClientId(saasResult.quickBooksSetup.clientId);
@@ -425,7 +595,7 @@ export function TaxSettingsCard({
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-4">
             <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)]">
               <label className="mb-2 block text-sm font-semibold text-slate-700">{t("admin.settings.taxPercentage")}</label>
               <Input
@@ -450,6 +620,18 @@ export function TaxSettingsCard({
                 className={inputClass}
               />
             </div>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)]">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">{t("admin.settings.bookingHoldDays")}</label>
+              <Input
+                type="number"
+                min={1}
+                max={30}
+                step={1}
+                value={bookingHoldDays}
+                onChange={(e) => setBookingHoldDays(e.target.value)}
+                className={inputClass}
+              />
+            </div>
             <div className="rounded-2xl border border-amber-200 bg-[linear-gradient(180deg,#fffdf6,#ffffff)] p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)]">
               <label className="mb-2 block text-sm font-semibold text-slate-700">{t("admin.settings.vehicleRatesTaxMode.label")}</label>
               <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200 bg-white/95 px-3 py-3 text-sm shadow-sm">
@@ -470,6 +652,237 @@ export function TaxSettingsCard({
                   </span>
                 </span>
               </label>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className={sectionClass}>
+        <div className={sectionBodyClass}>
+          <div className="flex items-start gap-4">
+            <div className="rounded-2xl bg-slate-100 p-3 text-slate-700 ring-1 ring-slate-200">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">Fleet Operations / Maintenance / Compliance</h3>
+              <p className="mt-1 text-sm text-slate-600">Enable maintenance, inventory, reminders, and compliance behavior without adding a separate settings system.</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              ["Maintenance module", maintenanceModuleEnabled, setMaintenanceModuleEnabled],
+              ["Inventory module", inventoryModuleEnabled, setInventoryModuleEnabled],
+              ["Vehicle financial tracking", vehicleFinancialTrackingEnabled, setVehicleFinancialTrackingEnabled],
+              ["Reminder widgets", remindersModuleEnabled, setRemindersModuleEnabled],
+            ].map(([label, checked, setter]) => (
+              <label key={label as string} className={toggleCardClass}>
+                <span className="w-full">
+                  <span className="block font-semibold text-slate-900">{label as string}</span>
+                </span>
+                <input type="checkbox" checked={checked as boolean} onChange={(e) => (setter as (value: boolean) => void)(e.target.checked)} className="mt-1" />
+              </label>
+            ))}
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Default small service interval (km)</label>
+              <Input type="number" value={defaultSmallServiceIntervalKm} onChange={(e) => setDefaultSmallServiceIntervalKm(e.target.value)} className={inputClass} />
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Default big service interval (km)</label>
+              <Input type="number" value={defaultBigServiceIntervalKm} onChange={(e) => setDefaultBigServiceIntervalKm(e.target.value)} className={inputClass} />
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Service due soon threshold (km)</label>
+              <Input type="number" value={serviceDueSoonThresholdKm} onChange={(e) => setServiceDueSoonThresholdKm(e.target.value)} className={inputClass} />
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Insurance reminder days before</label>
+              <Input type="number" value={insuranceReminderDaysBefore} onChange={(e) => setInsuranceReminderDaysBefore(e.target.value)} className={inputClass} />
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Inspection reminder days before</label>
+              <Input type="number" value={inspectionReminderDaysBefore} onChange={(e) => setInspectionReminderDaysBefore(e.target.value)} className={inputClass} />
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Inspection label</label>
+              <Input value={inspectionLabel} onChange={(e) => setInspectionLabel(e.target.value)} className={inputClass} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <label className={toggleCardClass}>
+              <span className="w-full space-y-1">
+                <span className="block font-semibold text-slate-900">Insurance feature</span>
+                <span className="block text-sm text-slate-600">Enable insurance history and expiry reminders per vehicle.</span>
+              </span>
+              <input type="checkbox" checked={insuranceFeatureEnabled} onChange={(e) => setInsuranceFeatureEnabled(e.target.checked)} className="mt-1" />
+            </label>
+            <label className={toggleCardClass}>
+              <span className="w-full space-y-1">
+                <span className="block font-semibold text-slate-900">Inspection feature</span>
+                <span className="block text-sm text-slate-600">Enable inspection / keurings tracking and reminders.</span>
+              </span>
+              <input type="checkbox" checked={inspectionFeatureEnabled} onChange={(e) => setInspectionFeatureEnabled(e.target.checked)} className="mt-1" />
+            </label>
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Inspection label NL</label>
+              <Input value={inspectionLocalizedLabelNl} onChange={(e) => setInspectionLocalizedLabelNl(e.target.value)} className={inputClass} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <label className={toggleCardClass}>
+              <span className="w-full space-y-1">
+                <span className="block font-semibold text-slate-900">Block booking if insurance expired</span>
+              </span>
+              <input type="checkbox" checked={blockVehicleBookingIfInsuranceExpired} onChange={(e) => setBlockVehicleBookingIfInsuranceExpired(e.target.checked)} className="mt-1" />
+            </label>
+            <label className={toggleCardClass}>
+              <span className="w-full space-y-1">
+                <span className="block font-semibold text-slate-900">Block booking if inspection expired</span>
+              </span>
+              <input type="checkbox" checked={blockVehicleBookingIfInspectionExpired} onChange={(e) => setBlockVehicleBookingIfInspectionExpired(e.target.checked)} className="mt-1" />
+            </label>
+            <label className={toggleCardClass}>
+              <span className="w-full space-y-1">
+                <span className="block font-semibold text-slate-900">Block booking if maintenance overdue</span>
+              </span>
+              <input type="checkbox" checked={blockVehicleBookingIfMaintenanceOverdue} onChange={(e) => setBlockVehicleBookingIfMaintenanceOverdue(e.target.checked)} className="mt-1" />
+            </label>
+          </div>
+        </div>
+      </Card>
+
+      <Card className={sectionClass}>
+        <div className={sectionBodyClass}>
+          <div className="flex items-start gap-4">
+            <div className="rounded-2xl bg-teal-100 p-3 text-teal-700 ring-1 ring-teal-200">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">{t("admin.settings.bookingRules.title")}</h3>
+              <p className="mt-1 text-sm text-slate-600">{t("admin.settings.bookingRules.description")}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-5 xl:grid-cols-2">
+            <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#f7fcfb,#ffffff)] p-5 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.35)]">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{t("admin.settings.bookingRules.minimumSectionTitle")}</p>
+                  <p className="mt-1 text-sm text-slate-600">{t("admin.settings.bookingRules.minimumSectionDescription")}</p>
+                </div>
+                <span className="rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+                  {minimumBookingDays} {t("booking.days").toLowerCase()}
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-4">
+                <label className={toggleCardClass}>
+                  <span className="w-full space-y-1">
+                    <span className="block font-semibold text-slate-900">{t("admin.settings.bookingRules.belowMinimumRentalAdminOnly")}</span>
+                    <span className="block text-sm text-slate-600">{t("admin.settings.bookingRules.belowMinimumRentalAdminOnlyDescription")}</span>
+                  </span>
+                  <input type="checkbox" checked={belowMinimumRentalAdminOnly} onChange={(e) => setBelowMinimumRentalAdminOnly(e.target.checked)} className="mt-1" />
+                </label>
+
+                <label className={toggleCardClass}>
+                  <span className="w-full space-y-1">
+                    <span className="block font-semibold text-slate-900">{t("admin.settings.bookingRules.belowMinimumRentalPricingEnabled")}</span>
+                    <span className="block text-sm text-slate-600">{t("admin.settings.bookingRules.belowMinimumRentalPricingEnabledDescription")}</span>
+                  </span>
+                  <input type="checkbox" checked={belowMinimumRentalPricingEnabled} onChange={(e) => setBelowMinimumRentalPricingEnabled(e.target.checked)} className="mt-1" />
+                </label>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-2 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)]">
+                    <span className="block text-sm font-semibold text-slate-700">{t("admin.settings.bookingRules.belowMinimumRentalSurchargeMode")}</span>
+                    <select
+                      value={belowMinimumRentalSurchargeMode}
+                      onChange={(e) => setBelowMinimumRentalSurchargeMode(e.target.value as BelowMinimumRentalSurchargeMode)}
+                      className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-sky-200"
+                    >
+                      <option value="percentage_on_base_total">{t("admin.settings.bookingRules.surchargeModes.percentage_on_base_total")}</option>
+                      <option value="percentage_on_current_total">{t("admin.settings.bookingRules.surchargeModes.percentage_on_current_total")}</option>
+                      <option value="fixed_amount">{t("admin.settings.bookingRules.surchargeModes.fixed_amount")}</option>
+                    </select>
+                  </label>
+
+                  <label className="space-y-2 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)]">
+                    <span className="block text-sm font-semibold text-slate-700">{t("admin.settings.bookingRules.belowMinimumRentalSurchargeValue")}</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={1000000}
+                      step={belowMinimumRentalSurchargeMode === "fixed_amount" ? 100 : 0.01}
+                      value={belowMinimumRentalSurchargeValue}
+                      onChange={(e) => setBelowMinimumRentalSurchargeValue(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#fcf9ff,#ffffff)] p-5 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.35)]">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{t("admin.settings.bookingRules.lastMinuteSectionTitle")}</p>
+                  <p className="mt-1 text-sm text-slate-600">{t("admin.settings.bookingRules.lastMinuteSectionDescription")}</p>
+                </div>
+                <span className="rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 py-1 text-xs font-semibold text-fuchsia-700">
+                  {lastMinuteBookingEnabled ? `${lastMinuteBookingThresholdHours || "24"}h` : t("common.no")}
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-4">
+                <label className={toggleCardClass}>
+                  <span className="w-full space-y-1">
+                    <span className="block font-semibold text-slate-900">{t("admin.settings.bookingRules.lastMinuteBookingEnabled")}</span>
+                    <span className="block text-sm text-slate-600">{t("admin.settings.bookingRules.lastMinuteBookingEnabledDescription")}</span>
+                  </span>
+                  <input type="checkbox" checked={lastMinuteBookingEnabled} onChange={(e) => setLastMinuteBookingEnabled(e.target.checked)} className="mt-1" />
+                </label>
+
+                <label className={toggleCardClass}>
+                  <span className="w-full space-y-1">
+                    <span className="block font-semibold text-slate-900">{t("admin.settings.bookingRules.lastMinuteBookingAdminOnly")}</span>
+                    <span className="block text-sm text-slate-600">{t("admin.settings.bookingRules.lastMinuteBookingAdminOnlyDescription")}</span>
+                  </span>
+                  <input type="checkbox" checked={lastMinuteBookingAdminOnly} onChange={(e) => setLastMinuteBookingAdminOnly(e.target.checked)} className="mt-1" />
+                </label>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-2 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)]">
+                    <span className="block text-sm font-semibold text-slate-700">{t("admin.settings.bookingRules.lastMinuteBookingThresholdHours")}</span>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={720}
+                      step={1}
+                      value={lastMinuteBookingThresholdHours}
+                      onChange={(e) => setLastMinuteBookingThresholdHours(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
+
+                  <label className="space-y-2 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)]">
+                    <span className="block text-sm font-semibold text-slate-700">{t("admin.settings.bookingRules.lastMinuteBookingExtraPercent")}</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={1000}
+                      step={0.01}
+                      value={lastMinuteBookingExtraPercent}
+                      onChange={(e) => setLastMinuteBookingExtraPercent(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>

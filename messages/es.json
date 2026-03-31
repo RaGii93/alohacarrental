@@ -10,7 +10,7 @@
     "fleetOverview": "Resumen de flota"
   },
   "common": {
-    "name": "EdgeRent Lite",
+    "name": "Aloha Car Rental",
     "phone": "Teléfono",
     "email": "Correo Electrónico",
     "currency": "$",
@@ -151,9 +151,9 @@
   },
   "securityPage": {
     "metaTitle": "Seguridad y manejo de datos",
-    "metaDescription": "Conoce cómo EdgeRent Lite gestiona control de acceso, carga de archivos, retención de licencias, registros de auditoría y prácticas operativas por despliegue.",
+    "metaDescription": "Conoce cómo Aloha Car Rental gestiona control de acceso, carga de archivos, retención de licencias, registros de auditoría y prácticas operativas por despliegue.",
     "eyebrow": "Seguridad y manejo de datos",
-    "title": "Cómo EdgeRent Lite maneja la seguridad, la privacidad y los controles operativos",
+    "title": "Cómo Aloha Car Rental maneja la seguridad, la privacidad y los controles operativos",
     "intro": "Esta página describe los controles que están implementados hoy en el producto y los temas operativos que tratamos con los clientes durante el despliegue. Evitamos afirmaciones amplias y nos centramos en lo que realmente existe.",
     "pillars": {
       "access": {
@@ -227,7 +227,7 @@
     }
   },
   "landing": {
-    "title": "Bienvenido a EdgeRent Lite",
+    "title": "Bienvenido a Aloha Car Rental",
     "subtitle": "Reserva tu vehículo fácilmente",
     "tagline": "Conduce Tus Sueños",
     "badge": "🚗 Servicio Premium de Alquiler de Vehículos",
@@ -244,7 +244,7 @@
       "supportLabel": "Soporte"
     },
     "whyChoose": {
-      "title": "¿Por Qué Elegir EdgeRent?",
+      "title": "¿Por Qué Elegir Aloha Car Rental?",
       "subtitle": "Experimenta lo mejor en alquiler de vehículos con nuestros servicios premium y soporte al cliente incomparable.",
       "features": {
         "selection": {
@@ -271,14 +271,25 @@
       "button": "Reservar Ahora"
     },
     "hero": {
-      "pill": "EdgeRent Lite para operadores de alquiler",
+      "pill": "Aloha Car Rental",
       "featureLine": "Reserva rapida, precios claros y soporte local en el que puedes confiar.",
+      "completeFields": "Completa todos los campos de la reserva antes de continuar.",
+      "headline": {
+        "line1": "Descubre Bonaire con",
+        "line2Prefix": "la libertad del",
+        "line2Highlight": "vehiculo ideal",
+        "line3": "esperandote."
+      },
       "title": "Deja de perder reservas",
       "titleAccent": "y toma el control de tu negocio de alquiler.",
       "description": "Gestiona reservas, vehículos, recogidas, devoluciones y pagos en un sistema profesional. No más WhatsApp, Excel ni errores manuales frenando a tu equipo.",
+      "bookButton": "Reserva tu vehiculo",
+      "viewFleetButton": "Ver flota",
+      "driverAge": "Edad del conductor",
+      "agePlaceholder": "Selecciona el rango de edad",
       "primaryCta": "Agenda tu demo",
       "secondaryCta": "Ver cómo funciona",
-      "dashboardAlt": "Vista previa del panel de EdgeRent",
+      "dashboardAlt": "Vista previa del panel de Aloha Car Rental",
       "bookingCard": {
         "title": "Recogida y devolución controladas",
         "detail": "Reserva, vehículo y estado de entrega en un solo lugar"
@@ -315,6 +326,11 @@
         "multiLanguage": "Creado para equipos de alquiler profesionales"
       }
     },
+    "fleet": {
+      "title": "Elige el vehiculo ideal para tus planes en la isla",
+      "seats": "{count} asientos",
+      "reserveNow": "Reservar ahora"
+    },
     "statsStrip": {
       "eyebrow": "Resumen de la plataforma",
       "title": "Operaciones profesionales de alquiler de un vistazo",
@@ -340,7 +356,7 @@
     "core": {
       "eyebrow": "Plataforma principal",
       "title": "Todo lo que necesitas para gestionar tu negocio de alquiler",
-      "description": "EdgeRent mantiene bajo control las reservas, la flota, las entregas, las devoluciones y la facturación en un solo sistema profesional. Desde reservas online hasta integraciones con QuickBooks Online y Zoho Invoice, está hecho para equipos de alquiler serios.",
+      "description": "Aloha Car Rental mantiene bajo control las reservas, la flota, las entregas, las devoluciones y la facturación en un solo sistema profesional. Desde reservas online hasta integraciones con QuickBooks Online y Zoho Invoice, está hecho para equipos de alquiler serios.",
       "features": {
         "onlineBooking": {
           "title": "Sitio web de reservas online",
@@ -413,10 +429,10 @@
       }
     },
     "whyUs": {
-      "eyebrow": "Por qué EdgeRent",
+      "eyebrow": "Por qué Aloha Car Rental",
       "title": "Creado por operadores,",
       "titleAccent": "para operadores",
-      "description": "Entendemos los desafíos únicos de gestionar un negocio de alquiler en el Caribe neerlandés. EdgeRent fue diseñado desde cero para este mercado.",
+      "description": "Entendemos los desafíos únicos de gestionar un negocio de alquiler en el Caribe neerlandés. Aloha Car Rental fue diseñado desde cero para este mercado.",
       "imageAlt": "Negocio de alquiler en el Caribe",
       "islands": {
         "curacao": "Curaçao",
@@ -469,6 +485,8 @@
       "subtitle": "Últimas reseñas publicadas de reservas verificadas.",
       "leaveButton": "Dejar una Reseña",
       "empty": "Todavía no hay reseñas publicadas.",
+      "faqPreview": "Respuestas rapidas para los clientes antes de reservar, en un solo lugar.",
+      "viewAllFaq": "Ver todas las preguntas frecuentes",
       "form": {
         "title": "Dejar una Reseña",
         "subtitle": "Ingresa tu código de reserva para enviar una reseña.",
@@ -494,7 +512,7 @@
       "pill": "Curaçao • Aruba • Bonaire",
       "title": "¿Listo para modernizar tu",
       "titleAccent": "negocio de alquiler?",
-      "description": "Solicita una demo personalizada y descubre cómo EdgeRent puede optimizar tus operaciones, evitar sobreventas y ayudar a crecer tu negocio.",
+      "description": "Solicita una demo personalizada y descubre cómo Aloha Car Rental puede optimizar tus operaciones, evitar sobreventas y ayudar a crecer tu negocio.",
       "primaryCta": "Solicitar una demo",
       "secondaryCta": "Contactar ventas",
       "note": "Implementación single-tenant • Tus datos siguen siendo tuyos • Marca blanca completa"
@@ -504,8 +522,8 @@
       "title": "Creado para operadores que necesitan flujos de alquiler listos para contabilidad",
       "description": "{tenantName} está posicionado como un sistema operativo profesional para equipos de alquiler de autos en el Caribe, con procesos listos para facturación y una experiencia de cliente preparada para escalar.",
       "logosEyebrow": "Clientes de confianza",
-      "logosTitle": "Empresas de alquiler que confían en EdgeRent",
-      "logosDescription": "Operadores reales en Bonaire y Curazao que usan EdgeRent en su negocio.",
+      "logosTitle": "Empresas de alquiler que confían en Aloha Car Rental",
+      "logosDescription": "Operadores reales en Bonaire y Curazao que usan Aloha Car Rental en su negocio.",
       "professionalEyebrow": "Por qué cambian los equipos",
       "professionalDescription": "Reemplaza mensajes dispersos de WhatsApp, hojas de cálculo y seguimientos manuales por un flujo de alquiler más limpio que tu equipo pueda gestionar con confianza.",
       "clients": {
@@ -520,6 +538,27 @@
         "bonDrive": {
           "status": "Comienza pronto",
           "detail": "Preparando el despliegue para uso operativo en Bonaire."
+        }
+      }
+    },
+    "updates": {
+      "eyebrow": "Nuevas actualizaciones",
+      "title": "Mejoras recientes visibles ahora en la experiencia pública",
+      "description": "Estamos mostrando las mejoras más recientes en reservas, alquileres de socios y planificación de flota para que los visitantes vean de inmediato qué cambió y qué ya está soportado.",
+      "primaryCta": "Ver FAQ actualizado",
+      "secondaryCta": "Explorar funciones",
+      "items": {
+        "pricingRules": {
+          "title": "Reglas de precios más inteligentes",
+          "description": "Las reglas de alquiler mínimo y reservas de última hora ahora pueden definir el flujo público con precios y restricciones más claras."
+        },
+        "partnerRentals": {
+          "title": "Alquileres de socios por separado",
+          "description": "Los vehículos de otras empresas pueden gestionarse operativamente sin mezclarse con la flota normal guardada que ve el público."
+        },
+        "fleetCalendar": {
+          "title": "Mejor visibilidad para planificar la flota",
+          "description": "El calendario de flota en admin y los filtros compartidos facilitan coordinar reservas, disponibilidad y tiempos operativos."
         }
       }
     }
@@ -571,7 +610,7 @@
     "identificationClause": "Los usuarios aceptan proporcionar una identificación válida para la verificación del alquiler.",
     "gdprNotice": "Los documentos de identificación se solicitan para la verificación del alquiler y requisitos de cumplimiento, incluidas obligaciones relacionadas con el RGPD.",
     "privacyPolicy": "Política de Privacidad",
-    "privacyDeletionNotice": "Si deseas eliminar tus datos personales, por favor contacta a: privacy@edgerentlite.com",
+    "privacyDeletionNotice": "Si deseas eliminar tus datos personales, por favor contacta a: privacy@alohacarrental.com",
     "privacyConsentCheckbox": "Entiendo que mi identificación se utilizará para la verificación del alquiler y se almacenará temporalmente de acuerdo con la Política de Privacidad.",
     "viewTerms": "Ver Términos (PDF)",
     "acceptTerms": "Acepto los Términos y Condiciones",
@@ -613,13 +652,19 @@
       "birthLicenseRequired": "La fecha de nacimiento y vencimiento de licencia son obligatorias",
       "ageMinimum": "El cliente debe tener al menos 21 años",
       "licenseInvalid": "La licencia debe ser válida en la fecha de recogida",
-      "minimumDuration": "La duración mínima de reserva es de {days} día(s)."
+      "minimumDuration": "La duración mínima de reserva es de {days} día(s).",
+      "minimumDurationAdminOnly": "Las reservas por menos de {days} día(s) solo están disponibles mediante administración.",
+      "lastMinuteAdminOnly": "Las reservas que empiezan dentro de {hours} hora(s) solo están disponibles mediante administración."
     },
     "success": {
       "title": "¡Reserva Enviada!",
       "message": "Tu número de referencia es: {{orderId}}",
       "next": "Nos pondremos en contacto pronto para confirmarla."
-    }
+    },
+    "baseTotal": "Total base",
+    "subtotal": "Subtotal",
+    "belowMinimumSurcharge": "Recargo por alquiler corto",
+    "lastMinuteSurcharge": "Recargo de última hora"
   },
   "admin": {
     "title": "Panel de Administración",
@@ -674,7 +719,8 @@
         "dates": "Fechas",
         "total": "Total",
         "status": "Estado",
-        "actions": "Acciones"
+        "actions": "Acciones",
+        "noVehicle": "—"
       },
       "detail": {
         "title": "Detalles de la Reserva",
@@ -1004,6 +1050,23 @@
         "actions": {
           "saveChanges": "Guardar cambios"
         }
+      },
+      "filters": {
+        "kicker": "Filtros de reservas",
+        "title": "Trabajo actual primero, historial cuando haga falta",
+        "description": "Las reservas pendientes, confirmadas y rechazadas comienzan desde hoy por defecto para mantener visible el trabajo en curso, mientras los filtros te permiten volver al historial en cualquier momento.",
+        "searchPlaceholder": "Código de reserva, cliente, correo, teléfono o vehículo"
+      },
+      "list": {
+        "title": "Flujo de reservas",
+        "description": "Las reservas pendientes, confirmadas y rechazadas ahora comienzan desde hoy en adelante por defecto para que el trabajo actual quede visible primero, mientras los filtros te permiten abrir todo el historial cuando lo necesites.",
+        "showingStatus": "{status}: mostrando {start}-{end} de {total}",
+        "rowsPerPage": "Filas por página",
+        "pills": {
+          "search": "Buscar: {value}",
+          "from": "Desde: {value}",
+          "to": "Hasta: {value}"
+        }
       }
     },
     "vehicles": {
@@ -1085,7 +1148,8 @@
         "locations": "Ubicaciones",
         "logs": "Registros",
         "users": "Usuarios",
-        "help": "Centro de ayuda"
+        "help": "Centro de ayuda",
+        "notifications": "Notificaciones"
       },
       "deliveries": {
         "title": "Próximas Entregas (Siguientes 7 Días)"
@@ -1317,7 +1381,11 @@
         "invalidTax": "Ingresa un porcentaje de impuesto válido entre 0 y 100.",
         "invalidMinDays": "Ingresa una duración mínima de reserva válida entre 1 y 365 días.",
         "updateFailed": "No se pudieron actualizar los ajustes.",
-        "requiredTenantFields": "El nombre del inquilino, el correo electrónico y la moneda son obligatorios."
+        "requiredTenantFields": "El nombre del inquilino, el correo electrónico y la moneda son obligatorios.",
+        "invalidBookingHoldDays": "Ingresa un período de espera de reserva válido entre 1 y 30 días.",
+        "invalidBelowMinimumSurcharge": "Ingresa un valor válido para el recargo por debajo del mínimo.",
+        "invalidLastMinuteThreshold": "Ingresa un umbral válido de última hora entre 1 y 720 horas.",
+        "invalidLastMinutePercent": "Ingresa un porcentaje extra válido para última hora."
       },
       "success": {
         "updated": "Ajustes actualizados. Impuesto: {tax}%, Reserva mínima: {days} día(s)."
@@ -1373,6 +1441,34 @@
       },
       "messages": {
         "updated": "Configuración actualizada."
+      },
+      "bookingHoldDays": "Días de espera de la reserva",
+      "bookingRules": {
+        "title": "Controles de reglas de reserva",
+        "description": "Controla quién puede crear reservas cortas o de última hora y si se aplican recargos.",
+        "minimumSectionTitle": "Reglas de alquiler mínimo",
+        "minimumSectionDescription": "Usa los días mínimos como base y decide si administración puede sobrepasarlos y cómo se calcula el recargo.",
+        "lastMinuteSectionTitle": "Reglas de última hora",
+        "lastMinuteSectionDescription": "Define cuándo una reserva es de última hora, si el público queda bloqueado y qué porcentaje extra se aplica.",
+        "belowMinimumRentalAdminOnly": "Reservas por debajo del mínimo solo para administración",
+        "belowMinimumRentalAdminOnlyDescription": "Los clientes públicos quedan bloqueados cuando el alquiler es más corto que el mínimo. Administración aún puede crear la reserva.",
+        "belowMinimumRentalPricingEnabled": "Aplicar recargo por debajo del mínimo",
+        "belowMinimumRentalPricingEnabledDescription": "Agrega un cargo extra cuando el alquiler es más corto que los días mínimos.",
+        "belowMinimumRentalSurchargeMode": "Modo de recargo por debajo del mínimo",
+        "belowMinimumRentalSurchargeValue": "Valor del recargo por debajo del mínimo",
+        "lastMinuteBookingEnabled": "Activar reglas de última hora",
+        "lastMinuteBookingEnabledDescription": "Detecta reservas que empiezan dentro del umbral configurado y aplica el porcentaje extra.",
+        "lastMinuteBookingAdminOnly": "Reservas de última hora solo para administración",
+        "lastMinuteBookingAdminOnlyDescription": "Los clientes públicos no pueden reservar dentro de la ventana de última hora, pero administración sí.",
+        "lastMinuteBookingThresholdHours": "Umbral de última hora en horas",
+        "lastMinuteBookingExtraPercent": "Porcentaje extra de última hora",
+        "adminOnly": "Solo admin",
+        "publicAllowed": "Público permitido",
+        "surchargeModes": {
+          "percentage_on_base_total": "Porcentaje sobre el total base",
+          "percentage_on_current_total": "Porcentaje sobre el subtotal actual",
+          "fixed_amount": "Monto fijo"
+        }
       }
     },
     "logout": "Cerrar Sesión",
@@ -1543,6 +1639,624 @@
         "created": "Descuento creado",
         "deactivateFailed": "No se pudo desactivar el código",
         "deactivated": "Descuento desactivado"
+      }
+    },
+    "activities": {
+      "range": "{start} a {end}",
+      "showing": "Mostrando {start}-{end} de {total}",
+      "rowsPerPage": "Filas por página",
+      "pills": {
+        "search": "Buscar: {value}",
+        "from": "Desde: {value}",
+        "to": "Hasta: {value}"
+      },
+      "filters": {
+        "kicker": "Filtros de actividad diaria",
+        "searchPlaceholder": "Código de reserva, cliente, correo, teléfono o vehículo"
+      }
+    },
+    "deliveries": {
+      "title": "Panel de entregas",
+      "description": "Seguimiento de entregas enfocado en despacho con valores por defecto desde hoy en adelante, búsqueda del lado del servidor y filtros de fecha para decisiones rápidas de programación.",
+      "cards": {
+        "visible": "Entregas visibles",
+        "today": "Para hoy",
+        "range": "Rango activo"
+      },
+      "filters": {
+        "title": "Entregas desde hoy en adelante",
+        "description": "Mantén las entregas próximas al frente del equipo por defecto y amplía el rango solo cuando necesites actividad pasada o más futura."
+      }
+    },
+    "returns": {
+      "title": "Panel de devoluciones",
+      "description": "Mantén visibles primero las devoluciones próximas con filtros del servidor desde hoy en adelante y amplía el rango solo cuando necesites actividad de devoluciones más antigua.",
+      "cards": {
+        "visible": "Devoluciones visibles",
+        "today": "Para hoy",
+        "range": "Rango activo"
+      },
+      "filters": {
+        "title": "Devoluciones desde hoy en adelante",
+        "description": "Muestra primero las entregas de regreso próximas para el equipo operativo y amplía el rango de fechas cuando haga falta revisar devoluciones históricas."
+      }
+    },
+    "notifications": {
+      "center": {
+        "title": "Centro de notificaciones",
+        "subtitle": "Actualizaciones y alertas recientes del sistema"
+      },
+      "page": {
+        "title": "Mantente al tanto de reservas, alertas y actividad administrativa",
+        "description": "Descarta cualquier notificación una vez atendida. Las notificaciones descartadas se eliminan de inmediato y las notificaciones con más de {days} días se limpian automáticamente.",
+        "cleanupTitle": "Limpieza automática activada",
+        "cleanupDescription": "La lista se mantiene ordenada sin mantenimiento extra. Las notificaciones antiguas se eliminan automáticamente."
+      },
+      "actions": {
+        "viewAll": "Ver todo",
+        "dismiss": "Descartar",
+        "openRelated": "Abrir página relacionada"
+      },
+      "empty": {
+        "compact": "No hay notificaciones en este momento.",
+        "page": "No hay notificaciones disponibles."
+      },
+      "messages": {
+        "dismissed": "Notificación descartada",
+        "dismissFailed": "No se pudo descartar la notificación"
+      }
+    },
+    "financial": {
+      "page": {
+        "title": "Espacio de control financiero",
+        "description": "Revisa ingresos de reservas, cobertura de facturacion y transferencias de alquileres asociados desde un panel financiero con filtros del servidor basados en URL.",
+        "filterRange": "Rango de filtro: {start} a {end}",
+        "noExtraFilters": "No se aplicaron filtros extra"
+      },
+      "filters": {
+        "kicker": "Filtros financieros",
+        "title": "Controles de ingresos, facturacion y transferencias",
+        "description": "Busca reservas y alquileres asociados, aísla el estado de facturacion y mantén la vista financiera compartible mediante filtros en la URL.",
+        "searchPlaceholder": "Codigo de reserva, cliente, correo, proveedor o vehiculo",
+        "bookingState": "Estado de reserva",
+        "billingState": "Estado de facturacion",
+        "transferState": "Estado de transferencia",
+        "allBookings": "Todas las reservas",
+        "allBillingStates": "Todos los estados de facturacion",
+        "allTransfers": "Todas las transferencias",
+        "invoiced": "Facturado",
+        "uninvoiced": "Sin facturar",
+        "pendingTransfer": "Transferencia pendiente",
+        "transferred": "Transferido"
+      },
+      "pills": {
+        "search": "Buscar: {value}",
+        "booking": "Reserva: {value}",
+        "billing": "Facturacion: {value}",
+        "transfer": "Transferencia: {value}"
+      },
+      "cards": {
+        "confirmedRevenue": "Ingresos confirmados",
+        "invoicedRevenue": "Ingresos facturados",
+        "pendingPipeline": "Pipeline pendiente",
+        "partnerRentalProfit": "Ganancia de alquiler asociado",
+        "uninvoicedConfirmed": "Confirmados sin facturar",
+        "averageConfirmedBooking": "Reserva confirmada promedio",
+        "pendingToConfirmed": "De pendiente a confirmado",
+        "partnerTransfersPending": "Transferencias asociadas pendientes"
+      },
+      "sections": {
+        "billingDocumentsDescription": "Reservas facturadas mas recientes dentro de los filtros financieros activos.",
+        "visibleCount": "{count} visibles",
+        "noBillingDocuments": "Ningun documento de facturacion coincide con los filtros actuales.",
+        "partnerLedgerTitle": "Libro de transferencias de alquileres asociados",
+        "partnerLedgerDescription": "Visibilidad de ingresos, gastos y pagos para reservas con proveedores externos.",
+        "noPartnerRentals": "Ningun alquiler asociado coincide con los filtros actuales.",
+        "partnerLedgerLine": "Ingreso {income} · Gasto {expense} · Ganancia {profit}",
+        "createdAt": "Creado {date}"
+      },
+      "actions": {
+        "viewPdf": "Ver PDF",
+        "sendByEmail": "Enviar por correo"
+      }
+    },
+    "partnerRentals": {
+      "page": {
+        "kicker": "Alquileres asociados",
+        "filterRange": "Rango de filtro: {start} a {end}"
+      },
+      "cards": {
+        "income": "Ingreso",
+        "expenses": "Gastos",
+        "profit": "Lo que ganaste",
+        "pendingTransfer": "Transferencia pendiente"
+      },
+      "bucket": {
+        "title": "Bucket de alquiler asociado",
+        "description": "Mantén separados los alquileres ocasionales de empresas externas de tu flota pública mientras sigues controlando pago, entrega, devolucion y transferencia."
+      },
+      "steps": {
+        "supplier": "Proveedor",
+        "customer": "Cliente y viaje",
+        "payment": "Pago",
+        "review": "Revision"
+      },
+      "sections": {
+        "supplierTitle": "Proveedor y vehiculo",
+        "supplierDescription": "Comienza con la empresa asociada y el vehiculo exacto que estas gestionando.",
+        "customerTitle": "Cliente y viaje",
+        "customerDescription": "Ingresa los datos del cliente, fechas y ubicaciones del alquiler.",
+        "pricingTitle": "Precio y pago",
+        "pricingDescription": "Usa solo tarifas diarias. El sistema calcula los totales automaticamente segun la duracion del alquiler.",
+        "reviewTitle": "Revision y notas",
+        "reviewDescription": "Revision final antes de crear la reserva y enviar el correo al cliente."
+      },
+      "fields": {
+        "supplierCompany": "Empresa proveedora",
+        "vehicleDetails": "Detalles del vehiculo",
+        "customerName": "Nombre del cliente",
+        "customerPhone": "Telefono del cliente",
+        "customerEmail": "Correo del cliente",
+        "pickupDateTime": "Fecha y hora de entrega",
+        "dropoffDateTime": "Fecha y hora de devolucion",
+        "pickupLocation": "Lugar de entrega",
+        "dropoffLocation": "Lugar de devolucion",
+        "clientDayPrice": "Tarifa diaria al cliente",
+        "supplierDayPrice": "Tarifa diaria del proveedor",
+        "paymentStatus": "Estado de pago",
+        "paymentMethod": "Metodo de pago",
+        "paymentReference": "Referencia de pago",
+        "internalNotes": "Notas internas",
+        "pickupNotes": "Notas de entrega",
+        "dropoffNotes": "Notas de devolucion"
+      },
+      "placeholders": {
+        "supplierCompany": "Island Partner Cars",
+        "vehicleDetails": "Toyota Rush · Placa ABC-123",
+        "clientDayPrice": "95.00",
+        "supplierDayPrice": "70.00",
+        "paymentMethod": "Efectivo, tarjeta, transferencia bancaria",
+        "paymentReference": "Referencia opcional de recibo o transferencia",
+        "operationalNotes": "Notas operativas opcionales"
+      },
+      "summary": {
+        "title": "Resumen de reserva",
+        "description": "Esto refleja lo que el equipo necesita operativamente.",
+        "ready": "{percent}% listo",
+        "supplierVehicle": "Vehiculo del proveedor",
+        "vehiclePending": "Vehiculo aun no ingresado",
+        "supplierPending": "Proveedor aun no ingresado",
+        "tripPlan": "Plan del viaje",
+        "range": "{start} a {end}",
+        "chooseDates": "Elige fechas validas de entrega y devolucion",
+        "rentalDays": "{count} dia(s) de alquiler",
+        "dayCountAuto": "El numero de dias se calcula automaticamente",
+        "pickup": "Entrega",
+        "dropoff": "Devolucion",
+        "financeSnapshot": "Resumen financiero",
+        "clientDayPrice": "Tarifa diaria al cliente",
+        "supplierDayPrice": "Tarifa diaria del proveedor",
+        "estimatedProfit": "Ganancia estimada",
+        "initialPaymentState": "Estado inicial del pago",
+        "paymentMethodPending": "Metodo de pago aun no ingresado",
+        "paymentReferencePending": "Aun no hay referencia de pago"
+      },
+      "statuses": {
+        "paid": "Pagado",
+        "unpaid": "No pagado",
+        "transferred": "Transferido",
+        "pendingTransfer": "Transferencia pendiente"
+      },
+      "actions": {
+        "new": "Nuevo alquiler asociado",
+        "continue": "Continuar",
+        "create": "Crear alquiler asociado",
+        "creating": "Creando...",
+        "emailCustomer": "Enviar correo al cliente",
+        "markPaid": "Marcar pagado",
+        "markPickup": "Marcar entrega",
+        "markDropoff": "Marcar devolucion",
+        "markTransferred": "Marcar transferido",
+        "saving": "Guardando...",
+        "saveUpdate": "Guardar actualizacion"
+      },
+      "dialogs": {
+        "createTitle": "Crear alquiler asociado",
+        "createDescription": "Un flujo paso a paso y amigable para movil para alquileres de empresas externas. El precio se calcula como tarifa diaria × dias de alquiler."
+      },
+      "flow": {
+        "markPaidTitle": "Marcar {code} como pagado",
+        "markPickupTitle": "Marcar {code} como entregado",
+        "markDropoffTitle": "Marcar {code} como devuelto",
+        "updateTitle": "Actualizar alquiler asociado",
+        "description": "Guarda el siguiente paso operativo sin mezclar esta reserva con los registros normales de tu flota."
+      },
+      "row": {
+        "payment": "Pago: {value}",
+        "pickup": "Entrega: {value}",
+        "dropoff": "Devolucion: {value}",
+        "notReceived": "Aun no recibido",
+        "notMarked": "Aun no marcado"
+      },
+      "messages": {
+        "completeSupplier": "Completa los datos del proveedor y del vehiculo.",
+        "completeCustomer": "Completa los datos del cliente y del viaje con fechas validas de entrega y devolucion.",
+        "completePricing": "Ingresa la tarifa diaria para el cliente y el proveedor.",
+        "paymentMethodRequired": "Ingresa un metodo de pago.",
+        "createFailed": "No se pudo crear el alquiler asociado.",
+        "created": "Se creo el alquiler asociado {code} y se envio el correo al cliente.",
+        "transferFailed": "No se pudo actualizar el bucket de transferencia.",
+        "transferred": "Marcado como transferido.",
+        "updateFailed": "No se pudo actualizar el flujo del alquiler asociado.",
+        "updated": "Alquiler asociado actualizado."
+      },
+      "empty": "No se encontraron alquileres asociados en este rango."
+    },
+    "logs": {
+      "page": {
+        "kicker": "Registros de auditoria admin",
+        "title": "Flujo de actividad operativa",
+        "description": "Revisa acciones administrativas, rastrea cambios relacionados con reservas y reduce resultados por usuario, rol o accion desde un solo lugar.",
+        "searchHint": "Busqueda por palabra clave en accion, correo del admin y codigo de reserva",
+        "filterHint": "Filtros por rol y accion"
+      },
+      "cards": {
+        "filtered": "Filtrado",
+        "matchingEvents": "Eventos de auditoria coincidentes",
+        "activity24h": "Actividad 24h",
+        "eventsToday": "Eventos creados hoy",
+        "bookingLinked": "Vinculado a reserva",
+        "linkedDescription": "Registros vinculados a una reserva"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar accion, correo del admin o codigo de reserva",
+        "allRoles": "Todos los roles",
+        "allActions": "Todas las acciones",
+        "apply": "Aplicar",
+        "clear": "Limpiar"
+      },
+      "pills": {
+        "search": "Buscar: {value}",
+        "role": "Rol: {value}",
+        "action": "Accion: {value}"
+      },
+      "meta": {
+        "showing": "Mostrando {start}-{end} de {total}",
+        "rows": "Filas:"
+      },
+      "empty": {
+        "title": "No se encontraron registros de auditoria",
+        "description": "Prueba una busqueda mas amplia o limpia uno de los filtros activos para ver mas historial operativo."
+      },
+      "entry": {
+        "booking": "Reserva {code}",
+        "logId": "ID del registro"
+      },
+      "roles": {
+        "root": "Root",
+        "owner": "Propietario",
+        "staff": "Personal"
+      }
+    },
+    "fleetOps": {
+      "filtersTitle": "Filtros",
+      "builtFor": "Diseñado para",
+      "search": "Buscar",
+      "apply": "Aplicar filtros",
+      "reset": "Restablecer",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin",
+      "startPlaceholder": "Selecciona fecha de inicio",
+      "endPlaceholder": "Selecciona fecha de fin"
+    },
+    "fleet": {
+      "workspace": {
+        "kicker": "Espacio de flota",
+        "comparedWindow": "Comparado con la ventana anterior de {days} dias."
+      },
+      "tabs": {
+        "calendar": "Calendario",
+        "operations": "Operaciones",
+        "forecast": "Pronostico",
+        "calendarHint": "Agenda en vivo",
+        "operationsHint": "Movimiento actual",
+        "forecastHint": "Perspectiva de demanda"
+      },
+      "cards": {
+        "activeFleet": "Flota activa",
+        "onRentNow": "En alquiler ahora",
+        "utilization": "Utilizacion de flota",
+        "pickups": "Entregas ({days}d)",
+        "returns": "Devoluciones ({days}d)",
+        "returnsToday": "Devoluciones para hoy",
+        "overdueReturns": "Devoluciones vencidas",
+        "expectedDemand": "Demanda esperada ({days}d)",
+        "topDemand": "Categoria con mayor demanda"
+      },
+      "statuses": {
+        "active": "Activo",
+        "completed": "Completado",
+        "blockout": "Bloqueo"
+      },
+      "calendar": {
+        "title": "Calendario de flota",
+        "description": "Reservas, alquileres activos, solicitudes pendientes y mantenimiento se muestran dentro del rango seleccionado.",
+        "maintenanceBlock": "Vehiculo en mantenimiento",
+        "vehicleBlockout": "Bloqueo de vehiculo",
+        "globalBlockout": "Bloqueo global",
+        "unavailableRange": "No disponible en todo el rango visible",
+        "licensePlate": "Placa",
+        "noPlate": "SIN-PLACA"
+      },
+      "operations": {
+        "snapshotDescription": "Reservas que se superponen con el rango actual.",
+        "visibleCount": "{count} visibles",
+        "emptySnapshot": "Ninguna reserva se superpone con este rango de fechas.",
+        "bookingWindow": "{start} a {end}",
+        "notesTitle": "Notas operativas",
+        "selectedRange": "Rango seleccionado",
+        "todayMarker": "Marcador de hoy",
+        "todayVisible": "Visible en la pestaña de calendario para facilitar la coordinacion operativa.",
+        "todayOutside": "Fuera del rango seleccionado.",
+        "bestPractice": "Buena practica",
+        "bestPracticeDescription": "Mantén el rango entre una y tres semanas al planificar entregas y devoluciones. Los rangos más amplios funcionan mejor para revisar el pronostico."
+      },
+      "forecast": {
+        "title": "Demanda esperada por categoria",
+        "description": "El rango seleccionado destaca donde se estan concentrando las reservas.",
+        "bookingsCount": "{count} reservas",
+        "empty": "No hay demanda esperada en este rango."
+      }
+    },
+    "maintenance": {
+      "page": {
+        "title": "Mantenimiento de flota, cumplimiento y control de costos",
+        "description": "Mantén trabajos de servicio, reparaciones, recordatorios de inspección, renovaciones de seguro y costos del vehículo dentro de la misma operación administrativa."
+      },
+      "audiences": {
+        "financialClerk": "Auxiliar financiero",
+        "mechanic": "Mecánico",
+        "administration": "Administración",
+        "rentalAgent": "Agente de alquiler"
+      },
+      "filters": {
+        "title": "Filtros de mantenimiento para taller, finanzas y operaciones",
+        "description": "Filtra por vehículo, urgencia, tipo de servicio y fechas para que cada equipo pueda pasar entre seguimiento, revisión de costos y preparación de alquiler.",
+        "resultSummary": "{overdue} vencidos, {dueSoon} próximos, {records} registros coincidentes",
+        "searchPlaceholder": "Buscar vehículo, placa, título del registro o proveedor",
+        "allVehicles": "Todos los vehículos",
+        "attention": "Atención",
+        "allStatuses": "Todos los estados",
+        "actionRequired": "Acción requerida",
+        "serviceType": "Tipo de servicio",
+        "allServiceTypes": "Todos los tipos de servicio"
+      },
+      "cards": {
+        "overdueVehicles": "Vehículos vencidos",
+        "dueSoon": "Próximos",
+        "trackedCosts": "Costos registrados",
+        "vehicleRevenue": "Ingresos del vehículo",
+        "netContribution": "Contribución neta"
+      },
+      "workspace": {
+        "kicker": "Operaciones",
+        "title": "Espacio de mantenimiento y cumplimiento",
+        "description": "Registra trabajos de servicio, renovaciones de seguro y fechas de inspección desde un solo flujo administrativo."
+      },
+      "actions": {
+        "logMaintenance": "Registrar mantenimiento",
+        "saveRecord": "Guardar registro",
+        "addInsurance": "Agregar seguro",
+        "saveInsurance": "Guardar seguro",
+        "addInspection": "Agregar inspección",
+        "saveInspection": "Guardar inspección",
+        "exportHistory": "Exportar historial CSV",
+        "exportReminders": "Exportar recordatorios CSV"
+      },
+      "dialogs": {
+        "maintenance": {
+          "title": "Registrar mantenimiento",
+          "description": "Este modal está pensado para uso administrativo rápido en escritorio y móvil. Agrega detalles del servicio, piezas usadas y tiempo fuera de servicio en un solo guardado."
+        },
+        "insurance": {
+          "title": "Agregar renovación de seguro",
+          "description": "Registra proveedor, prima, fechas de cobertura y notas para mantener correctos los recordatorios y costos."
+        },
+        "inspection": {
+          "title": "Agregar registro de inspección",
+          "description": "Conserva la última fecha de inspección, vencimiento, proveedor y costo para recordatorios y controles de cumplimiento."
+        }
+      },
+      "form": {
+        "vehicle": "Vehículo",
+        "selectVehicle": "Selecciona un vehículo",
+        "currentOdometer": "Odómetro actual: {value} km",
+        "notRecorded": "Sin registro",
+        "template": "Plantilla",
+        "optionalTemplate": "Plantilla opcional",
+        "noTemplate": "Sin plantilla",
+        "recordType": "Tipo de registro",
+        "serviceDate": "Fecha de servicio",
+        "title": "Título",
+        "titlePlaceholder": "Ejemplo: Servicio menor a 52.000 km",
+        "vendor": "Taller / proveedor",
+        "vendorPlaceholder": "Napa, taller local, concesionario...",
+        "odometerKm": "Odómetro (km)",
+        "laborCost": "Costo de mano de obra",
+        "notes": "Notas",
+        "notesPlaceholder": "Notas de factura, detalles de reparación, marca de neumático, reemplazo de compresor...",
+        "markUnavailable": "Marcar este vehículo como no disponible mientras el trabajo esté en curso.",
+        "notSet": "No definido"
+      },
+      "serviceTypes": {
+        "small": "Servicio menor",
+        "big": "Servicio mayor",
+        "repair": "Reparación",
+        "custom": "Mantenimiento personalizado",
+        "inspectionPrep": "Relacionado con inspección",
+        "insuranceRelated": "Relacionado con seguro"
+      },
+      "parts": {
+        "title": "Piezas usadas",
+        "description": "Registra piezas gestionadas por inventario o piezas puntuales en el mismo trabajo.",
+        "addLine": "Agregar línea de pieza",
+        "inventoryPart": "Pieza de inventario",
+        "customNotInStock": "Personalizada / sin stock",
+        "customPartName": "Nombre de pieza personalizada",
+        "qty": "Cant.",
+        "unitCost": "Costo unitario"
+      },
+      "costSummary": {
+        "title": "Resumen de costos",
+        "parts": "Piezas",
+        "labor": "Mano de obra",
+        "total": "Total"
+      },
+      "insurance": {
+        "provider": "Proveedor de seguro",
+        "policyNumber": "Número de póliza",
+        "coverageType": "Tipo de cobertura",
+        "premiumAmount": "Monto de la prima",
+        "notes": "Notas opcionales del seguro"
+      },
+      "inspection": {
+        "type": "Tipo de inspección",
+        "vendor": "Autoridad o proveedor",
+        "cost": "Costo",
+        "notes": "Notas opcionales de inspección"
+      },
+      "reminderSnapshot": {
+        "title": "Resumen de recordatorios",
+        "description": "{overdue} vehículos vencidos y {count} piezas con stock bajo requieren atención."
+      },
+      "tables": {
+        "overdueItems": "Elementos vencidos",
+        "dueSoon": "Próximos",
+        "recentHistory": "Historial reciente de mantenimiento y reparación"
+      },
+      "table": {
+        "date": "Fecha",
+        "vehicle": "Vehículo",
+        "record": "Registro",
+        "vendor": "Proveedor",
+        "cost": "Costo"
+      },
+      "empty": {
+        "noOverdue": "No hay elementos vencidos de mantenimiento o cumplimiento en este momento.",
+        "nothingDueSoon": "Nada vence pronto en este momento."
+      },
+      "badges": {
+        "overdue": "Vencido",
+        "dueSoon": "Próximo"
+      },
+      "statusLine": "Seguro: {insurance} · Inspección: {inspection} · Mantenimiento: {maintenance}",
+      "expiryLine": "Vence seguro: {insurance} · Vence inspección: {inspection}",
+      "messages": {
+        "saveRecordFailed": "No se pudo guardar el registro de mantenimiento",
+        "recordSaved": "Registro de mantenimiento guardado",
+        "saveInsuranceFailed": "No se pudo guardar el registro de seguro",
+        "insuranceSaved": "Registro de seguro guardado",
+        "saveInspectionFailed": "No se pudo guardar el registro de inspección",
+        "inspectionSaved": "Registro de inspección guardado"
+      }
+    },
+    "inventory": {
+      "page": {
+        "title": "Inventario de piezas y movimientos de stock",
+        "description": "Supervisa piezas disponibles, stock relacionado con neumáticos, precios de proveedores y movimientos de compra o uso que alimentan mantenimiento y control de costos."
+      },
+      "audiences": {
+        "financialClerk": "Auxiliar financiero",
+        "mechanic": "Mecánico",
+        "administration": "Administración",
+        "rentalAgent": "Agente de alquiler"
+      },
+      "filters": {
+        "title": "Filtros de inventario para compras, taller y preparación de alquiler",
+        "description": "Busca stock, aísla piezas con poco inventario y piezas relacionadas con neumáticos, y revisa movimientos para que finanzas, mecánicos y administración trabajen mejor.",
+        "resultSummary": "{parts} piezas coincidentes y {movements} movimientos de stock",
+        "searchPlaceholder": "Buscar pieza, SKU, proveedor, notas o marca",
+        "stockStatus": "Estado de stock",
+        "allStockStatuses": "Todos los estados de stock",
+        "lowStock": "Stock bajo",
+        "outOfStock": "Sin stock",
+        "inStock": "En stock",
+        "allCategories": "Todas las categorías",
+        "movementType": "Tipo de movimiento",
+        "allMovements": "Todos los movimientos",
+        "tireStock": "Stock de neumáticos",
+        "allParts": "Todas las piezas",
+        "tireOnly": "Solo relacionadas con neumáticos"
+      },
+      "cards": {
+        "activeParts": "Piezas activas",
+        "lowStock": "Stock bajo",
+        "unitsOnHand": "Unidades disponibles",
+        "stockValue": "Valor del inventario"
+      },
+      "workspace": {
+        "title": "Inventario y movimiento de stock",
+        "description": "Registra compras, juegos de neumáticos, piezas puntuales y descuentos por uso desde trabajos de mantenimiento sin salir del área administrativa."
+      },
+      "actions": {
+        "newPart": "Nueva pieza",
+        "createPart": "Crear pieza",
+        "addStockMovement": "Agregar movimiento de stock",
+        "saveMovement": "Guardar movimiento",
+        "exportParts": "Exportar piezas CSV",
+        "exportMovements": "Exportar movimientos CSV"
+      },
+      "dialogs": {
+        "part": {
+          "title": "Crear pieza de inventario",
+          "description": "Agrega un artículo reutilizable para futuras plantillas de mantenimiento, compras y descuentos por uso de piezas."
+        },
+        "transaction": {
+          "title": "Registrar movimiento de stock",
+          "description": "Úsalo para compras, ajustes manuales, devoluciones o uso no vinculado a un modal de mantenimiento."
+        }
+      },
+      "form": {
+        "partName": "Nombre de la pieza",
+        "sku": "SKU",
+        "category": "Categoría",
+        "brand": "Marca",
+        "unit": "Unidad",
+        "defaultSupplier": "Proveedor predeterminado",
+        "openingStock": "Stock inicial",
+        "reorderThreshold": "Umbral de reposición",
+        "averageUnitCost": "Costo unitario promedio",
+        "tireBrandModel": "Marca/modelo del neumático",
+        "tireRelatedHint": "Marca esta pieza como relacionada con neumáticos para mantener visibles los costos y el historial de reemplazo.",
+        "inventoryPart": "Pieza de inventario",
+        "quantity": "Cantidad",
+        "unitCost": "Costo unitario",
+        "transactionNotes": "Proveedor, factura, motivo de ajuste de stock..."
+      },
+      "tables": {
+        "partsCatalog": "Catálogo de piezas",
+        "recentStockMovements": "Movimientos recientes de stock"
+      },
+      "table": {
+        "part": "Pieza",
+        "stock": "Stock",
+        "threshold": "Umbral",
+        "avgCost": "Costo prom.",
+        "uncategorized": "Sin categoría",
+        "tireRelated": "Relacionado con neumáticos",
+        "qty": "Cant."
+      },
+      "transactionTypes": {
+        "purchase": "Compra",
+        "return": "Devolución",
+        "adjustment": "Ajuste",
+        "usage": "Uso"
+      },
+      "messages": {
+        "createPartFailed": "No se pudo crear la pieza de inventario",
+        "partCreated": "Pieza de inventario creada",
+        "saveTransactionFailed": "No se pudo guardar el movimiento de inventario",
+        "transactionSaved": "Movimiento de inventario guardado"
       }
     }
   },

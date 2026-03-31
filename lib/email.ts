@@ -62,6 +62,8 @@ export async function bookingEmailHtml(input: {
   documentLabel?: string;
   termsUrl?: string | null;
   termsLabel?: string;
+  introText?: string;
+  outroText?: string;
 }) {
   const tenant = await getTenantConfig();
   const primaryHex = tenantThemeTokenToHex(tenant.theme.primary);
@@ -89,6 +91,8 @@ export async function bookingEmailHtml(input: {
   const safeAddress = escapeHtml(tenant.address || "-");
   const safeEmail = escapeHtml(tenant.email || "-");
   const safePhone = escapeHtml(tenant.phone || "-");
+  const safeIntroText = escapeHtml(input.introText || `Thank you for choosing ${tenant.tenantName}. Below is your booking summary.`);
+  const safeOutroText = escapeHtml(input.outroText || `If you need assistance, contact us at ${tenant.email || "-"}.`);
   const safeInvoiceUrl = input.invoiceUrl ? escapeHtml(input.invoiceUrl) : null;
   const safeTermsUrl = input.termsUrl ? escapeHtml(input.termsUrl) : null;
   const safeTermsLabel = escapeHtml(input.termsLabel || "Terms and Conditions");
@@ -112,7 +116,7 @@ export async function bookingEmailHtml(input: {
         <div style="padding:24px 26px;">
           <p style="margin:0 0 12px 0;font-size:15px;">Hello ${safeName},</p>
           <p style="margin:0 0 18px 0;font-size:14px;color:#334155;">
-            Thank you for choosing ${safeTenant}. Below is your booking summary.
+            ${safeIntroText}
           </p>
 
           <table role="presentation" style="width:100%;border-collapse:collapse;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
@@ -158,7 +162,7 @@ export async function bookingEmailHtml(input: {
           }
 
           <p style="margin:18px 0 0 0;font-size:13px;color:#475569;">
-            If you need assistance, contact us at ${safeEmail}.
+            ${safeOutroText}
           </p>
         </div>
 

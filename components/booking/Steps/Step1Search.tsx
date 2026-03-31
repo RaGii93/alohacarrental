@@ -9,9 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { searchAvailabilityAction, AvailabilityResult } from "@/actions/availability";
-import { calculateDays, formatCurrency } from "@/lib/pricing";
+import { calculateDays, evaluateBookingRules, formatCurrency, type BookingSource } from "@/lib/pricing";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { BookingData } from "../BookingWizard";
+import type { BookingRuleSettings } from "@/lib/settings";
 import {
   CalendarDays,
   CheckCircle2,
@@ -33,6 +34,8 @@ interface Step1SearchProps {
   availability: AvailabilityResult[];
   locations: { id: string; name: string; code?: string | null; address?: string | null }[];
   minimumBookingDays: number;
+  bookingSource: BookingSource;
+  bookingRuleSettings: BookingRuleSettings;
 }
 
 export function Step1Search({
@@ -44,6 +47,8 @@ export function Step1Search({
   availability,
   locations,
   minimumBookingDays,
+  bookingSource,
+  bookingRuleSettings,
 }: Step1SearchProps) {
   const t = useTranslations();
   const [isSearching, setIsSearching] = useState(false);
@@ -59,7 +64,7 @@ export function Step1Search({
   const fromDateInputValue = (value: string) => (value ? new Date(`${value}T12:00:00`) : null);
 
   const minimumEndDate = bookingData.startDate ? new Date(bookingData.startDate) : null;
-  if (minimumEndDate) {
+  if (minimumEndDate && bookingSource === "public" && bookingRuleSettings.belowMinimumRentalAdminOnly) {
     minimumEndDate.setHours(0, 0, 0, 0);
     minimumEndDate.setDate(minimumEndDate.getDate() + minimumBookingDays);
   }
@@ -79,15 +84,28 @@ export function Step1Search({
   const selectedDays = hasValidRange && pickupDateTime && dropoffDateTime
     ? calculateDays(pickupDateTime, dropoffDateTime)
     : 0;
-  const meetsMinimumDuration = !hasValidRange || selectedDays >= minimumBookingDays;
+  const bookingRules = hasValidRange && pickupDateTime && dropoffDateTime
+    ? evaluateBookingRules({
+        startDate: pickupDateTime,
+        endDate: dropoffDateTime,
+        basePriceCents: 0,
+        bookingSource,
+        settings: bookingRuleSettings,
+      })
+    : null;
+  const blockedMessage = bookingRules?.belowMinimumBlocked
+    ? t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })
+    : bookingRules?.lastMinuteBlocked
+      ? t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })
+      : null;
 
   const handleSearch = async () => {
     if (!pickupDateTime || !dropoffDateTime || dropoffDateTime <= pickupDateTime) return;
-    if (calculateDays(pickupDateTime, dropoffDateTime) < minimumBookingDays) return;
+    if (blockedMessage) return;
 
     setIsSearching(true);
     try {
-      const results = await searchAvailabilityAction(pickupDateTime, dropoffDateTime);
+      const results = await searchAvailabilityAction(pickupDateTime, dropoffDateTime, bookingSource);
       setAvailability(results);
     } catch (error) {
       console.error("Search failed:", error);
@@ -101,7 +119,7 @@ export function Step1Search({
   };
 
   const hasLocations = !!bookingData.pickupLocationId && !!bookingData.dropoffLocationId;
-  const canContinue = bookingData.categoryId && availability.length > 0 && hasValidRange && hasLocations && meetsMinimumDuration;
+  const canContinue = bookingData.categoryId && availability.length > 0 && hasValidRange && hasLocations && !blockedMessage;
 
   return (
     <div className="space-y-6">
@@ -220,9 +238,9 @@ export function Step1Search({
         {!hasValidRange && bookingData.startDate && bookingData.endDate && (
           <p className="text-sm text-red-600 mt-3">{t("booking.errors.endBeforeStart")}</p>
         )}
-        {hasValidRange && !meetsMinimumDuration && (
+        {blockedMessage && (
           <p className="text-sm text-red-600 mt-2">
-            {t("booking.errors.minimumDuration", { days: minimumBookingDays })}
+            {blockedMessage}
           </p>
         )}
         {!hasLocations && (
@@ -232,7 +250,7 @@ export function Step1Search({
         <div className="mt-4">
           <Button
             onClick={handleSearch}
-            disabled={!hasValidRange || !meetsMinimumDuration || isSearching || disabled}
+            disabled={!hasValidRange || !!blockedMessage || isSearching || disabled}
             className="h-12 w-full rounded-md bg-[#ffc93b] font-extrabold uppercase tracking-[0.08em] text-[#0d4aa0] shadow-[0_20px_40px_-20px_rgba(255,201,59,0.9)] hover:bg-[#ffd65f]"
           >
             <Search className="h-4 w-4" />
@@ -249,6 +267,11 @@ export function Step1Search({
               const isSelected = bookingData.categoryId === cat.categoryId;
               const isAvailable = cat.availableCount > 0;
               const days = pickupDateTime && dropoffDateTime ? calculateDays(pickupDateTime, dropoffDateTime) : 1;
+              const cardBlockedMessage = cat.belowMinimumBlocked
+                ? t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })
+                : cat.lastMinuteBlocked
+                  ? t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })
+                  : null;
 
               return (
                 <Card
@@ -275,6 +298,27 @@ export function Step1Search({
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
+                      {cardBlockedMessage ? (
+                        <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+                          {cardBlockedMessage}
+                        </div>
+                      ) : null}
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-[#5f7ead]">{t("booking.baseTotal")}:</span>
+                        <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.baseTotalForRange)}</span>
+                      </div>
+                      {cat.belowMinimumSurcharge > 0 && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-[#5f7ead]">{t("booking.belowMinimumSurcharge")}:</span>
+                          <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.belowMinimumSurcharge)}</span>
+                        </div>
+                      )}
+                      {cat.lastMinuteSurcharge > 0 && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-[#5f7ead]">{t("booking.lastMinuteSurcharge")}:</span>
+                          <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.lastMinuteSurcharge)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-[#5f7ead]">{t("booking.total")}:</span>
                         <span className="font-bold text-[#0c3e88]">{formatCurrency(cat.totalForRange)}</span>

@@ -1,3 +1,4 @@
+import { DEFAULT_PUBLIC_PROFILE, type PublicProfile } from "@/lib/deployment-profiles";
 import type { TenantConfig } from "@/lib/tenant";
 import { getBaseUrl, toLocalePath } from "@/lib/seo";
 
@@ -14,7 +15,7 @@ function parseCoordinates(address?: string): { latitude?: number; longitude?: nu
   return { latitude: Number(match[1]), longitude: Number(match[2]) };
 }
 
-export function getHomeJsonLd(locale: string, tenant: TenantConfig) {
+function getRentalHomeJsonLd(locale: string, tenant: TenantConfig) {
   const baseUrl = getBaseUrl();
   const homeUrl = `${baseUrl}${toLocalePath(locale, "/") === "/" ? "" : toLocalePath(locale, "/")}`;
   const bookUrl = `${baseUrl}${toLocalePath(locale, "/book")}`;
@@ -94,6 +95,95 @@ export function getHomeJsonLd(locale: string, tenant: TenantConfig) {
   };
 
   return [organization, localBusiness, website, service];
+}
+
+function getSaasHomeJsonLd(locale: string, tenant: TenantConfig) {
+  const baseUrl = getBaseUrl();
+  const homeUrl = `${baseUrl}${toLocalePath(locale, "/") === "/" ? "" : toLocalePath(locale, "/")}`;
+  const lang = localeToLanguageTag(locale);
+  const sameAs = [
+    tenant.facebookUrl,
+    tenant.instagramUrl,
+    tenant.linkedinUrl,
+    tenant.tiktokUrl,
+    tenant.whatsappUrl,
+  ].filter(Boolean);
+
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${baseUrl}/#organization`,
+    name: tenant.tenantName,
+    url: homeUrl,
+    logo: tenant.logoUrl?.startsWith("http") ? tenant.logoUrl : `${baseUrl}${tenant.logoUrl}`,
+    email: tenant.email,
+    telephone: tenant.phone,
+    areaServed: "Caribbean",
+    sameAs: sameAs.length ? sameAs : undefined,
+  };
+
+  const website = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${baseUrl}/#website`,
+    name: tenant.tenantName,
+    url: homeUrl,
+    inLanguage: lang,
+  };
+
+  const software = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": `${baseUrl}/#software`,
+    name: tenant.tenantName,
+    applicationCategory: "BusinessApplication",
+    applicationSubCategory: "Car Rental Software",
+    operatingSystem: "Web",
+    url: homeUrl,
+    description: `${tenant.tenantName} is car rental SaaS for Caribbean operators with online booking, fleet management, pickup and return tracking, and billing integrations.`,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      url: homeUrl,
+    },
+    provider: {
+      "@id": `${baseUrl}/#organization`,
+    },
+    areaServed: "Caribbean",
+    availableLanguage: ["en", "es", "nl"],
+  };
+
+  const service = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${baseUrl}/#service`,
+    serviceType: "Car Rental Management Software",
+    name: `${tenant.tenantName} Car Rental Platform`,
+    provider: {
+      "@id": `${baseUrl}/#organization`,
+    },
+    audience: {
+      "@type": "Audience",
+      audienceType: "Car rental operators",
+    },
+    areaServed: "Caribbean",
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      url: homeUrl,
+      availability: "https://schema.org/InStock",
+    },
+  };
+
+  return [organization, website, software, service];
+}
+
+export function getHomeJsonLd(
+  locale: string,
+  tenant: TenantConfig,
+  profile: PublicProfile = DEFAULT_PUBLIC_PROFILE,
+) {
+  return profile === "saas" ? getSaasHomeJsonLd(locale, tenant) : getRentalHomeJsonLd(locale, tenant);
 }
 
 export function getBookingJsonLd(locale: string, tenant: TenantConfig) {

@@ -165,6 +165,13 @@ async function ensureContact(input: ZohoCustomerInput) {
   return String(created?.contact?.contact_id || "");
 }
 
+async function markInvoiceAsSent(invoiceId: string) {
+  if (!invoiceId) {
+    throw new Error("Zoho invoice id is required before marking invoice as sent");
+  }
+  await zohoRequest(`/invoices/${invoiceId}/status/sent`, "POST");
+}
+
 export async function syncZohoInvoice(input: ZohoInvoiceInput) {
   if (!(await isZohoInvoiceEnabled())) {
     return { success: false as const, error: "Zoho Invoice is disabled" };
@@ -185,10 +192,12 @@ export async function syncZohoInvoice(input: ZohoInvoiceInput) {
         },
       ],
     });
+    const invoiceId = String(invoice?.invoice?.invoice_id || "");
+    await markInvoiceAsSent(invoiceId);
     return {
       success: true as const,
       customerId,
-      invoiceId: String(invoice?.invoice?.invoice_id || ""),
+      invoiceId,
     };
   } catch (error: any) {
     return { success: false as const, error: String(error?.message || "Zoho invoice sync failed") };

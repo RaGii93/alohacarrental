@@ -1189,6 +1189,267 @@ const HELP_DOCS: HelpDocDefinition[] = [
       },
     ],
   },
+  {
+    id: "booking-pricing-rules",
+    slug: ["bookings", "pricing-rules"],
+    title: {
+      en: "Booking pricing rules and exceptions",
+      es: "Reglas de precios y excepciones de reserva",
+      nl: "Boekingsprijsregels en uitzonderingen",
+    },
+    description: {
+      en: "How minimum rental days, last-minute windows, admin overrides, and pricing surcharges work in the booking flow.",
+      es: "Cómo funcionan los días mínimos, las ventanas de última hora, las excepciones de admin y los recargos en el flujo de reservas.",
+      nl: "Hoe minimale huurdagen, last-minute vensters, admin-uitzonderingen en prijstoeslagen werken in de boekingsflow.",
+    },
+    keywords: ["minimum rental", "last minute", "pricing rules", "admin only", "surcharge", "booking settings"],
+    sections: [
+      {
+        id: "base-pricing",
+        heading: {
+          en: "Base pricing starts with daily rate",
+          es: "El precio base empieza con la tarifa diaria",
+          nl: "Basisprijs begint met het dagtarief",
+        },
+        summary: {
+          en: "Every booking starts from the category base price multiplied by rental days. Extras and booking-rule surcharges are layered on top of that base.",
+          es: "Cada reserva parte del precio base de la categoría multiplicado por los días. Los extras y recargos se suman encima de esa base.",
+          nl: "Elke boeking start met de basisprijs van de categorie vermenigvuldigd met het aantal huurdagen. Extra's en toeslagen komen daar bovenop.",
+        },
+        bullets: {
+          en: [
+            "Base total is daily rate × rental days.",
+            "Extras are added after the base total.",
+            "Tax is calculated after the booking-rule pricing adjustments.",
+          ],
+          es: [
+            "El total base es tarifa diaria × días de alquiler.",
+            "Los extras se suman después del total base.",
+            "El impuesto se calcula después de aplicar los ajustes de reglas de reserva.",
+          ],
+          nl: [
+            "Het basistotaal is dagtarief × huurdagen.",
+            "Extra's worden toegevoegd na het basistotaal.",
+            "Belasting wordt berekend na de boekingsregel-aanpassingen.",
+          ],
+        },
+      },
+      {
+        id: "minimum-rental-rules",
+        heading: {
+          en: "Minimum rental and admin-only exceptions",
+          es: "Alquiler mínimo y excepciones solo para admin",
+          nl: "Minimale huur en alleen-admin uitzonderingen",
+        },
+        summary: {
+          en: "The minimum rental days setting is the main threshold. Public users can be blocked below that threshold while admin users stay allowed to create exceptions.",
+          es: "La configuración de días mínimos es el umbral principal. Los usuarios públicos pueden quedar bloqueados por debajo de ese umbral mientras administración sigue pudiendo crear excepciones.",
+          nl: "De instelling voor minimale huurdagen is de hoofdgrens. Publieke gebruikers kunnen daaronder worden geblokkeerd terwijl admins nog uitzonderingen kunnen maken.",
+        },
+        bullets: {
+          en: [
+            "When below-minimum admin-only is enabled, public users see a blocking message and cannot continue.",
+            "Admins can still create the booking from the admin booking flow.",
+            "A below-minimum surcharge can be configured as percentage on base total, percentage on current subtotal, or fixed amount.",
+          ],
+          es: [
+            "Cuando la opción solo-admin para reservas por debajo del mínimo está activa, los usuarios públicos ven un bloqueo y no pueden continuar.",
+            "Los admins aún pueden crear la reserva desde el flujo de admin.",
+            "El recargo por debajo del mínimo puede configurarse como porcentaje sobre el total base, porcentaje sobre el subtotal actual o monto fijo.",
+          ],
+          nl: [
+            "Wanneer alleen-admin voor onder-minimum boekingen is ingeschakeld, zien publieke gebruikers een blokkade en kunnen ze niet doorgaan.",
+            "Admins kunnen de boeking nog steeds aanmaken vanuit de admin-flow.",
+            "De onder-minimum toeslag kan worden ingesteld als percentage op basistotaal, percentage op huidig subtotaal of vast bedrag.",
+          ],
+        },
+      },
+      {
+        id: "last-minute-rules",
+        heading: {
+          en: "Last-minute rules",
+          es: "Reglas de última hora",
+          nl: "Last-minute regels",
+        },
+        summary: {
+          en: "A booking becomes last-minute when pickup is inside the configured threshold hours. That can trigger an extra percentage and optional public blocking.",
+          es: "Una reserva pasa a ser de última hora cuando la recogida cae dentro del umbral configurado en horas. Eso puede activar un porcentaje extra y un bloqueo opcional al público.",
+          nl: "Een boeking wordt last-minute wanneer de pickup binnen de ingestelde urendrempel valt. Dat kan een extra percentage en optionele blokkering voor publiek activeren.",
+        },
+        bullets: {
+          en: [
+            "Last-minute rules are managed from Admin Settings.",
+            "Public users can be restricted while admins remain allowed to proceed.",
+            "The extra percent is shown in the booking price breakdown before confirmation.",
+          ],
+          es: [
+            "Las reglas de última hora se gestionan desde Ajustes de Admin.",
+            "Los usuarios públicos pueden quedar restringidos mientras los admins siguen autorizados.",
+            "El porcentaje extra se muestra en el desglose antes de confirmar.",
+          ],
+          nl: [
+            "Last-minute regels worden beheerd vanuit Admin Instellingen.",
+            "Publieke gebruikers kunnen worden beperkt terwijl admins doorgaan.",
+            "Het extra percentage wordt in de prijsopbouw getoond vóór bevestiging.",
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "partner-rentals",
+    slug: ["operations", "partner-rentals"],
+    title: {
+      en: "Partner rentals and outside-company vehicles",
+      es: "Alquileres de socios y vehículos de otras empresas",
+      nl: "Partnerverhuur en voertuigen van andere bedrijven",
+    },
+    description: {
+      en: "How separate partner rentals work without mixing outside-company vehicles into the main fleet inventory.",
+      es: "Cómo funcionan los alquileres de socios sin mezclar vehículos externos con el inventario principal.",
+      nl: "Hoe partnerverhuur werkt zonder voertuigen van externe bedrijven te mengen met de hoofdvloot.",
+    },
+    keywords: ["partner rentals", "external rentals", "outside company", "supplier vehicles", "finance bucket"],
+    sections: [
+      {
+        id: "separate-flow",
+        heading: {
+          en: "Separate operational flow",
+          es: "Flujo operativo separado",
+          nl: "Aparte operationele flow",
+        },
+        summary: {
+          en: "Partner rentals live in their own admin area and do not create public-fleet availability or saved fleet records.",
+          es: "Los alquileres de socios viven en su propia área de admin y no crean disponibilidad en la flota pública ni registros de flota guardados.",
+          nl: "Partnerverhuur leeft in een eigen admin-gebied en maakt geen publieke vlootbeschikbaarheid of opgeslagen vlootrecords aan.",
+        },
+        bullets: {
+          en: [
+            "Use partner rentals when the vehicle belongs to another company.",
+            "The customer still receives the normal booking email and operational follow-up.",
+            "These bookings stay out of the public booking inventory and fleet calendar.",
+          ],
+          es: [
+            "Usa alquileres de socios cuando el vehículo pertenece a otra empresa.",
+            "El cliente sigue recibiendo el correo normal de reserva y el seguimiento operativo.",
+            "Estas reservas se mantienen fuera del inventario público y del calendario de flota.",
+          ],
+          nl: [
+            "Gebruik partnerverhuur wanneer het voertuig van een ander bedrijf is.",
+            "De klant ontvangt nog steeds de normale boekingsmail en operationele opvolging.",
+            "Deze boekingen blijven buiten de publieke inventaris en vlootkalender.",
+          ],
+        },
+      },
+      {
+        id: "finance-tracking",
+        heading: {
+          en: "Finance tracking and transfers",
+          es: "Seguimiento financiero y transferencias",
+          nl: "Financiële tracking en overdrachten",
+        },
+        summary: {
+          en: "Partner rentals track income, supplier expense, margin, payment state, and transfer bucket movement separately from fleet rentals.",
+          es: "Los alquileres de socios registran ingreso, gasto del proveedor, margen, estado de pago y bucket de transferencia por separado.",
+          nl: "Partnerverhuur houdt omzet, leverancierskosten, marge, betaalstatus en bucket-overdracht apart bij van vlootverhuur.",
+        },
+        bullets: {
+          en: [
+            "Day price is multiplied by the rental days for the booking total.",
+            "Payment, pickup, dropoff, and transfer status can be updated from the partner rental workflow.",
+            "Use the transfer/bucket status to track what still needs to be paid out to the supplier.",
+          ],
+          es: [
+            "El precio por día se multiplica por los días del alquiler para obtener el total.",
+            "Pago, recogida, entrega y estado de transferencia se actualizan desde el flujo de partner rental.",
+            "Usa el estado de transferencia/bucket para seguir lo que aún debe pagarse al proveedor.",
+          ],
+          nl: [
+            "De dagprijs wordt vermenigvuldigd met het aantal huurdagen voor het totaal.",
+            "Betaling, pickup, dropoff en overdrachtsstatus kunnen vanuit de partnerverhuur-flow worden bijgewerkt.",
+            "Gebruik de transfer/bucket-status om te volgen wat nog aan de leverancier moet worden betaald.",
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "fleet-calendar",
+    slug: ["fleet", "calendar-view"],
+    title: {
+      en: "Fleet calendar and date-range views",
+      es: "Calendario de flota y vistas por rango de fechas",
+      nl: "Vlootkalender en datumrange-weergaven",
+    },
+    description: {
+      en: "How the fleet calendar tab works, what it shows, and how date-range filters affect every fleet view.",
+      es: "Cómo funciona la pestaña de calendario de flota, qué muestra y cómo los filtros de fechas afectan cada vista.",
+      nl: "Hoe de vlootkalender-tab werkt, wat deze toont en hoe datumfilters elke vlootweergave beïnvloeden.",
+    },
+    keywords: ["fleet calendar", "calendar tab", "operations", "forecast", "date range", "filters"],
+    sections: [
+      {
+        id: "calendar-layout",
+        heading: {
+          en: "Calendar layout",
+          es: "Diseño del calendario",
+          nl: "Kalenderindeling",
+        },
+        summary: {
+          en: "The fleet calendar aligns vehicle rows with day columns so staff can see bookings, overlaps, and today markers at a glance.",
+          es: "El calendario alinea filas de vehículos con columnas de días para ver reservas, solapes y el marcador de hoy de un vistazo.",
+          nl: "De vlootkalender zet voertuigrijen uit tegen dagkolommen zodat medewerkers boekingen, overlap en vandaag-markeringen direct zien.",
+        },
+        bullets: {
+          en: [
+            "Each row represents a vehicle.",
+            "Booking bars span the active dates for that vehicle.",
+            "The today marker helps operations compare upcoming and in-progress work.",
+          ],
+          es: [
+            "Cada fila representa un vehículo.",
+            "Las barras de reserva abarcan las fechas activas de ese vehículo.",
+            "El marcador de hoy ayuda a comparar trabajo próximo y en curso.",
+          ],
+          nl: [
+            "Elke rij vertegenwoordigt een voertuig.",
+            "Boekingsbalken lopen over de actieve data van dat voertuig.",
+            "De vandaag-markering helpt bij het vergelijken van aankomend en lopend werk.",
+          ],
+        },
+      },
+      {
+        id: "shared-filters",
+        heading: {
+          en: "Shared date filters",
+          es: "Filtros de fecha compartidos",
+          nl: "Gedeelde datumfilters",
+        },
+        summary: {
+          en: "The selected start and end dates drive the calendar, operations, and forecast tabs together so every fleet view stays aligned.",
+          es: "Las fechas elegidas gobiernan juntos el calendario, operaciones y previsión para que todas las vistas queden alineadas.",
+          nl: "De gekozen start- en einddatum sturen kalender, operations en forecast samen aan zodat alle vlootweergaven uitgelijnd blijven.",
+        },
+        bullets: {
+          en: [
+            "Changing the date range updates every fleet tab.",
+            "The selected tab and date filters persist in the URL.",
+            "Use the same range when comparing occupancy, utilization, and scheduled work.",
+          ],
+          es: [
+            "Cambiar el rango de fechas actualiza cada pestaña de flota.",
+            "La pestaña elegida y los filtros se mantienen en la URL.",
+            "Usa el mismo rango al comparar ocupación, utilización y trabajo programado.",
+          ],
+          nl: [
+            "Het wijzigen van het datumbereik werkt door in elke vloottab.",
+            "De gekozen tab en filters blijven in de URL staan.",
+            "Gebruik hetzelfde bereik bij het vergelijken van bezetting, benutting en gepland werk.",
+          ],
+        },
+      },
+    ],
+  },
 ];
 
 export function isHelpLocale(locale: string): locale is HelpLocale {
@@ -1258,6 +1519,9 @@ export function getFeaturedHelpDocs(locale: string): HelpDoc[] {
   const priority = [
     "admin-sidebar-guide",
     "booking-lifecycle",
+    "booking-pricing-rules",
+    "partner-rentals",
+    "fleet-calendar",
     "quickbooks-setup",
     "zoho-setup",
     "pickup-check-in",
@@ -1299,6 +1563,9 @@ export function getHelpSuggestions(locale: string): string[] {
       "How are late return charges calculated?",
       "Can staff manually set a vehicle to ON_RENT?",
       "What customer emails are sent?",
+      "How do minimum rental days and last-minute booking rules work?",
+      "How do partner rentals stay separate from my normal fleet?",
+      "How does the fleet calendar tab use date filters?",
       "What does each admin sidebar section do?",
       "How do I connect QuickBooks in sandbox mode?",
       "How do I reconnect Zoho if the token expires?",
@@ -1309,6 +1576,9 @@ export function getHelpSuggestions(locale: string): string[] {
       "¿Cómo se calculan los cargos por devolución tardía?",
       "¿El personal puede poner un vehículo manualmente en ON_RENT?",
       "¿Qué correos se envían al cliente?",
+      "¿Cómo funcionan los días mínimos y las reglas de última hora?",
+      "¿Cómo se mantienen separados los alquileres de socios de mi flota normal?",
+      "¿Cómo usa filtros de fecha la pestaña de calendario de flota?",
       "¿Para qué sirve cada sección del menú lateral de admin?",
       "¿Cómo conecto QuickBooks en modo sandbox?",
       "¿Cómo vuelvo a conectar Zoho si expira el token?",
@@ -1319,6 +1589,9 @@ export function getHelpSuggestions(locale: string): string[] {
       "Hoe worden kosten voor te late retour berekend?",
       "Kunnen medewerkers een voertuig handmatig op ON_RENT zetten?",
       "Welke klantmails worden verstuurd?",
+      "Hoe werken minimale huurdagen en last-minute regels?",
+      "Hoe blijven partnerverhuren gescheiden van mijn normale vloot?",
+      "Hoe gebruikt de vlootkalender-tab datumfilters?",
       "Waarvoor dient elke sectie in de admin-zijbalk?",
       "Hoe verbind ik QuickBooks in sandboxmodus?",
       "Hoe verbind ik Zoho opnieuw als de token verloopt?",

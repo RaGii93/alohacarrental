@@ -18,6 +18,7 @@ import { MapPinIcon, UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const HERO_BG = "/home/hero-bg.png";
+const HERO_LOGO = "/home/logo.png";
 
 type HeroSectionProps = {
   locations: { id: string; name: string; address?: string | null }[];
@@ -98,22 +99,34 @@ export default function HeroSection({ locations }: HeroSectionProps) {
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="space-y-6 text-white">
             <h1 className="text-5xl font-extrabold italic leading-[1.08] tracking-tight sm:text-6xl">
-              <span className="block">{t("landing.hero.headline.line1")}</span>
-              <span className="block">
-                {t("landing.hero.headline.line2Prefix")}{" "}
-                <span className="text-[#f7bf00]">{t("landing.hero.headline.line2Highlight")}</span>
+              <span className="block">Discover Bonaire</span>
+              <span className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <span className="inline-flex rounded-[1.5rem] bg-white/14 px-4 py-3 backdrop-blur-sm">
+                  <Image
+                    src={HERO_LOGO}
+                    alt="Aloha Car Rental"
+                    width={280}
+                    height={72}
+                    className="h-10 w-auto sm:h-12"
+                  />
+                </span>
+                <span>with</span>
               </span>
-              <span className="block">{t("landing.hero.headline.line3")}</span>
+              <span className="mt-3 block text-[#f7bf00]">Car Rental</span>
             </h1>
-            <p className="text-[2rem] font-semibold text-white/90">{t("landing.hero.featureLine")}</p>
-            <p className="max-w-xl text-2xl text-white/75">{t("landing.hero.description")}</p>
+            <p className="text-[2rem] font-semibold text-white/90">
+              Reliable • Affordable • Island Ready Vehicles
+            </p>
+            <p className="max-w-3xl text-2xl text-white/75">
+              Explore Bonaire&apos;s pink beaches, flamingos and donkey sanctuary, and stunning salt flats at your own pace.
+            </p>
             <div className="flex flex-wrap gap-4">
               <Button
                 size="lg"
                 className="rounded-full px-8 font-bold shadow-lg"
                 onClick={goToBookingPage}
               >
-                {t("landing.hero.bookButton")}
+                Book Your Car
               </Button>
               <Button
                 size="lg"
@@ -124,7 +137,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
               >
-                {t("landing.hero.viewFleetButton")}
+                View Our Fleet
               </Button>
             </div>
           </div>

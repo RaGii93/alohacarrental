@@ -38,7 +38,7 @@ export async function requireLicensedAdmin(locale: string) {
   return { admin, licenseActive };
 }
 
-const STAFF_ALLOWED_SECTIONS = new Set(["bookings", "deliveries", "returns", "fleet", "help"]);
+const STAFF_ALLOWED_SECTIONS = new Set(["bookings", "deliveries", "returns", "fleet", "help", "notifications"]);
 
 export function canAccessAdminSection(role: string, section: string) {
   if (role === "ROOT" || role === "OWNER") return true;

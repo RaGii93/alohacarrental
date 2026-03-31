@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { db } from "@/lib/db";
 import { getTenantConfig } from "@/lib/tenant";
-import { getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
+import { getBookingRuleSettings, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 
@@ -18,10 +18,11 @@ export default async function AdminNewBookingPage({
     redirect(`/${locale}/admin/bookings`);
   }
 
-  const [tenant, taxPercentage, minimumBookingDays, vehicleRatesIncludeTax, locations, categories] = await Promise.all([
+  const [tenant, taxPercentage, minimumBookingDays, bookingRules, vehicleRatesIncludeTax, locations, categories] = await Promise.all([
     getTenantConfig(),
     getTaxPercentage(),
     getMinBookingDays(),
+    getBookingRuleSettings(),
     getVehicleRatesIncludeTax(),
     db.location.findMany({
       select: { id: true, name: true, code: true, address: true },
@@ -80,6 +81,7 @@ export default async function AdminNewBookingPage({
           taxPercentage={taxPercentage}
           vehicleRatesIncludeTax={vehicleRatesIncludeTax}
           minimumBookingDays={minimumBookingDays}
+          bookingRuleSettings={bookingRules}
           termsPdfUrl={tenant.termsPdfUrl}
           bookingSource="admin"
         />

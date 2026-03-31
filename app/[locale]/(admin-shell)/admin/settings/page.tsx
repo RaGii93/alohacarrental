@@ -1,6 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { TaxSettingsCard } from "@/components/admin/TaxSettingsCard";
 import {
+  getBookingRuleSettings,
+  getFleetOperationsSettings,
+  getBookingHoldDays,
   getInvoiceProvider,
   getMinBookingDays,
   getQuickBooksFeatureSettings,
@@ -25,9 +28,12 @@ export default async function AdminSettingsPage({
   const { integration, status, message } = await searchParams;
   const t = await getTranslations();
   await requireAdminSection(locale, "settings");
-  const [taxPercentage, minimumBookingDays, tenant, quickBooks, quickBooksSetup, vehicleRatesIncludeTax, invoiceProvider, zoho, zohoOrganizationId, zohoSetup] = await Promise.all([
+  const [taxPercentage, minimumBookingDays, bookingHoldDays, bookingRules, fleetOperations, tenant, quickBooks, quickBooksSetup, vehicleRatesIncludeTax, invoiceProvider, zoho, zohoOrganizationId, zohoSetup] = await Promise.all([
     getTaxPercentage(),
     getMinBookingDays(),
+    getBookingHoldDays(),
+    getBookingRuleSettings(),
+    getFleetOperationsSettings(),
     getTenantSettings(),
     getQuickBooksFeatureSettings(),
     getQuickBooksSetupSettings(),
@@ -46,6 +52,9 @@ export default async function AdminSettingsPage({
         initialTaxPercentage={taxPercentage}
         initialVehicleRatesIncludeTax={vehicleRatesIncludeTax}
         initialMinimumBookingDays={minimumBookingDays}
+        initialBookingHoldDays={bookingHoldDays}
+        initialBookingRules={bookingRules}
+        initialFleetOperations={fleetOperations}
         initialTenant={tenant}
         initialQuickBooks={quickBooks}
         initialQuickBooksSetup={quickBooksSetup}

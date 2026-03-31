@@ -2,9 +2,10 @@
 
 import { db } from "@/lib/db";
 import { cancelExpiredHolds } from "./booking";
-import { getMinBookingDays } from "@/lib/settings";
+import { getBookingRuleSettings } from "@/lib/settings";
 import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
+import { evaluateBookingRules, type BookingSource } from "@/lib/pricing";
 
 export interface AvailabilityResult {
   categoryId: string;
@@ -16,6 +17,13 @@ export interface AvailabilityResult {
   dailyRate: number;
   availableCount: number;
   totalForRange: number;
+  baseTotalForRange: number;
+  belowMinimumSurcharge: number;
+  lastMinuteSurcharge: number;
+  isBelowMinimumRental: boolean;
+  isLastMinuteBooking: boolean;
+  belowMinimumBlocked: boolean;
+  lastMinuteBlocked: boolean;
 }
 
 type InfoSchemaColumn = {
@@ -24,11 +32,11 @@ type InfoSchemaColumn = {
 
 export async function searchAvailabilityAction(
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  bookingSource: BookingSource = "public"
 ): Promise<AvailabilityResult[]> {
-  const minDays = await getMinBookingDays();
+  const bookingRules = await getBookingRuleSettings();
   const days = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
-  if (days < minDays) return [];
 
   // Cancel expired holds first
   await cancelExpiredHolds();
@@ -150,7 +158,14 @@ export async function searchAvailabilityAction(
       `;
       availableCount = globalBlockRows?.[0]?.count ? 0 : Math.max(0, totalVehicles - (bookingRows?.[0]?.count ?? 0));
     }
-    const totalForRange = category.dailyRate * days;
+    const pricing = evaluateBookingRules({
+      startDate,
+      endDate,
+      basePriceCents: category.dailyRate,
+      extrasCents: 0,
+      bookingSource,
+      settings: bookingRules,
+    });
 
     results.push({
       categoryId: category.id,
@@ -161,7 +176,14 @@ export async function searchAvailabilityAction(
       features: getCategoryFeatureNames(category),
       dailyRate: category.dailyRate,
       availableCount,
-      totalForRange,
+      totalForRange: pricing.totalAmountCents,
+      baseTotalForRange: pricing.baseTotalCents,
+      belowMinimumSurcharge: pricing.belowMinimumSurchargeCents,
+      lastMinuteSurcharge: pricing.lastMinuteSurchargeCents,
+      isBelowMinimumRental: pricing.isBelowMinimumRental,
+      isLastMinuteBooking: pricing.isLastMinuteBooking,
+      belowMinimumBlocked: pricing.belowMinimumBlocked,
+      lastMinuteBlocked: pricing.lastMinuteBlocked,
     });
   }
 

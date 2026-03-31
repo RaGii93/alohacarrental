@@ -14,6 +14,7 @@ import {
   CalendarDays,
   CheckCircle2,
   ClipboardList,
+  Clock3,
   ExternalLink,
   FileText,
   HandCoins,
@@ -26,10 +27,11 @@ import {
 } from "lucide-react";
 import { AvailabilityResult } from "@/actions/availability";
 import { createCategoryBookingAction } from "@/actions/booking";
-import { calculateBookingAmounts, calculateDays, formatCurrency } from "@/lib/pricing";
+import { calculateDays, evaluateBookingRules, formatCurrency } from "@/lib/pricing";
 import { BookingData } from "../BookingWizard";
 import { formatDate, formatDateTime } from "@/lib/datetime";
 import { combinePhoneNumber } from "@/lib/phone";
+import type { BookingRuleSettings } from "@/lib/settings";
 
 interface Step3ReviewProps {
   bookingData: BookingData;
@@ -44,6 +46,7 @@ interface Step3ReviewProps {
   vehicleRatesIncludeTax: boolean;
   termsPdfUrl: string;
   bookingSource?: "public" | "admin";
+  bookingRuleSettings: BookingRuleSettings;
 }
 
 export function Step3Review({
@@ -59,6 +62,7 @@ export function Step3Review({
   vehicleRatesIncludeTax,
   termsPdfUrl,
   bookingSource = "public",
+  bookingRuleSettings,
 }: Step3ReviewProps) {
   const t = useTranslations();
   const router = useRouter();
@@ -109,6 +113,16 @@ export function Step3Review({
         setIsSubmitting(false);
         return;
       }
+      if (pricing?.belowMinimumBlocked) {
+        toast.error(t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays }));
+        setIsSubmitting(false);
+        return;
+      }
+      if (pricing?.lastMinuteBlocked) {
+        toast.error(t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours }));
+        setIsSubmitting(false);
+        return;
+      }
       formData.append("startDate", pickupDateTime.toISOString());
       formData.append("endDate", dropoffDateTime.toISOString());
       formData.append("pickupLocationId", bookingData.pickupLocationId);
@@ -143,12 +157,21 @@ export function Step3Review({
     if (!extra) return sum;
     return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
   }, 0);
-  const { taxAmount, totalAmount } = calculateBookingAmounts({
-    baseRentalCents: baseAmount,
-    extrasCents: extrasAmount,
-    taxPercentage,
-    baseRentalIncludesTax: vehicleRatesIncludeTax,
-  });
+  const pricing = pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime
+    ? evaluateBookingRules({
+        startDate: pickupDateTime,
+        endDate: dropoffDateTime,
+        basePriceCents: categoryRate,
+        extrasCents: extrasAmount,
+        taxPercentage,
+        baseRentalIncludesTax: vehicleRatesIncludeTax,
+        bookingSource,
+        settings: bookingRuleSettings,
+      })
+    : null;
+  const taxAmount = pricing?.taxAmountCents ?? 0;
+  const totalAmount = pricing?.totalAmountCents ?? 0;
+  const subtotalBeforeTax = pricing?.subtotalBeforeTaxCents ?? (baseAmount + extrasAmount);
   const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocationId);
   const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocationId);
   const pickupLocationMapUrl = pickupLocation?.address
@@ -169,6 +192,16 @@ export function Step3Review({
             <CardTitle className="text-[#0c3e88]">{t("booking.summary")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {pricing?.belowMinimumBlocked ? (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                {t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })}
+              </div>
+            ) : null}
+            {pricing?.lastMinuteBlocked ? (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                {t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })}
+              </div>
+            ) : null}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h4 className="mb-2 flex items-center gap-2 font-medium">
@@ -204,6 +237,14 @@ export function Step3Review({
               <p>{formatCurrency(categoryRate)}</p>
             </div>
 
+            <div>
+              <h4 className="mb-2 flex items-center gap-2 font-medium">
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+                {t("booking.baseTotal")}
+              </h4>
+              <p>{formatCurrency(baseAmount)}</p>
+            </div>
+
             {extrasAmount > 0 && (
               <div>
                 <h4 className="mb-2 flex items-center gap-2 font-medium">
@@ -227,6 +268,34 @@ export function Step3Review({
                 </div>
               </div>
             )}
+
+            {pricing?.belowMinimumSurchargeCents ? (
+              <div>
+                <h4 className="mb-2 flex items-center gap-2 font-medium">
+                  <Receipt className="h-4 w-4 text-muted-foreground" />
+                  {t("booking.belowMinimumSurcharge")}
+                </h4>
+                <p>{formatCurrency(pricing.belowMinimumSurchargeCents)}</p>
+              </div>
+            ) : null}
+
+            {pricing?.lastMinuteSurchargeCents ? (
+              <div>
+                <h4 className="mb-2 flex items-center gap-2 font-medium">
+                  <Clock3 className="h-4 w-4 text-muted-foreground" />
+                  {t("booking.lastMinuteSurcharge")}
+                </h4>
+                <p>{formatCurrency(pricing.lastMinuteSurchargeCents)}</p>
+              </div>
+            ) : null}
+
+            <div>
+              <h4 className="mb-2 flex items-center gap-2 font-medium">
+                <Receipt className="h-4 w-4 text-muted-foreground" />
+                {t("booking.subtotal")}
+              </h4>
+              <p>{formatCurrency(subtotalBeforeTax)}</p>
+            </div>
 
             <div>
               <h4 className="mb-2 flex items-center gap-2 font-medium">
@@ -423,7 +492,7 @@ export function Step3Review({
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled}
+          disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled || !!pricing?.belowMinimumBlocked || !!pricing?.lastMinuteBlocked}
           className="h-12 rounded-md bg-[#ffc93b] px-6 font-extrabold uppercase tracking-[0.08em] text-[#0d4aa0] shadow-[0_20px_40px_-20px_rgba(255,201,59,0.9)] hover:bg-[#ffd65f]"
         >
           <CheckCircle2 className="h-4 w-4" />

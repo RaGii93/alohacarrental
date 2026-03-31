@@ -1,3 +1,5 @@
+import { DEFAULT_FAQ_PROFILE, type FaqProfile } from "@/lib/deployment-profiles";
+
 export type FaqTextRun = {
   text: string;
   bold?: boolean;
@@ -45,7 +47,7 @@ function coerceFaqLocale(locale: string | null | undefined): FaqLocale {
   return "en";
 }
 
-const faqByLocale: Record<FaqLocale, FaqEntry[]> = {
+const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
   en: [
     {
       id: "accident",
@@ -174,6 +176,33 @@ const faqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "How far in advance should I reserve my rental car?",
       keywords: ["reserve", "book in advance", "advance", "last minute", "24 hours"],
       blocks: [p(t("You can reserve up to one year in advance. For last-minute bookings within 24 hours, contact us directly by WhatsApp or phone."))],
+    },
+    {
+      id: "minimum-rental-rules",
+      question: "Why can’t I book a very short rental online?",
+      keywords: ["minimum rental", "minimum days", "short rental", "admin only", "booking rules"],
+      blocks: [
+        p(t("Some rentals have a minimum number of days configured in the booking flow.")),
+        p(t("If a booking is shorter than that minimum, the site may apply an extra short-rental surcharge or require staff assistance instead of letting the public request continue online.")),
+      ],
+    },
+    {
+      id: "last-minute-rules",
+      question: "Can I make a last-minute booking online?",
+      keywords: ["last minute", "same day", "same-day", "urgent booking", "24 hours"],
+      blocks: [
+        p(t("That depends on the active booking rules.")),
+        p(t("If your pickup is inside the configured last-minute window, the website may add an extra percentage or require the booking to be handled directly by staff.")),
+      ],
+    },
+    {
+      id: "partner-rentals",
+      question: "Do you sometimes arrange rentals with partner vehicles?",
+      keywords: ["partner rentals", "outside company", "supplier car", "other company", "partner vehicle"],
+      blocks: [
+        p(t("Yes. In some cases a booking may be fulfilled with a partner-supplied vehicle instead of our own saved fleet.")),
+        p(t("Those rentals are handled separately on the operational side so they do not mix into the normal public fleet inventory, while the customer still receives the normal booking communication.")),
+      ],
     },
   ],
   nl: [
@@ -305,6 +334,33 @@ const faqByLocale: Record<FaqLocale, FaqEntry[]> = {
       keywords: ["reserveren", "van tevoren", "vooraf", "last minute", "24 uur"],
       blocks: [p(t("Je kunt tot één jaar van tevoren reserveren. Voor last-minute boekingen binnen 24 uur kun je ons het beste direct bellen of appen."))],
     },
+    {
+      id: "minimum-rental-rules",
+      question: "Waarom kan ik een heel korte huurperiode niet online boeken?",
+      keywords: ["minimum huur", "minimum dagen", "korte huur", "alleen admin", "boekingsregels"],
+      blocks: [
+        p(t("Voor sommige huurperiodes is een minimum aantal dagen ingesteld in de boekingsflow.")),
+        p(t("Als een boeking korter is dan dat minimum, kan de site een extra korte-huurtoeslag toevoegen of vragen dat medewerkers de boeking handmatig afhandelen in plaats van online door te gaan.")),
+      ],
+    },
+    {
+      id: "last-minute-rules",
+      question: "Kan ik een last-minute boeking online maken?",
+      keywords: ["last minute", "zelfde dag", "spoedboeking", "24 uur"],
+      blocks: [
+        p(t("Dat hangt af van de actieve boekingsregels.")),
+        p(t("Als je pickup binnen het ingestelde last-minute venster valt, kan de website een extra percentage toevoegen of vereisen dat medewerkers de boeking rechtstreeks verwerken.")),
+      ],
+    },
+    {
+      id: "partner-rentals",
+      question: "Regelen jullie soms huur met partner-voertuigen?",
+      keywords: ["partnerverhuur", "ander bedrijf", "leveranciersauto", "partnervoertuig"],
+      blocks: [
+        p(t("Ja. In sommige gevallen kan een boeking worden uitgevoerd met een voertuig van een partner in plaats van uit onze eigen opgeslagen vloot.")),
+        p(t("Die huur wordt operationeel apart afgehandeld zodat ze niet in de normale publieke vlootinventaris terechtkomt, terwijl de klant wel de normale boekingscommunicatie ontvangt.")),
+      ],
+    },
   ],
   es: [
     {
@@ -435,11 +491,280 @@ const faqByLocale: Record<FaqLocale, FaqEntry[]> = {
       keywords: ["reservar", "anticipación", "adelantado", "último minuto", "24 horas"],
       blocks: [p(t("Puede reservar hasta con un año de anticipación. Para reservas de último minuto dentro de 24 horas, contáctenos directamente por WhatsApp o teléfono."))],
     },
+    {
+      id: "minimum-rental-rules",
+      question: "¿Por qué no puedo reservar un alquiler muy corto en línea?",
+      keywords: ["alquiler mínimo", "días mínimos", "alquiler corto", "solo admin", "reglas de reserva"],
+      blocks: [
+        p(t("Algunos alquileres tienen un número mínimo de días configurado en el flujo de reservas.")),
+        p(t("Si una reserva es más corta que ese mínimo, el sitio puede aplicar un recargo por alquiler corto o pedir que el personal la gestione manualmente en lugar de dejar continuar al público en línea.")),
+      ],
+    },
+    {
+      id: "last-minute-rules",
+      question: "¿Puedo hacer una reserva de última hora en línea?",
+      keywords: ["última hora", "mismo día", "reserva urgente", "24 horas"],
+      blocks: [
+        p(t("Depende de las reglas activas de reserva.")),
+        p(t("Si la recogida cae dentro de la ventana configurada de última hora, el sitio puede añadir un porcentaje extra o requerir que el personal gestione la reserva directamente.")),
+      ],
+    },
+    {
+      id: "partner-rentals",
+      question: "¿A veces gestionan alquileres con vehículos de socios?",
+      keywords: ["alquiler de socios", "otra empresa", "vehículo de proveedor", "vehículo socio"],
+      blocks: [
+        p(t("Sí. En algunos casos una reserva puede cumplirse con un vehículo suministrado por un socio en lugar de uno de nuestra flota guardada.")),
+        p(t("Esos alquileres se gestionan por separado en la parte operativa para no mezclarse con el inventario público normal, mientras el cliente sigue recibiendo la comunicación habitual de la reserva.")),
+      ],
+    },
   ],
 };
 
-export function getFaqEntries(locale: string): FaqEntry[] {
-  return faqByLocale[coerceFaqLocale(locale)];
+const systemFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
+  en: [
+    {
+      id: "system-online-booking",
+      question: "How does the online booking system work?",
+      keywords: ["online booking", "website", "reservations", "availability", "booking flow"],
+      blocks: [
+        p(t("Customers can browse active categories, choose dates and locations, add extras, and submit a booking through the public website.")),
+        p(t("Availability and pricing are calculated from the configured fleet, rates, minimum booking rules, and active operational restrictions.")),
+      ],
+    },
+    {
+      id: "system-double-booking",
+      question: "How does the system prevent double bookings?",
+      keywords: ["double booking", "overlap", "conflict", "availability", "inventory"],
+      blocks: [
+        p(t("The platform checks vehicle availability against active bookings and vehicle blockouts before confirming a reservation.")),
+        p(t("This keeps the same vehicle from being allocated to overlapping rental periods.")),
+      ],
+    },
+    {
+      id: "system-fleet",
+      question: "What fleet management features are included?",
+      keywords: ["fleet", "vehicles", "status", "maintenance", "blockouts"],
+      blocks: [
+        list(
+          [t("Vehicle categories with pricing and feature setup")],
+          [t("Vehicle status tracking for active, on-rent, maintenance, and inactive units")],
+          [t("Vehicle blockouts for service, repairs, or internal use")],
+          [t("Pickup and dropoff location management")],
+        ),
+      ],
+    },
+    {
+      id: "system-billing",
+      question: "Does the platform support invoices and accounting integrations?",
+      keywords: ["invoice", "billing", "quickbooks", "zoho", "payments", "accounting"],
+      blocks: [
+        p(t("Yes. The system supports booking totals, payment tracking, invoice generation, and accounting workflows.")),
+        p(t("It can be configured for QuickBooks Online and Zoho Invoice integrations where those modules are enabled.")),
+      ],
+    },
+    {
+      id: "system-documents",
+      question: "Can customers upload licenses and documents?",
+      keywords: ["license", "document", "upload", "driver license", "files"],
+      blocks: [
+        p(t("Yes. The booking flow supports driver-license and document uploads for rental validation workflows.")),
+        p(t("Access to uploaded files is restricted inside the admin system according to the configured permissions and retention rules.")),
+      ],
+    },
+    {
+      id: "system-localization",
+      question: "Is the system ready for Caribbean operations?",
+      keywords: ["caribbean", "languages", "islands", "currencies", "pickup", "airport"],
+      blocks: [
+        p(t("The platform is built around Caribbean rental operations, including island pickup and return workflows, multi-location handling, and multilingual public pages.")),
+        p(t("The current product includes English, Spanish, and Dutch language support.")),
+      ],
+    },
+    {
+      id: "system-users",
+      question: "Can the system be used by a team?",
+      keywords: ["users", "team", "roles", "admin", "permissions"],
+      blocks: [
+        p(t("Yes. Admin access is designed for operational teams managing bookings, fleet, returns, billing, and reviews.")),
+        p(t("Role-based access can be used to control which staff members can view or update specific areas.")),
+      ],
+    },
+    {
+      id: "system-deployment",
+      question: "Can this system be reused for new rental brands or SaaS deployments?",
+      keywords: ["deployment", "tenant", "branding", "saas", "reuse", "white label"],
+      blocks: [
+        p(t("Yes. Branding, tenant settings, metadata, and FAQ content can be adapted for a rental company deployment or for a SaaS/system marketing deployment.")),
+        p(t("This codebase now keeps separate rental and system content profiles to reduce copy mismatches during future rollouts.")),
+      ],
+    },
+  ],
+  nl: [
+    {
+      id: "system-online-booking",
+      question: "Hoe werkt het online boekingssysteem?",
+      keywords: ["online boeken", "website", "reserveringen", "beschikbaarheid", "boekingsflow"],
+      blocks: [
+        p(t("Klanten kunnen actieve categorieën bekijken, datums en locaties kiezen, extra's toevoegen en een reservering indienen via de publieke website.")),
+        p(t("Beschikbaarheid en tarieven worden berekend op basis van de ingestelde vloot, prijstabellen, minimale huurregels en actieve operationele beperkingen.")),
+      ],
+    },
+    {
+      id: "system-double-booking",
+      question: "Hoe voorkomt het systeem dubbele reserveringen?",
+      keywords: ["dubbele reservering", "overlap", "conflict", "beschikbaarheid", "inventory"],
+      blocks: [
+        p(t("Het platform controleert de beschikbaarheid van voertuigen tegen actieve reserveringen en blockouts voordat een boeking wordt bevestigd.")),
+        p(t("Daardoor kan hetzelfde voertuig niet aan overlappende huurperiodes worden toegewezen.")),
+      ],
+    },
+    {
+      id: "system-fleet",
+      question: "Welke vlootbeheerfuncties zijn inbegrepen?",
+      keywords: ["vloot", "voertuigen", "status", "onderhoud", "blockouts"],
+      blocks: [
+        list(
+          [t("Voertuigcategorieën met prijs- en featureconfiguratie")],
+          [t("Statusbeheer voor actieve, verhuurde, onderhouds- en inactieve voertuigen")],
+          [t("Voertuigblockouts voor service, reparaties of intern gebruik")],
+          [t("Beheer van pickup- en dropofflocaties")],
+        ),
+      ],
+    },
+    {
+      id: "system-billing",
+      question: "Ondersteunt het platform facturen en boekhoudintegraties?",
+      keywords: ["factuur", "boekhouding", "quickbooks", "zoho", "betalingen", "billing"],
+      blocks: [
+        p(t("Ja. Het systeem ondersteunt boekingstotalen, betalingsregistratie, factuurgeneratie en boekhoudworkflows.")),
+        p(t("Het kan worden ingericht voor integraties met QuickBooks Online en Zoho Invoice wanneer die modules zijn ingeschakeld.")),
+      ],
+    },
+    {
+      id: "system-documents",
+      question: "Kunnen klanten rijbewijzen en documenten uploaden?",
+      keywords: ["rijbewijs", "document", "upload", "bestanden", "license"],
+      blocks: [
+        p(t("Ja. De boekingsflow ondersteunt uploads van rijbewijzen en documenten voor validatie tijdens het verhuurproces.")),
+        p(t("Toegang tot geüploade bestanden is binnen het adminsysteem beperkt volgens de ingestelde rechten en retentieregels.")),
+      ],
+    },
+    {
+      id: "system-localization",
+      question: "Is het systeem geschikt voor Caribische verhuurprocessen?",
+      keywords: ["caribisch", "talen", "eilanden", "luchthaven", "pickup", "return"],
+      blocks: [
+        p(t("Het platform is gebouwd rond Caribische verhuurprocessen, inclusief eiland-specifieke pickup- en returnflows, meerdere locaties en meertalige publieke pagina's.")),
+        p(t("Het product ondersteunt momenteel Engels, Spaans en Nederlands.")),
+      ],
+    },
+    {
+      id: "system-users",
+      question: "Kan het systeem door een team worden gebruikt?",
+      keywords: ["gebruikers", "team", "rollen", "admin", "rechten"],
+      blocks: [
+        p(t("Ja. Admin-toegang is bedoeld voor teams die reserveringen, vloot, retouren, facturatie en reviews beheren.")),
+        p(t("Rolgebaseerde toegang kan worden gebruikt om te bepalen welke medewerkers specifieke onderdelen mogen bekijken of aanpassen.")),
+      ],
+    },
+    {
+      id: "system-deployment",
+      question: "Kan dit systeem opnieuw worden gebruikt voor nieuwe verhuurmerken of SaaS-deployments?",
+      keywords: ["deployment", "tenant", "branding", "saas", "hergebruik", "white label"],
+      blocks: [
+        p(t("Ja. Branding, tenantinstellingen, metadata en FAQ-inhoud kunnen worden aangepast voor een verhuurbedrijf of voor een SaaS-/systeemdeployment.")),
+        p(t("Deze codebase bewaart nu aparte rental- en system-profielen om copy-mismatches bij toekomstige uitrol te voorkomen.")),
+      ],
+    },
+  ],
+  es: [
+    {
+      id: "system-online-booking",
+      question: "¿Cómo funciona el sistema de reservas en línea?",
+      keywords: ["reservas en línea", "sitio web", "disponibilidad", "flujo de reserva"],
+      blocks: [
+        p(t("Los clientes pueden ver categorías activas, elegir fechas y ubicaciones, agregar extras y enviar una reserva desde el sitio público.")),
+        p(t("La disponibilidad y los precios se calculan según la flota configurada, las tarifas, las reglas mínimas de reserva y las restricciones operativas activas.")),
+      ],
+    },
+    {
+      id: "system-double-booking",
+      question: "¿Cómo evita el sistema las reservas duplicadas?",
+      keywords: ["reserva duplicada", "solapamiento", "conflicto", "disponibilidad", "inventario"],
+      blocks: [
+        p(t("La plataforma revisa la disponibilidad del vehículo frente a reservas activas y bloqueos antes de confirmar una reserva.")),
+        p(t("Eso evita que el mismo vehículo se asigne a periodos de alquiler superpuestos.")),
+      ],
+    },
+    {
+      id: "system-fleet",
+      question: "¿Qué funciones de gestión de flota incluye?",
+      keywords: ["flota", "vehículos", "estado", "mantenimiento", "bloqueos"],
+      blocks: [
+        list(
+          [t("Categorías de vehículos con configuración de precios y características")],
+          [t("Seguimiento de estado para unidades activas, alquiladas, en mantenimiento e inactivas")],
+          [t("Bloqueos de vehículos por servicio, reparaciones o uso interno")],
+          [t("Gestión de ubicaciones de recogida y entrega")],
+        ),
+      ],
+    },
+    {
+      id: "system-billing",
+      question: "¿La plataforma soporta facturas e integraciones contables?",
+      keywords: ["factura", "contabilidad", "quickbooks", "zoho", "pagos", "billing"],
+      blocks: [
+        p(t("Sí. El sistema soporta totales de reserva, seguimiento de pagos, generación de facturas y flujos contables.")),
+        p(t("Puede configurarse para integraciones con QuickBooks Online y Zoho Invoice cuando esos módulos estén habilitados.")),
+      ],
+    },
+    {
+      id: "system-documents",
+      question: "¿Los clientes pueden subir licencias y documentos?",
+      keywords: ["licencia", "documento", "subida", "archivos", "driver license"],
+      blocks: [
+        p(t("Sí. El flujo de reserva admite la carga de licencias y documentos para validación dentro del proceso de alquiler.")),
+        p(t("El acceso a los archivos subidos queda restringido dentro del sistema administrativo según permisos y reglas de retención.")),
+      ],
+    },
+    {
+      id: "system-localization",
+      question: "¿El sistema está preparado para operaciones del Caribe?",
+      keywords: ["caribe", "idiomas", "islas", "aeropuerto", "recogida", "devolución"],
+      blocks: [
+        p(t("La plataforma está construida para operaciones de alquiler en el Caribe, incluyendo flujos de recogida y devolución en islas, múltiples ubicaciones y páginas públicas multilingües.")),
+        p(t("Actualmente el producto incluye soporte en inglés, español y neerlandés.")),
+      ],
+    },
+    {
+      id: "system-users",
+      question: "¿Puede usarlo un equipo de trabajo?",
+      keywords: ["usuarios", "equipo", "roles", "admin", "permisos"],
+      blocks: [
+        p(t("Sí. El acceso administrativo está pensado para equipos que gestionan reservas, flota, devoluciones, facturación y reseñas.")),
+        p(t("El acceso por roles puede usarse para controlar qué miembros del equipo pueden ver o editar áreas específicas.")),
+      ],
+    },
+    {
+      id: "system-deployment",
+      question: "¿Puede reutilizarse este sistema para nuevas marcas de alquiler o despliegues SaaS?",
+      keywords: ["despliegue", "tenant", "branding", "saas", "reutilizar", "white label"],
+      blocks: [
+        p(t("Sí. La marca, la configuración del tenant, los metadatos y el contenido del FAQ pueden adaptarse tanto para una empresa de alquiler como para una implantación SaaS o de sistema.")),
+        p(t("Este código ahora mantiene perfiles separados de rental y system para evitar mezclar textos en futuros despliegues.")),
+      ],
+    },
+  ],
+};
+
+const faqByProfile: Record<FaqProfile, Record<FaqLocale, FaqEntry[]>> = {
+  rental: rentalFaqByLocale,
+  system: systemFaqByLocale,
+};
+
+export function getFaqEntries(locale: string, profile: FaqProfile = DEFAULT_FAQ_PROFILE): FaqEntry[] {
+  return faqByProfile[profile][coerceFaqLocale(locale)];
 }
 
 export function faqBlocksToPlainText(blocks: FaqBlock[]): string {
@@ -465,14 +790,19 @@ export function normalizeFaqSearchText(value: string): string {
     .trim();
 }
 
-export function getFaqAssistantCopy(locale: string): FaqAssistantCopy {
+export function getFaqAssistantCopy(locale: string, profile: FaqProfile = DEFAULT_FAQ_PROFILE): FaqAssistantCopy {
   const normalizedLocale = coerceFaqLocale(locale);
+  const isSystemProfile = profile === "system";
 
   if (normalizedLocale === "es") {
     return {
       title: "Asistente FAQ",
-      welcome: "Haz una pregunta sobre alquileres, pagos, depósito, combustible, aeropuerto o soporte y responderé con la información del FAQ.",
-      notFound: "No encontré una respuesta directa en el FAQ. Abre la página FAQ o contáctanos por WhatsApp para recibir ayuda.",
+      welcome: isSystemProfile
+        ? "Haz una pregunta sobre reservas en línea, flota, facturación, roles o despliegue del sistema y responderé con la información del FAQ."
+        : "Haz una pregunta sobre alquileres, pagos, depósito, combustible, aeropuerto o soporte y responderé con la información del FAQ.",
+      notFound: isSystemProfile
+        ? "No encontré una respuesta directa en el FAQ del sistema. Abre la página FAQ o contacta al equipo para más detalles."
+        : "No encontré una respuesta directa en el FAQ. Abre la página FAQ o contáctanos por WhatsApp para recibir ayuda.",
       readMore: "Lee más en la página de FAQ.",
       openWhatsapp: "Abrir WhatsApp",
       askPlaceholder: "Haz una pregunta...",
@@ -482,8 +812,12 @@ export function getFaqAssistantCopy(locale: string): FaqAssistantCopy {
   if (normalizedLocale === "nl") {
     return {
       title: "FAQ Assistent",
-      welcome: "Stel een vraag over huur, betaling, borg, brandstof, luchthaven of support en ik antwoord met info uit de FAQ.",
-      notFound: "Ik vond geen direct antwoord in de FAQ. Open de FAQ-pagina of neem contact op via WhatsApp voor hulp.",
+      welcome: isSystemProfile
+        ? "Stel een vraag over online boekingen, vlootbeheer, facturatie, rollen of systeemdeployment en ik antwoord met info uit de FAQ."
+        : "Stel een vraag over huur, betaling, borg, brandstof, luchthaven of support en ik antwoord met info uit de FAQ.",
+      notFound: isSystemProfile
+        ? "Ik vond geen direct antwoord in de systeem-FAQ. Open de FAQ-pagina of neem contact op met het team voor meer details."
+        : "Ik vond geen direct antwoord in de FAQ. Open de FAQ-pagina of neem contact op via WhatsApp voor hulp.",
       readMore: "Lees meer op de FAQ-pagina.",
       openWhatsapp: "Open WhatsApp",
       askPlaceholder: "Stel een vraag...",
@@ -492,8 +826,12 @@ export function getFaqAssistantCopy(locale: string): FaqAssistantCopy {
 
   return {
     title: "FAQ Assistant",
-    welcome: "Ask about rentals, payments, deposit, fuel, airport pickup, or support and I’ll answer from the FAQ.",
-    notFound: "I couldn’t find a direct FAQ answer. Open the FAQ page or contact us on WhatsApp for help.",
+    welcome: isSystemProfile
+      ? "Ask about online booking, fleet operations, billing, user roles, or system deployment and I’ll answer from the FAQ."
+      : "Ask about rentals, payments, deposit, fuel, airport pickup, or support and I’ll answer from the FAQ.",
+    notFound: isSystemProfile
+      ? "I couldn’t find a direct answer in the system FAQ. Open the FAQ page or contact the team for more detail."
+      : "I couldn’t find a direct FAQ answer. Open the FAQ page or contact us on WhatsApp for help.",
     readMore: "Read more on the FAQ page.",
     openWhatsapp: "Open WhatsApp",
     askPlaceholder: "Ask a question...",

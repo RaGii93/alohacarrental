@@ -11,6 +11,8 @@ import { logoutAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { getInvoiceProvider } from "@/lib/settings";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { listNotifications } from "@/lib/notifications";
+import { NotificationCenterClient } from "@/components/admin/NotificationCenterClient";
 
 export async function generateMetadata({
   params,
@@ -39,6 +41,7 @@ export default async function AdminLayout({
   const t = await getTranslations();
   const admin = await requireAdmin(locale);
   const invoiceProvider = await getInvoiceProvider();
+  const notifications = await listNotifications({ limit: 8 });
   const licenseActive = isLicenseActive();
   if (!licenseActive && admin.role !== "ROOT") {
     redirect(`/${locale}/admin/billing-required`);
@@ -96,6 +99,7 @@ export default async function AdminLayout({
             </div>
             <form action={logoutAction.bind(null, locale)} className="w-full shrink-0 md:w-auto">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:justify-end">
+                <NotificationCenterClient locale={locale} notifications={notifications} compact />
                 <LanguageSwitcher />
                 <Button type="submit" variant="outline" size="sm" className="h-11 w-full rounded-xl sm:w-auto">
                   {t("nav.logout")}
