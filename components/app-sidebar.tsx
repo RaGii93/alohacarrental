@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -12,6 +12,7 @@ import {
   Cog,
   CircleHelp,
   CirclePlus,
+  Clock3,
   DollarSign,
   FileText,
   Grid2X2,
@@ -59,6 +60,7 @@ export function AppSidebar({
 }) {
   const t = useTranslations();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const parts = pathname.split("/").filter(Boolean);
   const hasLocalePrefix = routing.locales.includes(parts[0] as any);
   const section = hasLocalePrefix ? (parts[2] || "bookings") : (parts[1] || "bookings");
