@@ -163,6 +163,27 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
   }
 
+  .admin-primary-button {
+    background: linear-gradient(135deg, rgb(15, 39, 64), rgb(18, 104, 126));
+    color: white;
+    box-shadow: 0 18px 42px -24px rgba(15, 39, 64, 0.38);
+  }
+
+  .admin-primary-button:hover {
+    opacity: 0.96;
+  }
+
+  .admin-active-card {
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    background:
+      linear-gradient(135deg, rgb(15, 39, 64), rgb(17, 84, 109)),
+      radial-gradient(circle at top right, rgba(125, 211, 252, 0.14), transparent 34%);
+    color: white;
+    box-shadow:
+      0 26px 60px -36px rgba(15, 39, 64, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
   .admin-outline-button {
     border: 1px solid rgba(203, 213, 225, 0.9);
     background: rgba(255, 255, 255, 0.92);

@@ -176,7 +176,7 @@ export default async function AdminBookingsPage({
           {(auth.admin.role === "ROOT" || auth.admin.role === "OWNER") && (
             <Link
               href={`/${locale}/admin/bookings/new`}
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-[linear-gradient(135deg,hsl(var(--foreground)),hsl(var(--primary)))] px-5 text-sm font-semibold text-white shadow-[0_18px_42px_-24px_hsl(var(--primary)/0.4)] transition-all hover:opacity-95"
+              className="admin-primary-button inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold transition-all"
             >
               {tOr("admin.bookings.create", {}, "New booking")}
             </Link>
@@ -213,15 +213,15 @@ export default async function AdminBookingsPage({
                 key={item.key}
                 href={buildStatusHref(item.key as "pending" | "confirmed" | "declined")}
               className={`rounded-[1.7rem] p-5 shadow-[0_24px_56px_-32px_hsl(var(--primary)/0.14)] transition ${
-                  isActive ? "border border-[hsl(var(--primary)/0.22)] bg-[linear-gradient(135deg,hsl(var(--foreground)),hsl(var(--primary)))] text-white" : "admin-surface-soft border-transparent hover:border-[hsl(var(--primary)/0.14)]"
+                  isActive ? "admin-active-card" : "admin-surface-soft border-transparent hover:border-[hsl(var(--primary)/0.14)]"
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className={`text-sm font-medium ${isActive ? "text-white/88" : "text-slate-500"}`}>{item.label}</p>
+                    <p className={`text-sm font-medium ${isActive ? "text-white/85" : "text-slate-500"}`}>{item.label}</p>
                     <p className={`mt-2 text-3xl font-black tracking-tight ${isActive ? "text-white" : "text-slate-900"}`}>{item.total}</p>
                   </div>
-                  <div className={`inline-flex size-12 items-center justify-center rounded-2xl ${isActive ? "bg-white/18 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]" : item.tone}`}>
+                  <div className={`inline-flex size-12 items-center justify-center rounded-2xl ${isActive ? "bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] ring-1 ring-white/10" : item.tone}`}>
                     <item.icon className="size-5" />
                   </div>
                 </div>
