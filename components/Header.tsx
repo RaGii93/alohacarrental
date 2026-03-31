@@ -49,21 +49,21 @@ export function Header() {
       "group relative inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300",
       darkChrome
         ? "text-white/82 hover:bg-white/12 hover:text-white"
-        : "text-[hsl(var(--foreground)/0.78)] hover:bg-[hsl(var(--accent)/0.45)] hover:text-[hsl(var(--foreground))]",
+        : "text-[hsl(var(--foreground)/0.78)] hover:bg-[linear-gradient(135deg,hsl(var(--accent)/0.7),rgba(255,255,255,0.76))] hover:text-[hsl(var(--foreground))]",
       isActive(href) &&
         (darkChrome
           ? "bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]"
-          : "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-[0_18px_40px_-24px_hsl(var(--primary)/0.6)]"),
+          : "bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(229_54%_28%))] text-[hsl(var(--primary-foreground))] shadow-[0_18px_40px_-24px_hsl(var(--primary)/0.5)]"),
     );
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-0 pt-0">
       <div
         className={cn(
-          "relative overflow-hidden border-b transition-all duration-500",
+          "relative overflow-hidden transition-all duration-500",
           darkChrome
-            ? "border-white/12 bg-[rgba(7,26,54,0.46)] text-white shadow-[0_16px_50px_-30px_rgba(7,26,54,0.85)] backdrop-blur-2xl"
-            : "border-[hsl(var(--border))] bg-white/92 text-[hsl(var(--foreground))] shadow-[0_16px_40px_-30px_hsl(var(--foreground)/0.12)] backdrop-blur-2xl",
+            ? "bg-[rgba(7,26,54,0.46)] text-white shadow-[0_16px_50px_-30px_rgba(7,26,54,0.85)] backdrop-blur-2xl"
+            : "bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(252,246,255,0.86))] text-[hsl(var(--foreground))] shadow-[0_18px_44px_-30px_hsl(var(--foreground)/0.14)] backdrop-blur-2xl",
         )}
       >
         <div className="mx-auto max-w-[1600px]">
@@ -72,16 +72,17 @@ export function Header() {
               "pointer-events-none absolute inset-0",
               darkChrome
                 ? "bg-[linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0.05)_38%,hsl(var(--primary)/0.26)_100%)]"
-                : "bg-[linear-gradient(135deg,hsl(var(--primary)/0.03),rgba(255,255,255,0.82)_38%,hsl(var(--accent)/0.18)_100%)]",
+                : "bg-[linear-gradient(135deg,hsl(var(--primary)/0.08),rgba(255,255,255,0.84)_34%,hsl(var(--accent)/0.26)_72%,hsl(229_54%_28%/0.08)_100%)]",
             )}
           />
-          <div className="animate-float-soft pointer-events-none absolute -left-12 top-2 h-24 w-24 rounded-full bg-[hsl(var(--accent)/0.38)] blur-3xl" />
-          <div className="pointer-events-none absolute right-[-2rem] top-[-1rem] h-28 w-28 rounded-full bg-[hsl(var(--primary)/0.28)] blur-3xl" />
+          <div className="animate-float-soft pointer-events-none absolute -left-12 top-2 h-24 w-24 rounded-full bg-[hsl(var(--accent)/0.42)] blur-3xl" />
+          <div className="pointer-events-none absolute right-[-2rem] top-[-1rem] h-28 w-28 rounded-full bg-[hsl(var(--primary)/0.3)] blur-3xl" />
+          <div className="pointer-events-none absolute left-1/3 top-0 h-24 w-28 rounded-full bg-[hsl(229_54%_28%/0.12)] blur-3xl" />
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.42),transparent)]" />
           <div
             className={cn(
               "pointer-events-none absolute inset-x-0 bottom-0 h-px",
-              darkChrome ? "bg-white/18" : "bg-[hsl(var(--border))]",
+              darkChrome ? "bg-white/18" : "bg-[linear-gradient(90deg,transparent,hsl(var(--primary)/0.18),transparent)]",
             )}
           />
 
@@ -90,7 +91,7 @@ export function Header() {
               <div
                 className={cn(
                   "relative flex h-16 w-16 items-center justify-center rounded-2xl backdrop-blur-xl",
-                  darkChrome ? "bg-white/8" : "bg-white/55",
+                  darkChrome ? "bg-white/8" : "bg-[linear-gradient(135deg,rgba(255,255,255,0.72),hsl(var(--accent)/0.16))] ring-1 ring-white/55",
                 )}
               >
                 <Image
@@ -120,10 +121,10 @@ export function Header() {
             >
               <div
                 className={cn(
-                  "flex items-center gap-1 rounded-full border px-2 py-2",
+                  "flex items-center gap-1 rounded-full px-2 py-2",
                   darkChrome
                     ? "border-white/18 bg-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_30px_-20px_rgba(0,0,0,0.4)]"
-                    : "border-[hsl(var(--border))] bg-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]",
+                    : "bg-[linear-gradient(135deg,rgba(255,255,255,0.7),hsl(var(--accent)/0.12)_52%,hsl(229_54%_28%/0.05)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.74),0_18px_40px_-28px_hsl(var(--foreground)/0.12)] ring-1 ring-white/65 backdrop-blur-xl",
                 )}
               >
               {navItems.map((item) => {
@@ -144,7 +145,7 @@ export function Header() {
                   "w-[168px] rounded-full shadow-none",
                   darkChrome
                     ? "border-white/18 bg-white/12 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] [&_svg]:text-white/72"
-                    : "border-[hsl(var(--border))] bg-white/86 text-[hsl(var(--foreground))] [&_svg]:text-[hsl(var(--muted-foreground))]",
+                    : "border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.76),hsl(var(--accent)/0.12))] text-[hsl(var(--foreground))] ring-1 ring-white/60 [&_svg]:text-[hsl(var(--muted-foreground))]",
                 )}
                 contentClassName="rounded-2xl border-[hsl(var(--border))] bg-white/96 backdrop-blur-xl"
               />
@@ -154,7 +155,7 @@ export function Header() {
                   "rounded-full px-6 font-bold shadow-[0_20px_45px_-28px_hsl(var(--primary)/0.6)]",
                   darkChrome
                     ? "bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] text-[hsl(var(--primary-foreground))] hover:opacity-95"
-                    : "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.9)]",
+                    : "bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(229_54%_28%))] text-[hsl(var(--primary-foreground))] hover:opacity-95",
                 )}
               >
                 <Link href="/book">
