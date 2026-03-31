@@ -529,7 +529,7 @@ export function TaxSettingsCard({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24 sm:pb-28">
       {integrationBanner ? (
         <Card className={`overflow-hidden rounded-[1.5rem] border shadow-[0_22px_50px_-38px_rgba(15,23,42,0.45)] ${
           integrationBanner.status === "connected"
@@ -1230,15 +1230,15 @@ export function TaxSettingsCard({
         </div>
       </Card>
 
-      <div className="sticky bottom-4 z-10 flex justify-end">
-        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/92 px-4 py-3 shadow-[0_24px_50px_-30px_rgba(15,23,42,0.38)] backdrop-blur">
-          <p className="hidden text-sm text-slate-600 md:block">{t("admin.settings.subtitle")}</p>
+      <div className="pointer-events-none fixed bottom-4 right-4 z-40 flex justify-end sm:bottom-5 sm:right-5">
+        <div className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white/94 px-4 py-3 shadow-[0_24px_50px_-26px_rgba(15,23,42,0.34)] backdrop-blur-md">
+          <p className="hidden text-sm text-slate-600 xl:block">{t("admin.settings.subtitle")}</p>
           <Button
             onClick={onSave}
             disabled={isSaving}
-            className="rounded-xl bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] px-5 text-white shadow-[0_18px_34px_-20px_hsl(var(--primary)/0.55)] hover:opacity-95"
+            className="min-w-[140px] rounded-xl bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] px-5 text-white shadow-[0_18px_34px_-20px_hsl(var(--primary)/0.55)] hover:opacity-95"
           >
-          {isSaving ? t("admin.settings.saving") : t("common.save")}
+            {isSaving ? t("admin.settings.saving") : t("common.save")}
           </Button>
         </div>
       </div>
