@@ -71,8 +71,8 @@ export function AccordionItem({
       <div
         data-state={open ? "open" : "closed"}
         className={cn(
-          "overflow-hidden rounded-[1.6rem] border border-[hsl(var(--border)/0.8)] bg-white/72 shadow-[0_18px_48px_-32px_hsl(var(--foreground)/0.14)] ring-1 ring-white/45 backdrop-blur-md transition-all",
-          open && "border-[hsl(var(--primary)/0.24)] bg-white/82 shadow-[0_24px_64px_-34px_hsl(var(--primary)/0.18)]",
+          "overflow-hidden rounded-[1.6rem] border border-[rgba(15,39,64,0.08)] bg-white/88 shadow-[0_20px_50px_-34px_rgba(15,39,64,0.18)] ring-1 ring-white/70 backdrop-blur-md transition-all",
+          open && "border-[rgba(19,120,152,0.18)] bg-white shadow-[0_28px_72px_-38px_rgba(19,120,152,0.24)]",
           className
         )}
       >
@@ -102,15 +102,15 @@ export function AccordionTrigger({
       aria-expanded={item.open}
       onClick={() => accordion.setValue(item.value)}
       className={cn(
-        "flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition-colors hover:bg-white/28 sm:px-7",
+        "flex w-full items-center justify-between gap-6 px-6 py-5 text-left transition-colors hover:bg-[rgba(19,120,152,0.04)] sm:px-7",
         className
       )}
     >
       <span className="text-base font-semibold text-[hsl(var(--foreground))] sm:text-lg">{children}</span>
       <span
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-full border border-[hsl(var(--primary)/0.16)] bg-[linear-gradient(180deg,hsl(var(--accent)/0.22),white)] text-[hsl(var(--primary))] shadow-[0_12px_24px_-20px_hsl(var(--primary)/0.25)] transition-transform duration-200",
-          item.open && "rotate-180 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+          "flex size-10 shrink-0 items-center justify-center rounded-full border border-[rgba(19,120,152,0.14)] bg-[rgba(19,120,152,0.08)] text-[rgb(19,120,152)] shadow-[0_12px_24px_-20px_rgba(19,120,152,0.22)] transition-transform duration-200",
+          item.open && "rotate-180 border-[rgb(19,120,152)] bg-[rgb(19,120,152)] text-white"
         )}
       >
         <ChevronDown className="size-5" />
@@ -137,7 +137,7 @@ export function AccordionContent({
   }
 
   return (
-    <div className={cn("border-t border-[hsl(var(--border)/0.7)] px-6 pb-6 pt-4 sm:px-7", className)}>
+    <div className={cn("border-t border-[rgba(15,39,64,0.08)] px-6 pb-6 pt-4 sm:px-7", className)}>
       {children}
     </div>
   );
