@@ -30,10 +30,14 @@ type ReviewsSectionProps = {
 };
 
 function StarRating({ count }: { count: number }) {
+  const rating = Math.max(0, Math.min(5, Math.round(count)));
   return (
     <div className="flex gap-0.5">
-      {Array.from({ length: Math.max(1, Math.min(5, count)) }).map((_, i) => (
-        <StarIcon key={i} className="h-4 w-4 fill-[#f4b400] text-[#f4b400]" />
+      {Array.from({ length: 5 }).map((_, i) => (
+        <StarIcon
+          key={i}
+          className={i < rating ? "h-4 w-4 fill-[#f4b400] text-[#f4b400]" : "h-4 w-4 fill-transparent text-[#d4a017]"}
+        />
       ))}
     </div>
   );

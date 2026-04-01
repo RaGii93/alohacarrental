@@ -117,7 +117,7 @@ export default function FleetSection({ categories }: FleetSectionProps) {
               <Button
                 asChild
                 size="lg"
-                className="h-13 rounded-full bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] px-10 text-base font-bold text-[hsl(var(--primary-foreground))] shadow-[0_20px_44px_-24px_hsl(var(--primary)/0.45)] hover:opacity-95"
+                className="h-13 rounded-full bg-[rgb(19,120,152)] px-10 text-base font-bold text-white shadow-[0_20px_44px_-24px_rgba(19,120,152,0.42)] hover:opacity-95"
               >
                 <Link href="/fleet">
                   {t("landing.fleet.seeMore")}

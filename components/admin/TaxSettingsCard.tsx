@@ -1236,7 +1236,7 @@ export function TaxSettingsCard({
           <Button
             onClick={onSave}
             disabled={isSaving}
-            className="min-w-[140px] rounded-xl bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] px-5 text-white shadow-[0_18px_34px_-20px_hsl(var(--primary)/0.55)] hover:opacity-95"
+            className="min-w-[140px] rounded-xl bg-[rgb(19,120,152)] px-5 text-white shadow-[0_18px_34px_-20px_rgba(19,120,152,0.42)] hover:opacity-95"
           >
             {isSaving ? t("admin.settings.saving") : t("common.save")}
           </Button>
