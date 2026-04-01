@@ -130,7 +130,7 @@ export function SocialFABs({
         >
           <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
             <div className="flex items-center gap-2 font-semibold">
-              <Bot className="h-5 w-5 text-blue-600" />
+              <Bot className="h-5 w-5 text-fuchsia-600" />
               {assistantCopy.title}
             </div>
             <button
@@ -176,14 +176,19 @@ export function SocialFABs({
                   key={`${item.role}-${index}`}
                   className={`max-w-[90%] rounded-xl px-3 py-2 text-sm ${
                     item.role === "user"
-                      ? "ml-auto bg-blue-600 text-white"
+                      ? "ml-auto bg-fuchsia-600 text-white"
                       : "bg-slate-100 text-slate-900"
                   }`}
                 >
                   {item.text}
                   {item.role === "bot" && item.text.includes("WhatsApp") && whatsappHref ? (
                     <div className="mt-2">
-                      <Link href={whatsappHref} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline">
+                      <Link
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-fuchsia-700 underline"
+                      >
                         {assistantCopy.openWhatsapp}
                       </Link>
                     </div>
@@ -206,7 +211,7 @@ export function SocialFABs({
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={assistantCopy.askPlaceholder}
               />
-              <Button type="submit" size="icon" className="h-10 w-10">
+              <Button type="submit" size="icon" className="h-10 w-10 bg-fuchsia-600 hover:bg-fuchsia-700">
                 <Send className="h-4 w-4" />
               </Button>
             </form>
@@ -218,7 +223,7 @@ export function SocialFABs({
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-label="Open help assistant"
-        className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl transition hover:bg-blue-700"
+        className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-fuchsia-600 text-white shadow-xl transition hover:bg-fuchsia-700"
       >
         <Bot className="h-8 w-8" />
       </button>
