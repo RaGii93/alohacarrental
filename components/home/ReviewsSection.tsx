@@ -1,17 +1,11 @@
 "use client";
 
-import { MessageCircleMoreIcon, StarIcon } from "lucide-react";
+import { MessageCircleMoreIcon, StarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion.tsx";
 import { formatDate } from "@/lib/datetime";
-import { Link } from "@/i18n/navigation";
 import Reveal from "./Reveal";
 
 type ReviewItem = {
@@ -39,7 +33,7 @@ function StarRating({ count }: { count: number }) {
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: Math.max(1, Math.min(5, count)) }).map((_, i) => (
-        <StarIcon key={i} className="h-4 w-4 fill-primary text-primary" />
+        <StarIcon key={i} className="h-4 w-4 fill-[#f4b400] text-[#f4b400]" />
       ))}
     </div>
   );
@@ -47,10 +41,45 @@ function StarRating({ count }: { count: number }) {
 
 export default function ReviewsSection({ reviews, loading = false, faqItems }: ReviewsSectionProps) {
   const t = useTranslations();
+  const [cardsPerView, setCardsPerView] = useState(4);
+  const [activePage, setActivePage] = useState(0);
   const visibleReviews = reviews.filter((review) => review?.isVisible !== false);
   const averageRating = visibleReviews.length
     ? (visibleReviews.reduce((sum, review) => sum + review.rating, 0) / visibleReviews.length).toFixed(1)
     : "5.0";
+  const pageCount = Math.max(1, Math.ceil(visibleReviews.length / cardsPerView));
+  const pagedReviews = useMemo(
+    () =>
+      Array.from({ length: pageCount }, (_, pageIndex) =>
+        visibleReviews.slice(pageIndex * cardsPerView, pageIndex * cardsPerView + cardsPerView)
+      ),
+    [cardsPerView, pageCount, visibleReviews]
+  );
+
+  useEffect(() => {
+    const updateCardsPerView = () => {
+      if (window.innerWidth >= 1280) setCardsPerView(4);
+      else if (window.innerWidth >= 1024) setCardsPerView(3);
+      else if (window.innerWidth >= 640) setCardsPerView(2);
+      else setCardsPerView(1);
+    };
+
+    updateCardsPerView();
+    window.addEventListener("resize", updateCardsPerView);
+    return () => window.removeEventListener("resize", updateCardsPerView);
+  }, []);
+
+  useEffect(() => {
+    setActivePage((current) => Math.min(current, Math.max(0, pageCount - 1)));
+  }, [pageCount]);
+
+  useEffect(() => {
+    if (pageCount <= 1) return;
+    const interval = window.setInterval(() => {
+      setActivePage((current) => (current + 1) % pageCount);
+    }, 5000);
+    return () => window.clearInterval(interval);
+  }, [pageCount]);
 
   return (
     <section className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
@@ -68,7 +97,7 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
           </p>
         </Reveal>
 
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="space-y-5">
           <div className="space-y-5">
             <Reveal>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -98,74 +127,79 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
                 Guest reviews will appear here as new bookings are completed.
               </Card>
             ) : (
-              visibleReviews.map((review, index) => (
-                <Reveal key={review.id} delay={index * 80}>
-                  <Card className="public-glass-card rounded-[1.85rem] p-0">
-                    <div className="space-y-4 p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-[hsl(var(--foreground))]">
-                            <MessageCircleMoreIcon className="h-5 w-5 text-[rgb(19,120,152)]" />
-                            <span className="font-bold">{review.customerName}</span>
-                          </div>
-                          <StarRating count={review.rating} />
+              <Reveal>
+                <div className="space-y-4">
+                  <div className="overflow-hidden">
+                    <div
+                      className="flex transition-transform duration-700 ease-out"
+                      style={{ transform: `translateX(-${activePage * 100}%)` }}
+                    >
+                      {pagedReviews.map((page, pageIndex) => (
+                        <div key={pageIndex} className="grid w-full shrink-0 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                          {page.map((review) => (
+                            <Card key={review.id} className="public-glass-card rounded-[1.85rem] p-0">
+                              <div className="space-y-4 p-6">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-[hsl(var(--foreground))]">
+                                      <MessageCircleMoreIcon className="h-5 w-5 text-[rgb(19,120,152)]" />
+                                      <span className="font-bold">{review.customerName}</span>
+                                    </div>
+                                    <StarRating count={review.rating} />
+                                  </div>
+                                  <span className="public-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]">
+                                    {formatDate(review.createdAt)}
+                                  </span>
+                                </div>
+                                <p className="text-base leading-7 text-[hsl(var(--muted-foreground))]">"{review.comment}"</p>
+                              </div>
+                            </Card>
+                          ))}
                         </div>
-                        <span className="public-chip rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]">
-                          {formatDate(review.createdAt)}
-                        </span>
-                      </div>
-                      <p className="text-base leading-7 text-[hsl(var(--muted-foreground))]">"{review.comment}"</p>
+                      ))}
                     </div>
-                  </Card>
-                </Reveal>
-              ))
+                  </div>
+
+                  {pageCount > 1 ? (
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        {pagedReviews.map((_, pageIndex) => (
+                          <button
+                            key={pageIndex}
+                            type="button"
+                            aria-label={`Show review group ${pageIndex + 1}`}
+                            onClick={() => setActivePage(pageIndex)}
+                            className={`h-2.5 rounded-full transition-all ${activePage === pageIndex ? "w-8 bg-[rgb(19,120,152)]" : "w-2.5 bg-slate-300"}`}
+                          />
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="rounded-full"
+                          onClick={() => setActivePage((current) => (current - 1 + pageCount) % pageCount)}
+                        >
+                          <ChevronLeftIcon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="rounded-full"
+                          onClick={() => setActivePage((current) => (current + 1) % pageCount)}
+                        >
+                          <ChevronRightIcon className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </Reveal>
             )}
           </div>
-
-          <Reveal className="lg:self-start">
-            <div className="overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.1)] bg-[#0c2238] text-white shadow-[0_34px_90px_-44px_rgba(15,23,42,0.5)] ring-1 ring-white/8">
-              <div className="border-b border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.01))] p-6 sm:p-8">
-                <div className="mb-6 space-y-3">
-                  <span className="inline-flex rounded-full border border-white/14 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/88 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                    Aloha Car Rental
-                  </span>
-                  <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("nav.faq")}</h3>
-                  <p className="max-w-lg text-sm leading-6 text-white/72">
-                    {t("landing.reviews.faqPreview")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 sm:p-5">
-                <Accordion collapsible className="space-y-3">
-                  {faqItems.map((faq) => (
-                    <AccordionItem
-                      key={faq.id}
-                      value={`item-${faq.id}`}
-                      className="rounded-2xl border border-white/8 bg-[#12324b] px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                    >
-                      <AccordionTrigger className="text-left font-semibold text-white hover:bg-white/6 hover:no-underline">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="border-white/10 text-white/72">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </div>
-
-              <div className="border-t border-white/10 p-5 sm:p-6">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full rounded-full border-white/14 bg-white/10 font-bold text-white hover:bg-white/14 hover:text-white"
-                >
-                  <Link href="/faq">{t("landing.reviews.viewAllFaq")}</Link>
-                </Button>
-              </div>
-            </div>
-          </Reveal>
         </div>
       </div>
 

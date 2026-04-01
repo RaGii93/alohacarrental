@@ -154,8 +154,8 @@ export function Header() {
                 className={cn(
                   "rounded-full px-6 font-bold shadow-[0_20px_45px_-28px_hsl(var(--primary)/0.6)]",
                   darkChrome
-                    ? "bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent-foreground)))] text-[hsl(var(--primary-foreground))] hover:opacity-95"
-                    : "bg-[linear-gradient(135deg,rgb(15,39,64),rgb(19,120,152))] text-white hover:opacity-95",
+                    ? "bg-[rgb(19,120,152)] text-white hover:opacity-95"
+                    : "bg-[rgb(19,120,152)] text-white hover:opacity-95",
                 )}
               >
                 <Link href="/book">
