@@ -189,7 +189,7 @@ export default function AdminLoginPage({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-12 w-full rounded-2xl text-sm font-bold shadow-[0_16px_36px_-20px_hsl(var(--primary)/0.65)]"
+                className="h-12 w-full rounded-2xl bg-fuchsia-600 text-sm font-bold text-white shadow-[0_16px_36px_-20px_rgba(192,38,211,0.55)] hover:bg-fuchsia-700"
               >
                 <LogIn className="h-4 w-4" />
                 {isSubmitting ? t("common.loading") : t("admin.login.submit")}
