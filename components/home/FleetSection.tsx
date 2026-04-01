@@ -2,14 +2,14 @@
 
 import { Button } from "@/components/ui/button.tsx";
 import { Card } from "@/components/ui/card.tsx";
-import { CarFrontIcon, ChevronRightIcon, GaugeIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
+import { CarFrontIcon, ChevronRightIcon, GaugeIcon, ShieldCheckIcon, SparklesIcon, UsersIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { getBlobProxyUrl } from "@/lib/blob";
 import Reveal from "./Reveal";
 
 type FleetSectionProps = {
-  categories: { id: string; name: string; seats: number; imageUrl: string | null }[];
+  categories: { id: string; name: string; seats: number; imageUrl: string | null; features: string[] }[];
 };
 
 const CARD_ACCENTS = [
@@ -93,6 +93,19 @@ export default function FleetSection({ categories }: FleetSectionProps) {
                           <UsersIcon className="h-4 w-4 text-[rgb(19,120,152)]" />
                           <span>{t("landing.fleet.seats", { count: category.seats })}</span>
                         </div>
+                        {category.features.length ? (
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {category.features.slice(0, 3).map((feature) => (
+                              <span
+                                key={feature}
+                                className="public-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[rgb(19,120,152)]"
+                              >
+                                <SparklesIcon className="h-3.5 w-3.5" />
+                                <span>{feature}</span>
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
 
                       <div className="flex items-center justify-between rounded-[1.15rem] border border-[rgba(15,39,64,0.08)] bg-[rgba(248,250,252,0.92)] px-4 py-3 text-sm text-[rgb(15,39,64)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-xl">

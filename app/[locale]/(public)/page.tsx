@@ -4,6 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 import { getHomeJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
 import { db } from "@/lib/db";
+import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 
 export async function generateMetadata({
   params,
@@ -45,6 +46,7 @@ export default async function HomePage({
     name: string;
     seats: number;
     imageUrl: string | null;
+    features: string[];
   }[] = [];
   try {
     locations = await db.location.findMany({
@@ -63,9 +65,18 @@ export default async function HomePage({
         name: true,
         seats: true,
         imageUrl: true,
+        hasAC: true,
+        hasCarPlay: true,
+        features: { include: { feature: true }, orderBy: { feature: { sortOrder: "asc" } } },
       },
       orderBy: { sortOrder: "asc" },
-    });
+    }).then((rows) => rows.map((category) => ({
+      id: category.id,
+      name: category.name,
+      seats: category.seats,
+      imageUrl: category.imageUrl,
+      features: getCategoryFeatureNames(category),
+    })));
   } catch {
     categories = [];
   }

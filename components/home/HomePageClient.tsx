@@ -21,7 +21,7 @@ type PublicReview = {
 
 type HomePageClientProps = {
   locations: { id: string; name: string; address?: string | null }[];
-  categories: { id: string; name: string; seats: number; imageUrl: string | null }[];
+  categories: { id: string; name: string; seats: number; imageUrl: string | null; features: string[] }[];
 };
 
 export function HomePageClient({ locations, categories }: HomePageClientProps) {
