@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
-import { MapPinIcon, UserIcon } from "lucide-react";
+import { MapPinIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const HERO_BG = "/home/hero-bg.png";
@@ -53,7 +53,6 @@ export default function HeroSection({ locations }: HeroSectionProps) {
   const [dropoffTime, setDropoffTime] = useState("10:00");
   const [pickupLocationId, setPickupLocationId] = useState(defaults.pickupLocationId);
   const [dropoffLocationId, setDropoffLocationId] = useState(defaults.dropoffLocationId);
-  const [driverAge, setDriverAge] = useState("26-35");
 
   const goToBookingPage = () => {
     if (!startDate || !endDate || !pickupTime || !dropoffTime || !pickupLocationId || !dropoffLocationId) {
@@ -75,7 +74,6 @@ export default function HeroSection({ locations }: HeroSectionProps) {
       dropoffTime,
       pickupLocationId,
       dropoffLocationId,
-      driverAge,
     });
 
     router.push(`/book?${params.toString()}`);
@@ -197,26 +195,6 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                           {location.name}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-                    <UserIcon className="h-3.5 w-3.5 text-primary" />
-                    {t("landing.hero.driverAge")}
-                  </Label>
-                  <Select value={driverAge} onValueChange={setDriverAge}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("landing.hero.agePlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="21-25">21 - 25</SelectItem>
-                      <SelectItem value="26-35">26 - 35</SelectItem>
-                      <SelectItem value="36-50">36 - 50</SelectItem>
-                      <SelectItem value="51-plus">51+</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

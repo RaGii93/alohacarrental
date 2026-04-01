@@ -69,7 +69,10 @@ export function buildMetadata(input: {
   const logoUrl = tenant.logoUrl?.startsWith("http")
     ? tenant.logoUrl
     : `${getBaseUrl()}${tenant.logoUrl || "/logo.svg"}`;
-  const iconUrl = `${getBaseUrl()}/images/icon.png`;
+  const iconPath = tenant.logoUrl || "/home/logo.png";
+  const iconUrl = iconPath.startsWith("http")
+    ? iconPath
+    : `${getBaseUrl()}${iconPath}`;
 
   return {
     metadataBase: new URL(getBaseUrl()),
