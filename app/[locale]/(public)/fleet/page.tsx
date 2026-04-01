@@ -6,6 +6,8 @@ import { buildMetadata } from "@/lib/seo";
 import { getTenantConfig } from "@/lib/tenant";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 
 export async function generateMetadata({
   params,
@@ -105,6 +107,12 @@ export default async function FleetOverviewPage() {
                     </li>
                   ))}
                 </ul>
+
+                <div className="pt-3">
+                  <Button asChild className="public-primary-button h-12 w-full rounded-full font-bold">
+                    <Link href="/book">Book Now</Link>
+                  </Button>
+                </div>
               </div>
             </article>
           ))}
