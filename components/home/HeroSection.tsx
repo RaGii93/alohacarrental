@@ -118,7 +118,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
             <div className="flex flex-wrap gap-4">
               <Button
                 size="lg"
-                className="rounded-full px-8 font-bold shadow-lg"
+                className="rounded-full bg-[linear-gradient(135deg,#d946ef,#ec4899)] px-8 font-bold text-white shadow-[0_24px_44px_-24px_rgba(217,70,239,0.6)] hover:opacity-95"
                 onClick={goToBookingPage}
               >
                 Book Your Car
