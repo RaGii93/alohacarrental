@@ -95,16 +95,15 @@ export default function HeroSection({ locations }: HeroSectionProps) {
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-20 lg:pt-36">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="space-y-6 text-white">
-            <h1 className="text-5xl font-extrabold italic leading-[1.08] tracking-tight drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
-              <span className="block">Discover Bonaire with,</span>
-              <span className="relative mt-4 inline-flex min-h-[5.5rem] min-w-[18rem] items-center sm:min-h-[6.3rem] sm:min-w-[21rem]">
-                <span className="pointer-events-none absolute left-[4.65rem] top-[3rem] text-[2.15rem] font-black not-italic tracking-[-0.05em] text-white/95 drop-shadow-[0_12px_22px_rgba(0,0,0,0.3)] sm:left-[5.55rem] sm:top-[3.45rem] sm:text-[2.7rem]">
-                  Car Rental
-                </span>
-                <span className="relative z-10 text-5xl font-black not-italic tracking-[-0.05em] text-[rgb(255,210,63)] drop-shadow-[0_14px_24px_rgba(0,0,0,0.34)] sm:text-6xl">
+            <h1 className="text-5xl font-extrabold italic leading-[1.02] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
+              <span className="block">Discover Bonaire</span>
+              <span className="mt-1 block">
+                with{" "}
+                <span className="text-[rgb(255,210,63)] drop-shadow-[0_14px_24px_rgba(0,0,0,0.34)]">
                   Aloha
                 </span>
               </span>
+              <span className="mt-1 block">Car Rental</span>
             </h1>
             <p className="text-[2rem] font-semibold text-[rgba(255,247,237,0.96)] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
               Reliable • Affordable • Island Ready Vehicles
