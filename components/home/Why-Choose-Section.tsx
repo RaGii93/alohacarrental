@@ -69,7 +69,7 @@ export default function WhyChooseSection() {
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,19,43,0.08),rgba(10,19,43,0.56))]" />
                 <div className="absolute left-5 top-5 max-w-[16rem] rounded-[1.4rem] bg-white/88 p-4 text-[rgb(141,74,11)] shadow-[0_20px_44px_-28px_rgba(15,23,42,0.35)] backdrop-blur-xl">
                   <p className="text-xs font-bold uppercase tracking-[0.24em] text-[rgb(228,98,170)]">Bonaire mood</p>
-                  <p className="mt-2 text-sm leading-7 text-[rgba(148,92,28,0.9)]">
+                  <p className="mt-2 text-sm leading-7 text-[rgba(46,64,134,0.92)]">
                     Clean sea light, warm roads, and landmark stops from the southern salt pans to the historic slave huts.
                   </p>
                 </div>
@@ -95,7 +95,7 @@ export default function WhyChooseSection() {
                     <feature.icon className="h-7 w-7 text-[rgb(141,74,11)]" />
                   </div>
                   <h3 className="text-xl font-black tracking-tight text-[rgb(141,74,11)]">{feature.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-[rgba(148,92,28,0.9)] sm:text-base">
+                  <p className="mt-3 text-sm leading-7 text-[rgba(46,64,134,0.92)] sm:text-base">
                     {feature.description}
                   </p>
                 </div>
@@ -110,11 +110,11 @@ export default function WhyChooseSection() {
                 </div>
                 <div className="rounded-[1.45rem] bg-[rgba(255,246,235,0.96)] p-5 text-[rgb(141,74,11)]">
                   <div className="text-3xl font-black">100%</div>
-                  <div className="mt-2 text-sm leading-6 text-[rgba(148,92,28,0.9)]">{t("landing.whyChoose.features.security.title")}</div>
+                  <div className="mt-2 text-sm leading-6 text-[rgba(46,64,134,0.92)]">{t("landing.whyChoose.features.security.title")}</div>
                 </div>
                 <div className="rounded-[1.45rem] bg-[rgba(255,239,247,0.94)] p-5 text-[rgb(141,74,11)]">
                   <div className="text-3xl font-black">4.9</div>
-                  <div className="mt-2 text-sm leading-6 text-[rgba(148,92,28,0.9)]">{t("landing.whyChoose.features.rating.title")}</div>
+                  <div className="mt-2 text-sm leading-6 text-[rgba(46,64,134,0.92)]">{t("landing.whyChoose.features.rating.title")}</div>
                 </div>
               </div>
             </Reveal>

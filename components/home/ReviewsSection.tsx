@@ -111,11 +111,11 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
             </div>
             <div className="public-glass-card rounded-[1.6rem] p-5">
               <div className="text-3xl font-black text-[rgb(141,74,11)]">{visibleReviews.length || 0}</div>
-              <div className="mt-1 text-sm font-medium text-[rgba(148,92,28,0.88)]">{t("landing.reviews.title")}</div>
+              <div className="mt-1 text-sm font-medium text-[rgba(46,64,134,0.92)]">{t("landing.reviews.title")}</div>
             </div>
             <div className="public-glass-card rounded-[1.6rem] p-5">
               <div className="text-3xl font-black text-[rgb(141,74,11)]">{faqItems.length}</div>
-              <div className="mt-1 text-sm font-medium text-[rgba(148,92,28,0.88)]">{t("nav.faq")}</div>
+              <div className="mt-1 text-sm font-medium text-[rgba(46,64,134,0.92)]">{t("nav.faq")}</div>
             </div>
           </div>
         </Reveal>
@@ -134,7 +134,7 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,19,43,0.06),rgba(10,19,43,0.52))]" />
                 <div className="absolute left-5 top-5 max-w-[17rem] rounded-[1.5rem] bg-white/90 p-4 text-[rgb(141,74,11)] shadow-[0_22px_48px_-28px_rgba(15,23,42,0.34)] backdrop-blur-xl">
                   <p className="text-xs font-bold uppercase tracking-[0.24em] text-[rgb(228,98,170)]">Bonaire notes</p>
-                  <p className="mt-2 text-sm leading-7 text-[rgba(148,92,28,0.9)]">
+                  <p className="mt-2 text-sm leading-7 text-[rgba(46,64,134,0.92)]">
                     The best guest stories usually start with a simple plan: collect the keys, follow the coast, and stop where the island tells you to.
                   </p>
                 </div>
@@ -147,11 +147,11 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
 
           <div className="space-y-4">
             {loading ? (
-              <Card className="public-glass-card rounded-[1.75rem] p-6 text-center text-[rgba(148,92,28,0.88)]">
+              <Card className="public-glass-card rounded-[1.75rem] p-6 text-center text-[rgba(46,64,134,0.92)]">
                 We are gathering recent guest feedback.
               </Card>
             ) : visibleReviews.length === 0 ? (
-              <Card className="public-glass-card rounded-[1.75rem] p-6 text-center text-[rgba(148,92,28,0.88)]">
+              <Card className="public-glass-card rounded-[1.75rem] p-6 text-center text-[rgba(46,64,134,0.92)]">
                 Guest reviews will appear here as new bookings are completed.
               </Card>
             ) : (
@@ -179,7 +179,7 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
                                     {formatDate(review.createdAt)}
                                   </span>
                                 </div>
-                                <p className="text-base leading-8 text-[rgba(148,92,28,0.92)]">"{review.comment}"</p>
+                                <p className="text-base leading-8 text-[rgba(46,64,134,0.92)]">"{review.comment}"</p>
                               </div>
                             </Card>
                           ))}

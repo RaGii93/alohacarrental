@@ -138,7 +138,7 @@ export default function FleetSection({ categories }: FleetSectionProps) {
                     <div className="space-y-4 p-5">
                       <div className="space-y-2">
                         <h3 className="text-xl font-black tracking-tight text-[rgb(141,74,11)]">{category.name}</h3>
-                        <div className="flex items-center gap-2 text-sm text-[rgba(148,92,28,0.9)]">
+                        <div className="flex items-center gap-2 text-sm text-[rgba(46,64,134,0.92)]">
                           <UsersIcon className="h-4 w-4 text-[rgb(228,98,170)]" />
                           <span>{t("landing.fleet.seats", { count: category.seats })}</span>
                         </div>
