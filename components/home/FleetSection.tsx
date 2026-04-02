@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button.tsx";
 import { Card } from "@/components/ui/card.tsx";
 import { CarFrontIcon, ChevronRightIcon, MapPinnedIcon, SparklesIcon, UsersIcon } from "lucide-react";
@@ -18,12 +19,63 @@ const STORY_STOPS = ["Coastal drives", "Salt flats", "Slave huts"];
 export default function FleetSection({ categories }: FleetSectionProps) {
   const t = useTranslations();
   const featuredCategories = categories.slice(0, 4);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [parallaxOffset, setParallaxOffset] = useState(0);
+  const [imageOpacity, setImageOpacity] = useState(0.42);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const updateParallax = () => {
+      frame = 0;
+      const node = sectionRef.current;
+      if (!node) return;
+
+      const rect = node.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 1;
+      const progress = 1 - Math.min(Math.max(rect.bottom / (rect.height + viewportHeight), 0), 1);
+      const offset = Math.max(Math.min((viewportHeight - rect.top) * 0.14, 92), -42);
+      const opacity = Math.max(0.14, 0.5 - progress * 0.32);
+
+      setParallaxOffset(offset);
+      setImageOpacity(opacity);
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateParallax);
+    };
+
+    updateParallax();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   return (
     <section
+      ref={sectionRef}
       id="fleet"
       className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24"
     >
+      <div
+        className="absolute inset-0 scale-[1.08] will-change-transform"
+        style={{ transform: `translate3d(0, ${parallaxOffset}px, 0) scale(1.08)`, opacity: imageOpacity }}
+      >
+        <Image
+          src="/images/bonaire/slave-huts-bonaire.jpg"
+          alt="Historic slave huts in Bonaire"
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      </div>
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,252,255,0.88),rgba(244,250,255,0.76),rgba(241,249,255,0.9))]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(56,189,248,0.14),transparent_26%),radial-gradient(circle_at_85%_10%,rgba(255,145,28,0.12),transparent_24%),radial-gradient(circle_at_82%_86%,rgba(228,98,170,0.12),transparent_22%)]" />
 
       <div className="relative mx-auto max-w-7xl space-y-10">
