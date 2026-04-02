@@ -97,11 +97,11 @@ export default function HeroSection({ locations }: HeroSectionProps) {
           <div className="space-y-6 text-white">
             <h1 className="text-5xl font-extrabold italic leading-[1.08] tracking-tight drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
               <span className="block">Discover Bonaire with,</span>
-              <span className="relative mt-4 inline-flex min-h-[5.5rem] min-w-[18rem] items-center rounded-[1.5rem] bg-white/12 px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-sm sm:min-h-[6.3rem] sm:min-w-[21rem]">
-                <span className="pointer-events-none absolute left-[4.65rem] top-[3rem] text-[2.15rem] font-black not-italic tracking-[-0.05em] text-white/95 sm:left-[5.55rem] sm:top-[3.45rem] sm:text-[2.7rem]">
+              <span className="relative mt-4 inline-flex min-h-[5.5rem] min-w-[18rem] items-center sm:min-h-[6.3rem] sm:min-w-[21rem]">
+                <span className="pointer-events-none absolute left-[4.65rem] top-[3rem] text-[2.15rem] font-black not-italic tracking-[-0.05em] text-white/95 drop-shadow-[0_12px_22px_rgba(0,0,0,0.3)] sm:left-[5.55rem] sm:top-[3.45rem] sm:text-[2.7rem]">
                   Car Rental
                 </span>
-                <span className="relative z-10 text-5xl font-black not-italic tracking-[-0.05em] text-[rgb(255,210,63)] sm:text-6xl">
+                <span className="relative z-10 text-5xl font-black not-italic tracking-[-0.05em] text-[rgb(255,210,63)] drop-shadow-[0_14px_24px_rgba(0,0,0,0.34)] sm:text-6xl">
                   Aloha
                 </span>
               </span>
