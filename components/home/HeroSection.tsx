@@ -95,15 +95,12 @@ export default function HeroSection({ locations }: HeroSectionProps) {
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-20 lg:pt-36">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="space-y-6 text-white">
-            <h1 className="text-5xl font-extrabold italic leading-[1.02] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
-              <span className="block">Discover Bonaire</span>
-              <span className="mt-1 block">
-                with{" "}
-                <span className="text-[rgb(255,210,63)] drop-shadow-[0_14px_24px_rgba(0,0,0,0.34)]">
-                  Aloha
-                </span>
-              </span>
-              <span className="mt-1 block">Car Rental</span>
+            <h1 className="max-w-4xl text-5xl font-extrabold italic leading-[1.08] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
+              Discover Bonaire with{" "}
+              <span className="text-[rgb(255,210,63)] drop-shadow-[0_14px_24px_rgba(0,0,0,0.34)]">
+                Aloha
+              </span>{" "}
+              Car Rental
             </h1>
             <p className="text-[2rem] font-semibold text-[rgba(255,247,237,0.96)] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
               Reliable • Affordable • Island Ready Vehicles
