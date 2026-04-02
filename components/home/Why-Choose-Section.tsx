@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRightIcon,
   HeadphonesIcon,
@@ -15,6 +16,9 @@ import Reveal from "./Reveal";
 
 export default function WhyChooseSection() {
   const t = useTranslations();
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [parallaxOffset, setParallaxOffset] = useState(0);
+  const [imageOpacity, setImageOpacity] = useState(0.72);
 
   const features = [
     {
@@ -39,8 +43,55 @@ export default function WhyChooseSection() {
     },
   ];
 
+  useEffect(() => {
+    let frame = 0;
+
+    const updateParallax = () => {
+      frame = 0;
+      const node = sectionRef.current;
+      if (!node) return;
+
+      const rect = node.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 1;
+      const progress = 1 - Math.min(Math.max(rect.bottom / (rect.height + viewportHeight), 0), 1);
+      const offset = Math.max(Math.min((viewportHeight - rect.top) * 0.14, 90), -36);
+      const opacity = Math.max(0.22, 0.8 - progress * 0.5);
+
+      setParallaxOffset(offset);
+      setImageOpacity(opacity);
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateParallax);
+    };
+
+    updateParallax();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
   return (
-    <section className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
+    <section ref={sectionRef} className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
+      <div
+        className="absolute inset-0 scale-[1.08] will-change-transform"
+        style={{ transform: `translate3d(0, ${parallaxOffset}px, 0) scale(1.08)`, opacity: imageOpacity }}
+      >
+        <Image
+          src="/images/bonaire/slave-huts-bonaire.jpg"
+          alt="Historic slave huts in Bonaire"
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      </div>
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,252,255,0.84),rgba(244,250,255,0.72),rgba(241,249,255,0.84))]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_center,rgba(56,189,248,0.14),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(255,145,28,0.12),transparent_24%),radial-gradient(circle_at_76%_85%,rgba(228,98,170,0.12),transparent_24%)]" />
       <div className="relative mx-auto max-w-7xl">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.02fr] lg:items-start">
@@ -57,24 +108,14 @@ export default function WhyChooseSection() {
               </p>
             </div>
 
-            <div className="public-photo-frame overflow-hidden rounded-[2rem] p-4">
-              <div className="relative min-h-[28rem] overflow-hidden rounded-[1.55rem]">
-                <Image
-                  src="/images/bonaire/kralendijk-waterfront.jpg"
-                  alt="Waterfront in Kralendijk, Bonaire"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,19,43,0.08),rgba(10,19,43,0.56))]" />
-                <div className="absolute left-5 top-5 max-w-[16rem] rounded-[1.4rem] bg-white/88 p-4 text-[rgb(141,74,11)] shadow-[0_20px_44px_-28px_rgba(15,23,42,0.35)] backdrop-blur-xl">
-                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-[rgb(228,98,170)]">Bonaire mood</p>
-                  <p className="mt-2 text-sm leading-7 text-[rgba(46,64,134,0.92)]">
-                    Clean sea light, warm roads, and landmark stops from the southern salt pans to the historic slave huts.
-                  </p>
-                </div>
-                <div className="public-photo-label absolute bottom-5 left-5 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em]">
-                  Designed for island travel
+            <div className="public-photo-frame rounded-[2rem] p-5">
+              <div className="rounded-[1.6rem] bg-white/72 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-xl">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[rgb(228,98,170)]">Bonaire mood</p>
+                <p className="mt-3 max-w-lg text-base leading-8 text-[rgba(46,64,134,0.92)]">
+                  The southern slave huts now sit behind this whole section, so the story feels tied directly to Bonaire&apos;s landscape while the image glides away as you scroll.
+                </p>
+                <div className="mt-5 inline-flex rounded-full bg-[rgba(255,241,247,0.86)] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[rgb(141,74,11)]">
+                  Scroll to see the image drift
                 </div>
               </div>
             </div>
