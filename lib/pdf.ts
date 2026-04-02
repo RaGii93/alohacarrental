@@ -1,5 +1,6 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import { TenantConfig } from "./tenant";
+import { getBaseUrl } from "./seo";
 
 export interface InvoiceData {
   documentType?: "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
@@ -31,8 +32,7 @@ function resolveLogoUrl(rawUrl: string | undefined) {
   if (!logoUrl) return "";
   if (logoUrl.startsWith("http://") || logoUrl.startsWith("https://")) return logoUrl;
   if (!logoUrl.startsWith("/")) return "";
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "";
-  if (!baseUrl) return "";
+  const baseUrl = getBaseUrl();
   return `${baseUrl.replace(/\/$/, "")}${logoUrl}`;
 }
 

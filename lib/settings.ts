@@ -906,7 +906,7 @@ export function getDefaultTenantSettings(): TenantSettings {
 
   return {
     tenantName: sanitizeRequiredText(process.env.TENANT_NAME, "EdgeRent Lite"),
-    logoUrl: sanitizeRequiredText(process.env.TENANT_LOGO_URL, "/logo.svg"),
+    logoUrl: sanitizeRequiredText(process.env.TENANT_LOGO_URL, "/home/logo.png"),
     phone: sanitizeRequiredText(process.env.TENANT_PHONE, "+1 (555) 123-4567"),
     whatsapp: sanitizeRequiredText(process.env.TENANT_WHATSAPP, "+1 (555) 123-4567"),
     whatsappUrl: sanitizeOptionalText(process.env.TENANT_WHATSAPP_URL),

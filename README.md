@@ -254,8 +254,8 @@ DATABASE_URL=postgresql://...
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
 SESSION_SECRET=long-random-secret
 RESEND_API_KEY=re_...
-RESEND_FROM="Aloha Car Rental Bonaire <alohacarrentalbonaire@endlessedgetechnology.com>"
-NEXT_PUBLIC_APP_URL=https://your-domain.com
+RESEND_FROM="Aloha Car Rental Bonaire <info@alohacarrentalbonaire.com>"
+NEXT_PUBLIC_APP_URL=https://www.alohacarrentalbonaire.com
 QUICKBOOKS_ENABLED=false
 QUICKBOOKS_ENVIRONMENT=production
 ```
@@ -264,16 +264,16 @@ QUICKBOOKS_ENVIRONMENT=production
 
 ```env
 DATABASE_URL_UNPOOLED=postgresql://...
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+NEXT_PUBLIC_SITE_URL=https://www.alohacarrentalbonaire.com
 LICENSE_STATUS=ACTIVE
 LICENSE_MESSAGE=Your license has been suspended...
 
 TENANT_NAME="Aloha Car Rental"
-TENANT_LOGO_URL="/logo.svg"
+TENANT_LOGO_URL="/home/logo.png"
 TENANT_PRIMARY_COLOR="#2563eb"
 TENANT_PHONE="+599 700 0000"
 TENANT_WHATSAPP="+599 700 0000"
-TENANT_EMAIL="alohacarrentalbonaire@endlessedgetechnology.com"
+TENANT_EMAIL="info@alohacarrentalbonaire.com"
 TENANT_ADDRESS="Kaya Example 100, Kralendijk, Bonaire"
 TENANT_CURRENCY="USD"
 TENANT_PAYMENT_INSTRUCTIONS="Please pay by bank transfer or card and include your booking code in the payment reference."
@@ -292,6 +292,7 @@ QUICKBOOKS_ITEM_ID=
 
 - `TENANT_*` drives branding, email content, metadata, and JSON-LD
 - `NEXT_PUBLIC_APP_URL` should match production canonical domain
+- If env vars are missing, the app falls back to `https://www.alohacarrentalbonaire.com`
 - Use `QUICKBOOKS_ENABLED=true` only when QuickBooks credentials + item ID are set
 - QuickBooks integration is QuickBooks Online API only
 - Set `QUICKBOOKS_ENVIRONMENT=sandbox` when connecting to an Intuit Sandbox company (`production` for live QBO companies)
@@ -304,7 +305,7 @@ QUICKBOOKS_ITEM_ID=
   - `GET /api/quickbooks/items` (admin ROOT/OWNER only)
   - `GET /api/quickbooks/env-check` (admin ROOT/OWNER only; masked runtime env preview)
   - `GET /api/quickbooks/smoke` (admin ROOT/OWNER only; runs invoice/sales receipt/payment sync smoke test)
-  - Set `QUICKBOOKS_REDIRECT_URI` to your callback URL, e.g. `https://your-domain.com/api/quickbooks/callback`
+  - Set `QUICKBOOKS_REDIRECT_URI` to your callback URL, e.g. `https://www.alohacarrentalbonaire.com/api/quickbooks/callback`
   - OAuth hardening implemented: fixed state prefix + per-request nonce + PKCE (`S256`) on connect/callback
 
 ---

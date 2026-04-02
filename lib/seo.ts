@@ -25,6 +25,8 @@ export const allKeywords = [
   "Caribbean car rental",
 ] as const;
 
+export const DEFAULT_PUBLIC_BASE_URL = "https://www.alohacarrentalbonaire.com";
+
 function defaultDescriptionByLocale(locale: string, tenantName: string): string {
   return getProfileDefaultDescription("rental", locale, tenantName);
 }
@@ -34,7 +36,7 @@ export function getBaseUrl(): string {
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  const host = envUrl ? (envUrl.startsWith("http") ? envUrl : `https://${envUrl}`) : "http://localhost:3000";
+  const host = envUrl ? (envUrl.startsWith("http") ? envUrl : `https://${envUrl}`) : DEFAULT_PUBLIC_BASE_URL;
   return host.replace(/\/+$/, "");
 }
 
