@@ -68,7 +68,7 @@ export function buildMetadata(input: {
   const absoluteUrl = `${getBaseUrl()}${canonical === "/" ? "" : canonical}`;
   const logoUrl = tenant.logoUrl?.startsWith("http")
     ? tenant.logoUrl
-    : `${getBaseUrl()}${tenant.logoUrl || "/logo.svg"}`;
+    : `${getBaseUrl()}${tenant.logoUrl || "/home/logo.png"}`;
   const iconPath = tenant.logoUrl || "/home/logo.png";
   const iconUrl = iconPath.startsWith("http")
     ? iconPath

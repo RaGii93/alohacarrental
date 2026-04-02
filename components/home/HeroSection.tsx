@@ -96,17 +96,16 @@ export default function HeroSection({ locations }: HeroSectionProps) {
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="space-y-6 text-white">
             <h1 className="max-w-4xl text-5xl font-extrabold italic leading-[1.08] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
-              Discover Bonaire with{" "}
+              {t("landing.hero.headline.line1")}{" "}
               <span className="text-[rgb(255,210,63)] drop-shadow-[0_14px_24px_rgba(0,0,0,0.34)]">
                 Aloha
-              </span>{" "}
-              Car Rental
+              </span> Car Rental
             </h1>
             <p className="text-[2rem] font-semibold text-[rgba(255,247,237,0.96)] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
-              Reliable • Affordable • Island Ready Vehicles
+              {t("landing.hero.featureLine")}
             </p>
             <p className="max-w-3xl text-2xl text-white/86 drop-shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
-              Explore Bonaire&apos;s pink beaches, flamingos and donkey sanctuary, and stunning salt flats at your own pace.
+              {t("landing.ctaSection.subtitle")}
             </p>
             <div className="flex flex-wrap gap-4">
               <Button
@@ -114,7 +113,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                 className="rounded-full bg-[linear-gradient(135deg,rgba(255,145,28,0.98),rgba(255,210,63,0.94))] px-8 font-bold text-[rgb(120,62,9)] shadow-[0_24px_44px_-24px_rgba(255,145,28,0.42)] hover:brightness-[1.03]"
                 onClick={goToBookingPage}
               >
-                Book Your Car
+                {t("landing.hero.bookButton")}
               </Button>
               <Button
                 size="lg"
@@ -125,7 +124,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
               >
-                View Our Fleet
+                {t("landing.hero.viewFleetButton")}
               </Button>
             </div>
           </div>
