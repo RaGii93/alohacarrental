@@ -18,6 +18,7 @@ import { MapPinIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const HERO_BG = "/home/hero-bg.png";
+const HERO_LOGO = "/home/logo.png";
 type HeroSectionProps = {
   locations: { id: string; name: string; address?: string | null }[];
 };
@@ -97,10 +98,14 @@ export default function HeroSection({ locations }: HeroSectionProps) {
           <div className="space-y-6 text-white">
             <h1 className="text-5xl font-extrabold italic leading-[1.08] tracking-tight drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
               <span className="block">Discover Bonaire with,</span>
-              <span className="mt-4 inline-flex rounded-[1.5rem] bg-white/12 px-5 py-3 text-[rgb(255,210,63)] shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-sm">
-                <span className="text-5xl font-black not-italic tracking-[-0.05em] sm:text-6xl">
-                  Aloha
-                </span>
+              <span className="mt-4 inline-flex rounded-[1.5rem] bg-white/14 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-sm">
+                <Image
+                  src={HERO_LOGO}
+                  alt="Aloha Car Rental"
+                  width={280}
+                  height={72}
+                  className="h-10 w-auto sm:h-12"
+                />
               </span>
             </h1>
             <p className="text-[2rem] font-semibold text-[rgba(255,247,237,0.96)] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
