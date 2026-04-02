@@ -244,30 +244,30 @@
       "supportLabel": "Soporte"
     },
     "whyChoose": {
-      "title": "¿Por Qué Elegir Aloha Car Rental?",
-      "subtitle": "Experimenta lo mejor en alquiler de vehículos con nuestros servicios premium y soporte al cliente incomparable.",
+      "title": "Un vehículo local para playas, salinas y paradas en Bonaire",
+      "subtitle": "Diseñamos la experiencia según cómo la gente realmente se mueve por Bonaire: recogidas en el aeropuerto, paseos tranquilos junto a las casitas de esclavos del sur y apoyo flexible cuando cambian los planes.",
       "features": {
         "selection": {
-          "title": "Amplia Selección",
-          "description": "Elige de nuestra diversa flota de vehículos"
+          "title": "El tamaño ideal para la isla",
+          "description": "Elige un auto práctico, un SUV espacioso o una pickup que funcione para playa, familia y recorridos panorámicos."
         },
         "security": {
-          "title": "Reserva Segura",
-          "description": "Procesamiento de pagos seguro y protegido"
+          "title": "Reserva sencilla",
+          "description": "Detalles claros, precios transparentes y un proceso simple desde el primer clic hasta la entrega de llaves."
         },
         "support": {
-          "title": "Soporte 24/7",
-          "description": "Asistencia al cliente las 24 horas"
+          "title": "Soporte local cuando lo necesitas",
+          "description": "Nuestro equipo ayuda con horarios de entrega, rutas y esos pequeños detalles que hacen más fácil el viaje por la isla."
         },
         "rating": {
-          "title": "Mejor Calificado",
-          "description": "Confiado por miles de clientes"
+          "title": "Los huéspedes vuelven por la facilidad",
+          "description": "Los viajeros eligen Aloha por el servicio relajado, los vehículos limpios y la libertad de descubrir Bonaire a su manera."
         }
       }
     },
     "ctaSection": {
-      "title": "¿Listo para Comenzar Tu Viaje?",
-      "subtitle": "Reserva tu vehículo perfecto hoy y experimenta la libertad de la carretera.",
+      "title": "Haz de la isla tu ruta del día",
+      "subtitle": "Reserva el auto que encaja con tus planes en Bonaire, desde mañanas de playa y paradas de buceo hasta atardeceres por la costa sur.",
       "button": "Reservar Ahora"
     },
     "hero": {
@@ -327,7 +327,8 @@
       }
     },
     "fleet": {
-      "title": "Elige el vehiculo ideal para tus planes en la isla",
+      "title": "Elige el vehículo que siga tu ritmo en Bonaire",
+      "description": "Encuentra el vehículo ideal para recogidas en el aeropuerto, vueltas por Kralendijk, paradas fotográficas en la costa sur y tardes tranquilas junto al mar.",
       "seats": "{count} asientos",
       "reserveNow": "Reservar ahora",
       "seeMore": "Ver mas"
@@ -482,8 +483,8 @@
     },
     "reviews": {
       "eyebrow": "Historias de clientes",
-      "title": "Reseñas de Clientes",
-      "subtitle": "Últimas reseñas publicadas de reservas verificadas.",
+      "title": "Historias de huéspedes con paisaje de Bonaire",
+      "subtitle": "Opiniones reales de viajeros que usaron Aloha para moverse entre playas, sitios de buceo, la ciudad y las carreteras costeras más icónicas de la isla.",
       "leaveButton": "Dejar una Reseña",
       "empty": "Todavía no hay reseñas publicadas.",
       "faqPreview": "Respuestas rapidas para los clientes antes de reservar, en un solo lugar.",
