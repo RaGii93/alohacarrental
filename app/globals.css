@@ -263,6 +263,51 @@
     backdrop-filter: blur(14px);
   }
 
+  .public-section-kicker {
+    color: rgb(228, 98, 170);
+  }
+
+  .public-widget-label {
+    color: rgb(196, 69, 142);
+  }
+
+  .public-widget-field {
+    border-color: rgba(251, 191, 36, 0.22);
+    background: rgba(255, 252, 247, 0.92);
+    color: rgb(141, 74, 11);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      0 10px 24px -22px rgba(141, 74, 11, 0.24);
+  }
+
+  .public-widget-field::placeholder {
+    color: rgba(148, 92, 28, 0.62);
+  }
+
+  .public-hero-panel {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background:
+      linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(255, 247, 237, 0.92)),
+      linear-gradient(135deg, rgba(228, 98, 170, 0.06), rgba(255, 210, 63, 0.06));
+    box-shadow: 0 30px 80px -40px rgba(96, 45, 10, 0.34);
+    backdrop-filter: blur(16px);
+  }
+
+  .public-hero-secondary-button {
+    border: 1px solid rgba(255, 255, 255, 0.44);
+    background: rgba(255, 255, 255, 0.14);
+    color: white;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 18px 40px -28px rgba(15, 23, 42, 0.34);
+    backdrop-filter: blur(10px);
+  }
+
+  .public-hero-secondary-button:hover {
+    background: rgba(255, 241, 247, 0.2);
+    color: white;
+  }
+
   .public-chip {
     border: 1px solid rgba(15, 39, 64, 0.08);
     background: rgba(248, 250, 252, 0.92);
