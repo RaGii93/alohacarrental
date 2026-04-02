@@ -49,11 +49,11 @@ export function Header() {
       "group relative inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300",
       darkChrome
         ? "text-white/82 hover:bg-white/12 hover:text-white"
-        : "text-[rgb(15,39,64)]/82 hover:bg-[rgba(15,120,152,0.08)] hover:text-[rgb(15,39,64)]",
+        : "text-[rgb(141,74,11)] hover:bg-[rgba(255,241,247,0.72)] hover:text-[rgb(120,62,9)]",
       isActive(href) &&
         (darkChrome
-          ? "bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]"
-          : "bg-[linear-gradient(135deg,rgb(15,39,64),rgb(19,120,152))] text-white shadow-[0_18px_40px_-24px_rgba(15,39,64,0.32)]"),
+          ? "bg-[rgba(255,241,247,0.16)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]"
+          : "bg-[linear-gradient(135deg,rgba(255,145,28,0.96),rgba(255,210,63,0.92))] text-[rgb(120,62,9)] shadow-[0_18px_40px_-24px_rgba(255,145,28,0.36)]"),
     );
 
   return (
@@ -62,8 +62,8 @@ export function Header() {
         className={cn(
           "relative overflow-hidden transition-all duration-500",
           darkChrome
-            ? "bg-[rgba(7,26,54,0.46)] text-white shadow-[0_16px_50px_-30px_rgba(7,26,54,0.85)] backdrop-blur-2xl"
-            : "bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,250,252,0.94))] text-[rgb(15,39,64)] shadow-[0_18px_44px_-30px_rgba(15,23,42,0.14)] backdrop-blur-2xl",
+            ? "bg-[rgba(96,45,10,0.26)] text-white shadow-[0_16px_50px_-30px_rgba(7,26,54,0.85)] backdrop-blur-2xl"
+            : "bg-[linear-gradient(180deg,rgba(255,252,247,0.92),rgba(255,247,237,0.96))] text-[rgb(141,74,11)] shadow-[0_18px_44px_-30px_rgba(96,45,10,0.18)] backdrop-blur-2xl",
         )}
       >
         <div className="mx-auto max-w-[1600px]">
@@ -71,13 +71,13 @@ export function Header() {
             className={cn(
               "pointer-events-none absolute inset-0",
               darkChrome
-                ? "bg-[linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0.05)_38%,hsl(var(--primary)/0.26)_100%)]"
-                : "bg-[linear-gradient(135deg,rgba(15,120,152,0.08),rgba(255,255,255,0.86)_34%,rgba(23,184,197,0.08)_72%,rgba(15,39,64,0.05)_100%)]",
+                ? "bg-[linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0.05)_38%,rgba(228,98,170,0.24)_100%)]"
+                : "bg-[linear-gradient(135deg,rgba(255,241,247,0.7),rgba(255,255,255,0.88)_34%,rgba(255,247,237,0.72)_72%,rgba(255,210,63,0.12)_100%)]",
             )}
           />
-          <div className="animate-float-soft pointer-events-none absolute -left-12 top-2 h-24 w-24 rounded-full bg-[rgba(23,184,197,0.16)] blur-3xl" />
-          <div className="pointer-events-none absolute right-[-2rem] top-[-1rem] h-28 w-28 rounded-full bg-[rgba(15,39,64,0.12)] blur-3xl" />
-          <div className="pointer-events-none absolute left-1/3 top-0 h-24 w-28 rounded-full bg-[rgba(19,120,152,0.08)] blur-3xl" />
+          <div className="animate-float-soft pointer-events-none absolute -left-12 top-2 h-24 w-24 rounded-full bg-[rgba(255,210,63,0.18)] blur-3xl" />
+          <div className="pointer-events-none absolute right-[-2rem] top-[-1rem] h-28 w-28 rounded-full bg-[rgba(228,98,170,0.14)] blur-3xl" />
+          <div className="pointer-events-none absolute left-1/3 top-0 h-24 w-28 rounded-full bg-[rgba(255,145,28,0.12)] blur-3xl" />
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.42),transparent)]" />
           <div
             className={cn(
@@ -145,7 +145,7 @@ export function Header() {
                   "w-[168px] rounded-full shadow-none",
                   darkChrome
                     ? "border-white/18 bg-white/12 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] [&_svg]:text-white/72"
-                    : "border-[rgba(15,39,64,0.1)] bg-[rgba(255,255,255,0.92)] text-[rgb(15,39,64)] ring-1 ring-white/60 [&_svg]:text-[rgb(71,85,105)]",
+                    : "border-[rgba(228,98,170,0.2)] bg-[rgba(255,255,255,0.94)] text-[rgb(141,74,11)] ring-1 ring-white/60 [&_svg]:text-[rgb(196,69,142)]",
                 )}
                 contentClassName="rounded-2xl border-[hsl(var(--border))] bg-white/96 backdrop-blur-xl"
               />
@@ -154,8 +154,8 @@ export function Header() {
                 className={cn(
                   "rounded-full px-6 font-bold shadow-[0_20px_45px_-28px_hsl(var(--primary)/0.6)]",
                   darkChrome
-                    ? "bg-[rgb(19,120,152)] text-white hover:opacity-95"
-                    : "bg-[rgb(19,120,152)] text-white hover:opacity-95",
+                    ? "bg-[linear-gradient(135deg,rgba(255,145,28,0.96),rgba(255,210,63,0.94))] text-[rgb(120,62,9)] hover:brightness-[1.03]"
+                    : "bg-[linear-gradient(135deg,rgba(255,145,28,0.96),rgba(255,210,63,0.94))] text-[rgb(120,62,9)] hover:brightness-[1.03]",
                 )}
               >
                 <Link href="/book">

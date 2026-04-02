@@ -124,11 +124,11 @@ export function Step1Search({
   return (
     <div className="space-y-6">
       <div className="public-glass-card rounded-[1.75rem] p-6">
-        <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.selectDateRange")}</h2>
+        <h2 className="mb-4 text-xl font-black text-[rgb(228,98,170)]">{t("booking.selectDateRange")}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+            <label className="public-widget-label mb-2 flex items-center gap-2 text-sm font-bold">
               <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.startDate")}
             </label>
@@ -138,12 +138,12 @@ export function Step1Search({
               onChange={(e) => updateBookingData({ startDate: fromDateInputValue(e.target.value) })}
               disabled={disabled}
               min={toDateInputValue(today)}
-              className="h-11 rounded-xl border-white/60 bg-white/82 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.64)] ring-1 ring-white/55 backdrop-blur-xl"
+              className="public-widget-field h-11 rounded-xl ring-1 ring-white/55 backdrop-blur-xl"
             />
           </div>
 
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+            <label className="public-widget-label mb-2 flex items-center gap-2 text-sm font-bold">
               <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.endDate")}
             </label>
@@ -153,14 +153,14 @@ export function Step1Search({
               onChange={(e) => updateBookingData({ endDate: fromDateInputValue(e.target.value) })}
               disabled={disabled}
               min={toDateInputValue(minimumEndDate ?? today)}
-              className="h-11 rounded-xl border-white/60 bg-white/82 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.64)] ring-1 ring-white/55 backdrop-blur-xl"
+              className="public-widget-field h-11 rounded-xl ring-1 ring-white/55 backdrop-blur-xl"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+            <label className="public-widget-label mb-2 flex items-center gap-2 text-sm font-bold">
               <Clock3 className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.pickupTime")}
             </label>
@@ -169,11 +169,11 @@ export function Step1Search({
               value={bookingData.pickupTime}
               onChange={(e) => updateBookingData({ pickupTime: e.target.value })}
               disabled={disabled}
-              className="h-11 rounded-xl border-white/60 bg-white/82 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.64)] ring-1 ring-white/55 backdrop-blur-xl"
+              className="public-widget-field h-11 rounded-xl ring-1 ring-white/55 backdrop-blur-xl"
             />
           </div>
           <div>
-            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-[hsl(var(--accent-foreground))]">
+            <label className="public-widget-label mb-2 flex items-center gap-2 text-sm font-bold">
               <Clock3 className="h-4 w-4 text-[hsl(var(--primary))]" />
               {t("booking.dropoffTime")}
             </label>
@@ -182,15 +182,15 @@ export function Step1Search({
               value={bookingData.dropoffTime}
               onChange={(e) => updateBookingData({ dropoffTime: e.target.value })}
               disabled={disabled}
-              className="h-11 rounded-xl border-white/60 bg-white/82 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.64)] ring-1 ring-white/55 backdrop-blur-xl"
+              className="public-widget-field h-11 rounded-xl ring-1 ring-white/55 backdrop-blur-xl"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <Label className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <MapPin className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label className="public-widget-label mb-2 flex items-center gap-2 font-bold">
+              <MapPin className="h-4 w-4 text-[rgb(228,98,170)]" />
               {t("booking.pickupLocation")}
             </Label>
             <Select
@@ -198,7 +198,7 @@ export function Step1Search({
               onValueChange={(value) => updateBookingData({ pickupLocationId: value })}
               disabled={disabled}
             >
-              <SelectTrigger className="h-11 w-full rounded-xl border-white/60 bg-white/82 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.64)] ring-1 ring-white/55 backdrop-blur-xl">
+              <SelectTrigger className="public-widget-field h-11 w-full rounded-xl ring-1 ring-white/55 backdrop-blur-xl">
                 <SelectValue placeholder={t("booking.selectLocation")} />
               </SelectTrigger>
               <SelectContent>
@@ -212,8 +212,8 @@ export function Step1Search({
           </div>
 
           <div>
-            <Label className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <MapPin className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label className="public-widget-label mb-2 flex items-center gap-2 font-bold">
+              <MapPin className="h-4 w-4 text-[rgb(228,98,170)]" />
               {t("booking.dropoffLocation")}
             </Label>
             <Select
@@ -221,7 +221,7 @@ export function Step1Search({
               onValueChange={(value) => updateBookingData({ dropoffLocationId: value })}
               disabled={disabled}
             >
-              <SelectTrigger className="h-11 w-full rounded-xl border-white/60 bg-white/82 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.64)] ring-1 ring-white/55 backdrop-blur-xl">
+              <SelectTrigger className="public-widget-field h-11 w-full rounded-xl ring-1 ring-white/55 backdrop-blur-xl">
                 <SelectValue placeholder={t("booking.selectLocation")} />
               </SelectTrigger>
               <SelectContent>

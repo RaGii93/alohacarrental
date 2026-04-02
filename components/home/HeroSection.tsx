@@ -90,7 +90,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,26,54,0.9)_0%,rgba(7,26,54,0.72)_34%,hsl(var(--primary)/0.34)_62%,rgba(7,26,54,0.12)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(96,45,10,0.78)_0%,rgba(96,45,10,0.54)_30%,rgba(228,98,170,0.24)_62%,rgba(255,210,63,0.08)_100%)]" />
         <div className="absolute inset-y-0 left-0 w-[58%] bg-[radial-gradient(circle_at_left_center,rgba(7,26,54,0.38),transparent_72%)]" />
       </div>
 
@@ -109,7 +109,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                 />
               </span>
             </h1>
-            <p className="text-[2rem] font-semibold text-white/94 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
+            <p className="text-[2rem] font-semibold text-[rgba(255,247,237,0.96)] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
               Reliable • Affordable • Island Ready Vehicles
             </p>
             <p className="max-w-3xl text-2xl text-white/86 drop-shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
@@ -118,14 +118,14 @@ export default function HeroSection({ locations }: HeroSectionProps) {
             <div className="flex flex-wrap gap-4">
               <Button
                 size="lg"
-                className="rounded-full bg-[rgb(19,120,152)] px-8 font-bold text-white shadow-[0_24px_44px_-24px_rgba(19,120,152,0.48)] hover:opacity-95"
+                className="rounded-full bg-[linear-gradient(135deg,rgba(255,145,28,0.98),rgba(255,210,63,0.94))] px-8 font-bold text-[rgb(120,62,9)] shadow-[0_24px_44px_-24px_rgba(255,145,28,0.42)] hover:brightness-[1.03]"
                 onClick={goToBookingPage}
               >
                 Book Your Car
               </Button>
               <Button
                 size="lg"
-                className="rounded-full border-2 border-white/40 bg-white/15 px-8 font-bold text-white shadow-lg backdrop-blur-sm hover:bg-white/25"
+                className="public-hero-secondary-button rounded-full px-8 font-bold"
                 onClick={() =>
                   document
                     .getElementById("fleet")
@@ -137,38 +137,38 @@ export default function HeroSection({ locations }: HeroSectionProps) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/28 bg-white/92 p-6 shadow-[0_30px_80px_-40px_rgba(7,26,54,0.45)] backdrop-blur-md">
+          <div className="public-hero-panel rounded-2xl p-6">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-foreground">{t("booking.startDate")}</Label>
-                  <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                  <Label className="public-widget-label text-sm font-semibold">{t("booking.startDate")}</Label>
+                  <Input className="public-widget-field" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-foreground">{t("booking.endDate")}</Label>
-                  <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-foreground">{t("booking.pickupTime")}</Label>
-                  <Input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-foreground">{t("booking.dropoffTime")}</Label>
-                  <Input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} />
+                  <Label className="public-widget-label text-sm font-semibold">{t("booking.endDate")}</Label>
+                  <Input className="public-widget-field" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-                    <MapPinIcon className="h-3.5 w-3.5 text-primary" />
+                  <Label className="public-widget-label text-sm font-semibold">{t("booking.pickupTime")}</Label>
+                  <Input className="public-widget-field" type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="public-widget-label text-sm font-semibold">{t("booking.dropoffTime")}</Label>
+                  <Input className="public-widget-field" type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="public-widget-label flex items-center gap-1.5 text-sm font-semibold">
+                    <MapPinIcon className="h-3.5 w-3.5 text-[rgb(228,98,170)]" />
                     {t("booking.pickupLocation")}
                   </Label>
                   <Select value={pickupLocationId} onValueChange={setPickupLocationId}>
-                    <SelectTrigger>
+                    <SelectTrigger className="public-widget-field">
                       <SelectValue placeholder={t("booking.selectLocation")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -181,12 +181,12 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-                    <MapPinIcon className="h-3.5 w-3.5 text-primary" />
+                  <Label className="public-widget-label flex items-center gap-1.5 text-sm font-semibold">
+                    <MapPinIcon className="h-3.5 w-3.5 text-[rgb(228,98,170)]" />
                     {t("booking.dropoffLocation")}
                   </Label>
                   <Select value={dropoffLocationId} onValueChange={setDropoffLocationId}>
-                    <SelectTrigger>
+                    <SelectTrigger className="public-widget-field">
                       <SelectValue placeholder={t("booking.selectLocation")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -202,7 +202,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
 
               <Button
                 size="lg"
-                className="w-full rounded-full bg-[rgb(19,120,152)] py-6 text-base font-bold text-white shadow-[0_24px_44px_-24px_rgba(19,120,152,0.48)] hover:opacity-95"
+                className="w-full rounded-full bg-[linear-gradient(135deg,rgba(255,145,28,0.98),rgba(255,210,63,0.94))] py-6 text-base font-bold text-[rgb(120,62,9)] shadow-[0_24px_44px_-24px_rgba(255,145,28,0.42)] hover:brightness-[1.03]"
                 onClick={goToBookingPage}
               >
                 {t("booking.searchAvailability")}
