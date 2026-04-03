@@ -20,7 +20,7 @@ import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
 import { formatDateTimeLocalInput } from "@/lib/datetime";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { FilterIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { CalendarClockIcon, Clock3Icon, FilterIcon, PlusIcon, SearchIcon } from "lucide-react";
 
 export function BlockoutsClient({
   locale,
@@ -53,6 +53,9 @@ export function BlockoutsClient({
   const [note, setNote] = useState("");
   const [search, setSearch] = useState("");
   const [scopeFilter, setScopeFilter] = useState<"ALL" | "GLOBAL" | "VEHICLE">("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "UPCOMING" | "EXPIRED">("ALL");
+
+  const now = new Date();
 
   const resetForm = () => {
     setEditingId(null);
@@ -108,6 +111,12 @@ export function BlockoutsClient({
     return rows.filter((row) => {
       if (scopeFilter === "GLOBAL" && row.vehicleId) return false;
       if (scopeFilter === "VEHICLE" && !row.vehicleId) return false;
+      const rowStatus = row.startDate <= now && row.endDate > now
+        ? "ACTIVE"
+        : row.startDate > now
+          ? "UPCOMING"
+          : "EXPIRED";
+      if (statusFilter !== "ALL" && rowStatus !== statusFilter) return false;
       if (!query) return true;
 
       const haystack = [row.vehicleName || "", row.plateNumber || "", row.note || "", row.vehicleId ? "vehicle" : "global"]
@@ -116,7 +125,47 @@ export function BlockoutsClient({
 
       return haystack.includes(query);
     });
-  }, [rows, scopeFilter, search]);
+  }, [now, rows, scopeFilter, search, statusFilter]);
+
+  const summary = useMemo(() => {
+    const active = rows.filter((row) => row.startDate <= now && row.endDate > now).length;
+    const upcoming = rows.filter((row) => row.startDate > now).length;
+    const expired = rows.filter((row) => row.endDate <= now).length;
+    const global = rows.filter((row) => !row.vehicleId).length;
+    return {
+      total: rows.length,
+      active,
+      upcoming,
+      expired,
+      global,
+      vehicleSpecific: rows.length - global,
+    };
+  }, [now, rows]);
+
+  const showingStart = filteredRows.length ? 1 : 0;
+  const showingEnd = filteredRows.length;
+
+  const statusMeta = {
+    ACTIVE: {
+      label: t("admin.blockouts.status.active"),
+      className: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    },
+    UPCOMING: {
+      label: t("admin.blockouts.status.upcoming"),
+      className: "bg-amber-50 text-amber-700 ring-amber-200",
+    },
+    EXPIRED: {
+      label: t("admin.blockouts.status.expired"),
+      className: "bg-slate-100 text-slate-600 ring-slate-200",
+    },
+  } as const;
+
+  const statCards = [
+    { key: "active", label: t("admin.blockouts.stats.active"), value: summary.active, tone: "bg-emerald-50 text-emerald-700" },
+    { key: "upcoming", label: t("admin.blockouts.stats.upcoming"), value: summary.upcoming, tone: "bg-amber-50 text-amber-700" },
+    { key: "expired", label: t("admin.blockouts.stats.expired"), value: summary.expired, tone: "bg-slate-100 text-slate-700" },
+    { key: "global", label: t("admin.blockouts.stats.global"), value: summary.global, tone: "bg-violet-50 text-violet-700" },
+  ];
 
   return (
     <div className="space-y-8">
@@ -132,8 +181,18 @@ export function BlockoutsClient({
         loading={Boolean(isDeletingId)}
         onConfirm={() => pendingDeleteId ? deleteBlockout(pendingDeleteId) : undefined}
       />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {statCards.map((card) => (
+          <div key={card.key} className="admin-surface-soft rounded-[1.7rem] border-transparent p-5">
+            <div className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${card.tone}`}>
+              {card.label}
+            </div>
+            <div className="mt-4 text-3xl font-black text-slate-900">{card.value}</div>
+          </div>
+        ))}
+      </div>
       <div className="flex flex-col gap-4 rounded-[1.6rem] bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)] lg:flex-row lg:items-end lg:justify-between">
-        <div className="grid gap-4 md:grid-cols-[minmax(0,1.2fr)_220px] lg:flex-1">
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1.2fr)_220px_220px] lg:flex-1">
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("common.search")}</label>
             <div className="relative">
@@ -159,6 +218,22 @@ export function BlockoutsClient({
               <option value="ALL">{t("admin.blockouts.filters.all")}</option>
               <option value="GLOBAL">{t("admin.blockouts.filters.global")}</option>
               <option value="VEHICLE">{t("admin.blockouts.filters.vehicleSpecific")}</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <Clock3Icon className="h-4 w-4 text-slate-500" />
+              {t("admin.blockouts.filters.statusLabel")}
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as "ALL" | "ACTIVE" | "UPCOMING" | "EXPIRED")}
+              className="h-10 w-full rounded-md border px-3 text-sm"
+            >
+              <option value="ALL">{t("admin.blockouts.filters.allStatuses")}</option>
+              <option value="ACTIVE">{t("admin.blockouts.status.active")}</option>
+              <option value="UPCOMING">{t("admin.blockouts.status.upcoming")}</option>
+              <option value="EXPIRED">{t("admin.blockouts.status.expired")}</option>
             </select>
           </div>
         </div>
@@ -262,12 +337,37 @@ export function BlockoutsClient({
         </Dialog>
       </div>
 
+      <div className="admin-surface rounded-[1.6rem] border-transparent p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="text-sm text-slate-500">
+            {t("admin.shared.showing", { start: showingStart, end: showingEnd, total: filteredRows.length })}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(["ALL", "ACTIVE", "UPCOMING", "EXPIRED"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setStatusFilter(value)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] transition ${
+                  statusFilter === value
+                    ? "bg-[hsl(var(--primary))] text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {value === "ALL" ? t("admin.blockouts.filters.allStatuses") : statusMeta[value].label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
         <Table className="bg-transparent">
           <TableHeader>
             <TableRow>
               <TableHead>{t("admin.blockouts.table.scope")}</TableHead>
               <TableHead>{t("admin.vehicles.table.plate")}</TableHead>
+              <TableHead>{t("admin.blockouts.table.status")}</TableHead>
               <TableHead>{t("admin.blockouts.table.start")}</TableHead>
               <TableHead>{t("admin.blockouts.table.end")}</TableHead>
               <TableHead>{t("admin.blockouts.table.reason")}</TableHead>
@@ -278,8 +378,29 @@ export function BlockoutsClient({
           <TableBody>
             {filteredRows.length ? filteredRows.map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.vehicleName || t("admin.blockouts.form.allVehicles")}</TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    <div className="font-medium text-slate-900">{row.vehicleName || t("admin.blockouts.form.allVehicles")}</div>
+                    <div className="text-xs text-slate-500">
+                      {row.vehicleId ? t("admin.blockouts.filters.vehicleSpecific") : t("admin.blockouts.filters.global")}
+                    </div>
+                  </div>
+                </TableCell>
                 <TableCell>{row.plateNumber || "-"}</TableCell>
+                <TableCell>
+                  {(() => {
+                    const status = row.startDate <= now && row.endDate > now
+                      ? "ACTIVE"
+                      : row.startDate > now
+                        ? "UPCOMING"
+                        : "EXPIRED";
+                    return (
+                      <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ring-1 ${statusMeta[status].className}`}>
+                        {statusMeta[status].label}
+                      </span>
+                    );
+                  })()}
+                </TableCell>
                 <TableCell>{formatDateTime(row.startDate)}</TableCell>
                 <TableCell>{formatDateTime(row.endDate)}</TableCell>
                 <TableCell>
@@ -306,7 +427,7 @@ export function BlockoutsClient({
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-sm text-slate-500">
+                <TableCell colSpan={8} className="py-10 text-center text-sm text-slate-500">
                   {t("admin.blockouts.filters.empty")}
                 </TableCell>
               </TableRow>

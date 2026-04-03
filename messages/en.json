@@ -1260,13 +1260,27 @@
       "filters": {
         "searchPlaceholder": "Search vehicle, plate, or reason",
         "scopeLabel": "Scope filter",
+        "statusLabel": "Status filter",
         "all": "All blockouts",
         "global": "Global only",
         "vehicleSpecific": "Vehicle-specific only",
+        "allStatuses": "All statuses",
         "empty": "No blockouts match the current filters."
+      },
+      "status": {
+        "active": "Active",
+        "upcoming": "Upcoming",
+        "expired": "Expired"
+      },
+      "stats": {
+        "active": "Active now",
+        "upcoming": "Upcoming",
+        "expired": "Expired",
+        "global": "Global blocks"
       },
       "table": {
         "scope": "Scope",
+        "status": "Status",
         "start": "Start",
         "end": "End",
         "reason": "Reason",

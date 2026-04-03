@@ -1230,13 +1230,27 @@
       "filters": {
         "searchPlaceholder": "Buscar vehículo, placa o motivo",
         "scopeLabel": "Filtro de alcance",
+        "statusLabel": "Filtro de estado",
         "all": "Todos los bloqueos",
         "global": "Solo globales",
         "vehicleSpecific": "Solo por vehículo",
+        "allStatuses": "Todos los estados",
         "empty": "Ningún bloqueo coincide con los filtros actuales."
+      },
+      "status": {
+        "active": "Activo",
+        "upcoming": "Próximo",
+        "expired": "Vencido"
+      },
+      "stats": {
+        "active": "Activos ahora",
+        "upcoming": "Próximos",
+        "expired": "Vencidos",
+        "global": "Bloqueos globales"
       },
       "table": {
         "scope": "Alcance",
+        "status": "Estado",
         "start": "Inicio",
         "end": "Fin",
         "reason": "Motivo",

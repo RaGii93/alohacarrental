@@ -1230,13 +1230,27 @@
       "filters": {
         "searchPlaceholder": "Zoek voertuig, kenteken of reden",
         "scopeLabel": "Bereikfilter",
+        "statusLabel": "Statusfilter",
         "all": "Alle blokkades",
         "global": "Alleen globaal",
         "vehicleSpecific": "Alleen voertuigspecifiek",
+        "allStatuses": "Alle statussen",
         "empty": "Geen blokkades komen overeen met de huidige filters."
+      },
+      "status": {
+        "active": "Actief",
+        "upcoming": "Aankomend",
+        "expired": "Verlopen"
+      },
+      "stats": {
+        "active": "Nu actief",
+        "upcoming": "Aankomend",
+        "expired": "Verlopen",
+        "global": "Globale blokkades"
       },
       "table": {
         "scope": "Bereik",
+        "status": "Status",
         "start": "Start",
         "end": "Einde",
         "reason": "Reden",
