@@ -108,8 +108,8 @@ export default function FleetSection({ categories }: FleetSectionProps) {
               <div className="grid gap-4 md:grid-cols-[1.15fr_0.85fr]">
                 <div className="relative min-h-[18rem] overflow-hidden rounded-[1.7rem]">
                   <Image
-                    src="/images/bonaire/slave-huts-bonaire.jpg"
-                    alt="Historic slave huts in Bonaire"
+                    src="/images/White Slave huts.png"
+                    alt="White slave huts in Bonaire"
                     fill
                     sizes="(max-width: 768px) 100vw, 40vw"
                     className="object-cover"
