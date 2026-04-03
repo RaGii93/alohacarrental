@@ -68,8 +68,8 @@ export default function FleetSection({ categories }: FleetSectionProps) {
         style={{ transform: `translate3d(0, ${parallaxOffset}px, 0) scale(1.08)`, opacity: imageOpacity }}
       >
         <Image
-          src="/images/bonaire/slave-huts-bonaire.jpg"
-          alt="Historic slave huts in Bonaire"
+          src="/images/Yellow Slave huts.jpeg"
+          alt="Yellow slave huts in Bonaire"
           fill
           sizes="100vw"
           className="object-cover"
@@ -137,15 +137,15 @@ export default function FleetSection({ categories }: FleetSectionProps) {
 
                   <div className="relative min-h-[10rem] overflow-hidden rounded-[1.5rem]">
                     <Image
-                      src="/images/bonaire/bonaire-aerial.jpg"
-                      alt="Aerial view of Bonaire"
+                      src="/images/Salt Company.jpeg"
+                      alt="Salt company coastline in Bonaire"
                       fill
                       sizes="(max-width: 768px) 100vw, 22vw"
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(96,45,10,0.16),rgba(96,45,10,0.58))]" />
                     <div className="public-photo-label absolute bottom-3 left-3 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em]">
-                      Island rhythm
+                      Salt company
                     </div>
                   </div>
                 </div>

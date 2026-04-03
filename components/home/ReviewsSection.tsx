@@ -125,8 +125,8 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
             <div className="public-photo-frame overflow-hidden rounded-[2rem] p-4">
               <div className="relative min-h-[28rem] overflow-hidden rounded-[1.6rem]">
                 <Image
-                  src="/images/bonaire/bonaire-flamingo-sanctuary.jpg"
-                  alt="Flamingos in the Bonaire sanctuary"
+                  src="/images/Toren.jpeg"
+                  alt="Historic tower view in Bonaire"
                   fill
                   sizes="(max-width: 1280px) 100vw, 34vw"
                   className="object-cover"

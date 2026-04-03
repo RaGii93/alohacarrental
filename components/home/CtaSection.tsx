@@ -19,8 +19,8 @@ export default function CtaSection() {
             <div className="relative overflow-hidden rounded-[1.9rem]">
               <div className="absolute inset-0">
                 <Image
-                  src="/images/bonaire/bonaire-aerial.jpg"
-                  alt="Aerial coastline view of Bonaire"
+                  src="/images/Salt Company2.jpeg"
+                  alt="Salt company shoreline in Bonaire"
                   fill
                   sizes="100vw"
                   className="object-cover"

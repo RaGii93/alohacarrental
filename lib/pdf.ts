@@ -1,6 +1,6 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import { TenantConfig } from "./tenant";
-import { getBaseUrl } from "./seo";
+import { documentBranding, hexToRgbUnit, resolveTenantAssetUrl } from "./document-branding";
 
 export interface InvoiceData {
   documentType?: "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
@@ -25,15 +25,6 @@ export interface InvoiceData {
   extras?: Array<{ name: string; quantity: number; lineTotal: number }>;
   paymentInstructions: string;
   tenantConfig: TenantConfig;
-}
-
-function resolveLogoUrl(rawUrl: string | undefined) {
-  const logoUrl = String(rawUrl || "").trim();
-  if (!logoUrl) return "";
-  if (logoUrl.startsWith("http://") || logoUrl.startsWith("https://")) return logoUrl;
-  if (!logoUrl.startsWith("/")) return "";
-  const baseUrl = getBaseUrl();
-  return `${baseUrl.replace(/\/$/, "")}${logoUrl}`;
 }
 
 async function loadLogoImageForPdf(pdfDoc: PDFDocument, logoUrl: string) {
@@ -77,13 +68,22 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
   const { width, height } = page.getSize();
   const margin = 42;
   const contentWidth = width - margin * 2;
-  const blue = rgb(0.12, 0.24, 0.52);
-  const lightBlue = rgb(0.93, 0.96, 1);
-  const dark = rgb(0.1, 0.1, 0.12);
-  const muted = rgb(0.38, 0.4, 0.45);
-  const border = rgb(0.86, 0.88, 0.92);
-  const okBg = rgb(0.9, 0.98, 0.92);
-  const okText = rgb(0.12, 0.47, 0.22);
+  const pdfColor = (hex: string) => {
+    const { r, g, b } = hexToRgbUnit(hex);
+    return rgb(r, g, b);
+  };
+  const blue = pdfColor(documentBranding.body);
+  const warm = pdfColor(documentBranding.warmSurface);
+  const blush = pdfColor(documentBranding.blushSurface);
+  const paper = pdfColor(documentBranding.surface);
+  const dark = pdfColor(documentBranding.title);
+  const muted = pdfColor(documentBranding.muted);
+  const border = pdfColor(documentBranding.line);
+  const accentOrange = pdfColor(documentBranding.orange);
+  const accentPink = pdfColor(documentBranding.pink);
+  const accentYellow = pdfColor(documentBranding.yellow);
+  const okBg = pdfColor(documentBranding.successBg);
+  const okText = pdfColor(documentBranding.successText);
 
   const currency = (cents: number) =>
     `${data.tenantConfig.currency} ${(Math.max(0, cents) / 100).toFixed(2)}`;
@@ -95,15 +95,37 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     Math.ceil((data.endDate.getTime() - data.startDate.getTime()) / (1000 * 60 * 60 * 24))
   );
 
+  page.drawRectangle({
+    x: 0,
+    y: 0,
+    width,
+    height,
+    color: pdfColor(documentBranding.canvas),
+  });
+
   // Header bar
   page.drawRectangle({
     x: 0,
-    y: height - 120,
+    y: height - 132,
     width,
-    height: 120,
-    color: blue,
+    height: 132,
+    color: warm,
   });
-  const resolvedLogoUrl = resolveLogoUrl(data.tenantConfig.logoUrl);
+  page.drawRectangle({
+    x: 0,
+    y: height - 12,
+    width,
+    height: 12,
+    color: accentPink,
+  });
+  page.drawRectangle({
+    x: 0,
+    y: height - 28,
+    width,
+    height: 16,
+    color: accentOrange,
+  });
+  const resolvedLogoUrl = resolveTenantAssetUrl(data.tenantConfig.logoUrl);
   const embeddedLogo = await loadLogoImageForPdf(pdfDoc, resolvedLogoUrl);
   if (embeddedLogo) {
     const logoMaxHeight = 52;
@@ -111,45 +133,51 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     const logoWidth = embeddedLogo.width * logoScale;
     page.drawImage(embeddedLogo, {
       x: margin,
-      y: height - 84,
+      y: height - 94,
       width: logoWidth,
       height: logoMaxHeight,
     });
   } else {
     page.drawText(data.tenantConfig.logoUrl || "LOGO", {
       x: margin,
-      y: height - 55,
+      y: height - 61,
       size: 14,
-      color: rgb(1, 1, 1),
+      color: dark,
     });
   }
+  page.drawText(data.tenantConfig.tenantName, {
+    x: embeddedLogo ? margin + 88 : margin,
+    y: height - 56,
+    size: 18,
+    color: blue,
+  });
   page.drawText(documentTitle, {
     x: margin,
-    y: height - 82,
+    y: height - 110,
     size: 12,
-    color: rgb(0.9, 0.94, 1),
+    color: accentPink,
   });
   page.drawText(`Invoice Date: ${new Date().toLocaleDateString()}`, {
     x: width - margin - 170,
-    y: height - 55,
+    y: height - 58,
     size: 10,
-    color: rgb(1, 1, 1),
+    color: dark,
   });
   page.drawText(`Booking Code: ${data.bookingCode}`, {
     x: width - margin - 170,
-    y: height - 72,
+    y: height - 75,
     size: 10,
-    color: rgb(1, 1, 1),
+    color: dark,
   });
   page.drawText(`Invoice ID: ${data.orderId}`, {
     x: width - margin - 170,
-    y: height - 89,
+    y: height - 92,
     size: 10,
-    color: rgb(0.9, 0.94, 1),
+    color: blue,
   });
 
   // Company meta
-  let y = height - 146;
+  let y = height - 162;
   page.drawText(data.tenantConfig.address || "-", {
     x: margin,
     y,
@@ -174,7 +202,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: y - cardHeight,
     width: cardW,
     height: cardHeight,
-    color: lightBlue,
+    color: blush,
     borderColor: border,
     borderWidth: 1,
   });
@@ -183,7 +211,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: y - cardHeight,
     width: cardW,
     height: cardHeight,
-    color: rgb(1, 1, 1),
+    color: paper,
     borderColor: border,
     borderWidth: 1,
   });
@@ -231,10 +259,10 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: ty - 28,
     width: tableW,
     height: 28,
-    color: blue,
+    color: accentOrange,
   });
-  page.drawText("DESCRIPTION", { x: tableX + leftPadding, y: ty - 18, size: 10, color: rgb(1, 1, 1) });
-  page.drawText("AMOUNT", { x: rightX, y: ty - 18, size: 10, color: rgb(1, 1, 1) });
+  page.drawText("DESCRIPTION", { x: tableX + leftPadding, y: ty - 18, size: 10, color: dark });
+  page.drawText("AMOUNT", { x: rightX, y: ty - 18, size: 10, color: dark });
   ty -= 28;
 
   const drawRow = (label: string, amount: string, emphasis = false) => {
@@ -244,7 +272,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       y: ty - h,
       width: tableW,
       height: h,
-      color: emphasis ? lightBlue : rgb(1, 1, 1),
+      color: emphasis ? warm : paper,
       borderColor: border,
       borderWidth: 1,
     });
@@ -290,7 +318,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     width: 182,
     height: 24,
     color: okBg,
-    borderColor: rgb(0.77, 0.93, 0.8),
+    borderColor: accentYellow,
     borderWidth: 1,
   });
   page.drawText(paymentStatusText, {
