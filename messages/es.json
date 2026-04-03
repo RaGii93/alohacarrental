@@ -1222,6 +1222,19 @@
         "create": "Crear bloqueo",
         "update": "Actualizar bloqueo"
       },
+      "actions": {
+        "new": "Nuevo bloqueo",
+        "newTitle": "Crear bloqueo de disponibilidad",
+        "editTitle": "Editar bloqueo de disponibilidad"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar vehículo, placa o motivo",
+        "scopeLabel": "Filtro de alcance",
+        "all": "Todos los bloqueos",
+        "global": "Solo globales",
+        "vehicleSpecific": "Solo por vehículo",
+        "empty": "Ningún bloqueo coincide con los filtros actuales."
+      },
       "table": {
         "scope": "Alcance",
         "start": "Inicio",

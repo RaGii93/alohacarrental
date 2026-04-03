@@ -1222,6 +1222,19 @@
         "create": "Blokkade aanmaken",
         "update": "Blokkade bijwerken"
       },
+      "actions": {
+        "new": "Nieuwe blokkade",
+        "newTitle": "Beschikbaarheidsblokkade aanmaken",
+        "editTitle": "Beschikbaarheidsblokkade bewerken"
+      },
+      "filters": {
+        "searchPlaceholder": "Zoek voertuig, kenteken of reden",
+        "scopeLabel": "Bereikfilter",
+        "all": "Alle blokkades",
+        "global": "Alleen globaal",
+        "vehicleSpecific": "Alleen voertuigspecifiek",
+        "empty": "Geen blokkades komen overeen met de huidige filters."
+      },
       "table": {
         "scope": "Bereik",
         "start": "Start",

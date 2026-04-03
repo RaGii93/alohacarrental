@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,9 @@ import { createVehicleBlockoutAction, deleteVehicleBlockoutAction, updateVehicle
 import { CompactText } from "@/components/shared/CompactText";
 import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
 import { formatDateTimeLocalInput } from "@/lib/datetime";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { FilterIcon, PlusIcon, SearchIcon } from "lucide-react";
 
 export function BlockoutsClient({
   locale,
@@ -43,13 +46,17 @@ export function BlockoutsClient({
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [vehicleId, setVehicleId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [note, setNote] = useState("");
+  const [search, setSearch] = useState("");
+  const [scopeFilter, setScopeFilter] = useState<"ALL" | "GLOBAL" | "VEHICLE">("ALL");
 
   const resetForm = () => {
     setEditingId(null);
+    setIsModalOpen(false);
     setVehicleId("");
     setStartDate("");
     setEndDate("");
@@ -89,11 +96,27 @@ export function BlockoutsClient({
 
   const startEditing = (row: (typeof rows)[number]) => {
     setEditingId(row.id);
+    setIsModalOpen(true);
     setVehicleId(row.vehicleId || "");
     setStartDate(formatDateTimeLocalInput(row.startDate));
     setEndDate(formatDateTimeLocalInput(row.endDate));
     setNote(row.note || "");
   };
+
+  const filteredRows = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return rows.filter((row) => {
+      if (scopeFilter === "GLOBAL" && row.vehicleId) return false;
+      if (scopeFilter === "VEHICLE" && !row.vehicleId) return false;
+      if (!query) return true;
+
+      const haystack = [row.vehicleName || "", row.plateNumber || "", row.note || "", row.vehicleId ? "vehicle" : "global"]
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [rows, scopeFilter, search]);
 
   return (
     <div className="space-y-8">
@@ -109,72 +132,135 @@ export function BlockoutsClient({
         loading={Boolean(isDeletingId)}
         onConfirm={() => pendingDeleteId ? deleteBlockout(pendingDeleteId) : undefined}
       />
-      <form action={createBlockout} className="grid gap-4 rounded-[1.6rem] bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)] md:grid-cols-2 xl:grid-cols-5">
-        {editingId ? <input type="hidden" name="blockoutId" value={editingId} /> : null}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t("admin.blockouts.form.vehicleScope")}</label>
-          <select
-            name="vehicleId"
-            value={vehicleId}
-            onChange={(e) => setVehicleId(e.target.value)}
-            className="h-10 w-full rounded-md border px-3 text-sm"
-          >
-            <option value="">{t("admin.blockouts.form.allVehicles")}</option>
-            {vehicles.map((vehicle) => (
-              <option key={vehicle.id} value={vehicle.id}>
-                {vehicle.name}{vehicle.plateNumber ? ` (${vehicle.plateNumber})` : ""}
-              </option>
-            ))}
-          </select>
+      <div className="flex flex-col gap-4 rounded-[1.6rem] bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)] lg:flex-row lg:items-end lg:justify-between">
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1.2fr)_220px] lg:flex-1">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("common.search")}</label>
+            <div className="relative">
+              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("admin.blockouts.filters.searchPlaceholder")}
+                className="pl-9"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <FilterIcon className="h-4 w-4 text-slate-500" />
+              {t("admin.blockouts.filters.scopeLabel")}
+            </label>
+            <select
+              value={scopeFilter}
+              onChange={(e) => setScopeFilter(e.target.value as "ALL" | "GLOBAL" | "VEHICLE")}
+              className="h-10 w-full rounded-md border px-3 text-sm"
+            >
+              <option value="ALL">{t("admin.blockouts.filters.all")}</option>
+              <option value="GLOBAL">{t("admin.blockouts.filters.global")}</option>
+              <option value="VEHICLE">{t("admin.blockouts.filters.vehicleSpecific")}</option>
+            </select>
+          </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t("admin.blockouts.form.start")}</label>
-          <input
-            name="startDate"
-            type="datetime-local"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="h-10 w-full rounded-md border px-3 text-sm"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t("admin.blockouts.form.end")}</label>
-          <input
-            name="endDate"
-            type="datetime-local"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="h-10 w-full rounded-md border px-3 text-sm"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t("admin.blockouts.form.reason")}</label>
-          <input
-            name="note"
-            type="text"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="h-10 w-full rounded-md border px-3 text-sm"
-            placeholder={t("admin.blockouts.form.optionalNote")}
-          />
-        </div>
-        <div className="flex items-end gap-2">
-          <Button type="submit" disabled={isSaving} className="w-full">
-            {isSaving
-              ? t("admin.blockouts.form.saving")
-              : editingId
-                ? t("admin.blockouts.form.update")
-                : t("admin.blockouts.form.create")}
-          </Button>
-          {editingId ? (
-            <Button type="button" variant="outline" onClick={resetForm}>
-              {t("common.cancel")}
+
+        <Dialog
+          open={isModalOpen}
+          onOpenChange={(open) => {
+            setIsModalOpen(open);
+            if (!open) resetForm();
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button
+              type="button"
+              className="rounded-full"
+              onClick={() => {
+                setEditingId(null);
+                setVehicleId("");
+                setStartDate("");
+                setEndDate("");
+                setNote("");
+                setIsModalOpen(true);
+              }}
+            >
+              <PlusIcon className="h-4 w-4" />
+              {t("admin.blockouts.actions.new")}
             </Button>
-          ) : null}
-        </div>
-      </form>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {editingId ? t("admin.blockouts.actions.editTitle") : t("admin.blockouts.actions.newTitle")}
+              </DialogTitle>
+              <DialogDescription>{t("admin.blockouts.description")}</DialogDescription>
+            </DialogHeader>
+            <form action={createBlockout} className="grid gap-4 md:grid-cols-2">
+              {editingId ? <input type="hidden" name="blockoutId" value={editingId} /> : null}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium">{t("admin.blockouts.form.vehicleScope")}</label>
+                <select
+                  name="vehicleId"
+                  value={vehicleId}
+                  onChange={(e) => setVehicleId(e.target.value)}
+                  className="h-10 w-full rounded-md border px-3 text-sm"
+                >
+                  <option value="">{t("admin.blockouts.form.allVehicles")}</option>
+                  {vehicles.map((vehicle) => (
+                    <option key={vehicle.id} value={vehicle.id}>
+                      {vehicle.name}{vehicle.plateNumber ? ` (${vehicle.plateNumber})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t("admin.blockouts.form.start")}</label>
+                <input
+                  name="startDate"
+                  type="datetime-local"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="h-10 w-full rounded-md border px-3 text-sm"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t("admin.blockouts.form.end")}</label>
+                <input
+                  name="endDate"
+                  type="datetime-local"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="h-10 w-full rounded-md border px-3 text-sm"
+                  required
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium">{t("admin.blockouts.form.reason")}</label>
+                <input
+                  name="note"
+                  type="text"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="h-10 w-full rounded-md border px-3 text-sm"
+                  placeholder={t("admin.blockouts.form.optionalNote")}
+                />
+              </div>
+              <DialogFooter className="md:col-span-2">
+                <Button type="button" variant="outline" onClick={resetForm}>
+                  {t("common.cancel")}
+                </Button>
+                <Button type="submit" disabled={isSaving}>
+                  {isSaving
+                    ? t("admin.blockouts.form.saving")
+                    : editingId
+                      ? t("admin.blockouts.form.update")
+                      : t("admin.blockouts.form.create")}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
         <Table className="bg-transparent">
@@ -190,7 +276,7 @@ export function BlockoutsClient({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((row) => (
+            {filteredRows.length ? filteredRows.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.vehicleName || t("admin.blockouts.form.allVehicles")}</TableCell>
                 <TableCell>{row.plateNumber || "-"}</TableCell>
@@ -218,7 +304,13 @@ export function BlockoutsClient({
                   </Button>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={7} className="py-10 text-center text-sm text-slate-500">
+                  {t("admin.blockouts.filters.empty")}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

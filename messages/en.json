@@ -1252,6 +1252,19 @@
         "create": "Create blockout",
         "update": "Update blockout"
       },
+      "actions": {
+        "new": "New blockout",
+        "newTitle": "Create availability block",
+        "editTitle": "Edit availability block"
+      },
+      "filters": {
+        "searchPlaceholder": "Search vehicle, plate, or reason",
+        "scopeLabel": "Scope filter",
+        "all": "All blockouts",
+        "global": "Global only",
+        "vehicleSpecific": "Vehicle-specific only",
+        "empty": "No blockouts match the current filters."
+      },
       "table": {
         "scope": "Scope",
         "start": "Start",
