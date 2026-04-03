@@ -60,8 +60,8 @@ export default function WhyChooseSection() {
             <div className="public-photo-frame overflow-hidden rounded-[2rem] p-4">
               <div className="relative min-h-[28rem] overflow-hidden rounded-[1.55rem]">
                 <Image
-                  src="/images/bonaire/kralendijk-waterfront.jpg"
-                  alt="Waterfront in Kralendijk, Bonaire"
+                  src="/images/SeaView.jpeg"
+                  alt="Sea view in Bonaire"
                   fill
                   sizes="(max-width: 1024px) 100vw, 42vw"
                   className="object-cover"
