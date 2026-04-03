@@ -17,7 +17,7 @@ export default async function AdminBlockoutsPage({
   const [vehicles, rows] = await Promise.all([
     db.vehicle.findMany({
       where: { status: { not: "INACTIVE" } },
-      select: { id: true, name: true },
+      select: { id: true, name: true, plateNumber: true },
       orderBy: { name: "asc" },
     }),
     listVehicleBlockouts(),

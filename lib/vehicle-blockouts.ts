@@ -31,6 +31,7 @@ export async function listVehicleBlockouts() {
       vb.id,
       vb."vehicleId",
       v.name AS "vehicleName",
+      v."plateNumber" AS "plateNumber",
       vb."startDate",
       vb."endDate",
       vb.note,

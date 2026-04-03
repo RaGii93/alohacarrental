@@ -3,25 +3,8 @@ import { redirect } from "next/navigation";
 import { BookingEditForm } from "@/components/admin/BookingEditForm";
 import { db } from "@/lib/db";
 import { requireAdminSection } from "@/app/[locale]/admin/_lib";
+import { formatDateForInput, formatDateTimeLocalInput } from "@/lib/datetime";
 import { getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
-
-function toLocalDateTimeInput(date: Date | null | undefined) {
-  if (!date) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-function toLocalDateInput(date: Date | null | undefined) {
-  if (!date) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
 
 export default async function BookingEditPage({
   params,
@@ -167,11 +150,11 @@ export default async function BookingEditPage({
           customerEmail: booking.customerEmail,
           customerPhone: booking.customerPhone,
           flightNumber: booking.flightNumber || "",
-          birthDate: toLocalDateInput(booking.birthDate),
+          birthDate: formatDateForInput(booking.birthDate),
           driverLicenseNumber: booking.driverLicenseNumber || "",
-          licenseExpiryDate: toLocalDateInput(booking.licenseExpiryDate),
-          startDate: toLocalDateTimeInput(booking.startDate),
-          endDate: toLocalDateTimeInput(booking.endDate),
+          licenseExpiryDate: formatDateForInput(booking.licenseExpiryDate),
+          startDate: formatDateTimeLocalInput(booking.startDate),
+          endDate: formatDateTimeLocalInput(booking.endDate),
           pickupLocationId: booking.pickupLocationId || "",
           dropoffLocationId: booking.dropoffLocationId || "",
           notes: booking.notes || "",

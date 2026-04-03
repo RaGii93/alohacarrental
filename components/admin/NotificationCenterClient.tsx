@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { dismissNotificationAction } from "@/actions/notifications";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { formatDateTime } from "@/lib/datetime";
 import {
   Popover,
   PopoverContent,
@@ -153,7 +154,7 @@ export function NotificationCenterClient({
                     {getSeverityLabel(notification.severity)}
                   </span>
                   <span className="text-xs text-slate-500">
-                    {new Date(notification.createdAt).toLocaleString()}
+                    {formatDateTime(notification.createdAt)}
                   </span>
                 </div>
                 <div>

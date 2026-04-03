@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatDate } from "@/lib/datetime";
 import { formatCurrency } from "@/lib/pricing";
 
 type PartRow = {
@@ -269,7 +270,7 @@ export function InventoryOverviewClient({
                   <div>
                     <p className="font-semibold text-slate-900">{transaction.inventoryPartName}</p>
                     <p className="mt-1 text-xs text-slate-600">
-                      {t(`admin.inventory.transactionTypes.${transaction.type.toLowerCase()}` as any)} · {new Date(transaction.transactionDate).toLocaleDateString()} · {t("admin.inventory.table.qty")} {transaction.quantity}
+                      {t(`admin.inventory.transactionTypes.${transaction.type.toLowerCase()}` as any)} · {formatDate(transaction.transactionDate)} · {t("admin.inventory.table.qty")} {transaction.quantity}
                     </p>
                     {transaction.notes ? <p className="mt-2 text-sm text-slate-600">{transaction.notes}</p> : null}
                   </div>

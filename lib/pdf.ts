@@ -1,6 +1,7 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import { TenantConfig } from "./tenant";
 import { documentBranding, hexToRgbUnit, resolveTenantAssetUrl } from "./document-branding";
+import { formatDate, formatDateTime } from "./datetime";
 
 export interface InvoiceData {
   documentType?: "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
@@ -89,7 +90,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     `${data.tenantConfig.currency} ${(Math.max(0, cents) / 100).toFixed(2)}`;
   const formatPercentage = (value: number) =>
     Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
-  const fmtDate = (d: Date) => d.toLocaleString();
+  const fmtDate = (d: Date) => formatDateTime(d);
   const rentalDays = Math.max(
     1,
     Math.ceil((data.endDate.getTime() - data.startDate.getTime()) / (1000 * 60 * 60 * 24))
@@ -157,7 +158,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     size: 12,
     color: accentPink,
   });
-  page.drawText(`Invoice Date: ${new Date().toLocaleDateString()}`, {
+  page.drawText(`Invoice Date: ${formatDate(new Date())}`, {
     x: width - margin - 170,
     y: height - 58,
     size: 10,

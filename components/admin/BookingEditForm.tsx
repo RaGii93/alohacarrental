@@ -13,6 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BadgeDollarSign, Banknote, CalendarClock, CarFront, FileText, MapPin, Plane, Plus, Receipt, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { updateCategoryBookingAction } from "@/actions/booking";
 import { calculateBookingAmounts, calculateDays, formatCurrency } from "@/lib/pricing";
+import {
+  parseKralendijkDate,
+  parseKralendijkDateTime,
+} from "@/lib/datetime";
 
 export function BookingEditForm({
   booking,
@@ -88,11 +92,6 @@ export function BookingEditForm({
     }))
   );
 
-  const dateInputToIso = (value: string, endOfDay = false) => {
-    const suffix = endOfDay ? "T23:59:59" : "T00:00:00";
-    return new Date(`${value}${suffix}`).toISOString();
-  };
-
   const handleSubmit = async () => {
     if (!birthDate || !licenseExpiryDate || !startDate || !endDate || !pickupLocationId || !dropoffLocationId) {
       toast.error(t("admin.bookings.edit.messages.completeRequired"));
@@ -107,11 +106,20 @@ export function BookingEditForm({
       formData.append("customerEmail", customerEmail);
       formData.append("customerPhone", customerPhone);
       formData.append("flightNumber", flightNumber);
-      formData.append("birthDate", dateInputToIso(birthDate));
+      const parsedBirthDate = parseKralendijkDate(birthDate);
+      const parsedLicenseExpiryDate = parseKralendijkDate(licenseExpiryDate, true);
+      const parsedStartDate = parseKralendijkDateTime(startDate);
+      const parsedEndDate = parseKralendijkDateTime(endDate);
+      if (!parsedBirthDate || !parsedLicenseExpiryDate || !parsedStartDate || !parsedEndDate) {
+        toast.error(t("admin.bookings.edit.messages.completeRequired"));
+        return;
+      }
+
+      formData.append("birthDate", parsedBirthDate.toISOString());
       formData.append("driverLicenseNumber", driverLicenseNumber);
-      formData.append("licenseExpiryDate", dateInputToIso(licenseExpiryDate, true));
-      formData.append("startDate", new Date(startDate).toISOString());
-      formData.append("endDate", new Date(endDate).toISOString());
+      formData.append("licenseExpiryDate", parsedLicenseExpiryDate.toISOString());
+      formData.append("startDate", parsedStartDate.toISOString());
+      formData.append("endDate", parsedEndDate.toISOString());
       formData.append("pickupLocationId", pickupLocationId);
       formData.append("dropoffLocationId", dropoffLocationId);
       formData.append("notes", notes);
@@ -138,8 +146,8 @@ export function BookingEditForm({
   const inputClass = "rounded-xl border-slate-200 bg-white/90 focus-visible:border-sky-300 focus-visible:ring-sky-200";
   const vehicleOptions = vehicles.filter((vehicle) => vehicle.categoryId === categoryId);
   const selectedCategory = categories.find((category) => category.id === categoryId) || null;
-  const parsedStartDate = startDate ? new Date(startDate) : null;
-  const parsedEndDate = endDate ? new Date(endDate) : null;
+  const parsedStartDate = startDate ? parseKralendijkDateTime(startDate) : null;
+  const parsedEndDate = endDate ? parseKralendijkDateTime(endDate) : null;
   const rentalDays =
     parsedStartDate && parsedEndDate && parsedEndDate > parsedStartDate
       ? calculateDays(parsedStartDate, parsedEndDate)

@@ -7,6 +7,7 @@ import { getTenantConfig } from "@/lib/tenant";
 import { getTermsEmailAttachment } from "@/lib/terms";
 import { logAdminAction } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { parseKralendijkDateTime } from "@/lib/datetime";
 import { ensureExternalRentalTable } from "@/lib/external-rentals";
 import { calculateDays } from "@/lib/pricing";
 
@@ -57,8 +58,8 @@ export async function createExternalRentalAction(formData: FormData, locale: str
     const paymentStatus = String(formData.get("paymentStatus") || "UNPAID").trim().toUpperCase();
     const paymentMethod = String(formData.get("paymentMethod") || "").trim();
     const paymentReference = String(formData.get("paymentReference") || "").trim();
-    const startDate = new Date(String(formData.get("startDate") || ""));
-    const endDate = new Date(String(formData.get("endDate") || ""));
+    const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
+    const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
     const incomeAmountRaw = parseMoneyToCents(String(formData.get("incomeAmount") || ""));
     const expenseAmountRaw = parseMoneyToCents(String(formData.get("expenseAmount") || ""));
     const dailyIncomeRate = parseMoneyToCents(String(formData.get("dailyIncomeRate") || ""));
@@ -72,8 +73,8 @@ export async function createExternalRentalAction(formData: FormData, locale: str
       !customerPhone ||
       !pickupLocation ||
       !dropoffLocation ||
-      Number.isNaN(startDate.getTime()) ||
-      Number.isNaN(endDate.getTime()) ||
+      !startDate ||
+      !endDate ||
       endDate <= startDate ||
       (
         (!Number.isFinite(incomeAmountRaw) || !Number.isFinite(expenseAmountRaw)) &&

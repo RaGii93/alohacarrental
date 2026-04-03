@@ -14,9 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDateTime } from "@/lib/datetime";
-import { createVehicleBlockoutAction, deleteVehicleBlockoutAction } from "@/actions/blockouts";
+import { createVehicleBlockoutAction, deleteVehicleBlockoutAction, updateVehicleBlockoutAction } from "@/actions/blockouts";
 import { CompactText } from "@/components/shared/CompactText";
 import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
+import { formatDateTimeLocalInput } from "@/lib/datetime";
 
 export function BlockoutsClient({
   locale,
@@ -24,11 +25,12 @@ export function BlockoutsClient({
   rows,
 }: {
   locale: string;
-  vehicles: Array<{ id: string; name: string }>;
+  vehicles: Array<{ id: string; name: string; plateNumber: string | null }>;
   rows: Array<{
     id: string;
     vehicleId: string | null;
     vehicleName: string | null;
+    plateNumber: string | null;
     startDate: Date;
     endDate: Date;
     note: string | null;
@@ -40,16 +42,35 @@ export function BlockoutsClient({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [vehicleId, setVehicleId] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [note, setNote] = useState("");
+
+  const resetForm = () => {
+    setEditingId(null);
+    setVehicleId("");
+    setStartDate("");
+    setEndDate("");
+    setNote("");
+  };
 
   const createBlockout = async (formData: FormData) => {
     setIsSaving(true);
-    const result = await createVehicleBlockoutAction(formData, locale);
+    const result = editingId
+      ? await updateVehicleBlockoutAction(formData, locale)
+      : await createVehicleBlockoutAction(formData, locale);
     setIsSaving(false);
     if (!result.success) {
-      toast.error(result.error || t("admin.blockouts.messages.createFailed"));
+      toast.error(
+        result.error ||
+          (editingId ? t("admin.blockouts.messages.updateFailed") : t("admin.blockouts.messages.createFailed"))
+      );
       return;
     }
-    toast.success(t("admin.blockouts.messages.created"));
+    toast.success(editingId ? t("admin.blockouts.messages.updated") : t("admin.blockouts.messages.created"));
+    resetForm();
     router.refresh();
   };
 
@@ -64,6 +85,14 @@ export function BlockoutsClient({
     }
     toast.success(t("admin.blockouts.messages.deleted"));
     router.refresh();
+  };
+
+  const startEditing = (row: (typeof rows)[number]) => {
+    setEditingId(row.id);
+    setVehicleId(row.vehicleId || "");
+    setStartDate(formatDateTimeLocalInput(row.startDate));
+    setEndDate(formatDateTimeLocalInput(row.endDate));
+    setNote(row.note || "");
   };
 
   return (
@@ -81,33 +110,69 @@ export function BlockoutsClient({
         onConfirm={() => pendingDeleteId ? deleteBlockout(pendingDeleteId) : undefined}
       />
       <form action={createBlockout} className="grid gap-4 rounded-[1.6rem] bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)] md:grid-cols-2 xl:grid-cols-5">
+        {editingId ? <input type="hidden" name="blockoutId" value={editingId} /> : null}
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("admin.blockouts.form.vehicleScope")}</label>
-          <select name="vehicleId" className="h-10 w-full rounded-md border px-3 text-sm">
+          <select
+            name="vehicleId"
+            value={vehicleId}
+            onChange={(e) => setVehicleId(e.target.value)}
+            className="h-10 w-full rounded-md border px-3 text-sm"
+          >
             <option value="">{t("admin.blockouts.form.allVehicles")}</option>
             {vehicles.map((vehicle) => (
               <option key={vehicle.id} value={vehicle.id}>
-                {vehicle.name}
+                {vehicle.name}{vehicle.plateNumber ? ` (${vehicle.plateNumber})` : ""}
               </option>
             ))}
           </select>
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("admin.blockouts.form.start")}</label>
-          <input name="startDate" type="datetime-local" className="h-10 w-full rounded-md border px-3 text-sm" required />
+          <input
+            name="startDate"
+            type="datetime-local"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="h-10 w-full rounded-md border px-3 text-sm"
+            required
+          />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("admin.blockouts.form.end")}</label>
-          <input name="endDate" type="datetime-local" className="h-10 w-full rounded-md border px-3 text-sm" required />
+          <input
+            name="endDate"
+            type="datetime-local"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="h-10 w-full rounded-md border px-3 text-sm"
+            required
+          />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("admin.blockouts.form.reason")}</label>
-          <input name="note" type="text" className="h-10 w-full rounded-md border px-3 text-sm" placeholder={t("admin.blockouts.form.optionalNote")} />
+          <input
+            name="note"
+            type="text"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="h-10 w-full rounded-md border px-3 text-sm"
+            placeholder={t("admin.blockouts.form.optionalNote")}
+          />
         </div>
-        <div className="flex items-end">
+        <div className="flex items-end gap-2">
           <Button type="submit" disabled={isSaving} className="w-full">
-            {isSaving ? t("admin.blockouts.form.saving") : t("admin.blockouts.form.create")}
+            {isSaving
+              ? t("admin.blockouts.form.saving")
+              : editingId
+                ? t("admin.blockouts.form.update")
+                : t("admin.blockouts.form.create")}
           </Button>
+          {editingId ? (
+            <Button type="button" variant="outline" onClick={resetForm}>
+              {t("common.cancel")}
+            </Button>
+          ) : null}
         </div>
       </form>
 
@@ -116,6 +181,7 @@ export function BlockoutsClient({
           <TableHeader>
             <TableRow>
               <TableHead>{t("admin.blockouts.table.scope")}</TableHead>
+              <TableHead>{t("admin.vehicles.table.plate")}</TableHead>
               <TableHead>{t("admin.blockouts.table.start")}</TableHead>
               <TableHead>{t("admin.blockouts.table.end")}</TableHead>
               <TableHead>{t("admin.blockouts.table.reason")}</TableHead>
@@ -127,13 +193,21 @@ export function BlockoutsClient({
             {rows.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.vehicleName || t("admin.blockouts.form.allVehicles")}</TableCell>
+                <TableCell>{row.plateNumber || "-"}</TableCell>
                 <TableCell>{formatDateTime(row.startDate)}</TableCell>
                 <TableCell>{formatDateTime(row.endDate)}</TableCell>
                 <TableCell>
                   <CompactText text={row.note} expandedTitle={t("admin.blockouts.table.fullReason")} />
                 </TableCell>
                 <TableCell>{formatDateTime(row.createdAt)}</TableCell>
-                <TableCell>
+                <TableCell className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => startEditing(row)}
+                  >
+                    {t("common.edit")}
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"

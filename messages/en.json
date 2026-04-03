@@ -1249,7 +1249,8 @@
         "reason": "Reason",
         "optionalNote": "Optional note",
         "saving": "Saving...",
-        "create": "Create blockout"
+        "create": "Create blockout",
+        "update": "Update blockout"
       },
       "table": {
         "scope": "Scope",
@@ -1263,8 +1264,10 @@
       },
       "messages": {
         "created": "Blockout created.",
+        "updated": "Blockout updated.",
         "deleted": "Blockout deleted.",
         "createFailed": "Failed to create blockout",
+        "updateFailed": "Failed to update blockout",
         "deleteFailed": "Failed to delete blockout"
       },
       "title": "Availability Blocks",

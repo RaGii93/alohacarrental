@@ -7,6 +7,7 @@ import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { logAdminAction } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { parseKralendijkDateTime } from "@/lib/datetime";
 import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 
 async function requireBlockoutAdmin() {
@@ -23,11 +24,11 @@ export async function createVehicleBlockoutAction(formData: FormData, locale: st
 
   const vehicleIdRaw = String(formData.get("vehicleId") || "").trim();
   const vehicleId = vehicleIdRaw || null;
-  const startDate = new Date(String(formData.get("startDate") || ""));
-  const endDate = new Date(String(formData.get("endDate") || ""));
+  const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
+  const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
   const note = String(formData.get("note") || "").trim() || null;
 
-  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate <= startDate) {
+  if (!startDate || !endDate || endDate <= startDate) {
     return { success: false as const, error: "Invalid date range" };
   }
 
@@ -39,6 +40,43 @@ export async function createVehicleBlockoutAction(formData: FormData, locale: st
   await logAdminAction({
     adminUserId: auth.session.adminUserId,
     action: vehicleId ? "VEHICLE_BLOCKOUT_CREATED" : "GLOBAL_BLOCKOUT_CREATED",
+  });
+  revalidatePath(`/${locale}/admin/blockouts`);
+  return { success: true as const };
+}
+
+export async function updateVehicleBlockoutAction(formData: FormData, locale: string) {
+  const auth = await requireBlockoutAdmin();
+  if (!auth.ok) return { success: false as const, error: auth.error };
+
+  const blockoutId = String(formData.get("blockoutId") || "").trim();
+  const vehicleIdRaw = String(formData.get("vehicleId") || "").trim();
+  const vehicleId = vehicleIdRaw || null;
+  const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
+  const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
+  const note = String(formData.get("note") || "").trim() || null;
+
+  if (!blockoutId) {
+    return { success: false as const, error: "Missing blockout id" };
+  }
+
+  if (!startDate || !endDate || endDate <= startDate) {
+    return { success: false as const, error: "Invalid date range" };
+  }
+
+  await ensureVehicleBlockoutsTable();
+  await db.$executeRaw`
+    UPDATE "VehicleBlockout"
+    SET
+      "vehicleId" = ${vehicleId},
+      "startDate" = ${startDate},
+      "endDate" = ${endDate},
+      note = ${note}
+    WHERE id = ${blockoutId}
+  `;
+  await logAdminAction({
+    adminUserId: auth.session.adminUserId,
+    action: vehicleId ? "VEHICLE_BLOCKOUT_UPDATED" : "GLOBAL_BLOCKOUT_UPDATED",
   });
   revalidatePath(`/${locale}/admin/blockouts`);
   return { success: true as const };

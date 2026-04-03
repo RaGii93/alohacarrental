@@ -11,6 +11,7 @@ import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { calculateDriverLicenseDeleteAfter } from "@/lib/driver-license-retention";
+import { formatDate, parseKralendijkDate, parseKralendijkDateTime } from "@/lib/datetime";
 import { getBookingHoldDays, getBookingRuleSettings, getInvoiceProvider, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { logAdminAction } from "@/lib/audit";
 import { calculateBookingAmounts, calculateFuelDifferenceCharge, calculateLateReturnCharge, evaluateBookingRules, getFuelChargePerQuarterForCategory } from "@/lib/pricing";
@@ -1405,11 +1406,11 @@ export async function createCategoryBookingAction(
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
     const flightNumber = ((formData.get("flightNumber") as string | null) || "").trim();
-    const birthDate = new Date(formData.get("birthDate") as string);
+    const birthDate = parseKralendijkDate(String(formData.get("birthDate") || ""));
     const driverLicenseNumber = formData.get("driverLicenseNumber") as string;
-    const licenseExpiryDate = new Date(formData.get("licenseExpiryDate") as string);
-    const startDate = new Date(formData.get("startDate") as string);
-    const endDate = new Date(formData.get("endDate") as string);
+    const licenseExpiryDate = parseKralendijkDate(String(formData.get("licenseExpiryDate") || ""), true);
+    const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
+    const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
     const pickupLocationId = (formData.get("pickupLocationId") as string | null) || null;
     const dropoffLocationId = (formData.get("dropoffLocationId") as string | null) || null;
     const pickupLocation = (formData.get("pickupLocation") as string | null) || null;
@@ -1451,11 +1452,12 @@ export async function createCategoryBookingAction(
       return { success: false, error: "Terms must be accepted" };
     }
 
+    if (!birthDate || !licenseExpiryDate || !startDate || !endDate) {
+      return { success: false, error: "Invalid booking date values" };
+    }
+
     if (startDate >= endDate) {
       return { success: false, error: "Invalid date range" };
-    }
-    if (Number.isNaN(birthDate.getTime()) || Number.isNaN(licenseExpiryDate.getTime())) {
-      return { success: false, error: "Invalid birth date or license expiry date" };
     }
 
     const validated = await categoryBookingFormSchemaRefined.parseAsync({
@@ -1746,7 +1748,7 @@ export async function createCategoryBookingAction(
       await createNotification({
         type: "BOOKING_CREATED",
         title: "New booking request received",
-        message: `${booking.customerName} requested ${category.name} from ${booking.startDate.toLocaleDateString()} to ${booking.endDate.toLocaleDateString()}.`,
+        message: `${booking.customerName} requested ${category.name} from ${formatDate(booking.startDate)} to ${formatDate(booking.endDate)}.`,
         href: `/${locale}/admin/bookings/${booking.id}`,
         severity: "INFO",
       });
@@ -1838,16 +1840,20 @@ export async function updateCategoryBookingAction(
     const customerEmail = String(formData.get("customerEmail") || "");
     const customerPhone = String(formData.get("customerPhone") || "");
     const flightNumber = String(formData.get("flightNumber") || "").trim();
-    const birthDate = new Date(String(formData.get("birthDate") || ""));
+    const birthDate = parseKralendijkDate(String(formData.get("birthDate") || ""));
     const driverLicenseNumber = String(formData.get("driverLicenseNumber") || "");
-    const licenseExpiryDate = new Date(String(formData.get("licenseExpiryDate") || ""));
-    const startDate = new Date(String(formData.get("startDate") || ""));
-    const endDate = new Date(String(formData.get("endDate") || ""));
+    const licenseExpiryDate = parseKralendijkDate(String(formData.get("licenseExpiryDate") || ""), true);
+    const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
+    const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
     const vehicleId = String(formData.get("vehicleId") || "").trim();
     const pickupLocationId = String(formData.get("pickupLocationId") || "");
     const dropoffLocationId = String(formData.get("dropoffLocationId") || "");
     const notes = String(formData.get("notes") || "");
     const extrasPayload = String(formData.get("selectedExtras") || "[]");
+
+    if (!birthDate || !licenseExpiryDate || !startDate || !endDate) {
+      return { success: false, error: "Invalid booking date values" };
+    }
 
     const validated = await adminCategoryBookingUpdateSchemaRefined.parseAsync({
       categoryId,

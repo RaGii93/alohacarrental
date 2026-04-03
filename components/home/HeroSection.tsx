@@ -16,30 +16,25 @@ import {
 } from "@/components/ui/select.tsx";
 import { MapPinIcon } from "lucide-react";
 import { toast } from "sonner";
+import { formatDateForInput, parseKralendijkDate, parseKralendijkDateTime } from "@/lib/datetime";
 
 const HERO_BG = "/home/hero-bg.png";
 type HeroSectionProps = {
   locations: { id: string; name: string; address?: string | null }[];
 };
 
-function toIsoDate(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
 export default function HeroSection({ locations }: HeroSectionProps) {
   const t = useTranslations();
   const router = useRouter();
 
   const defaults = useMemo(() => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const today = formatDateForInput(new Date());
+    const todayDate = parseKralendijkDate(today) || new Date();
+    const tomorrow = new Date(todayDate);
+    tomorrow.setDate(todayDate.getDate() + 1);
     return {
-      startDate: toIsoDate(today),
-      endDate: toIsoDate(tomorrow),
+      startDate: today,
+      endDate: formatDateForInput(tomorrow),
       pickupLocationId: locations[0]?.id ?? "",
       dropoffLocationId: locations[0]?.id ?? "",
     };
@@ -58,8 +53,12 @@ export default function HeroSection({ locations }: HeroSectionProps) {
       return;
     }
 
-    const start = new Date(`${startDate}T${pickupTime}`);
-    const end = new Date(`${endDate}T${dropoffTime}`);
+    const start = parseKralendijkDateTime(`${startDate}T${pickupTime}`);
+    const end = parseKralendijkDateTime(`${endDate}T${dropoffTime}`);
+    if (!start || !end) {
+      toast.error(t("landing.hero.completeFields"));
+      return;
+    }
     if (!(start < end)) {
       toast.error(t("booking.errors.endBeforeStart"));
       return;
