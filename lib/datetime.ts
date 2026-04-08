@@ -69,6 +69,10 @@ export function formatDateTimeLocalInput(input: DateInput): string {
 
 export function parseKralendijkDate(value: string, endOfDay = false): Date | null {
   const normalized = String(value || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}T/.test(normalized)) {
+    const isoDate = new Date(normalized);
+    return Number.isNaN(isoDate.getTime()) ? null : isoDate;
+  }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return null;
   const time = endOfDay ? "23:59:59" : "00:00:00";
   const date = new Date(`${normalized}T${time}${KRALENDIJK_UTC_OFFSET}`);
@@ -77,6 +81,10 @@ export function parseKralendijkDate(value: string, endOfDay = false): Date | nul
 
 export function parseKralendijkDateTime(value: string): Date | null {
   const normalized = String(value || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(normalized)) {
+    const isoDate = new Date(normalized);
+    return Number.isNaN(isoDate.getTime()) ? null : isoDate;
+  }
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(normalized)) return null;
   const withSeconds = normalized.length === 16 ? `${normalized}:00` : normalized;
   const date = new Date(`${withSeconds}${KRALENDIJK_UTC_OFFSET}`);
