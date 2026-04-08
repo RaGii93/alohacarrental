@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 
 const TAX_KEY = "tax_percentage";
@@ -417,45 +418,78 @@ export function calculateTaxAmount(subtotalCents: number, taxPercentage: number)
   return Math.max(0, Math.round(Math.max(0, subtotalCents) * (clampTaxPercentage(taxPercentage) / 100)));
 }
 
+let hasWarnedAboutSettingsReadFallback = false;
+
+function shouldFallbackToDefaultSettings(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return error.code === "P2021" || error.code === "ETIMEDOUT";
+  }
+
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      message.includes("timeout") ||
+      message.includes("timed out") ||
+      message.includes("\"appsetting\"") ||
+      message.includes("appsetting")
+    );
+  }
+
+  return false;
+}
+
+function warnAboutSettingsReadFallback(error: unknown) {
+  if (hasWarnedAboutSettingsReadFallback) return;
+  hasWarnedAboutSettingsReadFallback = true;
+  console.warn("Falling back to default app settings because AppSetting could not be read.", error);
+}
+
 async function ensureSettingsTable(): Promise<void> {
-  await db.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "AppSetting" (
-      key TEXT PRIMARY KEY,
-      value TEXT NOT NULL,
-      "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
-    )
-  `);
+  return;
 }
 
 export async function getAppSettingsMap(keys: string[]): Promise<Record<string, string>> {
   if (keys.length === 0) return {};
-  await ensureSettingsTable();
-  const rows = await db.appSetting.findMany({
-    where: { key: { in: keys } },
-    select: { key: true, value: true },
-  });
-  return Object.fromEntries(rows.map((row) => [row.key, String(row.value || "")]));
+
+  try {
+    const rows = await db.appSetting.findMany({
+      where: { key: { in: keys } },
+      select: { key: true, value: true },
+    });
+    return Object.fromEntries(rows.map((row) => [row.key, String(row.value || "")]));
+  } catch (error) {
+    if (shouldFallbackToDefaultSettings(error)) {
+      warnAboutSettingsReadFallback(error);
+      return {};
+    }
+    throw error;
+  }
 }
 
 export async function getAppSettingValue(key: string): Promise<string> {
-  await ensureSettingsTable();
-
-  const rows = await db.$queryRaw<Array<{ value: string }>>`
-    SELECT value FROM "AppSetting" WHERE key = ${key} LIMIT 1
-  `;
-
-  return String(rows[0]?.value || "");
+  try {
+    const row = await db.appSetting.findUnique({
+      where: { key },
+      select: { value: true },
+    });
+    return String(row?.value || "");
+  } catch (error) {
+    if (shouldFallbackToDefaultSettings(error)) {
+      warnAboutSettingsReadFallback(error);
+      return "";
+    }
+    throw error;
+  }
 }
 
 export async function setAppSettingValue(key: string, value: string): Promise<void> {
   await ensureSettingsTable();
 
-  await db.$executeRaw`
-    INSERT INTO "AppSetting" (key, value, "updatedAt")
-    VALUES (${key}, ${String(value || "")}, NOW())
-    ON CONFLICT (key)
-    DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
-  `;
+  await db.appSetting.upsert({
+    where: { key },
+    create: { key, value: String(value || "") },
+    update: { value: String(value || "") },
+  });
 }
 
 export async function setAppSettingValues(values: Record<string, string | undefined>): Promise<void> {
@@ -463,12 +497,11 @@ export async function setAppSettingValues(values: Record<string, string | undefi
   const entries = Object.entries(values);
   await Promise.all(
     entries.map(([key, value]) =>
-      db.$executeRaw`
-        INSERT INTO "AppSetting" (key, value, "updatedAt")
-        VALUES (${key}, ${String(value || "")}, NOW())
-        ON CONFLICT (key)
-        DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
-      `
+      db.appSetting.upsert({
+        where: { key },
+        create: { key, value: String(value || "") },
+        update: { value: String(value || "") },
+      })
     )
   );
 }
@@ -483,12 +516,11 @@ export async function setTaxPercentage(nextTaxPercentage: number): Promise<numbe
   await ensureSettingsTable();
 
   const normalized = clampTaxPercentage(nextTaxPercentage);
-  await db.$executeRaw`
-    INSERT INTO "AppSetting" (key, value, "updatedAt")
-    VALUES (${TAX_KEY}, ${String(normalized)}, NOW())
-    ON CONFLICT (key)
-    DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
-  `;
+  await db.appSetting.upsert({
+    where: { key: TAX_KEY },
+    create: { key: TAX_KEY, value: String(normalized) },
+    update: { value: String(normalized) },
+  });
 
   return normalized;
 }
@@ -503,12 +535,11 @@ export async function setVehicleRatesIncludeTax(nextValue: boolean): Promise<boo
   await ensureSettingsTable();
 
   const normalized = Boolean(nextValue);
-  await db.$executeRaw`
-    INSERT INTO "AppSetting" (key, value, "updatedAt")
-    VALUES (${VEHICLE_RATES_INCLUDE_TAX_KEY}, ${normalized ? "true" : "false"}, NOW())
-    ON CONFLICT (key)
-    DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
-  `;
+  await db.appSetting.upsert({
+    where: { key: VEHICLE_RATES_INCLUDE_TAX_KEY },
+    create: { key: VEHICLE_RATES_INCLUDE_TAX_KEY, value: normalized ? "true" : "false" },
+    update: { value: normalized ? "true" : "false" },
+  });
 
   return normalized;
 }
@@ -535,12 +566,11 @@ export async function setMinBookingDays(nextMinBookingDays: number): Promise<num
   await ensureSettingsTable();
 
   const normalized = clampMinBookingDays(nextMinBookingDays);
-  await db.$executeRaw`
-    INSERT INTO "AppSetting" (key, value, "updatedAt")
-    VALUES (${MIN_BOOKING_DAYS_KEY}, ${String(normalized)}, NOW())
-    ON CONFLICT (key)
-    DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
-  `;
+  await db.appSetting.upsert({
+    where: { key: MIN_BOOKING_DAYS_KEY },
+    create: { key: MIN_BOOKING_DAYS_KEY, value: String(normalized) },
+    update: { value: String(normalized) },
+  });
 
   return normalized;
 }
@@ -555,12 +585,11 @@ export async function setBookingHoldDays(nextBookingHoldDays: number): Promise<n
   await ensureSettingsTable();
 
   const normalized = clampBookingHoldDays(nextBookingHoldDays);
-  await db.$executeRaw`
-    INSERT INTO "AppSetting" (key, value, "updatedAt")
-    VALUES (${BOOKING_HOLD_DAYS_KEY}, ${String(normalized)}, NOW())
-    ON CONFLICT (key)
-    DO UPDATE SET value = EXCLUDED.value, "updatedAt" = NOW()
-  `;
+  await db.appSetting.upsert({
+    where: { key: BOOKING_HOLD_DAYS_KEY },
+    create: { key: BOOKING_HOLD_DAYS_KEY, value: String(normalized) },
+    update: { value: String(normalized) },
+  });
 
   return normalized;
 }

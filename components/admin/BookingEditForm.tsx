@@ -14,6 +14,8 @@ import { BadgeDollarSign, Banknote, CalendarClock, CarFront, FileText, MapPin, P
 import { updateCategoryBookingAction } from "@/actions/booking";
 import { calculateBookingAmounts, calculateDays, formatCurrency } from "@/lib/pricing";
 import {
+  formatDateForInput,
+  formatDateTimeLocalInput,
   parseKralendijkDate,
   parseKralendijkDateTime,
 } from "@/lib/datetime";
@@ -115,11 +117,11 @@ export function BookingEditForm({
         return;
       }
 
-      formData.append("birthDate", parsedBirthDate.toISOString());
+      formData.append("birthDate", formatDateForInput(parsedBirthDate));
       formData.append("driverLicenseNumber", driverLicenseNumber);
-      formData.append("licenseExpiryDate", parsedLicenseExpiryDate.toISOString());
-      formData.append("startDate", parsedStartDate.toISOString());
-      formData.append("endDate", parsedEndDate.toISOString());
+      formData.append("licenseExpiryDate", formatDateForInput(parsedLicenseExpiryDate));
+      formData.append("startDate", formatDateTimeLocalInput(parsedStartDate));
+      formData.append("endDate", formatDateTimeLocalInput(parsedEndDate));
       formData.append("pickupLocationId", pickupLocationId);
       formData.append("dropoffLocationId", dropoffLocationId);
       formData.append("notes", notes);

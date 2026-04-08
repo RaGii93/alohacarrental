@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
@@ -26,6 +27,19 @@ import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { ensureZohoBookingColumns, markBookingBillingDocumentZoho, queueBookingZohoTransfer } from "@/lib/zoho-bookings";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
+
+function shouldSkipExpiredHoldCleanup(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return error.code === "ETIMEDOUT" || error.code === "P2021";
+  }
+
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return message.includes("timeout") || message.includes("timed out") || message.includes("\"booking\"");
+  }
+
+  return false;
+}
 
 async function getCustomerTermsEmailData() {
   const terms = await getTermsEmailAttachment();
@@ -284,23 +298,41 @@ async function selectAvailableVehicleForBooking(params: {
 }
 
 export async function cancelExpiredHolds() {
-  const expiredBookings = await db.booking.findMany({
-    where: {
-      status: "PENDING",
-      holdExpiresAt: {
-        lt: new Date(),
+  let expiredBookings: Array<{
+    id: string;
+    customerEmail: string;
+    customerName: string;
+    bookingCode: string;
+    startDate: Date;
+    endDate: Date;
+    totalAmount: number;
+  }> = [];
+
+  try {
+    expiredBookings = await db.booking.findMany({
+      where: {
+        status: "PENDING",
+        holdExpiresAt: {
+          lt: new Date(),
+        },
       },
-    },
-    select: {
-      id: true,
-      customerEmail: true,
-      customerName: true,
-      bookingCode: true,
-      startDate: true,
-      endDate: true,
-      totalAmount: true,
-    },
-  });
+      select: {
+        id: true,
+        customerEmail: true,
+        customerName: true,
+        bookingCode: true,
+        startDate: true,
+        endDate: true,
+        totalAmount: true,
+      },
+    });
+  } catch (error) {
+    if (shouldSkipExpiredHoldCleanup(error)) {
+      console.warn("Skipping expired hold cleanup because bookings could not be queried.", error);
+      return 0;
+    }
+    throw error;
+  }
 
   if (expiredBookings.length === 0) return 0;
 

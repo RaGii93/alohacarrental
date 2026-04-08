@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { cancelExpiredHolds } from "./booking";
 import { getBookingRuleSettings } from "@/lib/settings";
@@ -40,7 +41,18 @@ export async function searchAvailabilityAction(
 
   // Cancel expired holds first
   await cancelExpiredHolds();
-  await ensureVehicleBlockoutsTable();
+  const canUseVehicleBlockouts = await ensureVehicleBlockoutsTable();
+  const blockoutVehicleClause = canUseVehicleBlockouts
+    ? Prisma.sql`
+          AND NOT EXISTS (
+            SELECT 1
+            FROM "VehicleBlockout" vb
+            WHERE (vb."vehicleId" IS NULL OR vb."vehicleId" = v.id)
+              AND vb."startDate" < ${endDate}
+              AND vb."endDate" > ${startDate}
+          )
+      `
+    : Prisma.sql``;
 
   // Some runtime environments may not expose the generated model accessor (db.vehicleCategory)
   // fall back to a raw query if it's not available to avoid TypeError on server.
@@ -96,13 +108,7 @@ export async function searchAvailabilityAction(
                 OR (b."status" = 'PENDING' AND b."holdExpiresAt" > now())
               )
           )
-          AND NOT EXISTS (
-            SELECT 1
-            FROM "VehicleBlockout" vb
-            WHERE (vb."vehicleId" IS NULL OR vb."vehicleId" = v.id)
-              AND vb."startDate" < ${endDate}
-              AND vb."endDate" > ${startDate}
-          )
+          ${blockoutVehicleClause}
       `;
       availableCount = rows?.[0]?.count ?? 0;
     } else if (hasVehicleCategory) {
@@ -122,13 +128,7 @@ export async function searchAvailabilityAction(
                 OR (b."status" = 'PENDING' AND b."holdExpiresAt" > now())
               )
           )
-          AND NOT EXISTS (
-            SELECT 1
-            FROM "VehicleBlockout" vb
-            WHERE (vb."vehicleId" IS NULL OR vb."vehicleId" = v.id)
-              AND vb."startDate" < ${endDate}
-              AND vb."endDate" > ${startDate}
-          )
+          ${blockoutVehicleClause}
       `;
       availableCount = rows?.[0]?.count ?? 0;
     } else if (hasBookingCategoryId) {
@@ -149,13 +149,15 @@ export async function searchAvailabilityAction(
           )
           AND "categoryId" = ${category.id}
       `;
-      const globalBlockRows = await db.$queryRaw<Array<{ count: number }>>`
-        SELECT COUNT(*)::int AS count
-        FROM "VehicleBlockout"
-        WHERE "vehicleId" IS NULL
-          AND "startDate" < ${endDate}
-          AND "endDate" > ${startDate}
-      `;
+      const globalBlockRows = canUseVehicleBlockouts
+        ? await db.$queryRaw<Array<{ count: number }>>`
+            SELECT COUNT(*)::int AS count
+            FROM "VehicleBlockout"
+            WHERE "vehicleId" IS NULL
+              AND "startDate" < ${endDate}
+              AND "endDate" > ${startDate}
+          `
+        : [];
       availableCount = globalBlockRows?.[0]?.count ? 0 : Math.max(0, totalVehicles - (bookingRows?.[0]?.count ?? 0));
     }
     const pricing = evaluateBookingRules({

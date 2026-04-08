@@ -29,7 +29,7 @@ import { AvailabilityResult } from "@/actions/availability";
 import { createCategoryBookingAction } from "@/actions/booking";
 import { calculateDays, evaluateBookingRules, formatCurrency } from "@/lib/pricing";
 import { BookingData } from "../BookingWizard";
-import { formatDate, formatDateTime } from "@/lib/datetime";
+import { formatDate, formatDateForInput, formatDateTime, formatDateTimeLocalInput } from "@/lib/datetime";
 import { combinePhoneNumber } from "@/lib/phone";
 import type { BookingRuleSettings } from "@/lib/settings";
 
@@ -105,9 +105,9 @@ export function Step3Review({
       formData.append("customerEmail", bookingData.customerEmail);
       formData.append("customerPhone", customerPhone);
       formData.append("flightNumber", bookingData.flightNumber);
-      formData.append("birthDate", bookingData.birthDate.toISOString());
+      formData.append("birthDate", formatDateForInput(bookingData.birthDate));
       formData.append("driverLicenseNumber", bookingData.driverLicenseNumber);
-      formData.append("licenseExpiryDate", bookingData.licenseExpiryDate.toISOString());
+      formData.append("licenseExpiryDate", formatDateForInput(bookingData.licenseExpiryDate));
       if (!pickupDateTime || !dropoffDateTime || dropoffDateTime <= pickupDateTime) {
         toast.error(t("booking.errors.endBeforeStart"));
         setIsSubmitting(false);
@@ -123,8 +123,8 @@ export function Step3Review({
         setIsSubmitting(false);
         return;
       }
-      formData.append("startDate", pickupDateTime.toISOString());
-      formData.append("endDate", dropoffDateTime.toISOString());
+      formData.append("startDate", formatDateTimeLocalInput(pickupDateTime));
+      formData.append("endDate", formatDateTimeLocalInput(dropoffDateTime));
       formData.append("pickupLocationId", bookingData.pickupLocationId);
       formData.append("dropoffLocationId", bookingData.dropoffLocationId);
       formData.append("driverLicenseUrl", bookingData.driverLicenseUrl);
