@@ -8,6 +8,7 @@ import { buildMetadata } from "@/lib/seo";
 import { getBookingJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
 import { getBookingRuleSettings, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
+import { getTermsPdfUrl } from "@/lib/terms";
 import { SearchCode } from "lucide-react";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 
@@ -38,12 +39,13 @@ export default async function BookingPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations();
-  const [tenant, taxPercentage, minimumBookingDays, vehicleRatesIncludeTax, bookingRuleSettings] = await Promise.all([
+  const [tenant, taxPercentage, minimumBookingDays, vehicleRatesIncludeTax, bookingRuleSettings, termsPdfUrl] = await Promise.all([
     getTenantConfig(),
     getTaxPercentage(),
     getMinBookingDays(),
     getVehicleRatesIncludeTax(),
     getBookingRuleSettings(),
+    getTermsPdfUrl(locale),
   ]);
   const jsonLd = getBookingJsonLd(locale, tenant);
 
@@ -122,7 +124,7 @@ export default async function BookingPage({
             vehicleRatesIncludeTax={vehicleRatesIncludeTax}
             minimumBookingDays={minimumBookingDays}
             bookingRuleSettings={bookingRuleSettings}
-            termsPdfUrl={tenant.termsPdfUrl}
+            termsPdfUrl={termsPdfUrl}
           />
         </div>
       </section>

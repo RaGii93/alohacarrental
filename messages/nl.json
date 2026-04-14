@@ -229,7 +229,7 @@
   "landing": {
     "title": "Welkom bij Aloha Car Rental",
     "subtitle": "Reserveer je voertuig gemakkelijk",
-    "tagline": "Rijd Je Dromen",
+    "tagline": "Your Local Island Ride",
     "badge": "🚗 Premium Voertuig Verhuur Service",
     "cta": "Start Nu met Reserveren",
     "features": "Snel reserveringsproces • Veilige betalingen • Geverifieerde bestuurders",
@@ -626,11 +626,13 @@
     "documentUnavailable": "Geen document beschikbaar",
     "backToBooking": "Terug naar reserveren",
     "reviewLookup": {
-      "cta": "Reservering bekijken",
+      "cta": "Review achterlaten",
+      "modalTitle": "Laat een echte review achter",
+      "modalDescription": "Voer je reserveringscode in om door te gaan naar de geverifieerde reviewflow.",
       "title": "Bekijk je reservering",
       "subtitle": "Voer je reserveringscode in om je reserveringsgegevens te bekijken.",
       "placeholder": "Voer reserveringscode in",
-      "submit": "Bekijk reservering",
+      "submit": "Doorgaan",
       "notFound": "Geen reservering gevonden voor deze reserveringscode.",
       "detailsTitle": "Reserveringsdetails"
     },

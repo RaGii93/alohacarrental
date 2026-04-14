@@ -3,6 +3,8 @@ import { TenantConfig } from "./tenant";
 import { documentBranding, hexToRgbUnit, resolveTenantAssetUrl } from "./document-branding";
 import { formatDate, formatDateTime } from "./datetime";
 
+const TENANT_SLOGAN = "Your Local Island Ride";
+
 export interface InvoiceData {
   documentType?: "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
   orderId: string;
@@ -151,6 +153,12 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: height - 56,
     size: 18,
     color: blue,
+  });
+  page.drawText(TENANT_SLOGAN, {
+    x: embeddedLogo ? margin + 88 : margin,
+    y: height - 72,
+    size: 10,
+    color: muted,
   });
   page.drawText(documentTitle, {
     x: margin,

@@ -37,7 +37,7 @@ export default function CtaSection() {
                     {t("landing.ctaSection.title")}
                   </h2>
                   <p className="max-w-2xl text-base leading-8 text-white/82 sm:text-lg">
-                    {t("landing.ctaSection.subtitle")}
+                    {t("landing.tagline")}
                   </p>
                 </div>
 

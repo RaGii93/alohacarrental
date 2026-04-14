@@ -101,7 +101,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
               </span> Car Rental
             </h1>
             <p className="text-[2rem] font-semibold text-[rgba(255,247,237,0.96)] drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
-              {t("landing.hero.featureLine")}
+              {t("landing.tagline")}
             </p>
             <p className="max-w-3xl text-2xl text-white/86 drop-shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
               {t("landing.ctaSection.subtitle")}

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { db } from "@/lib/db";
-import { getTenantConfig } from "@/lib/tenant";
 import { getBookingRuleSettings, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
+import { getTermsPdfUrl } from "@/lib/terms";
 import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 
@@ -18,8 +18,7 @@ export default async function AdminNewBookingPage({
     redirect(`/${locale}/admin/bookings`);
   }
 
-  const [tenant, taxPercentage, minimumBookingDays, bookingRules, vehicleRatesIncludeTax, locations, categories] = await Promise.all([
-    getTenantConfig(),
+  const [taxPercentage, minimumBookingDays, bookingRules, vehicleRatesIncludeTax, locations, categories, termsPdfUrl] = await Promise.all([
     getTaxPercentage(),
     getMinBookingDays(),
     getBookingRuleSettings(),
@@ -44,6 +43,7 @@ export default async function AdminNewBookingPage({
       },
       orderBy: { sortOrder: "asc" },
     }),
+    getTermsPdfUrl(locale),
   ]);
 
   let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
@@ -82,7 +82,7 @@ export default async function AdminNewBookingPage({
           vehicleRatesIncludeTax={vehicleRatesIncludeTax}
           minimumBookingDays={minimumBookingDays}
           bookingRuleSettings={bookingRules}
-          termsPdfUrl={tenant.termsPdfUrl}
+          termsPdfUrl={termsPdfUrl}
           bookingSource="admin"
         />
       </div>

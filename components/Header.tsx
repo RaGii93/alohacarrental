@@ -105,7 +105,7 @@ export function Header() {
               </div>
               <div className="min-w-0">
                 <div className={cn("text-base font-black uppercase tracking-[0.24em]", darkChrome ? "text-white" : "text-[hsl(var(--foreground))]")}>
-                  Aloha
+                  Aloha Bonaire
                 </div>
                 <div className={cn("flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.28em]", darkChrome ? "text-white/62" : "text-[hsl(var(--muted-foreground))]")}>
                   <Sparkles className="h-3 w-3" />

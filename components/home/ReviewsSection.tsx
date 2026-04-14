@@ -3,10 +3,13 @@
 import Image from "next/image";
 import { MessageCircleMoreIcon, StarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Card } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/datetime";
+import { useRouter } from "@/i18n/navigation";
 import Reveal from "./Reveal";
 
 type ReviewItem = {
@@ -46,8 +49,11 @@ function StarRating({ count }: { count: number }) {
 
 export default function ReviewsSection({ reviews, loading = false, faqItems }: ReviewsSectionProps) {
   const t = useTranslations();
+  const router = useRouter();
   const [cardsPerView, setCardsPerView] = useState(3);
   const [activePage, setActivePage] = useState(0);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [bookingCode, setBookingCode] = useState("");
   const visibleReviews = reviews.filter((review) => review?.isVisible !== false);
   const averageRating = visibleReviews.length
     ? (visibleReviews.reduce((sum, review) => sum + review.rating, 0) / visibleReviews.length).toFixed(1)
@@ -85,6 +91,14 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
     return () => window.clearInterval(interval);
   }, [pageCount]);
 
+  const submitReviewLookup = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const normalizedCode = bookingCode.trim();
+    if (!normalizedCode) return;
+    setReviewModalOpen(false);
+    router.push(`/book/review?code=${encodeURIComponent(normalizedCode)}`);
+  };
+
   return (
     <section className="public-shell-bg relative overflow-hidden px-4 py-16 pb-24 sm:px-6 lg:px-8 lg:py-24">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(228,98,170,0.1),transparent_28%),radial-gradient(circle_at_85%_15%,rgba(255,210,63,0.16),transparent_24%),radial-gradient(circle_at_10%_85%,rgba(255,145,28,0.12),transparent_26%)]" />
@@ -100,6 +114,13 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
             <p className="public-postcard-copy max-w-2xl text-base sm:text-lg">
               {t("landing.reviews.subtitle")}
             </p>
+            <Button
+              type="button"
+              className="public-primary-button rounded-full px-6 font-bold"
+              onClick={() => setReviewModalOpen(true)}
+            >
+              {t("booking.reviewLookup.cta")}
+            </Button>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
@@ -230,6 +251,35 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
           </div>
         </div>
       </div>
+
+      <Dialog open={reviewModalOpen} onOpenChange={setReviewModalOpen}>
+        <DialogContent className="rounded-[1.75rem] border-white/60 bg-white/95 p-0 backdrop-blur-xl">
+          <div className="p-6 sm:p-7">
+            <DialogHeader className="space-y-2">
+              <DialogTitle className="text-2xl font-bold text-[hsl(var(--foreground))]">
+                {t("booking.reviewLookup.modalTitle")}
+              </DialogTitle>
+              <DialogDescription className="text-sm leading-6 text-[hsl(var(--muted-foreground))]">
+                {t("booking.reviewLookup.modalDescription")}
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={submitReviewLookup} className="mt-6 space-y-4">
+              <Input
+                value={bookingCode}
+                onChange={(event) => setBookingCode(event.target.value)}
+                placeholder={t("booking.reviewLookup.placeholder")}
+                className="h-12 rounded-full border-white/60 bg-white/90 px-4"
+              />
+              <div className="flex justify-end">
+                <Button type="submit" className="public-primary-button rounded-full px-6 font-bold">
+                  {t("booking.reviewLookup.submit")}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

@@ -52,7 +52,7 @@ export default function SiteFooter() {
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-white/58">
               Aloha Car Rental
             </p>
-            <p className="text-sm text-white/78">{t("landing.ctaSection.subtitle")}</p>
+            <p className="text-sm text-white/78">{t("landing.tagline")}</p>
             <p className="pt-3 text-xs text-white/56">
               © {year} Aloha Car Rental. All rights reserved.
             </p>

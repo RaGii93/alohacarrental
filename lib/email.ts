@@ -2,6 +2,8 @@ import { getTenantConfig } from "@/lib/tenant";
 import { formatDateTime } from "@/lib/datetime";
 import { documentBranding, escapeHtml, resolveTenantAssetUrl } from "@/lib/document-branding";
 
+const TENANT_SLOGAN = "Your Local Island Ride";
+
 type SendEmailParams = {
   to: string | string[];
   subject: string;
@@ -73,6 +75,7 @@ export async function bookingEmailHtml(input: {
   const dropoff = formatDateTime(input.endDate);
 
   const safeTenant = escapeHtml(tenant.tenantName);
+  const safeSlogan = escapeHtml(TENANT_SLOGAN);
   const safeTitle = escapeHtml(input.title);
   const safeName = escapeHtml(input.customerName);
   const safeBookingCode = escapeHtml(input.bookingCode);
@@ -113,6 +116,7 @@ export async function bookingEmailHtml(input: {
               </td>
               <td style="vertical-align:middle;text-align:right;">
                 <p style="margin:0;font-size:12px;letter-spacing:.12em;color:${documentBranding.pink};text-transform:uppercase;font-weight:700;">${safeTenant}</p>
+                <p style="margin:8px 0 0 0;font-size:12px;letter-spacing:.08em;color:${documentBranding.muted};text-transform:uppercase;font-weight:700;">${safeSlogan}</p>
                 <h2 style="margin:8px 0 0 0;font-size:26px;line-height:1.2;color:${documentBranding.title};">${safeTitle}</h2>
               </td>
             </tr>

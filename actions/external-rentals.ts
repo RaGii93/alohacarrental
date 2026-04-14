@@ -148,7 +148,7 @@ export async function createExternalRentalAction(formData: FormData, locale: str
 
     try {
       const tenant = await getTenantConfig();
-      const terms = await getTermsEmailAttachment();
+      const terms = await getTermsEmailAttachment(locale);
       const html = await bookingEmailHtml({
         title: "Your booking has been confirmed",
         customerName,

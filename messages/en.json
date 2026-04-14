@@ -229,7 +229,7 @@
   "landing": {
     "title": "Welcome to Aloha Car Rental",
     "subtitle": "Book your vehicle with ease",
-    "tagline": "Drive Your Dreams",
+    "tagline": "Your Local Island Ride",
     "badge": "🚗 Premium Vehicle Rental Service",
     "cta": "Start Booking Now",
     "features": "Fast booking process • Secure payments • Verified drivers",
@@ -626,11 +626,13 @@
     "documentUnavailable": "No document available",
     "backToBooking": "Back to booking",
     "reviewLookup": {
-      "cta": "Review booking",
+      "cta": "Leave a review",
+      "modalTitle": "Leave an authentic review",
+      "modalDescription": "Enter your booking code to continue to the verified review flow.",
       "title": "Review your booking",
       "subtitle": "Enter your booking code to view your booking details.",
       "placeholder": "Enter booking code",
-      "submit": "View booking",
+      "submit": "Continue",
       "notFound": "No booking found for this booking code.",
       "detailsTitle": "Booking details"
     },
