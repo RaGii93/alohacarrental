@@ -156,7 +156,12 @@ export default async function FAQPage({
                         <div className="text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(125,211,252)]">
                           {t("common.email")}
                         </div>
-                        <p className="mt-1 text-sm font-medium text-white">{tenant.email}</p>
+                        <a
+                          href={`mailto:${tenant.email}`}
+                          className="mt-1 inline-block text-sm font-medium text-white underline decoration-white/30 underline-offset-4 transition hover:text-[rgb(94,234,212)] hover:decoration-[rgb(94,234,212)]"
+                        >
+                          {tenant.email}
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -168,7 +173,12 @@ export default async function FAQPage({
                         <div className="text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(125,211,252)]">
                           {t("common.phone")}
                         </div>
-                        <p className="mt-1 text-sm font-medium text-white">{tenant.phone}</p>
+                        <a
+                          href={`tel:${tenant.phone.replace(/[^\d+]/g, "")}`}
+                          className="mt-1 inline-block text-sm font-medium text-white underline decoration-white/30 underline-offset-4 transition hover:text-[rgb(94,234,212)] hover:decoration-[rgb(94,234,212)]"
+                        >
+                          {tenant.phone}
+                        </a>
                       </div>
                     </div>
                   </div>

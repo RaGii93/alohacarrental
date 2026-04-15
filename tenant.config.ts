@@ -8,7 +8,7 @@ import { TenantConfig } from "@/lib/tenant";
 export const tenantConfig: TenantConfig = {
   tenantName: process.env.TENANT_NAME || "Aloha Car Rental",
   logoUrl: process.env.TENANT_LOGO_URL || "/logo.svg",
-  phone: process.env.TENANT_PHONE || "+1 (555) 123-4567",
+  phone: process.env.TENANT_PHONE || "+599 785 5999",
   whatsapp: process.env.TENANT_WHATSAPP || "+599 785 5999",
   whatsappUrl: process.env.TENANT_WHATSAPP_URL || "https://wa.me/5997855999",
   facebookUrl: process.env.TENANT_FACEBOOK_URL || "https://www.facebook.com/profile.php?id=61584326601116",

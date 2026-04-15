@@ -138,16 +138,16 @@
   },
   "faqPage": {
     "heroTitle": "Respuestas dentro de la misma experiencia cuidada que el resto del sitio",
-    "heroDescription": "Encuentra respuestas rápidas sobre reservas, recogida, documentos, pagos, seguro y soporte sin navegar por bloques de texto anticuados.",
+    "heroDescription": "Encuentra respuestas rápidas sobre reservas, recogida, documentos, pagos, seguro y soporte basadas en los términos y condiciones y el proceso de soporte de Aloha Car Rental.",
     "popularTopic": "Tema popular",
     "helpCenterEyebrow": "Centro de ayuda",
     "helpCenterTitle": "Preguntas frecuentes",
-    "helpCenterDescription": "Cada respuesta aquí sigue las mismas reglas de reserva y el mismo proceso de soporte que el resto del proyecto.",
+    "helpCenterDescription": "Cada respuesta aquí está alineada con los términos y condiciones, las reglas de reserva y el proceso de soporte de Aloha Car Rental.",
     "supportTitle": "¿Aún necesitas ayuda?",
     "supportDescription": "Comunícate directamente con {tenantName} para preguntas sobre reservas, cambios de horario, coordinación de recogida o soporte urgente.",
     "openingHoursLabel": "Horario",
-    "openingHoursDays": "Lunes a sábado",
-    "openingHoursTime": "08:00 a 18:00"
+    "openingHoursDays": "Línea principal todos los días",
+    "openingHoursTime": "08:00 a 20:00"
   },
   "securityPage": {
     "metaTitle": "Seguridad y manejo de datos",

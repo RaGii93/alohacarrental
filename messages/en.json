@@ -138,16 +138,16 @@
   },
   "faqPage": {
     "heroTitle": "Answers built into the same polished experience as the rest of the site",
-    "heroDescription": "Find fast answers about booking, pickup, documents, payments, insurance, and support without digging through outdated blocks of text.",
+    "heroDescription": "Find fast answers about booking, pickup, documents, payments, insurance, and support based on Aloha Car Rental's terms and conditions and support process.",
     "popularTopic": "Popular topic",
     "helpCenterEyebrow": "Help Center",
     "helpCenterTitle": "Frequently asked questions",
-    "helpCenterDescription": "Every answer below uses the same booking rules and support process shown across the rest of the project.",
+    "helpCenterDescription": "Every answer below is aligned with Aloha Car Rental's terms and conditions, booking rules, and support process.",
     "supportTitle": "Still need help?",
     "supportDescription": "Reach {tenantName} directly for booking questions, schedule changes, pickup coordination, or urgent rental support.",
     "openingHoursLabel": "Opening hours",
-    "openingHoursDays": "Monday to Saturday",
-    "openingHoursTime": "08:00 to 18:00"
+    "openingHoursDays": "Main line daily",
+    "openingHoursTime": "08:00 to 20:00"
   },
   "securityPage": {
     "metaTitle": "Security and Data Handling",

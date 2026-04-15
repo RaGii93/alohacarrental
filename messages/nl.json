@@ -138,16 +138,16 @@
   },
   "faqPage": {
     "heroTitle": "Antwoorden in dezelfde verzorgde stijl als de rest van de site",
-    "heroDescription": "Vind snel antwoorden over reserveren, ophalen, documenten, betalingen, verzekering en support zonder door verouderde tekstblokken te moeten zoeken.",
+    "heroDescription": "Vind snel antwoorden over reserveren, ophalen, documenten, betalingen, verzekering en support op basis van de algemene voorwaarden en supportflow van Aloha Car Rental.",
     "popularTopic": "Populair onderwerp",
     "helpCenterEyebrow": "Helpcentrum",
     "helpCenterTitle": "Veelgestelde vragen",
-    "helpCenterDescription": "Alle antwoorden hieronder volgen dezelfde boekingsregels en supportflow als de rest van het project.",
+    "helpCenterDescription": "Alle antwoorden hieronder zijn afgestemd op de algemene voorwaarden, boekingsregels en supportflow van Aloha Car Rental.",
     "supportTitle": "Nog hulp nodig?",
     "supportDescription": "Neem direct contact op met {tenantName} voor vragen over reserveringen, wijzigingen, ophaalafspraken of urgente ondersteuning.",
     "openingHoursLabel": "Openingstijden",
-    "openingHoursDays": "Maandag t/m zaterdag",
-    "openingHoursTime": "08:00 tot 18:00"
+    "openingHoursDays": "Hoofdlijn dagelijks",
+    "openingHoursTime": "08:00 tot 20:00"
   },
   "securityPage": {
     "metaTitle": "Beveiliging en gegevensverwerking",
