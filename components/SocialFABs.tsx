@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { SVGProps } from "react";
 import { Bot, Instagram, Linkedin, Music2, Send, X } from "lucide-react";
-import { getFaqAssistantCopy, getFaqEntries } from "@/lib/faq";
+import { getFaqAssistantCopy, getFaqEntries, normalizeFaqSearchText } from "@/lib/faq";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -55,6 +55,41 @@ const faqEntryToPlainText = (blocks: ReturnType<typeof getFaqEntries>[number]["b
     )
     .join(" ");
 
+const scoreFaqEntry = (
+  question: string,
+  entry: ReturnType<typeof getFaqEntries>[number],
+  plainText: string
+) => {
+  const normalizedQuestion = normalizeFaqSearchText(question);
+  if (!normalizedQuestion) return 0;
+
+  const haystack = normalizeFaqSearchText(`${entry.question} ${plainText} ${entry.keywords.join(" ")}`);
+  const tokens = normalizedQuestion.split(" ").filter((token) => token.length > 2);
+  let score = 0;
+
+  if (haystack.includes(normalizedQuestion)) score += 10;
+
+  for (const keyword of entry.keywords) {
+    const normalizedKeyword = normalizeFaqSearchText(keyword);
+    if (!normalizedKeyword) continue;
+    if (normalizedQuestion.includes(normalizedKeyword) || haystack.includes(normalizedKeyword)) {
+      score += normalizedQuestion.includes(normalizedKeyword) ? 8 : 2;
+      continue;
+    }
+
+    const keywordTokens = normalizedKeyword.split(" ").filter((token) => token.length > 2);
+    if (keywordTokens.length > 0 && keywordTokens.every((token) => tokens.includes(token))) {
+      score += 5;
+    }
+  }
+
+  for (const token of tokens) {
+    if (haystack.includes(token)) score += 1;
+  }
+
+  return score;
+};
+
 export function SocialFABs({
   whatsapp,
   whatsappUrl,
@@ -71,6 +106,14 @@ export function SocialFABs({
   }, [pathname]);
   const faqEntries = useMemo(() => getFaqEntries(currentLocale), [currentLocale]);
   const assistantCopy = useMemo(() => getFaqAssistantCopy(currentLocale), [currentLocale]);
+  const searchableFaqEntries = useMemo(
+    () =>
+      faqEntries.map((entry) => ({
+        entry,
+        plainText: faqEntryToPlainText(entry.blocks),
+      })),
+    [faqEntries]
+  );
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<Array<{ role: "bot" | "user"; text: string }>>([
@@ -134,10 +177,15 @@ export function SocialFABs({
     const question = message.trim();
     if (!question) return;
 
-    const lower = question.toLowerCase();
-    const found = faqEntries.find((entry) => entry.keywords.some((kw) => lower.includes(kw)));
-    const reply = found
-      ? `${faqEntryToPlainText(found.blocks)} ${assistantCopy.readMore}`
+    const found = searchableFaqEntries
+      .map(({ entry, plainText }) => ({
+        entry,
+        plainText,
+        score: scoreFaqEntry(question, entry, plainText),
+      }))
+      .sort((a, b) => b.score - a.score)[0];
+    const reply = found && found.score > 0
+      ? `${found.plainText} ${assistantCopy.readMore}`
       : assistantCopy.notFound;
 
     setChat((prev) => [...prev, { role: "user", text: question }, { role: "bot", text: reply }]);
