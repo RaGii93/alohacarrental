@@ -3,10 +3,13 @@
 import Image from "next/image";
 import {
   ArrowRightIcon,
+  BadgeDollarSignIcon,
   HeadphonesIcon,
   MapPinnedIcon,
   ShieldCheckIcon,
   StarIcon,
+  CalendarRangeIcon,
+  GaugeIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button.tsx";
@@ -36,6 +39,34 @@ export default function WhyChooseSection() {
       icon: StarIcon,
       title: t("landing.whyChoose.features.rating.title"),
       description: t("landing.whyChoose.features.rating.description"),
+    },
+  ];
+
+  const benefits = [
+    {
+      icon: CalendarRangeIcon,
+      title: t("landing.whyChoose.benefits.consistentRates.title"),
+      description: t("landing.whyChoose.benefits.consistentRates.description"),
+    },
+    {
+      icon: MapPinnedIcon,
+      title: t("landing.whyChoose.benefits.pickup.title"),
+      description: t("landing.whyChoose.benefits.pickup.description"),
+    },
+    {
+      icon: ShieldCheckIcon,
+      title: t("landing.whyChoose.benefits.insurance.title"),
+      description: t("landing.whyChoose.benefits.insurance.description"),
+    },
+    {
+      icon: GaugeIcon,
+      title: t("landing.whyChoose.benefits.mileage.title"),
+      description: t("landing.whyChoose.benefits.mileage.description"),
+    },
+    {
+      icon: BadgeDollarSignIcon,
+      title: t("landing.whyChoose.benefits.pricing.title"),
+      description: t("landing.whyChoose.benefits.pricing.description"),
     },
   ];
 
@@ -120,6 +151,35 @@ export default function WhyChooseSection() {
             </Reveal>
           </div>
         </div>
+
+        <Reveal className="mt-10 space-y-6">
+          <div className="max-w-3xl space-y-3">
+            <h3 className="text-2xl font-black tracking-tight text-[rgb(141,74,11)] sm:text-3xl">
+              {t("landing.whyChoose.benefitsTitle")}
+            </h3>
+            <p className="text-base leading-7 text-[rgba(46,64,134,0.92)] sm:text-lg">
+              {t("landing.whyChoose.benefitsSubtitle")}
+            </p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+            {benefits.map((benefit, index) => (
+              <Reveal key={benefit.title} delay={index * 80}>
+                <div className="public-glass-card h-full rounded-[1.7rem] p-5">
+                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,rgba(255,145,28,0.16),rgba(228,98,170,0.16),rgba(255,210,63,0.14))]">
+                    <benefit.icon className="h-6 w-6 text-[rgb(141,74,11)]" />
+                  </div>
+                  <h4 className="text-lg font-black tracking-tight text-[rgb(141,74,11)]">
+                    {benefit.title}
+                  </h4>
+                  <p className="mt-3 text-sm leading-7 text-[rgba(46,64,134,0.92)]">
+                    {benefit.description}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
   );

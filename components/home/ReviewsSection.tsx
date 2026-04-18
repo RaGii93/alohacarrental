@@ -29,6 +29,10 @@ type FaqItem = {
 
 type ReviewsSectionProps = {
   reviews: ReviewItem[];
+  reviewsSummary?: {
+    count: number;
+    averageRating: number;
+  };
   loading?: boolean;
   faqItems: FaqItem[];
 };
@@ -47,7 +51,12 @@ function StarRating({ count }: { count: number }) {
   );
 }
 
-export default function ReviewsSection({ reviews, loading = false, faqItems }: ReviewsSectionProps) {
+export default function ReviewsSection({
+  reviews,
+  reviewsSummary,
+  loading = false,
+  faqItems,
+}: ReviewsSectionProps) {
   const t = useTranslations();
   const router = useRouter();
   const [cardsPerView, setCardsPerView] = useState(3);
@@ -55,9 +64,13 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [bookingCode, setBookingCode] = useState("");
   const visibleReviews = reviews.filter((review) => review?.isVisible !== false);
-  const averageRating = visibleReviews.length
-    ? (visibleReviews.reduce((sum, review) => sum + review.rating, 0) / visibleReviews.length).toFixed(1)
-    : "5.0";
+  const reviewCount = reviewsSummary?.count ?? visibleReviews.length;
+  const averageRatingValue = reviewsSummary?.averageRating
+    ? reviewsSummary.averageRating
+    : visibleReviews.length
+      ? Number((visibleReviews.reduce((sum, review) => sum + review.rating, 0) / visibleReviews.length).toFixed(1))
+      : 0;
+  const averageRating = averageRatingValue > 0 ? averageRatingValue.toFixed(1) : "0.0";
   const pageCount = Math.max(1, Math.ceil(visibleReviews.length / cardsPerView));
   const pagedReviews = useMemo(
     () =>
@@ -127,11 +140,11 @@ export default function ReviewsSection({ reviews, loading = false, faqItems }: R
             <div className="public-glass-card rounded-[1.6rem] p-5">
               <div className="text-3xl font-black text-[rgb(141,74,11)]">{averageRating}</div>
               <div className="mt-2">
-                <StarRating count={Math.round(Number(averageRating))} />
+                <StarRating count={averageRatingValue} />
               </div>
             </div>
             <div className="public-glass-card rounded-[1.6rem] p-5">
-              <div className="text-3xl font-black text-[rgb(141,74,11)]">{visibleReviews.length || 0}</div>
+              <div className="text-3xl font-black text-[rgb(141,74,11)]">{reviewCount}</div>
               <div className="mt-1 text-sm font-medium text-[rgba(46,64,134,0.92)]">{t("landing.reviews.title")}</div>
             </div>
             <div className="public-glass-card rounded-[1.6rem] p-5">

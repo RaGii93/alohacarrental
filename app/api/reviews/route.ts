@@ -5,20 +5,35 @@ import { getTenantConfig } from "@/lib/tenant";
 
 export async function GET() {
   try {
-    const reviews = await db.review.findMany({
-      where: { isVisible: true },
-      select: {
-        id: true,
-        customerName: true,
-        rating: true,
-        comment: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    });
+    const where = { isVisible: true };
+    const [reviews, summary] = await Promise.all([
+      db.review.findMany({
+        where,
+        select: {
+          id: true,
+          customerName: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+      }),
+      db.review.aggregate({
+        where,
+        _count: { id: true },
+        _avg: { rating: true },
+      }),
+    ]);
 
-    return NextResponse.json({ success: true, reviews });
+    return NextResponse.json({
+      success: true,
+      reviews,
+      summary: {
+        count: summary._count.id ?? 0,
+        averageRating: summary._avg.rating ? Number(summary._avg.rating.toFixed(1)) : 0,
+      },
+    });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error?.message || "Failed to load reviews" },

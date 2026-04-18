@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import Reveal from "./Reveal";
 
 const LOGO_URL = "/home/logo.png";
+const BRAND_LOGO_ALT = "Aloha Bonaire Car Rental logo";
 
 export default function SiteFooter() {
   const t = useTranslations();
@@ -15,6 +16,7 @@ export default function SiteFooter() {
     { href: "/book", label: t("nav.booking") },
     { href: "/faq", label: t("nav.faq") },
     { href: "/fleet", label: t("nav.fleetOverview") },
+    { href: "/security", label: t("securityPage.metaTitle") },
   ];
 
   return (
@@ -31,7 +33,7 @@ export default function SiteFooter() {
           <div className="space-y-5">
             <Image
               src={LOGO_URL}
-              alt="Aloha Car Rental"
+              alt={BRAND_LOGO_ALT}
               width={220}
               height={64}
               className="h-16 w-auto"

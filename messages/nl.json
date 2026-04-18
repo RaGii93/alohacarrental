@@ -13,6 +13,7 @@
     "name": "Aloha Car Rental",
     "phone": "Telefoonnummer",
     "email": "E-mailadres",
+    "location": "Locatie",
     "currency": "€",
     "loading": "Laden...",
     "submit": "Verzenden",
@@ -146,8 +147,9 @@
     "supportTitle": "Nog hulp nodig?",
     "supportDescription": "Neem direct contact op met {tenantName} voor vragen over reserveringen, wijzigingen, ophaalafspraken of urgente ondersteuning.",
     "openingHoursLabel": "Openingstijden",
-    "openingHoursDays": "Hoofdlijn dagelijks",
-    "openingHoursTime": "08:00 tot 20:00"
+    "openingHoursDays": "Maandag-vrijdag: 8:00 a.m.-8:00 p.m.",
+    "openingHoursSaturday": "Zaterdag: 10:00 a.m.-8:00 p.m.",
+    "openingHoursSunday": "Zondag: Fysiek gesloten, telefonisch bereikbaar van 10:00 a.m.-8:00 p.m."
   },
   "securityPage": {
     "metaTitle": "Beveiliging en gegevensverwerking",
@@ -246,6 +248,8 @@
     "whyChoose": {
       "title": "Een lokale auto voor Bonaire's stranden, zoutpannen en stops in de stad",
       "subtitle": "We hebben de ervaring afgestemd op hoe mensen zich echt over Bonaire verplaatsen: pickups op het vliegveld, rustige ritten langs de zuidelijke slavenhutten en flexibele hulp als plannen veranderen.",
+      "benefitsTitle": "Belangrijke voordelen van huren bij ons",
+      "benefitsSubtitle": "We houden de huurervaring eenvoudig, consistent en betrouwbaar van reservering tot inlevering.",
       "features": {
         "selection": {
           "title": "Het juiste formaat voor het eiland",
@@ -262,6 +266,28 @@
         "rating": {
           "title": "Gasten komen terug voor het gemak",
           "description": "Reizigers kiezen Aloha voor de ontspannen service, schone voertuigen en de vrijheid om Bonaire op hun eigen manier te ontdekken."
+        }
+      },
+      "benefits": {
+        "consistentRates": {
+          "title": "Gelijke tarieven het hele jaar door",
+          "description": "We houden prijzen eenvoudig en transparant met dezelfde sterke tarieven voor onze voertuigen, ongeacht het seizoen."
+        },
+        "pickup": {
+          "title": "Zorgeloze pickup",
+          "description": "Kies voor handige airport pickup of aflevering bij je accommodatie, zodat je eilandplannen direct kunnen beginnen."
+        },
+        "insurance": {
+          "title": "Verzekeringsopties voor extra rust",
+          "description": "We bieden uitgebreide dekkingsopties, inclusief all-inclusive keuzes die je met meer vertrouwen Bonaire laten verkennen."
+        },
+        "mileage": {
+          "title": "Onbeperkte kilometers",
+          "description": "Bonaire is compact, maar de kilometers lopen snel op als je het hele eiland ontdekt, dus je hoeft je geen zorgen te maken over extra afstandskosten."
+        },
+        "pricing": {
+          "title": "Transparante prijzen",
+          "description": "Wat je ziet is wat je krijgt, zonder verborgen kosten en met duidelijke brandstofregels vanaf het begin."
         }
       }
     },
@@ -612,7 +638,7 @@
     "identificationClause": "Gebruikers gaan ermee akkoord geldige identificatie te verstrekken voor verificatie van de huur.",
     "gdprNotice": "Identificatiedocumenten worden gevraagd voor huurverificatie en nalevingsvereisten, waaronder verplichtingen met betrekking tot de AVG.",
     "privacyPolicy": "Privacybeleid",
-    "privacyDeletionNotice": "Als je je persoonsgegevens wilt laten verwijderen, neem dan contact op met: privacy@alohacarrental.com",
+    "privacyDeletionNotice": "Als je je persoonsgegevens wilt laten verwijderen, neem dan contact op met: alohaservicesbonaire@gmail.com",
     "privacyConsentCheckbox": "Ik begrijp dat mijn identificatie wordt gebruikt voor huurverificatie en tijdelijk wordt opgeslagen in overeenstemming met het Privacybeleid.",
     "viewTerms": "Voorwaarden Bekijken (PDF)",
     "acceptTerms": "Ik ga akkoord met de Algemene Voorwaarden",

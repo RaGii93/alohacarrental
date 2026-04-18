@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { buildMetadata } from "@/lib/seo";
+import { getSimplePageJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -43,6 +44,14 @@ export default async function SecurityPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("securityPage");
+  const tenant = await getTenantConfig();
+  const jsonLd = getSimplePageJsonLd({
+    locale,
+    tenant,
+    path: "/security",
+    name: t("metaTitle"),
+    description: t("metaDescription"),
+  });
 
   const pillars = [
     {
@@ -114,12 +123,20 @@ export default async function SecurityPage({
   ];
 
   return (
-    <section className="public-shell-bg relative overflow-hidden pt-24 sm:pt-28">
-      <div className="absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(15,39,64,0.08),transparent)]" />
-      <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_360px] lg:items-start">
-          <div className="space-y-8">
-            <div className="public-glass-card-strong overflow-hidden rounded-[2rem] p-8 sm:p-10">
+    <>
+      {jsonLd.map((item, index) => (
+        <script
+          key={`security-ld-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+        />
+      ))}
+      <section className="public-shell-bg relative overflow-hidden pt-24 sm:pt-28">
+        <div className="absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(15,39,64,0.08),transparent)]" />
+        <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_360px] lg:items-start">
+            <div className="space-y-8">
+              <div className="public-glass-card-strong overflow-hidden rounded-[2rem] p-8 sm:p-10">
               <div className="public-eyebrow inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em]">
                 <ShieldCheck className="size-4" />
                 {t("eyebrow")}
@@ -149,7 +166,7 @@ export default async function SecurityPage({
               </div>
             </div>
 
-            <div className="public-glass-card overflow-hidden rounded-[2rem] p-6 sm:p-7">
+              <div className="public-glass-card overflow-hidden rounded-[2rem] p-6 sm:p-7">
               <div className="mb-6">
                   <div className="text-sm font-semibold uppercase tracking-[0.28em] text-[rgb(19,120,152)]">
                   {t("controlsEyebrow")}
@@ -177,7 +194,7 @@ export default async function SecurityPage({
               </div>
             </div>
 
-            <div className="public-glass-card overflow-hidden rounded-[2rem] p-6 sm:p-7">
+              <div className="public-glass-card overflow-hidden rounded-[2rem] p-6 sm:p-7">
               <div className="mb-6">
                   <div className="text-sm font-semibold uppercase tracking-[0.28em] text-[rgb(19,120,152)]">
                   {t("operationsEyebrow")}
@@ -206,7 +223,7 @@ export default async function SecurityPage({
             </div>
           </div>
 
-          <aside className="lg:sticky lg:top-24">
+            <aside className="lg:sticky lg:top-24">
             <div className="space-y-6">
               <div className="public-glass-card-strong overflow-hidden rounded-[2rem] p-7">
                 <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgb(15,39,64),rgb(19,120,152))] text-white shadow-[0_18px_40px_-24px_rgba(15,39,64,0.34)]">
@@ -249,9 +266,10 @@ export default async function SecurityPage({
                 </div>
               </div>
             </div>
-          </aside>
+            </aside>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

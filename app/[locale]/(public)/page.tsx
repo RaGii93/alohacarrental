@@ -14,14 +14,14 @@ export async function generateMetadata({
   const { locale } = await params;
   const tenant = await getTenantConfig();
   const titleMap: Record<string, string> = {
-    en: `${tenant.tenantName} | Premium Car Rental`,
-    nl: `${tenant.tenantName} | Premium Autoverhuur`,
-    es: `${tenant.tenantName} | Alquiler Premium de Coches`,
+    en: `${tenant.tenantName} | Car Rental in Bonaire`,
+    nl: `${tenant.tenantName} | Autoverhuur op Bonaire`,
+    es: `${tenant.tenantName} | Alquiler de Autos en Bonaire`,
   };
   const descriptionMap: Record<string, string> = {
-    en: `Rent vehicles with transparent pricing, fast booking, and trusted support from ${tenant.tenantName}.`,
-    nl: `Huur voertuigen met transparante prijzen, snelle boeking en betrouwbare ondersteuning van ${tenant.tenantName}.`,
-    es: `Alquila vehículos con precios transparentes, reserva rápida y soporte confiable de ${tenant.tenantName}.`,
+    en: `Rent a car in Bonaire with transparent pricing, quick airport pickup, and trusted local support from ${tenant.tenantName}.`,
+    nl: `Huur een auto op Bonaire met transparante prijzen, snelle luchthavenophaalservice en betrouwbare lokale ondersteuning van ${tenant.tenantName}.`,
+    es: `Alquila un auto en Bonaire con precios transparentes, recogida rápida en el aeropuerto y soporte local confiable de ${tenant.tenantName}.`,
   };
   return buildMetadata({
     locale,

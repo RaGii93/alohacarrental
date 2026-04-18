@@ -11,6 +11,12 @@ const rentalKeywords = [
   "car hire",
   "rental car",
   "vehicle rental",
+  "Bonaire car rental",
+  "Kralendijk car rental",
+  "Flamingo Airport car rental",
+  "Bonaire airport car rental",
+  "rent a car Bonaire",
+  "Bonaire rental cars",
   "airport pickup",
   "daily car rental",
   "weekly car rental",
@@ -22,10 +28,8 @@ const rentalKeywords = [
   "transparent pricing",
   "online booking",
   "trusted car rental support",
-  "Curacao car rental",
-  "Curacao airport car rental",
-  "Willemstad car rental",
-  "Caribbean car rental",
+  "island car rental",
+  "Caribbean Netherlands car rental",
 ] as const;
 
 const saasKeywords = [

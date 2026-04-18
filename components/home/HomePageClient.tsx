@@ -19,6 +19,11 @@ type PublicReview = {
   isVisible?: boolean;
 };
 
+type ReviewsSummary = {
+  count: number;
+  averageRating: number;
+};
+
 type HomePageClientProps = {
   locations: { id: string; name: string; address?: string | null }[];
   categories: { id: string; name: string; seats: number; imageUrl: string | null; features: string[] }[];
@@ -27,6 +32,7 @@ type HomePageClientProps = {
 export function HomePageClient({ locations, categories }: HomePageClientProps) {
   const locale = useLocale();
   const [reviews, setReviews] = useState<PublicReview[]>([]);
+  const [reviewsSummary, setReviewsSummary] = useState<ReviewsSummary>({ count: 0, averageRating: 0 });
   const [loadingReviews, setLoadingReviews] = useState(true);
   const faqEntries = useMemo(
     () =>
@@ -59,11 +65,19 @@ export function HomePageClient({ locations, categories }: HomePageClientProps) {
         if (payload?.success && Array.isArray(payload.reviews)) {
           const visibleReviews = payload.reviews.filter((review: PublicReview) => review?.isVisible !== false);
           setReviews(visibleReviews);
+          setReviewsSummary({
+            count: Number(payload?.summary?.count) || visibleReviews.length,
+            averageRating: Number(payload?.summary?.averageRating) || 0,
+          });
         } else {
           setReviews([]);
+          setReviewsSummary({ count: 0, averageRating: 0 });
         }
       } catch {
-        if (active) setReviews([]);
+        if (active) {
+          setReviews([]);
+          setReviewsSummary({ count: 0, averageRating: 0 });
+        }
       } finally {
         if (active) setLoadingReviews(false);
       }
@@ -81,7 +95,12 @@ export function HomePageClient({ locations, categories }: HomePageClientProps) {
       <HeroSection locations={locations} />
       <FleetSection categories={categories} />
       <WhyChooseSection />
-      <ReviewsSection reviews={reviews} loading={loadingReviews} faqItems={faqEntries} />
+      <ReviewsSection
+        reviews={reviews}
+        reviewsSummary={reviewsSummary}
+        loading={loadingReviews}
+        faqItems={faqEntries}
+      />
       <CtaSection />
       <FooterSection />
     </>

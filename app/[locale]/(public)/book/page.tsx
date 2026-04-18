@@ -20,14 +20,20 @@ export async function generateMetadata({
   const { locale } = await params;
   const tenant = await getTenantConfig();
   const titleMap: Record<string, string> = {
-    en: `Book a Vehicle | ${tenant.tenantName}`,
-    nl: `Voertuig Reserveren | ${tenant.tenantName}`,
-    es: `Reservar Vehículo | ${tenant.tenantName}`,
+    en: `Book a Rental Car in Bonaire | ${tenant.tenantName}`,
+    nl: `Huurauto Reserveren op Bonaire | ${tenant.tenantName}`,
+    es: `Reserva un Auto de Alquiler en Bonaire | ${tenant.tenantName}`,
+  };
+  const descriptionMap: Record<string, string> = {
+    en: `Reserve your Bonaire rental car online with transparent pricing, flexible pickup locations, and fast confirmation from ${tenant.tenantName}.`,
+    nl: `Reserveer je huurauto op Bonaire online met transparante prijzen, flexibele pick-uplocaties en snelle bevestiging van ${tenant.tenantName}.`,
+    es: `Reserva tu auto de alquiler en Bonaire en línea con precios transparentes, lugares de recogida flexibles y confirmación rápida de ${tenant.tenantName}.`,
   };
   return buildMetadata({
     locale,
     path: "/book",
     title: titleMap[locale] || titleMap.en,
+    description: descriptionMap[locale] || descriptionMap.en,
     tenant,
   });
 }
@@ -47,7 +53,24 @@ export default async function BookingPage({
     getBookingRuleSettings(),
     getTermsPdfUrl(locale),
   ]);
-  const jsonLd = getBookingJsonLd(locale, tenant);
+  const pageName =
+    locale === "nl"
+      ? "Huurauto Reserveren op Bonaire"
+      : locale === "es"
+        ? "Reserva un Auto de Alquiler en Bonaire"
+        : "Book a Rental Car in Bonaire";
+  const pageDescription =
+    locale === "nl"
+      ? `Reserveer je huurauto op Bonaire online met transparante prijzen, flexibele pick-uplocaties en snelle bevestiging van ${tenant.tenantName}.`
+      : locale === "es"
+        ? `Reserva tu auto de alquiler en Bonaire en línea con precios transparentes, lugares de recogida flexibles y confirmación rápida de ${tenant.tenantName}.`
+        : `Reserve your Bonaire rental car online with transparent pricing, flexible pickup locations, and fast confirmation from ${tenant.tenantName}.`;
+  const jsonLd = getBookingJsonLd({
+    locale,
+    tenant,
+    pageName,
+    description: pageDescription,
+  });
 
   // Fetch predefined pickup/dropoff locations
   const locations = await db.location.findMany({

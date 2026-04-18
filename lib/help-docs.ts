@@ -1,5 +1,5 @@
 import { routing } from "@/i18n/routing";
-import { toLocalePath } from "@/lib/seo";
+import { toLocalePath } from "@/lib/locale-paths";
 
 export type HelpLocale = (typeof routing.locales)[number];
 export const HELP_BASE_PATH = "/admin/help";

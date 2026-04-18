@@ -13,6 +13,7 @@
     "name": "Aloha Car Rental",
     "phone": "Teléfono",
     "email": "Correo Electrónico",
+    "location": "Ubicación",
     "currency": "$",
     "loading": "Cargando...",
     "submit": "Enviar",
@@ -146,8 +147,9 @@
     "supportTitle": "¿Aún necesitas ayuda?",
     "supportDescription": "Comunícate directamente con {tenantName} para preguntas sobre reservas, cambios de horario, coordinación de recogida o soporte urgente.",
     "openingHoursLabel": "Horario",
-    "openingHoursDays": "Línea principal todos los días",
-    "openingHoursTime": "08:00 a 20:00"
+    "openingHoursDays": "Lunes-viernes: 8:00 a.m.-8:00 p.m.",
+    "openingHoursSaturday": "Sábado: 10:00 a.m.-8:00 p.m.",
+    "openingHoursSunday": "Domingo: Cerrado físicamente, con atención por teléfono de 10:00 a.m.-8:00 p.m."
   },
   "securityPage": {
     "metaTitle": "Seguridad y manejo de datos",
@@ -246,6 +248,8 @@
     "whyChoose": {
       "title": "Un vehículo local para playas, salinas y paradas en Bonaire",
       "subtitle": "Diseñamos la experiencia según cómo la gente realmente se mueve por Bonaire: recogidas en el aeropuerto, paseos tranquilos junto a las casitas de esclavos del sur y apoyo flexible cuando cambian los planes.",
+      "benefitsTitle": "Beneficios clave de alquilar con nosotros",
+      "benefitsSubtitle": "Mantenemos la experiencia de alquiler simple, constante y fácil de confiar desde la reserva hasta la devolución.",
       "features": {
         "selection": {
           "title": "El tamaño ideal para la isla",
@@ -262,6 +266,28 @@
         "rating": {
           "title": "Los huéspedes vuelven por la facilidad",
           "description": "Los viajeros eligen Aloha por el servicio relajado, los vehículos limpios y la libertad de descubrir Bonaire a su manera."
+        }
+      },
+      "benefits": {
+        "consistentRates": {
+          "title": "Tarifas consistentes todo el año",
+          "description": "Mantenemos los precios simples y transparentes con las mismas buenas tarifas para nuestros vehículos sin importar la temporada."
+        },
+        "pickup": {
+          "title": "Recogida sin complicaciones",
+          "description": "Disfruta de recogida conveniente en el aeropuerto o entrega en tu alojamiento para comenzar tu aventura en la isla de inmediato."
+        },
+        "insurance": {
+          "title": "Opciones de seguro para mayor tranquilidad",
+          "description": "Ofrecemos opciones de cobertura integral, incluidas alternativas todo incluido que te ayudan a explorar Bonaire con más confianza."
+        },
+        "mileage": {
+          "title": "Kilometraje ilimitado",
+          "description": "Bonaire puede ser pequeña, pero los kilómetros suben rápido cuando recorres toda la isla, así que no hay preocupación por cargos extra por distancia."
+        },
+        "pricing": {
+          "title": "Precios transparentes",
+          "description": "Lo que ves es lo que pagas, sin cargos ocultos y con políticas de combustible claras desde el principio."
         }
       }
     },
@@ -612,7 +638,7 @@
     "identificationClause": "Los usuarios aceptan proporcionar una identificación válida para la verificación del alquiler.",
     "gdprNotice": "Los documentos de identificación se solicitan para la verificación del alquiler y requisitos de cumplimiento, incluidas obligaciones relacionadas con el RGPD.",
     "privacyPolicy": "Política de Privacidad",
-    "privacyDeletionNotice": "Si deseas eliminar tus datos personales, por favor contacta a: privacy@alohacarrental.com",
+    "privacyDeletionNotice": "Si deseas eliminar tus datos personales, por favor contacta a: alohaservicesbonaire@gmail.com",
     "privacyConsentCheckbox": "Entiendo que mi identificación se utilizará para la verificación del alquiler y se almacenará temporalmente de acuerdo con la Política de Privacidad.",
     "viewTerms": "Ver Términos (PDF)",
     "acceptTerms": "Acepto los Términos y Condiciones",

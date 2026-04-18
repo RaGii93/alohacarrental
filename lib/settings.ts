@@ -944,8 +944,8 @@ export function getDefaultTenantSettings(): TenantSettings {
     instagramUrl: sanitizeOptionalText(process.env.TENANT_INSTAGRAM_URL),
     linkedinUrl: sanitizeOptionalText(process.env.TENANT_LINKEDIN_URL),
     tiktokUrl: sanitizeOptionalText(process.env.TENANT_TIKTOK_URL),
-    email: sanitizeRequiredText(process.env.TENANT_EMAIL, "hello@example.com"),
-    address: sanitizeRequiredText(process.env.TENANT_ADDRESS, "123 Main St, City, State 12345"),
+    email: sanitizeRequiredText(process.env.TENANT_EMAIL, "alohaservicesbonaire@gmail.com"),
+    address: sanitizeRequiredText(process.env.TENANT_ADDRESS, "4 Kaya Industria, Kralendijk, Caribisch Nederland."),
     currency: sanitizeRequiredText(process.env.TENANT_CURRENCY, "USD"),
     paymentInstructions: sanitizeRequiredText(
       process.env.TENANT_PAYMENT_INSTRUCTIONS,

@@ -22,6 +22,8 @@ import { loginFormSchema } from "@/lib/validators";
 import { loginAction } from "@/actions/auth";
 import { Lock, LogIn, Mail, ShieldCheck, Sparkles } from "lucide-react";
 
+const BRAND_LOGO_ALT = "Aloha Bonaire Car Rental logo";
+
 export default function AdminLoginPage({
   params,
 }: {
@@ -85,7 +87,7 @@ export default function AdminLoginPage({
           <div className="mt-8">
             <Image
               src="/home/logo.png"
-              alt="Aloha Car Rental"
+              alt={BRAND_LOGO_ALT}
               width={320}
               height={88}
               priority
@@ -120,7 +122,7 @@ export default function AdminLoginPage({
           <div className="flex flex-col items-center text-center">
             <Image
               src="/home/logo.png"
-              alt="Aloha Car Rental"
+              alt={BRAND_LOGO_ALT}
               width={260}
               height={72}
               priority

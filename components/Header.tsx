@@ -18,6 +18,8 @@ import { cn } from "@/lib/utils";
 import { ArrowRight, CalendarCheck, CarFront, CircleHelp, House, Menu, Sparkles } from "lucide-react";
 import Image from "next/image";
 
+const BRAND_LOGO_ALT = "Aloha Bonaire Car Rental logo";
+
 export function Header() {
   const t = useTranslations();
   const pathname = usePathname();
@@ -96,7 +98,7 @@ export function Header() {
               >
                 <Image
                   src="/home/logo.png"
-                  alt="Aloha Car Rental"
+                  alt={BRAND_LOGO_ALT}
                   width={56}
                   height={56}
                   className="relative h-14 w-14 object-contain"
