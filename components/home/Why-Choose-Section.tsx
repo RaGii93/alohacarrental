@@ -101,11 +101,11 @@ export default function WhyChooseSection() {
                 <div className="absolute left-5 top-5 max-w-[16rem] rounded-[1.4rem] bg-white/88 p-4 text-[rgb(141,74,11)] shadow-[0_20px_44px_-28px_rgba(15,23,42,0.35)] backdrop-blur-xl">
                   <p className="text-xs font-bold uppercase tracking-[0.24em] text-[rgb(228,98,170)]">Bonaire mood</p>
                   <p className="mt-2 text-sm leading-7 text-[rgba(46,64,134,0.92)]">
-                    Clean sea light, warm roads, and landmark stops from the southern salt pans to the historic slave huts.
+                    {t("landing.whyChoose.photoCard.description")}
                   </p>
                 </div>
                 <div className="public-photo-label absolute bottom-5 left-5 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em]">
-                  Designed for island travel
+                  {t("landing.whyChoose.photoCard.label")}
                 </div>
               </div>
             </div>

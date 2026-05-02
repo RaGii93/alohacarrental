@@ -246,8 +246,12 @@
       "supportLabel": "Ondersteuning"
     },
     "whyChoose": {
-      "title": "Een lokale auto voor Bonaire's stranden, zoutpannen en stops in de stad",
-      "subtitle": "We hebben de ervaring afgestemd op hoe mensen zich echt over Bonaire verplaatsen: pickups op het vliegveld, rustige ritten langs de zuidelijke slavenhutten en flexibele hulp als plannen veranderen.",
+      "title": "Een lokale auto voor elke hoek van Bonaire.",
+      "subtitle": "We hebben onze service afgestemd op de manier waarop jij het eiland echt verkent. Geniet van de vrijheid om in je eigen tempo te ontdekken, met flexibele hulp wanneer plannen op het eiland veranderen.",
+      "photoCard": {
+        "description": "Kristalhelder zeelicht, een turquoise horizon en rustige momenten waarin je geniet van de natuurlijke schoonheid van de kust.",
+        "label": "Jouw lokale eilandrit"
+      },
       "benefitsTitle": "Belangrijke voordelen van huren bij ons",
       "benefitsSubtitle": "We houden de huurervaring eenvoudig, consistent en betrouwbaar van reservering tot inlevering.",
       "features": {
@@ -293,7 +297,7 @@
     },
     "ctaSection": {
       "title": "Maak het eiland jouw route van de dag",
-      "subtitle": "Reserveer de auto die past bij je plannen op Bonaire, van strandochtenden en duikstops tot zonsondergangritten langs de zuidkust.",
+      "subtitle": "Vind een auto die past bij wat je nodig hebt, van avonturen met kantduiken en de ruige schoonheid van Washington Slagbaai National Park tot luchtige middagen aan zee. Of je nu zuidelijke baaitjes ontdekt of op jacht gaat naar de perfecte zonsondergang, wij hebben de ideale auto voor elk Bonaire-moment.",
       "button": "Nu Reserveren"
     },
     "hero": {
@@ -353,8 +357,8 @@
       }
     },
     "fleet": {
-      "title": "Kies het voertuig dat past bij jouw Bonaire-ritme",
-      "description": "Vind de auto die werkt voor airport pickups, ritten door Kralendijk, fotostops aan de zuidkust en ontspannen middagen aan zee.",
+      "title": "Verken het eiland op jouw manier.",
+      "description": "Wij geloven dat de beste manier om het eiland te zien is met de vrijheid om te stoppen waar je maar wilt. Vind het voertuig dat past bij jouw plannen en begin vandaag nog de schoonheid van Bonaire te ontdekken.",
       "seats": "{count} zitplaatsen",
       "reserveNow": "Nu reserveren",
       "seeMore": "Meer bekijken"
@@ -509,8 +513,12 @@
     },
     "reviews": {
       "eyebrow": "Klantverhalen",
-      "title": "Gastverhalen met Bonaire als decor",
-      "subtitle": "Echte feedback van reizigers die Aloha gebruikten om tussen stranden, duikplekken, de stad en de bekende kustwegen van het eiland te reizen.",
+      "title": "Gastverhalen van over het hele eiland.",
+      "subtitle": "Echte feedback van reizigers die Aloha gebruikten om moeiteloos tussen hun favoriete plekken en de meest iconische uitzichten van het eiland te reizen.",
+      "photoCard": {
+        "description": "De beste eilandverhalen beginnen met een eenvoudig plan: pak de sleutels, ga richting het water en laat Bonaire je de weg wijzen.",
+        "label": "Jouw reis, onze prioriteit."
+      },
       "leaveButton": "Review Achterlaten",
       "empty": "Er zijn nog geen reviews gepubliceerd.",
       "faqPreview": "Snelle antwoorden voor huurders voordat ze boeken, allemaal op één plek.",

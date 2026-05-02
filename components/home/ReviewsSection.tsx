@@ -169,11 +169,11 @@ export default function ReviewsSection({
                 <div className="absolute left-5 top-5 max-w-[17rem] rounded-[1.5rem] bg-white/90 p-4 text-[rgb(141,74,11)] shadow-[0_22px_48px_-28px_rgba(15,23,42,0.34)] backdrop-blur-xl">
                   <p className="text-xs font-bold uppercase tracking-[0.24em] text-[rgb(228,98,170)]">Bonaire notes</p>
                   <p className="mt-2 text-sm leading-7 text-[rgba(46,64,134,0.92)]">
-                    The best guest stories usually start with a simple plan: collect the keys, follow the coast, and stop where the island tells you to.
+                    {t("landing.reviews.photoCard.description")}
                   </p>
                 </div>
                 <div className="public-photo-label absolute bottom-5 left-5 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em]">
-                  From beach to town in one easy drive
+                  {t("landing.reviews.photoCard.label")}
                 </div>
               </div>
             </div>
