@@ -696,7 +696,7 @@
     },
     "success": {
       "title": "Reservering Ingediend!",
-      "message": "Je referentienummer is: {{orderId}}",
+      "message": "Je referentienummer is: {orderId}",
       "next": "We nemen binnenkort contact met je op ter bevestiging."
     },
     "baseTotal": "Basistotaal",

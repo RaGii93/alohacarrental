@@ -7,7 +7,7 @@ import { TenantConfig } from "@/lib/tenant";
  */
 export const tenantConfig: TenantConfig = {
   tenantName: process.env.TENANT_NAME || "Aloha Car Rental",
-  logoUrl: process.env.TENANT_LOGO_URL || "/home/logo.png",
+  logoUrl: process.env.TENANT_LOGO_URL || "https://www.alohacarrentalbonaire.com/home/logo.png",
   phone: process.env.TENANT_PHONE || "+599 785 5999",
   whatsapp: process.env.TENANT_WHATSAPP || "+599 785 5999",
   whatsappUrl: process.env.TENANT_WHATSAPP_URL || "https://wa.me/5997855999",

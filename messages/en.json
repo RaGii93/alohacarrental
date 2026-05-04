@@ -696,7 +696,7 @@
     },
     "success": {
       "title": "Booking Submitted!",
-      "message": "Your booking reference is: {{orderId}}",
+      "message": "Your booking reference is: {orderId}",
       "next": "We will contact you shortly to confirm."
     },
     "baseTotal": "Base total",
@@ -716,11 +716,6 @@
     "forbidden": "Forbidden",
     "serverError": "Server error occurred",
     "tryAgain": "Try again"
-  },
-  "success": {
-    "title": "Booking Submitted!",
-    "message": "Your booking reference is: {{orderId}}",
-    "next": "We will contact you shortly to confirm."
   },
   "extras": {
     "gps": "GPS",

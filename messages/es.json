@@ -696,7 +696,7 @@
     },
     "success": {
       "title": "¡Reserva Enviada!",
-      "message": "Tu número de referencia es: {{orderId}}",
+      "message": "Tu número de referencia es: {orderId}",
       "next": "Nos pondremos en contacto pronto para confirmarla."
     },
     "baseTotal": "Total base",
