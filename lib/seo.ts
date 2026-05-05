@@ -138,7 +138,7 @@ export function buildMetadata(input: {
     defaultDescriptionByLocale(input.locale, siteName);
   const canonical = toLocalePath(input.locale, input.path);
   const absoluteUrl = `${baseUrl}${canonical === "/" ? "" : canonical}`;
-  const metadataLogoUrl = `${baseUrl}/images/Logo.png?v=2026-04-20`;
+  const metadataLogoUrl = `${baseUrl}/images/Logo.png?v=2026-05-04`;
   return {
     metadataBase: new URL(baseUrl),
     title: input.title,
@@ -155,7 +155,7 @@ export function buildMetadata(input: {
       siteName,
       type: "website",
       locale: input.locale,
-      images: [{ url: metadataLogoUrl }],
+      images: [{ url: metadataLogoUrl, width: 1200, height: 630, alt: siteName }],
     },
     twitter: {
       card: "summary_large_image",

@@ -91,6 +91,6 @@ export default async function HomePage({
         />
       ))}
       <HomePageClient locations={locations} categories={categories} />
-    </>
+     </>
   );
 }
