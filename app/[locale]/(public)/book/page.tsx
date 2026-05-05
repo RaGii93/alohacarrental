@@ -127,7 +127,7 @@ export default async function BookingPage({
       ))}
       <section className="bg-white">
         <div className="border-b border-[#f2ebe6] bg-[#faf8f6]">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
+          <div className="mx-auto max-w-7xl px-4 pt-28 pb-14 sm:px-6 lg:px-8 lg:pb-18">
             <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-end">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#FF912C] sm:text-[15px]">

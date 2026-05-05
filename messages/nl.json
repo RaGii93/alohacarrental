@@ -572,8 +572,8 @@
           "detail": "Draait reserveringen en operations vanuit Bonaire op het platform."
         },
         "bonDrive": {
-          "status": "Start binnenkort",
-          "detail": "Bezig met de uitrol voor operationeel gebruik in Bonaire."
+          "status": "Actieve klant",
+          "detail": "Beheert boekingen, vloot en operaties vanuit Bonaire op het platform."
         }
       }
     },

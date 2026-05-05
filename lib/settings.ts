@@ -905,7 +905,7 @@ export function getDefaultTenantSettings(): TenantSettings {
   );
 
   return {
-    tenantName: sanitizeRequiredText(process.env.TENANT_NAME, "Bon Drive Car Rental"),
+    tenantName: sanitizeRequiredText(process.env.TENANT_NAME, "Aloha Car Rental"),
     logoUrl: sanitizeRequiredText(process.env.TENANT_LOGO_URL, "/images/Logo.png"),
     phone: sanitizeRequiredText(process.env.TENANT_PHONE, "+5997017120"),
     whatsapp: sanitizeRequiredText(process.env.TENANT_WHATSAPP, "+5997017120"),
@@ -914,7 +914,7 @@ export function getDefaultTenantSettings(): TenantSettings {
     instagramUrl: sanitizeOptionalText(process.env.TENANT_INSTAGRAM_URL),
     linkedinUrl: sanitizeOptionalText(process.env.TENANT_LINKEDIN_URL),
     tiktokUrl: sanitizeOptionalText(process.env.TENANT_TIKTOK_URL),
-    email: sanitizeRequiredText(process.env.TENANT_EMAIL, "info@bondrivecarrental.com"),
+    email: sanitizeRequiredText(process.env.TENANT_EMAIL, "info@alohacarrentalbonaire.com"),
     address: sanitizeRequiredText(process.env.TENANT_ADDRESS, "Kralendijk, Bonaire"),
     currency: sanitizeRequiredText(process.env.TENANT_CURRENCY, "USD"),
     paymentInstructions: sanitizeRequiredText(

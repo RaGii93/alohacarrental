@@ -211,7 +211,7 @@ function getSaasHomeJsonLd(locale: string, tenant: TenantConfig) {
         name: "Sun & Fun Car Rental",
         url: "http://sunandfuncarrentalbv.com/",
       },
-      reviewBody: "EdgeRent transformed how we manage our fleet and bookings. Highly recommend!",
+      reviewBody: "Aloha Car Rental transformed how we manage our fleet and bookings. Highly recommend!",
       publisher: {
         "@type": "Organization",
         name: tenant.tenantName,
@@ -220,7 +220,7 @@ function getSaasHomeJsonLd(locale: string, tenant: TenantConfig) {
     {
       "@context": "https://schema.org",
       "@type": "Review",
-      "@id": `${baseUrl}/#review-bondrive`,
+      "@id": `${baseUrl}/#review-aloha`,
       reviewRating: {
         "@type": "Rating",
         ratingValue: "5",
@@ -228,8 +228,8 @@ function getSaasHomeJsonLd(locale: string, tenant: TenantConfig) {
       },
       author: {
         "@type": "Organization",
-        name: "Bon-Drive",
-        url: "http://bon-drive.vercel.app",
+        name: "Aloha Car Rental",
+        url: "https://alohacarrentalbonaire.com",
       },
       reviewBody: "Professional platform with excellent support. Perfect for our operations.",
       publisher: {

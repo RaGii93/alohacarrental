@@ -38,7 +38,7 @@ export async function sendEmail(params: SendEmailParams): Promise<{ success: boo
   const rawFrom = normalizeFromAddress(String(process.env.RESEND_FROM || ""));
   const from =
     !rawFrom || rawFrom.includes("@endlessedgetechnology.com")
-      ? "Bon Drive Car Rental <edgeRent@endlessedgetechnology.com>"
+      ? "Aloha Car Rental <edgeRent@endlessedgetechnology.com>"
       : rawFrom;
 
   try {

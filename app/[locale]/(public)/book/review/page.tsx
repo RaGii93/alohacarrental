@@ -80,7 +80,7 @@ export default async function BookingReviewPage({
   return (
     <section className="bg-white">
       <div className="border-b border-[#f2ebe6] bg-[#faf8f6]">
-        <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl px-4 pt-28 pb-14 sm:px-6 lg:px-8">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#FF912C] sm:text-[15px]">
             {t("booking.reviewLookup.title")}
           </p>

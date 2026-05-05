@@ -132,7 +132,7 @@ export function buildMetadata(input: {
 }): Metadata {
   const tenant = input.tenant;
   const baseUrl = getBaseUrl();
-  const siteName = tenant.tenantName || "Bon Drive Car Rental";
+  const siteName = tenant.tenantName || "Aloha Car Rental";
   const description =
     input.description ||
     defaultDescriptionByLocale(input.locale, siteName);

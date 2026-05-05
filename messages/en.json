@@ -572,8 +572,8 @@
           "detail": "Running bookings and operations from Bonaire on the platform."
         },
         "bonDrive": {
-          "status": "Starting soon",
-          "detail": "Preparing rollout for operational use in Bonaire."
+          "status": "Active customer",
+          "detail": "Running bookings, fleet, and operations from Bonaire on the platform."
         }
       }
     },

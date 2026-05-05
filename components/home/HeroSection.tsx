@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
-import { MapPinIcon } from "lucide-react";
+import { CalendarDaysIcon, MapPinIcon } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateInputInLaPaz, parseLaPazDateInput, parseLaPazDateTimeInput } from "@/lib/timezone";
 
@@ -91,7 +91,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
         <div className="absolute inset-y-0 left-0 w-[58%] bg-[radial-gradient(circle_at_left_center,rgba(7,26,54,0.38),transparent_72%)]" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-20 lg:pt-36">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-32">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="space-y-6 text-white">
             <h1 className="max-w-4xl text-5xl font-extrabold italic leading-[1.08] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
@@ -128,8 +128,13 @@ export default function HeroSection({ locations }: HeroSectionProps) {
             </div>
           </div>
 
-          <div className="public-hero-panel rounded-2xl p-6">
-            <div className="space-y-4">
+          <div className="public-hero-panel overflow-hidden rounded-2xl">
+            {/* Panel header */}
+            <div className="bg-[linear-gradient(135deg,#FF912C,#FFD23F)] px-6 py-3 flex items-center gap-2">
+              <CalendarDaysIcon className="h-4 w-4 text-[rgb(120,62,9)]" />
+              <span className="text-sm font-bold text-[rgb(120,62,9)] uppercase tracking-[0.16em]">{t("booking.searchAvailability")}</span>
+            </div>
+            <div className="space-y-4 p-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="public-widget-label text-sm font-semibold">{t("booking.startDate")}</Label>

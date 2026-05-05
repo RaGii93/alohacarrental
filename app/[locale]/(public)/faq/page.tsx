@@ -79,7 +79,7 @@ export default async function FAQPage({
   return (
     <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.12),_transparent_52%),linear-gradient(180deg,_#f8fbff,_#eef5ff_55%,_#ffffff)]">
       <div className="absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,hsl(var(--primary)/0.08),transparent)]" />
-      <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="relative mx-auto max-w-7xl px-4 pt-28 pb-12 sm:px-6 lg:px-8 lg:pb-16">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_360px] lg:items-start">
           <div className="space-y-8">
             <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--primary)/0.14)] bg-white/88 p-8 shadow-[0_30px_90px_-46px_hsl(var(--foreground)/0.22)] backdrop-blur-sm sm:p-10">

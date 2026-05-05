@@ -50,7 +50,7 @@ export default async function FleetOverviewPage() {
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.92),rgba(255,244,230,0.94))] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.92),rgba(255,244,230,0.94))] px-4 pt-28 pb-16 sm:px-6 lg:px-8 lg:pb-20">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,145,44,0.08),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(255,145,44,0.12),transparent_24%)]" />
       <div className="relative mx-auto w-full max-w-[1500px]">
         <div className="mx-auto max-w-3xl text-center">

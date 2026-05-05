@@ -91,7 +91,7 @@ const HELP_UI_COPY: Record<HelpLocale, HelpUiCopy> = {
     homeEyebrow: "Help Center",
     homeTitle: "Documentation, walkthroughs, and operational answers",
     homeDescription:
-      "Search the product docs, open detailed help pages, or ask the assistant for grounded answers based on the current Bon Drive documentation.",
+      "Search the product docs, open detailed help pages, or ask the assistant for grounded answers based on the current Aloha Car Rental documentation.",
     searchLabel: "Search documentation",
     searchPlaceholder: "Search bookings, pickup, returns, invoices, vehicle status...",
     searchEmptyTitle: "No matching docs found",
@@ -106,7 +106,7 @@ const HELP_UI_COPY: Record<HelpLocale, HelpUiCopy> = {
     assistantCta: "Open assistant",
     assistantPageTitle: "Help Assistant",
     assistantPageDescription:
-      "Ask how Bon Drive works. The assistant only answers from the current Help Center documentation.",
+      "Ask how Aloha Car Rental works. The assistant only answers from the current Help Center documentation.",
     assistantInputPlaceholder: "Ask a help question...",
     assistantSubmit: "Ask",
     assistantSubmitting: "Thinking...",
@@ -122,7 +122,7 @@ const HELP_UI_COPY: Record<HelpLocale, HelpUiCopy> = {
     homeEyebrow: "Centro de ayuda",
     homeTitle: "Documentación, guías y respuestas operativas",
     homeDescription:
-      "Busca en la documentación del producto, abre páginas de ayuda detalladas o pregunta al asistente para recibir respuestas basadas en la documentación actual de Bon Drive.",
+      "Busca en la documentación del producto, abre páginas de ayuda detalladas o pregunta al asistente para recibir respuestas basadas en la documentación actual de Aloha Car Rental.",
     searchLabel: "Buscar en la documentación",
     searchPlaceholder: "Buscar reservas, recogida, devoluciones, facturas, estado del vehículo...",
     searchEmptyTitle: "No se encontraron documentos",
@@ -137,7 +137,7 @@ const HELP_UI_COPY: Record<HelpLocale, HelpUiCopy> = {
     assistantCta: "Abrir asistente",
     assistantPageTitle: "Asistente de ayuda",
     assistantPageDescription:
-      "Pregunta cómo funciona Bon Drive. El asistente responde solo con la documentación actual del Centro de ayuda.",
+      "Pregunta cómo funciona Aloha Car Rental. El asistente responde solo con la documentación actual del Centro de ayuda.",
     assistantInputPlaceholder: "Haz una pregunta de ayuda...",
     assistantSubmit: "Preguntar",
     assistantSubmitting: "Pensando...",
@@ -153,7 +153,7 @@ const HELP_UI_COPY: Record<HelpLocale, HelpUiCopy> = {
     homeEyebrow: "Helpcentrum",
     homeTitle: "Documentatie, werkwijzes en operationele antwoorden",
     homeDescription:
-      "Doorzoek de productdocumentatie, open gedetailleerde hulppagina’s of stel een vraag aan de assistent voor antwoorden op basis van de huidige Bon Drive-documentatie.",
+      "Doorzoek de productdocumentatie, open gedetailleerde hulppagina’s of stel een vraag aan de assistent voor antwoorden op basis van de huidige Aloha Car Rental-documentatie.",
     searchLabel: "Zoek in de documentatie",
     searchPlaceholder: "Zoek op boekingen, ophalen, retour, facturen, voertuigstatus...",
     searchEmptyTitle: "Geen passende documentatie gevonden",
@@ -168,7 +168,7 @@ const HELP_UI_COPY: Record<HelpLocale, HelpUiCopy> = {
     assistantCta: "Assistent openen",
     assistantPageTitle: "Hulpassistent",
     assistantPageDescription:
-      "Vraag hoe Bon Drive werkt. De assistent antwoordt alleen vanuit de huidige Helpcentrum-documentatie.",
+      "Vraag hoe Aloha Car Rental werkt. De assistent antwoordt alleen vanuit de huidige Helpcentrum-documentatie.",
     assistantInputPlaceholder: "Stel een hulpvraag...",
     assistantSubmit: "Vragen",
     assistantSubmitting: "Bezig...",
@@ -1013,9 +1013,9 @@ const HELP_DOCS: HelpDocDefinition[] = [
           nl: "Gedrag van de refresh token",
         },
         summary: {
-          en: "Bon Drive stores the QuickBooks refresh token and uses it to renew access automatically when API calls or health checks run.",
-          es: "Bon Drive guarda el refresh token de QuickBooks y lo usa para renovar el acceso automáticamente cuando se ejecutan llamadas API o verificaciones de estado.",
-          nl: "Bon Drive slaat de QuickBooks refresh token op en gebruikt die om toegang automatisch te vernieuwen wanneer API-calls of health checks draaien.",
+          en: "Aloha Car Rental stores the QuickBooks refresh token and uses it to renew access automatically when API calls or health checks run.",
+          es: "Aloha Car Rental guarda el refresh token de QuickBooks y lo usa para renovar el acceso automáticamente cuando se ejecutan llamadas API o verificaciones de estado.",
+          nl: "Aloha Car Rental slaat de QuickBooks refresh token op en gebruikt die om toegang automatisch te vernieuwen wanneer API-calls of health checks draaien.",
         },
         bullets: {
           en: [
@@ -1132,9 +1132,9 @@ const HELP_DOCS: HelpDocDefinition[] = [
           nl: "Gedrag van de refresh token",
         },
         summary: {
-          en: "Bon Drive uses the stored Zoho refresh token to request fresh access tokens whenever a sync or health check runs.",
-          es: "Bon Drive usa el refresh token guardado de Zoho para solicitar access tokens nuevos cuando se ejecuta una sincronización o una verificación de estado.",
-          nl: "Bon Drive gebruikt de opgeslagen Zoho refresh token om nieuwe access tokens op te halen wanneer een sync of health check draait.",
+          en: "Aloha Car Rental uses the stored Zoho refresh token to request fresh access tokens whenever a sync or health check runs.",
+          es: "Aloha Car Rental usa el refresh token guardado de Zoho para solicitar access tokens nuevos cuando se ejecuta una sincronización o una verificación de estado.",
+          nl: "Aloha Car Rental gebruikt de opgeslagen Zoho refresh token om nieuwe access tokens op te halen wanneer een sync of health check draait.",
         },
         bullets: {
           en: [
@@ -1165,9 +1165,9 @@ const HELP_DOCS: HelpDocDefinition[] = [
           nl: "Volgorde van factuur en betaling",
         },
         summary: {
-          en: "If payment is not yet received, only the invoice is created. Once payment is marked in Bon Drive, the next Zoho sync creates the payment against that invoice.",
-          es: "Si el pago aún no se recibió, solo se crea la factura. Una vez marcado el pago en Bon Drive, la siguiente sincronización de Zoho crea el pago contra esa factura.",
-          nl: "Als de betaling nog niet is ontvangen, wordt alleen de factuur aangemaakt. Zodra de betaling in Bon Drive is gemarkeerd, maakt de volgende Zoho-sync de betaling tegen die factuur aan.",
+          en: "If payment is not yet received, only the invoice is created. Once payment is marked in Aloha Car Rental, the next Zoho sync creates the payment against that invoice.",
+          es: "Si el pago aún no se recibió, solo se crea la factura. Una vez marcado el pago en Aloha Car Rental, la siguiente sincronización de Zoho crea el pago contra esa factura.",
+          nl: "Als de betaling nog niet is ontvangen, wordt alleen de factuur aangemaakt. Zodra de betaling in Aloha Car Rental is gemarkeerd, maakt de volgende Zoho-sync de betaling tegen die factuur aan.",
         },
         bullets: {
           en: [

@@ -572,8 +572,8 @@
           "detail": "Gestiona reservas y operaciones desde Bonaire en la plataforma."
         },
         "bonDrive": {
-          "status": "Comienza pronto",
-          "detail": "Preparando el despliegue para uso operativo en Bonaire."
+          "status": "Cliente activo",
+          "detail": "Gestionando reservas, flota y operaciones desde Bonaire en la plataforma."
         }
       }
     },

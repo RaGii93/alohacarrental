@@ -424,3 +424,78 @@
   border-radius: 9999px;
   background: #ffffff;
 }
+
+/* ── Aloha public-site component classes ─────────────────────────── */
+
+/* Booking search widget panel (hero section) */
+.public-hero-panel {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 145, 44, 0.22);
+  box-shadow:
+    0 40px 100px -28px rgba(96, 45, 10, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Input / select trigger fields inside the widget */
+.public-widget-field {
+  background: #fff;
+  border: 1.5px solid rgba(255, 145, 44, 0.28) !important;
+  border-radius: 0.75rem;
+  color: rgb(50, 28, 6);
+  height: 2.75rem;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+.public-widget-field:focus,
+.public-widget-field:focus-within {
+  border-color: #ff912c !important;
+  box-shadow: 0 0 0 3px rgba(255, 145, 44, 0.16);
+  outline: none;
+}
+
+/* Labels above widget inputs */
+.public-widget-label {
+  color: rgb(80, 46, 12);
+  font-weight: 600;
+}
+
+/* Primary CTA button (orange gradient) */
+.public-primary-button {
+  background: linear-gradient(135deg, #ff912c 0%, #ffd23f 100%);
+  color: rgb(120, 62, 9);
+  font-weight: 700;
+  transition: filter 150ms;
+}
+
+.public-primary-button:hover {
+  filter: brightness(1.06);
+}
+
+/* Secondary hero button (white ghost) */
+.public-hero-secondary-button {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.44) !important;
+  color: white;
+  backdrop-filter: blur(10px);
+  transition: background 150ms;
+}
+
+.public-hero-secondary-button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Section eyebrow badges */
+.public-eyebrow {
+  background: rgba(255, 145, 44, 0.1);
+  border: 1px solid rgba(255, 145, 44, 0.22);
+  color: #e67f1f;
+}
+
+/* Glass card used in stats / reviews */
+.public-glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 145, 44, 0.14);
+  box-shadow: 0 18px 50px -28px rgba(96, 45, 10, 0.16);
+}
