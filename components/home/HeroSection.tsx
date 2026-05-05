@@ -77,7 +77,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-[700px] overflow-hidden pb-16">
+    <section className="relative min-h-[640px] overflow-hidden pb-16">
       <div className="absolute inset-0">
         <Image
           src={HERO_BG}
@@ -92,7 +92,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-32">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div className="grid items-center gap-8 lg:grid-cols-[1.12fr_0.88fr]">
           <div className="space-y-6 text-white">
             <h1 className="max-w-4xl text-5xl font-extrabold italic leading-[1.08] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
               {t("landing.hero.headline.line1")}{" "}
@@ -128,14 +128,14 @@ export default function HeroSection({ locations }: HeroSectionProps) {
             </div>
           </div>
 
-          <div className="public-hero-panel overflow-hidden rounded-2xl">
+          <div className="public-hero-panel w-full max-w-[30rem] justify-self-end overflow-hidden rounded-2xl">
             {/* Panel header */}
-            <div className="bg-[linear-gradient(135deg,#FF912C,#FFD23F)] px-6 py-3 flex items-center gap-2">
+            <div className="bg-[linear-gradient(135deg,#FF912C,#FFD23F)] px-5 py-2.5 flex items-center gap-2">
               <CalendarDaysIcon className="h-4 w-4 text-[rgb(120,62,9)]" />
               <span className="text-sm font-bold text-[rgb(120,62,9)] uppercase tracking-[0.16em]">{t("booking.searchAvailability")}</span>
             </div>
-            <div className="space-y-4 p-6">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-3 p-5">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="public-widget-label text-sm font-semibold">{t("booking.startDate")}</Label>
                   <Input className="public-widget-field" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -146,7 +146,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="public-widget-label text-sm font-semibold">{t("booking.pickupTime")}</Label>
                   <Input className="public-widget-field" type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
@@ -157,15 +157,15 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-1.5">
                   <Label className="public-widget-label flex items-center gap-1.5 text-sm font-semibold">
                     <MapPinIcon className="h-3.5 w-3.5 text-[rgb(228,98,170)]" />
                     {t("booking.pickupLocation")}
                   </Label>
                   <Select value={pickupLocationId} onValueChange={setPickupLocationId}>
-                    <SelectTrigger className="public-widget-field">
-                      <SelectValue placeholder={t("booking.selectLocation")} />
+                    <SelectTrigger className="public-widget-field w-full min-w-0">
+                      <SelectValue className="max-w-[calc(100%-1.25rem)] truncate" placeholder={t("booking.selectLocation")} />
                     </SelectTrigger>
                     <SelectContent>
                       {locations.map((location) => (
@@ -182,8 +182,8 @@ export default function HeroSection({ locations }: HeroSectionProps) {
                     {t("booking.dropoffLocation")}
                   </Label>
                   <Select value={dropoffLocationId} onValueChange={setDropoffLocationId}>
-                    <SelectTrigger className="public-widget-field">
-                      <SelectValue placeholder={t("booking.selectLocation")} />
+                    <SelectTrigger className="public-widget-field w-full min-w-0">
+                      <SelectValue className="max-w-[calc(100%-1.25rem)] truncate" placeholder={t("booking.selectLocation")} />
                     </SelectTrigger>
                     <SelectContent>
                       {locations.map((location) => (
@@ -198,7 +198,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
 
               <Button
                 size="lg"
-                className="w-full rounded-full bg-[linear-gradient(135deg,rgba(255,145,28,0.98),rgba(255,210,63,0.94))] py-6 text-base font-bold text-[rgb(120,62,9)] shadow-[0_24px_44px_-24px_rgba(255,145,28,0.42)] hover:brightness-[1.03]"
+                className="w-full rounded-full bg-[linear-gradient(135deg,rgba(255,145,28,0.98),rgba(255,210,63,0.94))] py-4 text-base font-bold text-[rgb(120,62,9)] shadow-[0_24px_44px_-24px_rgba(255,145,28,0.42)] hover:brightness-[1.03]"
                 onClick={goToBookingPage}
               >
                 {t("booking.searchAvailability")}

@@ -804,6 +804,7 @@
     },
     "bookings": {
       "title": "Bookings",
+      "create": "New booking",
       "empty": "No bookings found",
       "actions": {
         "view": "View",
@@ -974,6 +975,7 @@
           "description": "Capture the vehicle condition, upload inspection photos, and collect client acceptance before closing the step.",
           "steps": {
             "condition": "Condition",
+            "checklist": "Checklist",
             "photos": "Photos",
             "acceptance": "Acceptance"
           },
@@ -1019,15 +1021,46 @@
             "category": "Category",
             "fuelCharge": "Fuel charge",
             "totalCloseout": "Total close-out charge",
+            "checklistCompleted": "Checklist completed",
+            "closeoutPaidOnSpot": "Closeout paid on spot",
             "acceptedBy": "Accepted by client",
             "acceptedByPlaceholder": "Client full name",
             "checkbox": "I confirm the client reviewed this overview and accepted the recorded condition, fuel level, and charges if applicable."
+          },
+          "checklist": {
+            "title": "Pickup checklist",
+            "description": "Confirm handoff details before completing pickup.",
+            "items": {
+              "licenseVerified": "Driver license verified",
+              "vehicleExteriorChecked": "Vehicle exterior checked",
+              "vehicleInteriorChecked": "Vehicle interior checked",
+              "fuelLevelConfirmed": "Fuel level confirmed",
+              "accessoriesConfirmed": "Accessories confirmed",
+              "rentalWindowConfirmed": "Rental window confirmed",
+              "termsExplained": "Terms explained",
+              "clientReceivedVehicle": "Client received vehicle"
+            }
+          },
+          "returnChecklist": {
+            "title": "Return checklist",
+            "description": "Confirm closeout details before completing return.",
+            "items": {
+              "vehicleExteriorRechecked": "Vehicle exterior rechecked",
+              "vehicleInteriorRechecked": "Vehicle interior rechecked",
+              "fuelLevelRechecked": "Fuel level rechecked",
+              "damageReviewed": "Damage reviewed",
+              "lateReturnReviewed": "Late return reviewed",
+              "extraChargesExplained": "Extra charges explained",
+              "keysReceived": "Keys received",
+              "clientCloseoutConfirmed": "Client closeout confirmed"
+            }
           },
           "completePickup": "Complete Pickup",
           "completeReturn": "Complete Return",
           "validation": {
             "odometer": "Enter the odometer in kilometers.",
             "fuelLevel": "Select the fuel level.",
+            "checklist": "Complete all checklist items before continuing.",
             "damageNotes": "Describe the damage before continuing.",
             "acceptedBy": "Enter the client name for acceptance.",
             "acceptance": "Confirm client acceptance before completing the inspection."
@@ -1100,6 +1133,7 @@
         "filesCard": {
           "description": "Customer documents and generated billing outputs.",
           "openPaymentProof": "Open payment proof",
+          "openLatestInvoice": "Open latest invoice",
           "closeoutInvoicePaid": "Closeout Invoice (Paid)",
           "closeoutInvoicePending": "Closeout Invoice (Pending)",
           "closeoutInvoiceTitle": "Closeout Invoice",
@@ -1247,6 +1281,7 @@
       "message": "Your license has been suspended. Please contact us to resume access."
     },
     "dashboard": {
+      "title": "Admin",
       "header": {
         "welcome": "Welcome, {user}",
         "role": "Role: {role}",
@@ -1254,9 +1289,11 @@
         "licenseSuspended": "License: Suspended"
       },
       "tabs": {
+        "dashboard": "Dashboard",
         "bookings": "Bookings",
         "deliveries": "Deliveries",
         "returns": "Returns",
+        "customers": "Customers",
         "financial": "Financial",
         "fleet": "Fleet",
         "quickbooks": "QuickBooks",
@@ -1266,10 +1303,82 @@
         "reviews": "Reviews",
         "settings": "Settings",
         "locations": "Locations",
+        "inventory": "Inventory",
+        "maintenance": "Maintenance",
+        "partnerRentals": "Partner Rentals",
+        "automations": "Automations",
         "logs": "Logs",
         "users": "Users",
         "help": "Help Center",
         "notifications": "Notifications"
+      },
+      "commandCenter": {
+        "kicker": "Command center",
+        "title": "Operations dashboard",
+        "subtitle": "Live bookings, fleet load, financial momentum, and alerts in one place.",
+        "actions": {
+          "manageBookings": "Manage bookings",
+          "openFleet": "Open fleet"
+        },
+        "kpis": {
+          "bookingsToday": "Bookings today",
+          "activeRentalsNow": "Active rentals now",
+          "vehiclesAvailableNow": "Vehicles available now",
+          "vehiclesInMaintenance": "Vehicles in maintenance",
+          "unpaidInvoicesCount": "Unpaid invoices",
+          "revenueToday": "Revenue today",
+          "revenueThisMonth": "Revenue this month",
+          "utilizationRate": "Utilization rate",
+          "averageBookingValue": "Average booking value"
+        },
+        "analytics": {
+          "revenueTrend": "Revenue trend",
+          "bookingsTrend": "Bookings trend",
+          "last30Days": "Last 30 days",
+          "categoryPerformance": "Category performance",
+          "occupancyByCategory": "Occupancy by category",
+          "executiveRatios": "Executive ratios",
+          "cancellationRate": "Cancellation rate",
+          "repeatCustomerRate": "Repeat customer rate"
+        },
+        "alerts": {
+          "title": "Alerts",
+          "description": "Issues that need attention now.",
+          "affected": "Affected: {count}"
+        },
+        "widgets": {
+          "topVehiclesByRevenue": "Top vehicles by revenue",
+          "upcomingPickups": "Upcoming pickups",
+          "upcomingReturns": "Upcoming returns",
+          "overdueReturns": "Overdue returns",
+          "recentBookings": "Recent bookings",
+          "vehiclesNeedingAttention": "Vehicles needing attention",
+          "recentPayments": "Recent payments",
+          "reviewsPendingModeration": "Reviews pending moderation"
+        },
+        "table": {
+          "vehicle": "Vehicle",
+          "bookings": "Bookings",
+          "revenue": "Revenue",
+          "unassigned": "Unassigned",
+          "customer": "Customer",
+          "booking": "Booking",
+          "rating": "Rating",
+          "created": "Created"
+        },
+        "empty": {
+          "noCategoryPerformance": "No category performance data yet.",
+          "noOccupancy": "No occupancy data yet.",
+          "noAlerts": "No active alerts.",
+          "noTopVehicles": "No top-vehicle data yet.",
+          "noUpcomingPickups": "No upcoming pickups.",
+          "noUpcomingReturns": "No upcoming returns.",
+          "noOverdueReturns": "No overdue returns.",
+          "noRecentBookings": "No recent bookings.",
+          "noVehiclesAttention": "No vehicles require attention.",
+          "noRecentPayments": "No recent payments.",
+          "noPendingReviews": "No reviews pending moderation."
+        }
       },
       "deliveries": {
         "title": "Upcoming Deliveries (Next 7 Days)"
@@ -1342,6 +1451,7 @@
         "durationPending": "Select start and end to see duration",
         "globalHelper": "A global blockout applies to all vehicles and overrides individual availability.",
         "helperTitle": "Blockout Summary",
+        "dateTimeHelper": "Times are recorded in {timezone}.",
         "invalidRange": "End date must be after start date.",
         "reasonHelper": "Describe why vehicles are unavailable (e.g. public holiday, maintenance).",
         "singleVehicle": "Single Vehicle",
@@ -1531,6 +1641,7 @@
       "deleted": "User deleted",
       "protected": "Protected",
       "rootProtected": "ROOT user cannot be modified or deleted",
+      "deleteTitle": "Delete user?",
       "deleteConfirm": "Delete this user?",
       "empty": "No users found",
       "errors": {
@@ -1549,11 +1660,14 @@
       "name": "Name",
       "code": "Code",
       "address": "Address",
+      "coordinates": "Coordinates",
+      "coordinatesValue": "{lat}, {lng}",
       "bookings": "Bookings",
       "actions": "Actions",
       "created": "Location created",
       "updated": "Location updated",
       "deleted": "Location deleted",
+      "deleteTitle": "Delete location?",
       "deleteConfirm": "Delete this location?",
       "empty": "No locations found",
       "errors": {
@@ -1766,6 +1880,8 @@
       "add": "Add Feature",
       "edit": "Edit Feature",
       "name": "Feature Name",
+      "icon": "Icon",
+      "preview": "Preview",
       "slug": "Slug",
       "sortOrder": "Sort Order",
       "active": "Active",
@@ -2083,6 +2199,7 @@
         "payment": "Payment: {value}",
         "pickup": "Pickup: {value}",
         "dropoff": "Dropoff: {value}",
+        "closeoutPayment": "Closeout payment: {value}",
         "notReceived": "Not received yet",
         "notMarked": "Not marked yet",
         "closeoutBreakdown": "Closeout Breakdown",

@@ -774,6 +774,7 @@
     },
     "bookings": {
       "title": "Reserveringen",
+      "create": "Nieuwe boeking",
       "empty": "Geen reserveringen gevonden",
       "actions": {
         "view": "Bekijken",
@@ -944,6 +945,7 @@
           "description": "Leg de staat van het voertuig vast, upload inspectiefoto's en verzamel klantacceptatie voordat deze stap wordt afgerond.",
           "steps": {
             "condition": "Staat",
+            "checklist": "Checklist",
             "photos": "Foto's",
             "acceptance": "Acceptatie"
           },
@@ -989,15 +991,46 @@
             "category": "Categorie",
             "fuelCharge": "Brandstoftoeslag",
             "totalCloseout": "Totale afsluittaks",
+            "checklistCompleted": "Checklist voltooid",
+            "closeoutPaidOnSpot": "Sluiting ter plaatse betaald",
             "acceptedBy": "Geaccepteerd door klant",
             "acceptedByPlaceholder": "Volledige naam klant",
             "checkbox": "Ik bevestig dat de klant dit overzicht heeft bekeken en de vastgelegde staat, het brandstofniveau en eventuele kosten heeft geaccepteerd."
+          },
+          "checklist": {
+            "title": "Ophaalchecklist",
+            "description": "Bevestig overdrachtsdetails voordat je de uitgifte voltooit.",
+            "items": {
+              "licenseVerified": "Rijbewijs gecontroleerd",
+              "vehicleExteriorChecked": "Buitenzijde voertuig gecontroleerd",
+              "vehicleInteriorChecked": "Binnenzijde voertuig gecontroleerd",
+              "fuelLevelConfirmed": "Brandstofniveau bevestigd",
+              "accessoriesConfirmed": "Accessoires bevestigd",
+              "rentalWindowConfirmed": "Huurperiode bevestigd",
+              "termsExplained": "Voorwaarden uitgelegd",
+              "clientReceivedVehicle": "Klant heeft voertuig ontvangen"
+            }
+          },
+          "returnChecklist": {
+            "title": "Inleverchecklist",
+            "description": "Bevestig afhandelingsdetails voordat je de inlevering voltooit.",
+            "items": {
+              "vehicleExteriorRechecked": "Buitenzijde voertuig opnieuw gecontroleerd",
+              "vehicleInteriorRechecked": "Binnenzijde voertuig opnieuw gecontroleerd",
+              "fuelLevelRechecked": "Brandstofniveau opnieuw gecontroleerd",
+              "damageReviewed": "Schade beoordeeld",
+              "lateReturnReviewed": "Te late inlevering beoordeeld",
+              "extraChargesExplained": "Extra kosten toegelicht",
+              "keysReceived": "Sleutels ontvangen",
+              "clientCloseoutConfirmed": "Afhandeling bevestigd door klant"
+            }
           },
           "completePickup": "Uitgifte voltooien",
           "completeReturn": "Inlevering voltooien",
           "validation": {
             "odometer": "Voer de kilometerstand in kilometers in.",
             "fuelLevel": "Selecteer het brandstofniveau.",
+            "checklist": "Rond alle checklistpunten af voordat je doorgaat.",
             "damageNotes": "Beschrijf de schade voordat je doorgaat.",
             "acceptedBy": "Voer de naam van de klant in voor acceptatie.",
             "acceptance": "Bevestig klantacceptatie voordat je de inspectie afrondt."
@@ -1070,6 +1103,7 @@
         "filesCard": {
           "description": "Klantdocumenten en gegenereerde factuurbestanden.",
           "openPaymentProof": "Betalingsbewijs openen",
+          "openLatestInvoice": "Nieuwste factuur openen",
           "closeoutInvoicePaid": "Slotfactuur (Betaald)",
           "closeoutInvoicePending": "Slotfactuur (Lopend)",
           "closeoutInvoiceTitle": "Slotfactuur",
@@ -1217,6 +1251,7 @@
       "message": "Je licentie is opgeschort. Neem contact met ons op om het toegang te hervatten."
     },
     "dashboard": {
+      "title": "Beheer",
       "header": {
         "welcome": "Welkom, {user}",
         "role": "Rol: {role}",
@@ -1224,9 +1259,11 @@
         "licenseSuspended": "Licentie: Opgeschort"
       },
       "tabs": {
+        "dashboard": "Dashboard",
         "bookings": "Reserveringen",
         "deliveries": "Leveringen",
         "returns": "Innames",
+        "customers": "Klanten",
         "financial": "Financieel",
         "fleet": "Vloot",
         "quickbooks": "QuickBooks",
@@ -1236,10 +1273,82 @@
         "reviews": "Reviews",
         "settings": "Instellingen",
         "locations": "Locaties",
+        "inventory": "Voorraad",
+        "maintenance": "Onderhoud",
+        "partnerRentals": "Partnerverhuur",
+        "automations": "Automatiseringen",
         "logs": "Logs",
         "users": "Gebruikers",
         "help": "Helpcentrum",
         "notifications": "Meldingen"
+      },
+      "commandCenter": {
+        "kicker": "Commandocentrum",
+        "title": "Operationeel dashboard",
+        "subtitle": "Live boekingen, vlootbelasting, financiele voortgang en alerts op een plek.",
+        "actions": {
+          "manageBookings": "Boekingen beheren",
+          "openFleet": "Vloot openen"
+        },
+        "kpis": {
+          "bookingsToday": "Boekingen vandaag",
+          "activeRentalsNow": "Actieve verhuur nu",
+          "vehiclesAvailableNow": "Voertuigen nu beschikbaar",
+          "vehiclesInMaintenance": "Voertuigen in onderhoud",
+          "unpaidInvoicesCount": "Onbetaalde facturen",
+          "revenueToday": "Omzet vandaag",
+          "revenueThisMonth": "Omzet deze maand",
+          "utilizationRate": "Bezettingsgraad",
+          "averageBookingValue": "Gemiddelde boekingswaarde"
+        },
+        "analytics": {
+          "revenueTrend": "Omzettrend",
+          "bookingsTrend": "Boekingstrend",
+          "last30Days": "Laatste 30 dagen",
+          "categoryPerformance": "Prestaties per categorie",
+          "occupancyByCategory": "Bezetting per categorie",
+          "executiveRatios": "Kernratio's",
+          "cancellationRate": "Annuleringspercentage",
+          "repeatCustomerRate": "Terugkerende klanten"
+        },
+        "alerts": {
+          "title": "Waarschuwingen",
+          "description": "Onderwerpen die nu aandacht vragen.",
+          "affected": "Getroffen: {count}"
+        },
+        "widgets": {
+          "topVehiclesByRevenue": "Top voertuigen op omzet",
+          "upcomingPickups": "Aankomende pickups",
+          "upcomingReturns": "Aankomende inleveringen",
+          "overdueReturns": "Te late inleveringen",
+          "recentBookings": "Recente boekingen",
+          "vehiclesNeedingAttention": "Voertuigen die aandacht nodig hebben",
+          "recentPayments": "Recente betalingen",
+          "reviewsPendingModeration": "Reviews in afwachting van moderatie"
+        },
+        "table": {
+          "vehicle": "Voertuig",
+          "bookings": "Boekingen",
+          "revenue": "Omzet",
+          "unassigned": "Niet toegewezen",
+          "customer": "Klant",
+          "booking": "Boeking",
+          "rating": "Beoordeling",
+          "created": "Aangemaakt"
+        },
+        "empty": {
+          "noCategoryPerformance": "Nog geen categorieprestatiegegevens.",
+          "noOccupancy": "Nog geen bezettingsgegevens.",
+          "noAlerts": "Geen actieve waarschuwingen.",
+          "noTopVehicles": "Nog geen top-voertuiggegevens.",
+          "noUpcomingPickups": "Geen aankomende pickups.",
+          "noUpcomingReturns": "Geen aankomende inleveringen.",
+          "noOverdueReturns": "Geen te late inleveringen.",
+          "noRecentBookings": "Geen recente boekingen.",
+          "noVehiclesAttention": "Geen voertuigen vereisen aandacht.",
+          "noRecentPayments": "Geen recente betalingen.",
+          "noPendingReviews": "Geen reviews in afwachting van moderatie."
+        }
       },
       "deliveries": {
         "title": "Aankomende Leveringen (Volgende 7 Dagen)"
@@ -1312,6 +1421,7 @@
         "durationPending": "Selecteer begin en einde om de duur te zien",
         "globalHelper": "Een globale blokkering geldt voor alle voertuigen en overschrijft individuele beschikbaarheid.",
         "helperTitle": "Blokkeringsoverzicht",
+        "dateTimeHelper": "Tijden worden vastgelegd in {timezone}.",
         "invalidRange": "Einddatum moet na begindatum liggen.",
         "reasonHelper": "Beschrijf waarom voertuigen niet beschikbaar zijn (bijv. feestdag, onderhoud).",
         "singleVehicle": "Enkel voertuig",
@@ -1501,6 +1611,7 @@
       "deleted": "Gebruiker verwijderd",
       "protected": "Beveiligd",
       "rootProtected": "ROOT-gebruiker kan niet worden aangepast of verwijderd",
+      "deleteTitle": "Gebruiker verwijderen?",
       "deleteConfirm": "Deze gebruiker verwijderen?",
       "empty": "Geen gebruikers gevonden",
       "errors": {
@@ -1519,11 +1630,14 @@
       "name": "Naam",
       "code": "Code",
       "address": "Adres",
+      "coordinates": "Coördinaten",
+      "coordinatesValue": "{lat}, {lng}",
       "bookings": "Reserveringen",
       "actions": "Acties",
       "created": "Locatie aangemaakt",
       "updated": "Locatie bijgewerkt",
       "deleted": "Locatie verwijderd",
+      "deleteTitle": "Locatie verwijderen?",
       "deleteConfirm": "Deze locatie verwijderen?",
       "empty": "Geen locaties gevonden",
       "errors": {
@@ -1736,6 +1850,8 @@
       "add": "Kenmerk toevoegen",
       "edit": "Kenmerk bewerken",
       "name": "Naam van kenmerk",
+      "icon": "Icoon",
+      "preview": "Voorbeeld",
       "slug": "Slug",
       "sortOrder": "Sorteervolgorde",
       "active": "Actief",
@@ -2046,6 +2162,7 @@
         "markPaidTitle": "Markeer {code} als betaald",
         "markPickupTitle": "Markeer {code} als opgehaald",
         "markDropoffTitle": "Markeer {code} als ingeleverd",
+        "closeoutPayment": "Eindafrekening betaling: {value}",
         "updateTitle": "Partnerverhuur bijwerken",
         "description": "Sla de volgende operationele stap op zonder deze boeking in je normale vlootrecords te mengen."
       },
@@ -2053,6 +2170,7 @@
         "payment": "Betaling: {value}",
         "pickup": "Ophalen: {value}",
         "dropoff": "Inleveren: {value}",
+        "closeoutPayment": "Eindafrekening betaling: {value}",
         "notReceived": "Nog niet ontvangen",
         "notMarked": "Nog niet gemarkeerd",
         "closeoutBreakdown": "Slotoverzicht",

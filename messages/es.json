@@ -774,6 +774,7 @@
     },
     "bookings": {
       "title": "Reservas",
+      "create": "Nueva reserva",
       "empty": "No se encontraron reservas",
       "actions": {
         "view": "Ver",
@@ -944,6 +945,7 @@
           "description": "Registra el estado del vehículo, sube fotos de inspección y recopila la aceptación del cliente antes de cerrar este paso.",
           "steps": {
             "condition": "Estado",
+            "checklist": "Lista",
             "photos": "Fotos",
             "acceptance": "Aceptación"
           },
@@ -989,15 +991,46 @@
             "category": "Categoría",
             "fuelCharge": "Cargo de combustible",
             "totalCloseout": "Cargo total de cierre",
+            "checklistCompleted": "Lista completada",
+            "closeoutPaidOnSpot": "Cierre pagado en sitio",
             "acceptedBy": "Aceptado por el cliente",
             "acceptedByPlaceholder": "Nombre completo del cliente",
             "checkbox": "Confirmo que el cliente revisó este resumen y aceptó el estado registrado, el nivel de combustible y los cargos si corresponde."
+          },
+          "checklist": {
+            "title": "Lista de recogida",
+            "description": "Confirma los detalles de entrega antes de completar la recogida.",
+            "items": {
+              "licenseVerified": "Licencia verificada",
+              "vehicleExteriorChecked": "Exterior del vehículo revisado",
+              "vehicleInteriorChecked": "Interior del vehículo revisado",
+              "fuelLevelConfirmed": "Nivel de combustible confirmado",
+              "accessoriesConfirmed": "Accesorios confirmados",
+              "rentalWindowConfirmed": "Ventana de alquiler confirmada",
+              "termsExplained": "Términos explicados",
+              "clientReceivedVehicle": "Cliente recibió el vehículo"
+            }
+          },
+          "returnChecklist": {
+            "title": "Lista de devolución",
+            "description": "Confirma los detalles de cierre antes de completar la devolución.",
+            "items": {
+              "vehicleExteriorRechecked": "Exterior del vehículo revisado nuevamente",
+              "vehicleInteriorRechecked": "Interior del vehículo revisado nuevamente",
+              "fuelLevelRechecked": "Nivel de combustible verificado nuevamente",
+              "damageReviewed": "Daños revisados",
+              "lateReturnReviewed": "Devolución tardía revisada",
+              "extraChargesExplained": "Cargos extra explicados",
+              "keysReceived": "Llaves recibidas",
+              "clientCloseoutConfirmed": "Cierre confirmado por el cliente"
+            }
           },
           "completePickup": "Completar entrega",
           "completeReturn": "Completar devolución",
           "validation": {
             "odometer": "Ingresa el odómetro en kilómetros.",
             "fuelLevel": "Selecciona el nivel de combustible.",
+            "checklist": "Completa todos los elementos de la lista antes de continuar.",
             "damageNotes": "Describe el daño antes de continuar.",
             "acceptedBy": "Ingresa el nombre del cliente para la aceptación.",
             "acceptance": "Confirma la aceptación del cliente antes de completar la inspección."
@@ -1070,6 +1103,7 @@
         "filesCard": {
           "description": "Documentos del cliente y comprobantes de facturación generados.",
           "openPaymentProof": "Abrir comprobante de pago",
+          "openLatestInvoice": "Abrir última factura",
           "closeoutInvoicePaid": "Factura de cierre (Pagada)",
           "closeoutInvoicePending": "Factura de cierre (Pendiente)",
           "closeoutInvoiceTitle": "Factura de cierre",
@@ -1217,6 +1251,7 @@
       "message": "Tu licencia ha sido suspendida. Por favor, contáctanos para reanudar el acceso."
     },
     "dashboard": {
+      "title": "Administración",
       "header": {
         "welcome": "Bienvenido, {user}",
         "role": "Rol: {role}",
@@ -1224,9 +1259,11 @@
         "licenseSuspended": "Licencia: Suspendida"
       },
       "tabs": {
+        "dashboard": "Panel",
         "bookings": "Reservas",
         "deliveries": "Entregas",
         "returns": "Devoluciones",
+        "customers": "Clientes",
         "financial": "Finanzas",
         "fleet": "Flota",
         "quickbooks": "QuickBooks",
@@ -1236,10 +1273,82 @@
         "reviews": "Reseñas",
         "settings": "Configuración",
         "locations": "Ubicaciones",
+        "inventory": "Inventario",
+        "maintenance": "Mantenimiento",
+        "partnerRentals": "Alquileres de socios",
+        "automations": "Automatizaciones",
         "logs": "Registros",
         "users": "Usuarios",
         "help": "Centro de ayuda",
         "notifications": "Notificaciones"
+      },
+      "commandCenter": {
+        "kicker": "Centro de control",
+        "title": "Panel operativo",
+        "subtitle": "Reservas en vivo, carga de flota, rendimiento financiero y alertas en un solo lugar.",
+        "actions": {
+          "manageBookings": "Gestionar reservas",
+          "openFleet": "Abrir flota"
+        },
+        "kpis": {
+          "bookingsToday": "Reservas de hoy",
+          "activeRentalsNow": "Alquileres activos ahora",
+          "vehiclesAvailableNow": "Vehículos disponibles ahora",
+          "vehiclesInMaintenance": "Vehículos en mantenimiento",
+          "unpaidInvoicesCount": "Facturas pendientes",
+          "revenueToday": "Ingresos de hoy",
+          "revenueThisMonth": "Ingresos de este mes",
+          "utilizationRate": "Tasa de utilización",
+          "averageBookingValue": "Valor promedio por reserva"
+        },
+        "analytics": {
+          "revenueTrend": "Tendencia de ingresos",
+          "bookingsTrend": "Tendencia de reservas",
+          "last30Days": "Últimos 30 días",
+          "categoryPerformance": "Rendimiento por categoría",
+          "occupancyByCategory": "Ocupación por categoría",
+          "executiveRatios": "Ratios ejecutivos",
+          "cancellationRate": "Tasa de cancelación",
+          "repeatCustomerRate": "Tasa de clientes recurrentes"
+        },
+        "alerts": {
+          "title": "Alertas",
+          "description": "Incidencias que requieren atención inmediata.",
+          "affected": "Afectados: {count}"
+        },
+        "widgets": {
+          "topVehiclesByRevenue": "Vehículos top por ingresos",
+          "upcomingPickups": "Próximas entregas",
+          "upcomingReturns": "Próximas devoluciones",
+          "overdueReturns": "Devoluciones atrasadas",
+          "recentBookings": "Reservas recientes",
+          "vehiclesNeedingAttention": "Vehículos que requieren atención",
+          "recentPayments": "Pagos recientes",
+          "reviewsPendingModeration": "Reseñas pendientes de moderación"
+        },
+        "table": {
+          "vehicle": "Vehículo",
+          "bookings": "Reservas",
+          "revenue": "Ingresos",
+          "unassigned": "Sin asignar",
+          "customer": "Cliente",
+          "booking": "Reserva",
+          "rating": "Calificación",
+          "created": "Creado"
+        },
+        "empty": {
+          "noCategoryPerformance": "Aún no hay datos de rendimiento por categoría.",
+          "noOccupancy": "Aún no hay datos de ocupación.",
+          "noAlerts": "No hay alertas activas.",
+          "noTopVehicles": "Aún no hay datos de vehículos top.",
+          "noUpcomingPickups": "No hay entregas próximas.",
+          "noUpcomingReturns": "No hay devoluciones próximas.",
+          "noOverdueReturns": "No hay devoluciones atrasadas.",
+          "noRecentBookings": "No hay reservas recientes.",
+          "noVehiclesAttention": "No hay vehículos que requieran atención.",
+          "noRecentPayments": "No hay pagos recientes.",
+          "noPendingReviews": "No hay reseñas pendientes de moderación."
+        }
       },
       "deliveries": {
         "title": "Próximas Entregas (Siguientes 7 Días)"
@@ -1312,6 +1421,7 @@
         "durationPending": "Seleccione inicio y fin para ver la duración",
         "globalHelper": "Una restricción global aplica a todos los vehículos y anula la disponibilidad individual.",
         "helperTitle": "Resumen de restricción",
+        "dateTimeHelper": "Los horarios se registran en {timezone}.",
         "invalidRange": "La fecha de fin debe ser posterior a la de inicio.",
         "reasonHelper": "Describa por qué los vehículos no están disponibles (ej. feriado, mantenimiento).",
         "singleVehicle": "Vehículo individual",
@@ -1501,6 +1611,7 @@
       "deleted": "Usuario eliminado",
       "protected": "Protegido",
       "rootProtected": "El usuario ROOT no puede modificarse ni eliminarse",
+      "deleteTitle": "¿Eliminar usuario?",
       "deleteConfirm": "¿Eliminar este usuario?",
       "empty": "No se encontraron usuarios",
       "errors": {
@@ -1519,11 +1630,14 @@
       "name": "Nombre",
       "code": "Código",
       "address": "Dirección",
+      "coordinates": "Coordenadas",
+      "coordinatesValue": "{lat}, {lng}",
       "bookings": "Reservas",
       "actions": "Acciones",
       "created": "Ubicación creada",
       "updated": "Ubicación actualizada",
       "deleted": "Ubicación eliminada",
+      "deleteTitle": "¿Eliminar ubicación?",
       "deleteConfirm": "¿Eliminar esta ubicación?",
       "empty": "No se encontraron ubicaciones",
       "errors": {
@@ -1736,6 +1850,8 @@
       "add": "Agregar característica",
       "edit": "Editar característica",
       "name": "Nombre de la característica",
+      "icon": "Ícono",
+      "preview": "Vista previa",
       "slug": "Slug",
       "sortOrder": "Orden",
       "active": "Activa",
@@ -2046,6 +2162,7 @@
         "markPaidTitle": "Marcar {code} como pagado",
         "markPickupTitle": "Marcar {code} como entregado",
         "markDropoffTitle": "Marcar {code} como devuelto",
+        "closeoutPayment": "Pago de cierre: {value}",
         "updateTitle": "Actualizar alquiler asociado",
         "description": "Guarda el siguiente paso operativo sin mezclar esta reserva con los registros normales de tu flota."
       },
@@ -2053,6 +2170,7 @@
         "payment": "Pago: {value}",
         "pickup": "Entrega: {value}",
         "dropoff": "Devolucion: {value}",
+        "closeoutPayment": "Pago de cierre: {value}",
         "notReceived": "Aun no recibido",
         "notMarked": "Aun no marcado",
         "closeoutBreakdown": "Desglose de cierre",
