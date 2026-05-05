@@ -41,8 +41,8 @@ export function Header() {
   const navItems = [
     { href: "/", label: t("nav.home"), icon: House },
     { href: "/book", label: t("nav.booking"), icon: CalendarCheck },
-    { href: "/faq", label: t("nav.faq"), icon: CircleHelp },
     { href: "/fleet", label: t("nav.fleetOverview"), icon: CarFront },
+    { href: "/faq", label: t("nav.faq"), icon: CircleHelp },
   ];
   const darkChrome = isHome && !scrolled;
 

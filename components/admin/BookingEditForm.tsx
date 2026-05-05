@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,12 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BadgeDollarSign, Banknote, CalendarClock, CarFront, FileText, MapPin, Plane, Plus, Receipt, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { updateCategoryBookingAction } from "@/actions/booking";
 import { calculateBookingAmounts, calculateDays, formatCurrency } from "@/lib/pricing";
+import { AdditionalDriversEditor, type AdditionalDriverFormValue } from "@/components/shared/AdditionalDriversEditor";
+import { serializeAdditionalDrivers } from "@/lib/additional-drivers";
 import {
-  formatDateForInput,
-  formatDateTimeLocalInput,
-  parseKralendijkDate,
-  parseKralendijkDateTime,
-} from "@/lib/datetime";
+  createLaPazDate,
+  formatDateInputInLaPaz,
+  parseLaPazDateInput,
+  parseLaPazDateTimeInput,
+} from "@/lib/timezone";
 
 export function BookingEditForm({
   booking,
@@ -48,6 +51,7 @@ export function BookingEditForm({
     endDate: string;
     pickupLocationId: string;
     dropoffLocationId: string;
+    additionalDrivers: AdditionalDriverFormValue[];
     notes: string;
   };
   locale: string;
@@ -76,6 +80,7 @@ export function BookingEditForm({
   const [licenseExpiryDate, setLicenseExpiryDate] = useState(booking.licenseExpiryDate);
   const [startDate, setStartDate] = useState(booking.startDate);
   const [endDate, setEndDate] = useState(booking.endDate);
+  const [additionalDrivers, setAdditionalDrivers] = useState<AdditionalDriverFormValue[]>(booking.additionalDrivers);
   const [notes, setNotes] = useState(booking.notes);
   const [draftExtraId, setDraftExtraId] = useState("");
   const [selectedExtras, setSelectedExtras] = useState<Array<{
@@ -108,22 +113,34 @@ export function BookingEditForm({
       formData.append("customerEmail", customerEmail);
       formData.append("customerPhone", customerPhone);
       formData.append("flightNumber", flightNumber);
-      const parsedBirthDate = parseKralendijkDate(birthDate);
-      const parsedLicenseExpiryDate = parseKralendijkDate(licenseExpiryDate, true);
-      const parsedStartDate = parseKralendijkDateTime(startDate);
-      const parsedEndDate = parseKralendijkDateTime(endDate);
-      if (!parsedBirthDate || !parsedLicenseExpiryDate || !parsedStartDate || !parsedEndDate) {
+      const parsedBirthDate = parseLaPazDateInput(birthDate);
+      const parsedLicenseExpiryDateBase = parseLaPazDateInput(licenseExpiryDate);
+      const parsedStartDate = parseLaPazDateTimeInput(startDate);
+      const parsedEndDate = parseLaPazDateTimeInput(endDate);
+
+      if (!parsedBirthDate || !parsedLicenseExpiryDateBase || !parsedStartDate || !parsedEndDate) {
         toast.error(t("admin.bookings.edit.messages.completeRequired"));
+        setIsSaving(false);
         return;
       }
 
-      formData.append("birthDate", formatDateForInput(parsedBirthDate));
+      const parsedLicenseExpiryDate = createLaPazDate({
+        year: parsedLicenseExpiryDateBase.getUTCFullYear(),
+        month: parsedLicenseExpiryDateBase.getUTCMonth() + 1,
+        day: parsedLicenseExpiryDateBase.getUTCDate(),
+        hour: 23,
+        minute: 59,
+        second: 59,
+      });
+
+      formData.append("birthDate", parsedBirthDate.toISOString());
       formData.append("driverLicenseNumber", driverLicenseNumber);
-      formData.append("licenseExpiryDate", formatDateForInput(parsedLicenseExpiryDate));
-      formData.append("startDate", formatDateTimeLocalInput(parsedStartDate));
-      formData.append("endDate", formatDateTimeLocalInput(parsedEndDate));
+      formData.append("licenseExpiryDate", parsedLicenseExpiryDate.toISOString());
+      formData.append("startDate", parsedStartDate.toISOString());
+      formData.append("endDate", parsedEndDate.toISOString());
       formData.append("pickupLocationId", pickupLocationId);
       formData.append("dropoffLocationId", dropoffLocationId);
+      formData.append("additionalDrivers", serializeAdditionalDrivers(additionalDrivers));
       formData.append("notes", notes);
       formData.append("selectedExtras", JSON.stringify(selectedExtras.map((line) => ({
         extraId: line.extraId,
@@ -145,11 +162,11 @@ export function BookingEditForm({
 
   const sectionClass = "rounded-[1.6rem] border p-6 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.28)]";
   const fieldClass = "space-y-2";
-  const inputClass = "rounded-xl border-slate-200 bg-white/90 focus-visible:border-sky-300 focus-visible:ring-sky-200";
+  const inputClass = "rounded-xl border-slate-200 bg-white/90 focus-visible:border-[hsl(var(--primary)/0.35)] focus-visible:ring-[hsl(var(--primary)/0.18)]";
   const vehicleOptions = vehicles.filter((vehicle) => vehicle.categoryId === categoryId);
   const selectedCategory = categories.find((category) => category.id === categoryId) || null;
-  const parsedStartDate = startDate ? parseKralendijkDateTime(startDate) : null;
-  const parsedEndDate = endDate ? parseKralendijkDateTime(endDate) : null;
+  const parsedStartDate = parseLaPazDateTimeInput(startDate);
+  const parsedEndDate = parseLaPazDateTimeInput(endDate);
   const rentalDays =
     parsedStartDate && parsedEndDate && parsedEndDate > parsedStartDate
       ? calculateDays(parsedStartDate, parsedEndDate)
@@ -207,9 +224,9 @@ export function BookingEditForm({
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_360px]">
       <div className="space-y-6">
-        <Card className={`${sectionClass} border-sky-200 bg-[linear-gradient(180deg,#ffffff,#f4faff)]`}>
+        <Card className={`${sectionClass} border-red-200 bg-[linear-gradient(180deg,#ffffff,hsl(var(--primary)/0.04))]`}>
           <div className="mb-5 flex items-center gap-3">
-            <div className="rounded-2xl bg-sky-100 p-2.5 text-sky-700 ring-1 ring-sky-200"><UserRound className="h-5 w-5" /></div>
+            <div className="rounded-2xl bg-red-100 p-2.5 text-red-700 ring-1 ring-red-200"><UserRound className="h-5 w-5" /></div>
             <div>
               <h2 className="text-lg font-bold text-slate-900">{t("admin.bookings.edit.sections.customer.title")}</h2>
               <p className="text-sm text-slate-600">{t("admin.bookings.edit.sections.customer.description")}</p>
@@ -234,7 +251,12 @@ export function BookingEditForm({
             </div>
             <div className={fieldClass}>
               <Label>{t("admin.bookings.detail.customerProfile.fields.birthDate")}</Label>
-              <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className={inputClass} />
+              <DatePicker
+                value={parseLaPazDateInput(birthDate)}
+                onChange={(date) => setBirthDate(formatDateInputInLaPaz(date))}
+                placeholder={t("admin.bookings.detail.customerProfile.fields.birthDate")}
+                className={inputClass}
+              />
             </div>
             <div className={fieldClass}>
               <Label>{t("admin.bookings.detail.customerProfile.fields.licenseNumber")}</Label>
@@ -242,7 +264,12 @@ export function BookingEditForm({
             </div>
             <div className={fieldClass}>
               <Label>{t("admin.bookings.detail.customerProfile.fields.licenseExpiry")}</Label>
-              <Input type="date" value={licenseExpiryDate} onChange={(e) => setLicenseExpiryDate(e.target.value)} className={inputClass} />
+              <DatePicker
+                value={parseLaPazDateInput(licenseExpiryDate)}
+                onChange={(date) => setLicenseExpiryDate(formatDateInputInLaPaz(date))}
+                placeholder={t("admin.bookings.detail.customerProfile.fields.licenseExpiry")}
+                className={inputClass}
+              />
             </div>
           </div>
         </Card>
@@ -266,6 +293,13 @@ export function BookingEditForm({
             </div>
           </div>
         </Card>
+
+        <AdditionalDriversEditor
+          drivers={additionalDrivers}
+          onChange={setAdditionalDrivers}
+          rentalStartDate={parsedStartDate}
+          disabled={isSaving}
+        />
 
         <Card className={`${sectionClass} border-amber-200 bg-[linear-gradient(180deg,#ffffff,#fff9ef)]`}>
           <div className="mb-5 flex items-center gap-3">
@@ -455,9 +489,9 @@ export function BookingEditForm({
       </div>
 
       <div className="space-y-6">
-        <Card className="rounded-[1.65rem] border border-slate-200 bg-[linear-gradient(180deg,#ffffff,#eef6ff)] p-6 shadow-[0_22px_52px_-30px_rgba(15,23,42,0.35)] xl:sticky xl:top-24">
+        <Card className="rounded-[1.65rem] border border-slate-200 bg-[linear-gradient(180deg,#ffffff,hsl(var(--primary)/0.04))] p-6 shadow-[0_22px_52px_-30px_hsl(var(--primary)/0.14)] xl:sticky xl:top-24">
           <div className="mb-5 flex items-center gap-3">
-            <div className="rounded-2xl bg-sky-100 p-2.5 text-sky-700 ring-1 ring-sky-200"><ShieldCheck className="h-5 w-5" /></div>
+            <div className="rounded-2xl bg-red-100 p-2.5 text-red-700 ring-1 ring-red-200"><ShieldCheck className="h-5 w-5" /></div>
             <div>
               <h2 className="text-lg font-bold text-slate-900">{t("admin.bookings.edit.sidebar.title")}</h2>
               <p className="text-sm text-slate-600">{t("admin.bookings.edit.sidebar.description")}</p>
@@ -518,7 +552,7 @@ export function BookingEditForm({
                 <span className="text-slate-600">{vehicleRatesIncludeTax ? t("admin.bookings.detail.billing.taxOnExtras", { tax: taxPercentage }) : t("admin.bookings.detail.billing.taxOnBooking", { tax: taxPercentage })}</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(taxAmount)}</span>
               </div>
-              <div className="flex items-center justify-between rounded-2xl bg-[rgb(19,120,152)] px-4 py-4 text-white shadow-[0_16px_32px_-20px_rgba(19,120,152,0.42)]">
+              <div className="flex items-center justify-between rounded-2xl bg-[hsl(var(--primary))] px-4 py-4 text-white shadow-[0_16px_32px_-20px_hsl(var(--primary)/0.34)]">
                 <span className="font-semibold">{t("admin.bookings.edit.preview.projectedTotal")}</span>
                 <span className="text-lg font-black">{formatCurrency(totalAmount)}</span>
               </div>
@@ -544,7 +578,7 @@ export function BookingEditForm({
             <Button variant="outline" onClick={() => router.push(`/${locale}/admin/bookings/${booking.id}`)} disabled={isSaving} className="rounded-xl border-slate-300 bg-white hover:bg-slate-50">
               {t("common.cancel")}
             </Button>
-            <Button onClick={handleSubmit} disabled={isSaving} className="rounded-xl bg-[rgb(19,120,152)] text-white shadow-[0_16px_30px_-18px_rgba(19,120,152,0.42)] hover:opacity-95">
+            <Button onClick={handleSubmit} disabled={isSaving} className="rounded-xl bg-[hsl(var(--primary))] text-white shadow-[0_16px_30px_-18px_hsl(var(--primary)/0.34)] hover:bg-[hsl(var(--primary)/0.92)]">
               {isSaving ? t("admin.settings.saving") : t("admin.bookings.edit.actions.saveChanges")}
             </Button>
           </div>

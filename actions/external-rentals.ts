@@ -7,7 +7,6 @@ import { getTenantConfig } from "@/lib/tenant";
 import { getTermsEmailAttachment } from "@/lib/terms";
 import { logAdminAction } from "@/lib/audit";
 import { db } from "@/lib/db";
-import { parseKralendijkDateTime } from "@/lib/datetime";
 import { ensureExternalRentalTable } from "@/lib/external-rentals";
 import { calculateDays } from "@/lib/pricing";
 
@@ -58,8 +57,8 @@ export async function createExternalRentalAction(formData: FormData, locale: str
     const paymentStatus = String(formData.get("paymentStatus") || "UNPAID").trim().toUpperCase();
     const paymentMethod = String(formData.get("paymentMethod") || "").trim();
     const paymentReference = String(formData.get("paymentReference") || "").trim();
-    const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
-    const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
+    const startDate = new Date(String(formData.get("startDate") || ""));
+    const endDate = new Date(String(formData.get("endDate") || ""));
     const incomeAmountRaw = parseMoneyToCents(String(formData.get("incomeAmount") || ""));
     const expenseAmountRaw = parseMoneyToCents(String(formData.get("expenseAmount") || ""));
     const dailyIncomeRate = parseMoneyToCents(String(formData.get("dailyIncomeRate") || ""));
@@ -73,8 +72,8 @@ export async function createExternalRentalAction(formData: FormData, locale: str
       !customerPhone ||
       !pickupLocation ||
       !dropoffLocation ||
-      !startDate ||
-      !endDate ||
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime()) ||
       endDate <= startDate ||
       (
         (!Number.isFinite(incomeAmountRaw) || !Number.isFinite(expenseAmountRaw)) &&
@@ -148,7 +147,7 @@ export async function createExternalRentalAction(formData: FormData, locale: str
 
     try {
       const tenant = await getTenantConfig();
-      const terms = await getTermsEmailAttachment(locale);
+      const terms = await getTermsEmailAttachment();
       const html = await bookingEmailHtml({
         title: "Your booking has been confirmed",
         customerName,
@@ -274,5 +273,78 @@ export async function updateExternalRentalFlowAction(
     return { success: true as const };
   } catch (error: any) {
     return { success: false as const, error: error?.message || "Failed to update partner rental flow" };
+  }
+}
+
+export async function completeExternalRentalInspectionAction(
+  rentalId: string,
+  mode: "pickup" | "return",
+  data: {
+    odometerKm: number;
+    fuelLevel: number;
+    hasDamage: boolean;
+    damageNotes: string;
+    agentNotes: string;
+    acceptedBy: string;
+    imageUrls: string[];
+    checklistItemIds: string[];
+    lateChargeCents: number;
+    fuelChargeCents: number;
+    damageChargeCents: number;
+    closeoutPaidOnSpot: boolean;
+  },
+  locale: string
+) {
+  try {
+    const auth = await requireExternalRentalAdmin();
+    if (!auth.ok) return { success: false as const, error: auth.error };
+
+    await ensureExternalRentalTable();
+
+    if (mode === "pickup") {
+      await db.$executeRaw`
+        UPDATE "ExternalRentalBooking"
+        SET
+          "pickedUpAt" = COALESCE("pickedUpAt", NOW()),
+          "pickupOdometerKm" = ${data.odometerKm},
+          "pickupFuelLevel" = ${data.fuelLevel},
+          "pickupNotes" = ${String(data.agentNotes || "").trim() || null},
+          "pickupChecklistDocumentUrl" = ${data.imageUrls.length > 0 ? data.imageUrls[0] : null}
+        WHERE id = ${rentalId}
+      `;
+    } else if (mode === "return") {
+      await db.$executeRaw`
+        UPDATE "ExternalRentalBooking"
+        SET
+          "returnedAt" = COALESCE("returnedAt", NOW()),
+          "returnOdometerKm" = ${data.odometerKm},
+          "returnFuelLevel" = ${data.fuelLevel},
+          "returnNotes" = ${String(data.agentNotes || "").trim() || null},
+          "returnChecklistDocumentUrl" = ${data.imageUrls.length > 0 ? data.imageUrls[0] : null},
+          "returnLateCharge" = ${data.lateChargeCents},
+          "returnFuelCharge" = ${data.fuelChargeCents},
+          "returnDamageCharge" = ${data.damageChargeCents},
+          "closeoutPaymentDueAt" = CASE
+            WHEN ${data.lateChargeCents + data.fuelChargeCents + data.damageChargeCents} > 0
+            THEN COALESCE("closeoutPaymentDueAt", NOW())
+            ELSE NULL
+          END,
+          "closeoutPaymentReceivedAt" = CASE
+            WHEN ${data.closeoutPaidOnSpot}
+            THEN NOW()
+            ELSE "closeoutPaymentReceivedAt"
+          END
+        WHERE id = ${rentalId}
+      `;
+    }
+
+    await logAdminAction({
+      adminUserId: auth.session.adminUserId,
+      action: `EXTERNAL_RENTAL_INSPECTION_${mode.toUpperCase()}`,
+    });
+
+    return { success: true as const };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "Failed to complete inspection" };
   }
 }

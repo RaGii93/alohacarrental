@@ -108,10 +108,10 @@ export function FinancialFilters({
   };
 
   return (
-    <Card className="admin-surface rounded-[1.8rem] border-transparent p-6">
+    <Card className="rounded-[1.8rem] border-slate-200 p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">{t("admin.financial.filters.kicker")}</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">{t("admin.financial.filters.kicker")}</p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">{t("admin.financial.filters.title")}</h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">
             {t("admin.financial.filters.description")}
@@ -119,11 +119,11 @@ export function FinancialFilters({
         </div>
 
         <div className="flex gap-2 self-start">
-          <Button type="button" variant="outline" className="admin-outline-button rounded-xl border-transparent" onClick={applyFilters}>
+          <Button type="button" variant="outline" className="rounded-xl" onClick={applyFilters}>
             <Filter className="size-4" />
             {t("admin.fleetOps.apply")}
           </Button>
-          <Button type="button" variant="ghost" className="rounded-xl text-slate-600 hover:bg-slate-100/90 hover:text-slate-900" onClick={resetFilters} disabled={!hasActiveFilters}>
+          <Button type="button" variant="ghost" className="rounded-xl" onClick={resetFilters} disabled={!hasActiveFilters}>
             <RotateCcw className="size-4" />
             {t("admin.fleetOps.reset")}
           </Button>

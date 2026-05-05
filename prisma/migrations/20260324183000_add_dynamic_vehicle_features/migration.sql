@@ -56,19 +56,18 @@ INSERT INTO "VehicleCategoryFeature" ("categoryId", "featureId")
 SELECT vc.id, vf.id
 FROM "VehicleCategory" vc
 JOIN "VehicleFeature" vf ON vf.slug = 'ac'
-WHERE COALESCE(vc."hasAC", true) = true
 ON CONFLICT ("categoryId","featureId") DO NOTHING;
 
 INSERT INTO "VehicleCategoryFeature" ("categoryId", "featureId")
 SELECT vc.id, vf.id
 FROM "VehicleCategory" vc
 JOIN "VehicleFeature" vf ON vf.slug = 'apple-carplay'
-WHERE COALESCE(vc."hasCarPlay", false) = true
+WHERE false
 ON CONFLICT ("categoryId","featureId") DO NOTHING;
 
 INSERT INTO "VehicleCategoryFeature" ("categoryId", "featureId")
 SELECT vc.id, vf.id
 FROM "VehicleCategory" vc
 JOIN "VehicleFeature" vf ON vf.slug = 'backup-camera'
-WHERE COALESCE(vc."hasBackupCamera", false) = true
+WHERE false
 ON CONFLICT ("categoryId","featureId") DO NOTHING;

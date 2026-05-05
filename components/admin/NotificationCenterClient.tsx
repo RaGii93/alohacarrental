@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { dismissNotificationAction } from "@/actions/notifications";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formatDateTime } from "@/lib/datetime";
 import {
   Popover,
   PopoverContent,
@@ -35,7 +34,7 @@ function severityStyles(severity: NotificationRow["severity"]) {
     case "ERROR":
       return "border-rose-200 bg-rose-50 text-rose-700";
     default:
-      return "border-sky-200 bg-sky-50 text-sky-700";
+      return "border-red-200 bg-red-50 text-red-700";
   }
 }
 
@@ -99,18 +98,18 @@ export function NotificationCenterClient({
               <p className="text-sm font-semibold text-slate-900">{t("admin.notifications.center.title")}</p>
               <p className="text-xs text-slate-500">{t("admin.notifications.center.subtitle")}</p>
             </div>
-            <Link href={`/${locale}/admin/notifications`} className="text-xs font-semibold text-sky-700 hover:underline">
+            <Link href={`/${locale}/admin/notifications`} className="text-xs font-semibold text-red-700 hover:underline">
               {t("admin.notifications.actions.viewAll")}
             </Link>
           </div>
           <div className="space-y-2">
             {notifications.length === 0 ? (
-              <div className="admin-surface-soft rounded-xl border border-dashed border-slate-200/70 px-3 py-6 text-center text-sm text-slate-500">
+              <div className="rounded-xl border border-dashed border-slate-200 px-3 py-6 text-center text-sm text-slate-500">
                 {t("admin.notifications.empty.compact")}
               </div>
             ) : (
               notifications.slice(0, 6).map((notification) => (
-                <div key={notification.id} className="admin-surface-soft rounded-xl border-transparent p-3">
+                <div key={notification.id} className="rounded-xl border border-slate-200 bg-white p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${severityStyles(notification.severity)}`}>
@@ -141,12 +140,12 @@ export function NotificationCenterClient({
   return (
     <div className="space-y-4">
       {notifications.length === 0 ? (
-        <Card className="admin-surface rounded-[1.5rem] border-dashed border-slate-200/70 p-10 text-center text-sm text-slate-500">
+        <Card className="rounded-[1.5rem] border-dashed border-slate-200 p-10 text-center text-sm text-slate-500">
           {t("admin.notifications.empty.page")}
         </Card>
       ) : (
         notifications.map((notification) => (
-          <Card key={notification.id} className="admin-surface rounded-[1.5rem] border-transparent p-5">
+          <Card key={notification.id} className="rounded-[1.5rem] border-slate-200 p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
@@ -154,7 +153,7 @@ export function NotificationCenterClient({
                     {getSeverityLabel(notification.severity)}
                   </span>
                   <span className="text-xs text-slate-500">
-                    {formatDateTime(notification.createdAt)}
+                    {new Date(notification.createdAt).toLocaleString()}
                   </span>
                 </div>
                 <div>
@@ -162,13 +161,13 @@ export function NotificationCenterClient({
                   <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{notification.message}</p>
                 </div>
                 {notification.href ? (
-                  <Link href={notification.href} className="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:underline">
+                  <Link href={notification.href} className="inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:underline">
                     {t("admin.notifications.actions.openRelated")}
                     <ExternalLink className="h-4 w-4" />
                   </Link>
                 ) : null}
               </div>
-              <Button variant="outline" onClick={() => dismiss(notification.id)} disabled={isPending} className="admin-outline-button rounded-xl border-transparent">
+              <Button variant="outline" onClick={() => dismiss(notification.id)} disabled={isPending} className="rounded-xl">
                 <CheckCheck className="h-4 w-4" />
                 {t("admin.notifications.actions.dismiss")}
               </Button>

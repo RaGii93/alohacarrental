@@ -22,8 +22,6 @@ import { loginFormSchema } from "@/lib/validators";
 import { loginAction } from "@/actions/auth";
 import { Lock, LogIn, Mail, ShieldCheck, Sparkles } from "lucide-react";
 
-const BRAND_LOGO_ALT = "Aloha Bonaire Car Rental logo";
-
 export default function AdminLoginPage({
   params,
 }: {
@@ -86,12 +84,12 @@ export default function AdminLoginPage({
           </div>
           <div className="mt-8">
             <Image
-              src="/home/logo.png"
-              alt={BRAND_LOGO_ALT}
+              src="/images/Logo.png"
+              alt="Bon Drive"
               width={320}
               height={88}
               priority
-              className="h-16 w-auto"
+              className="h-16 w-auto object-contain"
             />
           </div>
           <h1 className="mt-8 max-w-xl text-5xl font-black tracking-[-0.05em] text-[hsl(var(--foreground))]">
@@ -121,12 +119,12 @@ export default function AdminLoginPage({
         <Card className="w-full rounded-[2rem] border-[hsl(var(--primary)/0.14)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,249,255,0.96))] p-8 shadow-[0_32px_90px_-48px_hsl(var(--foreground)/0.28)] sm:p-10">
           <div className="flex flex-col items-center text-center">
             <Image
-              src="/home/logo.png"
-              alt={BRAND_LOGO_ALT}
+              src="/images/Logo.png"
+              alt="Bon Drive"
               width={260}
               height={72}
               priority
-              className="h-14 w-auto"
+              className="h-14 w-auto object-contain"
             />
             <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--primary)/0.12)] bg-[hsl(var(--primary)/0.08)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[hsl(var(--primary))]">
               <ShieldCheck className="size-4" />
@@ -191,7 +189,7 @@ export default function AdminLoginPage({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-12 w-full rounded-2xl bg-fuchsia-600 text-sm font-bold text-white shadow-[0_16px_36px_-20px_rgba(192,38,211,0.55)] hover:bg-fuchsia-700"
+                className="h-12 w-full rounded-2xl text-sm font-bold shadow-[0_16px_36px_-20px_hsl(var(--primary)/0.65)]"
               >
                 <LogIn className="h-4 w-4" />
                 {isSubmitting ? t("common.loading") : t("admin.login.submit")}

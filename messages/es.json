@@ -246,12 +246,8 @@
       "supportLabel": "Soporte"
     },
     "whyChoose": {
-      "title": "Un vehículo local para cada rincón de Bonaire.",
-      "subtitle": "Diseñamos nuestro servicio según la forma en que realmente exploras. Disfruta la libertad de descubrir a tu propio ritmo, con apoyo flexible cuando cambian los planes en la isla.",
-      "photoCard": {
-        "description": "Luz de mar cristalina, horizonte turquesa y momentos tranquilos disfrutando de la belleza natural de la costa.",
-        "label": "Tu vehículo local en la isla"
-      },
+      "title": "Un vehículo local para playas, salinas y paradas en Bonaire",
+      "subtitle": "Diseñamos la experiencia según cómo la gente realmente se mueve por Bonaire: recogidas en el aeropuerto, paseos tranquilos junto a las casitas de esclavos del sur y apoyo flexible cuando cambian los planes.",
       "benefitsTitle": "Beneficios clave de alquilar con nosotros",
       "benefitsSubtitle": "Mantenemos la experiencia de alquiler simple, constante y fácil de confiar desde la reserva hasta la devolución.",
       "features": {
@@ -293,11 +289,15 @@
           "title": "Precios transparentes",
           "description": "Lo que ves es lo que pagas, sin cargos ocultos y con políticas de combustible claras desde el principio."
         }
+      },
+      "photoCard": {
+        "description": "Aguas cristalinas y playas vírgenes te esperan",
+        "label": "Paraíso Encontrado"
       }
     },
     "ctaSection": {
       "title": "Haz de la isla tu ruta del día",
-      "subtitle": "Encuentra un vehiculo que se adapte a tus necesidades, desde aventuras de buceo costero y la belleza salvaje del Parque Nacional Washington Slagbaai hasta tardes con brisa junto al mar. Ya sea que descubras calas del sur o persigas el atardecer perfecto, tenemos el vehiculo ideal para cada momento en Bonaire.",
+      "subtitle": "Reserva el auto que encaja con tus planes en Bonaire, desde mañanas de playa y paradas de buceo hasta atardeceres por la costa sur.",
       "button": "Reservar Ahora"
     },
     "hero": {
@@ -357,8 +357,8 @@
       }
     },
     "fleet": {
-      "title": "Explora la isla a tu manera.",
-      "description": "Creemos que la mejor manera de conocer la isla es con la libertad de detenerte donde quieras. Encuentra el vehículo que encaje con tus planes y empieza hoy a descubrir la belleza de Bonaire.",
+      "title": "Elige el vehículo que siga tu ritmo en Bonaire",
+      "description": "Encuentra el vehículo ideal para recogidas en el aeropuerto, vueltas por Kralendijk, paradas fotográficas en la costa sur y tardes tranquilas junto al mar.",
       "seats": "{count} asientos",
       "reserveNow": "Reservar ahora",
       "seeMore": "Ver mas"
@@ -513,12 +513,8 @@
     },
     "reviews": {
       "eyebrow": "Historias de clientes",
-      "title": "Historias de huéspedes desde toda la isla.",
-      "subtitle": "Opiniones reales de viajeros que usaron Aloha para moverse sin esfuerzo entre sus lugares favoritos y las vistas más icónicas de la isla.",
-      "photoCard": {
-        "description": "Las mejores historias de isla empiezan con un plan simple: toma las llaves, ve hacia el mar y deja que Bonaire te marque el camino.",
-        "label": "Tu viaje, nuestra prioridad."
-      },
+      "title": "Historias de huéspedes con paisaje de Bonaire",
+      "subtitle": "Opiniones reales de viajeros que usaron Aloha para moverse entre playas, sitios de buceo, la ciudad y las carreteras costeras más icónicas de la isla.",
       "leaveButton": "Dejar una Reseña",
       "empty": "Todavía no hay reseñas publicadas.",
       "faqPreview": "Respuestas rapidas para los clientes antes de reservar, en un solo lugar.",
@@ -542,6 +538,10 @@
       },
       "success": {
         "pendingApproval": "Reseña enviada. Será visible después de la aprobación del administrador."
+      },
+      "photoCard": {
+        "description": "Confiado por miles de viajeros felices en todo el mundo",
+        "label": "Aprobado por Huéspedes"
       }
     },
     "footer": {
@@ -692,17 +692,59 @@
       "licenseInvalid": "La licencia debe ser válida en la fecha de recogida",
       "minimumDuration": "La duración mínima de reserva es de {days} día(s).",
       "minimumDurationAdminOnly": "Las reservas por menos de {days} día(s) solo están disponibles mediante administración.",
-      "lastMinuteAdminOnly": "Las reservas que empiezan dentro de {hours} hora(s) solo están disponibles mediante administración."
+      "lastMinuteAdminOnly": "Las reservas que empiezan dentro de {hours} hora(s) solo están disponibles mediante administración.",
+      "accommodationDetailsRequired": "Por favor proporcione los detalles de su alojamiento.",
+      "termsScrollRequired": "Por favor desplácese por los términos antes de aceptar."
     },
     "success": {
       "title": "¡Reserva Enviada!",
-      "message": "Tu número de referencia es: {orderId}",
+      "message": "Tu número de referencia es: {{orderId}}",
       "next": "Nos pondremos en contacto pronto para confirmarla."
     },
     "baseTotal": "Total base",
     "subtotal": "Subtotal",
     "belowMinimumSurcharge": "Recargo por alquiler corto",
-    "lastMinuteSurcharge": "Recargo de última hora"
+    "lastMinuteSurcharge": "Recargo de última hora",
+    "accommodationAddress": "Dirección del alojamiento",
+    "accommodationAddressHelp": "Ingrese la dirección donde se hospedará para coordinar la entrega del vehículo.",
+    "accommodationAddressPlaceholder": "Dirección, hotel, resort...",
+    "accommodationPlaceName": "Nombre del alojamiento",
+    "accommodationPlaceNamePlaceholder": "Nombre del hotel, resort, dirección privada...",
+    "geolocationUnavailable": "La geolocalización no está disponible en su navegador.",
+    "locatingCurrentLocation": "Localizando su posición...",
+    "mapPickerDescription": "Haga clic en el mapa para seleccionar una ubicación de entrega.",
+    "mapSearchAction": "Buscar",
+    "mapSearchPlaceholder": "Buscar una dirección...",
+    "mapUnavailable": "El mapa no está disponible actualmente.",
+    "openMapPicker": "Abrir mapa",
+    "pickDropoffOnMap": "Marcar devolución en el mapa",
+    "pickPickupOnMap": "Marcar recogida en el mapa",
+    "selectedCoordinates": "Seleccionado: {lat}, {lng}",
+    "termsReadConfirmed": "Ha leído los términos de alquiler.",
+    "termsReadPending": "Por favor desplácese hasta el final de los términos para continuar.",
+    "termsScrollHint": "Desplácese al final de los términos para aceptar.",
+    "termsScrollRequired": "Debe desplazarse por los términos de alquiler antes de aceptar.",
+    "unavailableBanner": "Este vehículo no está disponible para las fechas seleccionadas.",
+    "useCurrentLocation": "Usar mi ubicación",
+    "useMarkedLocation": "Usar esta ubicación",
+    "additionalDrivers": {
+      "birthDate": "Fecha de nacimiento",
+      "countHelp": "Los conductores adicionales deben presentar una licencia válida al recoger el vehículo.",
+      "countLabel": "Número de conductores adicionales",
+      "dashboardCount": "{count, plural, =0 {Sin conductores adicionales} one {1 conductor adicional} other {{count} conductores adicionales}}",
+      "description": "Agregue conductores adicionales que también operarán el vehículo durante el período de alquiler.",
+      "documentTitle": "Conductor adicional {number}",
+      "driverLabel": "Conductor {number}",
+      "empty": "No se han agregado conductores adicionales.",
+      "fullName": "Nombre completo",
+      "licenseExpiryDate": "Vencimiento de licencia",
+      "licenseNumber": "Número de licencia",
+      "requiredHint": "Por favor complete los campos requeridos para todos los conductores adicionales.",
+      "reviewLocked": "Los detalles del conductor adicional se bloquean una vez confirmada la reserva.",
+      "summaryTitle": "Conductores adicionales ({count})",
+      "title": "Conductores adicionales",
+      "upload": "Cargar licencia"
+    }
   },
   "admin": {
     "title": "Panel de Administración",
@@ -968,7 +1010,9 @@
               "pickup": "No se pudo completar la inspección de entrega",
               "return": "No se pudo completar la inspección de devolución"
             }
-          }
+          },
+          "openPickupChecklist": "Abrir lista de recogida",
+          "openReturnChecklist": "Abrir lista de devolución"
         },
         "conditionLog": {
           "title": "Registro de Estado del Vehículo",
@@ -997,7 +1041,9 @@
           "quickbooksError": "Error de QuickBooks",
           "zohoError": "Error de Zoho Invoice",
           "openQuickbooksTransfers": "Abrir transferencias de QuickBooks",
-          "openZohoTransfers": "Abrir transferencias de Zoho Invoice"
+          "openZohoTransfers": "Abrir transferencias de Zoho Invoice",
+          "closeoutPayment": "Pago de cierre recibido",
+          "closeoutPaymentPending": "Pago de cierre pendiente"
         },
         "filesActions": {
           "sendByEmail": "Enviar por correo",
@@ -1023,7 +1069,13 @@
         },
         "filesCard": {
           "description": "Documentos del cliente y comprobantes de facturación generados.",
-          "openPaymentProof": "Abrir comprobante de pago"
+          "openPaymentProof": "Abrir comprobante de pago",
+          "closeoutInvoicePaid": "Factura de cierre (Pagada)",
+          "closeoutInvoicePending": "Factura de cierre (Pendiente)",
+          "closeoutInvoiceTitle": "Factura de cierre",
+          "openCloseoutInvoice": "Abrir factura de cierre",
+          "openPickupChecklist": "Abrir lista de recogida",
+          "openReturnChecklist": "Abrir lista de devolución"
         }
       },
       "edit": {
@@ -1256,7 +1308,18 @@
         "optionalNote": "Nota opcional",
         "saving": "Guardando...",
         "create": "Crear bloqueo",
-        "update": "Actualizar bloqueo"
+        "update": "Actualizar bloqueo",
+        "durationPending": "Seleccione inicio y fin para ver la duración",
+        "globalHelper": "Una restricción global aplica a todos los vehículos y anula la disponibilidad individual.",
+        "helperTitle": "Resumen de restricción",
+        "invalidRange": "La fecha de fin debe ser posterior a la de inicio.",
+        "reasonHelper": "Describa por qué los vehículos no están disponibles (ej. feriado, mantenimiento).",
+        "singleVehicle": "Vehículo individual",
+        "summaryDuration": "Duración: {duration}",
+        "summaryScope": "Alcance: {scope}",
+        "summaryWindow": "Ventana: {start} – {end}",
+        "vehicleHelper": "Esta restricción se aplicará solo al vehículo seleccionado.",
+        "windowPending": "Seleccione fechas de inicio y fin"
       },
       "actions": {
         "new": "Nuevo bloqueo",
@@ -1271,7 +1334,20 @@
         "global": "Solo globales",
         "vehicleSpecific": "Solo por vehículo",
         "allStatuses": "Todos los estados",
-        "empty": "Ningún bloqueo coincide con los filtros actuales."
+        "empty": "Ningún bloqueo coincide con los filtros actuales.",
+        "active": "Activas",
+        "allScopes": "Todos los alcances",
+        "allTimelines": "Todos los períodos",
+        "allVehicles": "Todos los vehículos",
+        "clear": "Limpiar filtros",
+        "globalOnly": "Solo globales",
+        "past": "Pasadas",
+        "results": "{count} resultados",
+        "searchLabel": "Buscar",
+        "timelineLabel": "Período",
+        "upcoming": "Próximas",
+        "vehicleLabel": "Vehículo",
+        "vehicleOnly": "Solo vehículo"
       },
       "status": {
         "active": "Activo",
@@ -1293,7 +1369,12 @@
         "created": "Creado",
         "action": "Acción",
         "fullReason": "Motivo completo",
-        "deleting": "Eliminando..."
+        "deleting": "Eliminando...",
+        "allFleetLabel": "Toda la flota",
+        "emptyDescription": "No hay restricciones que coincidan con los filtros actuales.",
+        "emptyTitle": "No se encontraron restricciones",
+        "globalLabel": "Global",
+        "vehicleLabel": "Vehículo"
       },
       "messages": {
         "created": "Bloqueo creado.",
@@ -1301,10 +1382,27 @@
         "deleted": "Bloqueo eliminado.",
         "createFailed": "No se pudo crear el bloqueo",
         "updateFailed": "No se pudo actualizar el bloqueo",
-        "deleteFailed": "No se pudo eliminar el bloqueo"
+        "deleteFailed": "No se pudo eliminar el bloqueo",
+        "invalidDateRange": "Rango de fechas no válido. El fin debe ser posterior al inicio."
       },
       "title": "Bloqueos de disponibilidad",
-      "description": "Bloquea todos los vehículos o uno específico para un rango de fechas. Estos bloqueos se aplican en la búsqueda de disponibilidad y en la creación de reservas."
+      "description": "Bloquea todos los vehículos o uno específico para un rango de fechas. Estos bloqueos se aplican en la búsqueda de disponibilidad y en la creación de reservas.",
+      "cards": {
+        "active": "Activas",
+        "global": "Globales",
+        "total": "Total",
+        "upcoming": "Próximas"
+      },
+      "dialog": {
+        "createDescription": "Bloquee un período en el que los vehículos no están disponibles.",
+        "createTitle": "Crear restricción",
+        "editDescription": "Actualice el período o motivo de la restricción.",
+        "editTitle": "Editar restricción"
+      },
+      "workspace": {
+        "description": "Gestione los períodos en que los vehículos o toda la flota no están disponibles.",
+        "title": "Restricciones de flota"
+      }
     },
     "quickbooks": {
       "description": "Las transferencias se ponen en cola desde acciones de cobro y se ejecutan por separado de la gestión de reservas.",
@@ -1431,7 +1529,17 @@
       "errors": {
         "delete": "Error al eliminar ubicación"
       },
-      "fullAddress": "Dirección completa"
+      "fullAddress": "Dirección completa",
+      "geolocationUnavailable": "La geolocalización no está disponible en su navegador.",
+      "locatingCurrentLocation": "Localizando su posición...",
+      "mapDescription": "Haga clic en el mapa para establecer las coordenadas exactas de esta ubicación.",
+      "mapSearchPlaceholder": "Buscar una dirección...",
+      "mapUnavailable": "El mapa no está disponible actualmente.",
+      "openMap": "Abrir mapa",
+      "pickOnMap": "Seleccionar en el mapa",
+      "searchMap": "Buscar",
+      "useCurrentLocation": "Usar mi ubicación",
+      "useMarkedLocation": "Usar esta ubicación"
     },
     "settings": {
       "title": "Configuración del Sistema",
@@ -1926,7 +2034,9 @@
         "markDropoff": "Marcar devolucion",
         "markTransferred": "Marcar transferido",
         "saving": "Guardando...",
-        "saveUpdate": "Guardar actualizacion"
+        "saveUpdate": "Guardar actualizacion",
+        "openInvoice": "Abrir factura",
+        "receiveCloseoutPayment": "Recibir pago de cierre"
       },
       "dialogs": {
         "createTitle": "Crear alquiler asociado",
@@ -1944,7 +2054,13 @@
         "pickup": "Entrega: {value}",
         "dropoff": "Devolucion: {value}",
         "notReceived": "Aun no recibido",
-        "notMarked": "Aun no marcado"
+        "notMarked": "Aun no marcado",
+        "closeoutBreakdown": "Desglose de cierre",
+        "closeoutDamage": "Daños",
+        "closeoutFuel": "Combustible",
+        "closeoutLate": "Devolución tardía",
+        "closeoutPending": "Cierre pendiente",
+        "closeoutTotal": "Total de cierre"
       },
       "messages": {
         "completeSupplier": "Completa los datos del proveedor y del vehiculo.",

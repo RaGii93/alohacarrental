@@ -247,12 +247,12 @@ export default async function VehiclesPage({
                     href={buildPaginationHref(tab.key, {})}
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition ${
                       isActive
-                        ? "border-sky-300 bg-sky-50 text-sky-700 shadow-sm"
+                        ? "border-red-300 bg-red-50 text-red-700 shadow-sm"
                         : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
                     }`}
                   >
                     <span>{tab.label}</span>
-                    <Badge className={isActive ? "bg-sky-600 text-white" : "bg-slate-100 text-slate-700"}>{tab.count}</Badge>
+                    <Badge className={isActive ? "bg-[hsl(var(--primary))] text-white" : "bg-slate-100 text-slate-700"}>{tab.count}</Badge>
                   </Link>
                 );
               })}

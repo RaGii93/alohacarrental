@@ -138,7 +138,7 @@ export function FleetOpsFilters({
     <Card className="rounded-[1.8rem] border-slate-200 p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">{t("admin.fleetOps.filtersTitle")}</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">{t("admin.fleetOps.filtersTitle")}</p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">{title}</h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
           <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-600">
@@ -147,7 +147,7 @@ export function FleetOpsFilters({
               {t("admin.fleetOps.builtFor")} {audiences.join(", ")}
             </span>
             {resultSummary ? (
-              <span className="rounded-full bg-sky-50 px-3 py-1 font-medium text-sky-700">{resultSummary}</span>
+              <span className="rounded-full bg-red-50 px-3 py-1 font-medium text-red-700">{resultSummary}</span>
             ) : null}
           </div>
         </div>

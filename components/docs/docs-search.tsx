@@ -65,7 +65,7 @@ export function DocsSearch({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={copy.searchPlaceholder}
-          className="h-12 rounded-2xl border-[hsl(var(--border))] bg-white pl-11 text-sm shadow-sm"
+          className="h-12 rounded-2xl border-[hsl(var(--border))] bg-white pl-11 text-sm shadow-[0_12px_28px_-22px_hsl(var(--primary)/0.24)]"
         />
       </div>
 
@@ -80,7 +80,7 @@ export function DocsSearch({
             <div className="space-y-3">
               {results.map((result) => (
                 <a key={result.id} href={result.href}>
-                  <Card className="rounded-2xl border-[hsl(var(--border))] bg-white p-4 transition-colors hover:border-[hsl(var(--primary)/0.34)] hover:bg-[hsl(var(--primary)/0.03)]">
+                  <Card className="rounded-2xl border-[hsl(var(--border))] bg-white p-4 transition-colors hover:border-[hsl(var(--primary)/0.34)] hover:bg-[hsl(var(--primary)/0.04)] hover:shadow-[0_18px_36px_-26px_hsl(var(--primary)/0.16)]">
                     <div className="space-y-2">
                       <div className="text-sm font-semibold text-[hsl(var(--foreground))]">
                         <HighlightedText text={result.title} query={query} />

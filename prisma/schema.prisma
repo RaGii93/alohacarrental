@@ -79,6 +79,8 @@ model Location {
   name           String
   code           String?   @unique
   address        String?
+  latitude       Float?
+  longitude      Float?
   createdAt      DateTime  @default(now())
   pickupBookings Booking[] @relation("PickupLocation")
   dropoffBookings Booking[] @relation("DropoffLocation")
@@ -430,6 +432,7 @@ model VehicleFeature {
   id          String    @id @default(cuid())
   name        String
   slug        String    @unique
+  iconName    String?
   sortOrder   Int       @default(0)
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
@@ -471,7 +474,13 @@ model Booking {
   dropoffLocationId   String?
   dropoffLocationRef  Location? @relation("DropoffLocation", fields: [dropoffLocationId], references: [id], onDelete: SetNull)
   pickupLocation      String?
+  pickupLocationAddress String?
+  pickupLatitude      Float?
+  pickupLongitude     Float?
   dropoffLocation     String?
+  dropoffLocationAddress String?
+  dropoffLatitude     Float?
+  dropoffLongitude    Float?
   totalAmount         Int       // stored in cents
   status              BookingStatus @default(PENDING)
   bookingCode         String    @unique
@@ -486,6 +495,8 @@ model Booking {
   pickupAcceptedAt    DateTime?
   pickupAgentNotes    String?
   deliveredAt         DateTime?
+  pickupChecklistData Json?
+  pickupChecklistDocumentUrl String?
   returnOdometerKm    Int?
   returnFuelLevel     Int?
   returnHasDamage     Boolean   @default(false)
@@ -497,6 +508,10 @@ model Booking {
   returnFuelCharge    Int       @default(0)
   returnDamageCharge  Int       @default(0)
   returnedAt          DateTime?
+  returnChecklistData Json?
+  returnChecklistDocumentUrl String?
+  closeoutPaymentDueAt DateTime?
+  closeoutPaymentReceivedAt DateTime?
   termsAcceptedAt     DateTime?
   driverLicenseDeleteAfter DateTime?
   driverLicenseDeletedAt DateTime?
@@ -523,9 +538,11 @@ model Booking {
   createdAt           DateTime  @default(now())
   bookingExtras       BookingExtra[]
   bookingDiscount     BookingDiscount?
+  additionalDrivers   BookingAdditionalDriver[]
   inspectionPhotos    BookingInspectionPhoto[]
   review              Review?
   auditLogs           AuditLog[]
+  rentalAgreement     RentalAgreement?
 
   @@index([vehicleId, startDate, endDate])
   @@index([categoryId, startDate, endDate])
@@ -545,6 +562,22 @@ model AppSetting {
   key       String   @id
   value     String
   updatedAt DateTime @default(now()) @db.Timestamp(6)
+}
+
+model BookingAdditionalDriver {
+  id                    String   @id @default(cuid())
+  bookingId             String
+  booking               Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fullName              String
+  birthDate             DateTime
+  driverLicenseNumber   String
+  licenseExpiryDate     DateTime
+  driverLicenseUrl      String?
+  driverLicenseDeletedAt DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([bookingId])
 }
 
 model Review {
@@ -707,4 +740,120 @@ model BookingDiscount {
   createdAt      DateTime     @default(now())
 
   @@index([discountCodeId])
+}
+
+enum AutomationTriggerType {
+  booking_created
+  booking_confirmed
+  invoice_sent
+  payment_received
+  pickup_due_24h
+  return_due_24h
+  booking_overdue
+  review_request_due
+  unpaid_booking_before_pickup
+  return_completed
+}
+
+enum AutomationActionType {
+  send_email
+  create_admin_alert
+  create_crm_log
+  enqueue_webhook
+  mark_follow_up
+  send_review_request
+}
+
+enum AutomationExecutionStatus {
+  success
+  skipped
+  failed
+}
+
+model AutomationRule {
+  id                   String                  @id @default(cuid())
+  name                 String
+  description          String?
+  isActive             Boolean                 @default(true)
+  triggerType          AutomationTriggerType
+  triggerOffsetMinutes Int?
+  conditions           Json                    @default("{}")
+  actionType           AutomationActionType
+  actionConfig         Json                    @default("{}")
+  sortOrder            Int                     @default(0)
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  executionLogs        AutomationExecutionLog[]
+
+  @@index([isActive, triggerType])
+  @@index([sortOrder])
+}
+
+model AutomationExecutionLog {
+  id              String                    @id @default(cuid())
+  ruleId          String
+  rule            AutomationRule            @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  entityType      String                    @default("booking")
+  entityId        String
+  idempotencyKey  String                    @unique
+  status          AutomationExecutionStatus
+  errorDetails    String?
+  executedAt      DateTime                  @default(now())
+
+  @@index([ruleId, entityId])
+  @@index([entityId])
+  @@index([executedAt])
+  @@index([idempotencyKey])
+}
+
+// ─── Rental Agreement Engine ──────────────────────────────────────────────────
+
+enum RentalAgreementStatus {
+  DRAFT
+  GENERATED
+  AWAITING_SIGNATURES
+  SIGNED
+  VOID
+}
+
+enum AgreementSignerRole {
+  CUSTOMER
+  AGENT
+}
+
+model RentalAgreement {
+  id                String                   @id @default(cuid())
+  bookingId         String                   @unique
+  booking           Booking                  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  agreementNumber   String                   @unique
+  status            RentalAgreementStatus    @default(DRAFT)
+  termsVersion      String?
+  termsSnippet      String?                  @db.Text
+  pdfUrl            String?
+  signedPdfUrl      String?
+  signedAt          DateTime?
+  voidedAt          DateTime?
+  voidReason        String?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  signatures        RentalAgreementSignature[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model RentalAgreementSignature {
+  id                  String              @id @default(cuid())
+  rentalAgreementId   String
+  rentalAgreement     RentalAgreement     @relation(fields: [rentalAgreementId], references: [id], onDelete: Cascade)
+  signerName          String
+  signerEmail         String?
+  signerRole          AgreementSignerRole
+  signatureDataUrl    String              @db.Text
+  signedAt            DateTime            @default(now())
+  ipAddress           String?
+  userAgent           String?
+
+  @@index([rentalAgreementId])
+  @@index([signerRole])
 }

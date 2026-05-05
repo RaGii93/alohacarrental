@@ -18,6 +18,8 @@ type LocationRow = {
   name: string;
   code: string | null;
   address: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   _count?: {
     pickupBookings?: number;
     dropoffBookings?: number;
@@ -124,6 +126,7 @@ export function LocationsTable({
                 </button>
               </TableHead>
               <TableHead>{t("admin.locations.address")}</TableHead>
+              <TableHead>{t("admin.locations.coordinates")}</TableHead>
               <TableHead>
                 <button type="button" onClick={() => toggleSort("bookings")}>
                   {t("admin.locations.bookings")}
@@ -143,6 +146,11 @@ export function LocationsTable({
                   <TableCell>{location.code || "-"}</TableCell>
                   <TableCell>
                     <CompactText text={location.address} expandedTitle={t("admin.locations.fullAddress")} />
+                  </TableCell>
+                  <TableCell>
+                    {typeof location.latitude === "number" && typeof location.longitude === "number"
+                      ? `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`
+                      : "-"}
                   </TableCell>
                   <TableCell>
                     <Badge className="bg-slate-100 text-slate-700">{pickupCount + dropoffCount}</Badge>

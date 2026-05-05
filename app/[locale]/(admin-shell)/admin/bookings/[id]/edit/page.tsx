@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { BookingEditForm } from "@/components/admin/BookingEditForm";
 import { db } from "@/lib/db";
 import { requireAdminSection } from "@/app/[locale]/admin/_lib";
-import { formatDateForInput, formatDateTimeLocalInput } from "@/lib/datetime";
 import { getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
+import { formatDateInputInLaPaz, formatDateTimeInputInLaPaz } from "@/lib/timezone";
+import { ensureBookingAdditionalDriversTable } from "@/lib/additional-drivers.server";
 
 export default async function BookingEditPage({
   params,
@@ -17,6 +18,8 @@ export default async function BookingEditPage({
   if (auth.admin.role !== "ROOT" && auth.admin.role !== "OWNER") {
     redirect(`/${locale}/admin/bookings/${id}`);
   }
+
+  await ensureBookingAdditionalDriversTable();
 
   const booking = await db.booking.findUnique({
     where: { id },
@@ -37,6 +40,9 @@ export default async function BookingEditPage({
       pickupLocationId: true,
       dropoffLocationId: true,
       notes: true,
+      additionalDrivers: {
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 
@@ -51,7 +57,7 @@ export default async function BookingEditPage({
       orderBy: { sortOrder: "asc" },
     }),
     db.location.findMany({
-      select: { id: true, name: true },
+      select: { id: true, name: true, address: true, latitude: true, longitude: true },
       orderBy: { name: "asc" },
     }),
     db.vehicle.findMany({
@@ -150,13 +156,22 @@ export default async function BookingEditPage({
           customerEmail: booking.customerEmail,
           customerPhone: booking.customerPhone,
           flightNumber: booking.flightNumber || "",
-          birthDate: formatDateForInput(booking.birthDate),
+          birthDate: formatDateInputInLaPaz(booking.birthDate),
           driverLicenseNumber: booking.driverLicenseNumber || "",
-          licenseExpiryDate: formatDateForInput(booking.licenseExpiryDate),
-          startDate: formatDateTimeLocalInput(booking.startDate),
-          endDate: formatDateTimeLocalInput(booking.endDate),
+          licenseExpiryDate: formatDateInputInLaPaz(booking.licenseExpiryDate),
+          startDate: formatDateTimeInputInLaPaz(booking.startDate),
+          endDate: formatDateTimeInputInLaPaz(booking.endDate),
           pickupLocationId: booking.pickupLocationId || "",
           dropoffLocationId: booking.dropoffLocationId || "",
+          additionalDrivers: booking.additionalDrivers.map((driver) => ({
+            id: driver.id,
+            fullName: driver.fullName,
+            birthDate: driver.birthDate,
+            driverLicenseNumber: driver.driverLicenseNumber,
+            licenseExpiryDate: driver.licenseExpiryDate,
+            driverLicenseUrl: driver.driverLicenseUrl || "",
+            driverLicenseDeletedAt: driver.driverLicenseDeletedAt,
+          })),
           notes: booking.notes || "",
         }}
         categories={categories}

@@ -246,12 +246,8 @@
       "supportLabel": "Support"
     },
     "whyChoose": {
-      "title": "A local ride for every corner of Bonaire.",
-      "subtitle": "We shaped our service around the way you actually explore. Enjoy the freedom to discover at your own pace, with flexible support when the island plan changes.",
-      "photoCard": {
-        "description": "Crystal sea light, turquoise horizon and quiet moments spent enjoying the natural beauty of the coast.",
-        "label": "Your local island ride"
-      },
+      "title": "A local ride for Bonaire's beaches, salt flats, and town stops",
+      "subtitle": "We shaped the experience around the way people actually move across Bonaire: airport pickups, easy drives past the southern slave huts, and flexible support when the island plan changes.",
       "benefitsTitle": "Key benefits of renting with us",
       "benefitsSubtitle": "We keep the rental experience simple, consistent, and easy to trust from booking to return.",
       "features": {
@@ -293,11 +289,15 @@
           "title": "Transparent pricing",
           "description": "What you see is what you get, with no hidden fees and clear fuel policies from the start."
         }
+      },
+      "photoCard": {
+        "description": "Crystal waters and pristine beaches await your arrival",
+        "label": "Paradise Found"
       }
     },
     "ctaSection": {
       "title": "Make the island your route for the day",
-      "subtitle": "Find a ride that fits your needs-from shore diving adventures and the wild beauty of Washington Slagbaai National Park to breezy afternoons by the sea. Whether you're discovering southern coves or chasing the perfect sunset, we have the ideal ride for every Bonaire moment.",
+      "subtitle": "Reserve the car that fits your Bonaire plans, from beach mornings and diving stops to sunset drives along the southern coast.",
       "button": "Book Now"
     },
     "hero": {
@@ -357,8 +357,8 @@
       }
     },
     "fleet": {
-      "title": "Explore the island your way.",
-      "description": "We believe the best way to see the island is with the freedom to stop wherever you like. Find the vehicle that matches your plans and start exploring the beauty of Bonaire today.",
+      "title": "Choose the vehicle that fits your Bonaire rhythm",
+      "description": "Find the ride that works for airport pickups, downtown Kralendijk errands, southern coast photo stops, and easy afternoons by the water.",
       "seats": "{count} seats",
       "reserveNow": "Reserve now",
       "seeMore": "See more"
@@ -513,12 +513,8 @@
     },
     "reviews": {
       "eyebrow": "Customer Stories",
-      "title": "Guest stories from across the island.",
-      "subtitle": "Real feedback from travelers who used Aloha to move effortlessly between their favorite locations and the island's most iconic views.",
-      "photoCard": {
-        "description": "The best island stories start with a simple plan: grab the keys, head for the water, and let Bonaire show you the way.",
-        "label": "Your journey, our priotity."
-      },
+      "title": "Guest stories with a Bonaire backdrop",
+      "subtitle": "Real feedback from travelers who used Aloha to move between beaches, dive spots, town, and the island's landmark coastal roads.",
       "leaveButton": "Leave a Review",
       "empty": "No reviews are published yet.",
       "faqPreview": "Quick answers for renters before they book, all in one place.",
@@ -542,6 +538,10 @@
       },
       "success": {
         "pendingApproval": "Review submitted. It will be visible after admin approval."
+      },
+      "photoCard": {
+        "description": "Trusted by thousands of happy travelers worldwide",
+        "label": "Guest Approved"
       }
     },
     "footer": {
@@ -692,17 +692,59 @@
       "licenseInvalid": "License must be valid at pickup date",
       "minimumDuration": "Minimum booking duration is {days} day(s).",
       "minimumDurationAdminOnly": "Bookings under {days} day(s) are only available through admin.",
-      "lastMinuteAdminOnly": "Bookings starting within {hours} hour(s) are only available through admin."
+      "lastMinuteAdminOnly": "Bookings starting within {hours} hour(s) are only available through admin.",
+      "accommodationDetailsRequired": "Please provide your accommodation details.",
+      "termsScrollRequired": "Please scroll through the terms before accepting."
     },
     "success": {
       "title": "Booking Submitted!",
-      "message": "Your booking reference is: {orderId}",
+      "message": "Your booking reference is: {{orderId}}",
       "next": "We will contact you shortly to confirm."
     },
     "baseTotal": "Base total",
     "subtotal": "Subtotal",
     "belowMinimumSurcharge": "Short-rental surcharge",
-    "lastMinuteSurcharge": "Last-minute surcharge"
+    "lastMinuteSurcharge": "Last-minute surcharge",
+    "accommodationAddress": "Accommodation Address",
+    "accommodationAddressHelp": "Enter the address where you'll be staying so we can arrange delivery.",
+    "accommodationAddressPlaceholder": "Street address, hotel, resort...",
+    "accommodationPlaceName": "Accommodation Name",
+    "accommodationPlaceNamePlaceholder": "Hotel name, resort, private address...",
+    "geolocationUnavailable": "Geolocation is not available in your browser.",
+    "locatingCurrentLocation": "Locating your position...",
+    "mapPickerDescription": "Click on the map to select a delivery location.",
+    "mapSearchAction": "Search",
+    "mapSearchPlaceholder": "Search for an address...",
+    "mapUnavailable": "Map is currently unavailable.",
+    "openMapPicker": "Open Map",
+    "pickDropoffOnMap": "Pick Drop-off on Map",
+    "pickPickupOnMap": "Pick Pick-up on Map",
+    "selectedCoordinates": "Selected: {lat}, {lng}",
+    "termsReadConfirmed": "You have read the rental terms.",
+    "termsReadPending": "Please scroll to the bottom of the terms to continue.",
+    "termsScrollHint": "Scroll to the bottom of the terms to accept.",
+    "termsScrollRequired": "You must scroll through the rental terms before accepting.",
+    "unavailableBanner": "This vehicle is not available for the selected dates.",
+    "useCurrentLocation": "Use My Location",
+    "useMarkedLocation": "Use This Location",
+    "additionalDrivers": {
+      "birthDate": "Date of Birth",
+      "countHelp": "Additional drivers must present a valid license at pick-up.",
+      "countLabel": "Number of Additional Drivers",
+      "dashboardCount": "{count, plural, =0 {No additional drivers} one {1 additional driver} other {{count} additional drivers}}",
+      "description": "Add extra drivers who will also operate the vehicle during the rental period.",
+      "documentTitle": "Additional Driver {number}",
+      "driverLabel": "Driver {number}",
+      "empty": "No additional drivers added.",
+      "fullName": "Full Name",
+      "licenseExpiryDate": "License Expiry",
+      "licenseNumber": "License Number",
+      "requiredHint": "Please complete the required fields for all additional drivers.",
+      "reviewLocked": "Additional driver details are locked once the booking is confirmed.",
+      "summaryTitle": "Additional Drivers ({count})",
+      "title": "Additional Drivers",
+      "upload": "Upload License"
+    }
   },
   "continue": "Continue",
   "summary": "Summary",
@@ -716,6 +758,11 @@
     "forbidden": "Forbidden",
     "serverError": "Server error occurred",
     "tryAgain": "Try again"
+  },
+  "success": {
+    "title": "Booking Submitted!",
+    "message": "Your booking reference is: {{orderId}}",
+    "next": "We will contact you shortly to confirm."
   },
   "extras": {
     "gps": "GPS",
@@ -993,7 +1040,9 @@
               "pickup": "Failed to complete pickup inspection",
               "return": "Failed to complete return inspection"
             }
-          }
+          },
+          "openPickupChecklist": "Open Pick-up Checklist",
+          "openReturnChecklist": "Open Return Checklist"
         },
         "conditionLog": {
           "title": "Vehicle Condition Log",
@@ -1022,7 +1071,9 @@
           "quickbooksError": "QuickBooks error",
           "zohoError": "Zoho Invoice error",
           "openQuickbooksTransfers": "Open QuickBooks transfers",
-          "openZohoTransfers": "Open Zoho Invoice transfers"
+          "openZohoTransfers": "Open Zoho Invoice transfers",
+          "closeoutPayment": "Closeout Payment Received",
+          "closeoutPaymentPending": "Closeout Payment Pending"
         },
         "filesActions": {
           "sendByEmail": "Send by Email",
@@ -1048,7 +1099,13 @@
         },
         "filesCard": {
           "description": "Customer documents and generated billing outputs.",
-          "openPaymentProof": "Open payment proof"
+          "openPaymentProof": "Open payment proof",
+          "closeoutInvoicePaid": "Closeout Invoice (Paid)",
+          "closeoutInvoicePending": "Closeout Invoice (Pending)",
+          "closeoutInvoiceTitle": "Closeout Invoice",
+          "openCloseoutInvoice": "Open Closeout Invoice",
+          "openPickupChecklist": "Open Pick-up Checklist",
+          "openReturnChecklist": "Open Return Checklist"
         }
       },
       "edit": {
@@ -1281,7 +1338,18 @@
         "optionalNote": "Optional note",
         "saving": "Saving...",
         "create": "Create blockout",
-        "update": "Update blockout"
+        "update": "Update blockout",
+        "durationPending": "Select start and end to see duration",
+        "globalHelper": "A global blockout applies to all vehicles and overrides individual availability.",
+        "helperTitle": "Blockout Summary",
+        "invalidRange": "End date must be after start date.",
+        "reasonHelper": "Describe why vehicles are unavailable (e.g. public holiday, maintenance).",
+        "singleVehicle": "Single Vehicle",
+        "summaryDuration": "Duration: {duration}",
+        "summaryScope": "Scope: {scope}",
+        "summaryWindow": "Window: {start} – {end}",
+        "vehicleHelper": "This blockout will apply only to the selected vehicle.",
+        "windowPending": "Select start and end dates"
       },
       "actions": {
         "new": "New blockout",
@@ -1296,7 +1364,20 @@
         "global": "Global only",
         "vehicleSpecific": "Vehicle-specific only",
         "allStatuses": "All statuses",
-        "empty": "No blockouts match the current filters."
+        "empty": "No blockouts match the current filters.",
+        "active": "Active",
+        "allScopes": "All Scopes",
+        "allTimelines": "All Timelines",
+        "allVehicles": "All Vehicles",
+        "clear": "Clear Filters",
+        "globalOnly": "Global Only",
+        "past": "Past",
+        "results": "{count} results",
+        "searchLabel": "Search",
+        "timelineLabel": "Timeline",
+        "upcoming": "Upcoming",
+        "vehicleLabel": "Vehicle",
+        "vehicleOnly": "Vehicle Only"
       },
       "status": {
         "active": "Active",
@@ -1318,7 +1399,12 @@
         "created": "Created",
         "action": "Action",
         "fullReason": "Full reason",
-        "deleting": "Deleting..."
+        "deleting": "Deleting...",
+        "allFleetLabel": "All Fleet",
+        "emptyDescription": "No blockouts match the current filters.",
+        "emptyTitle": "No Blockouts Found",
+        "globalLabel": "Global",
+        "vehicleLabel": "Vehicle"
       },
       "messages": {
         "created": "Blockout created.",
@@ -1326,10 +1412,27 @@
         "deleted": "Blockout deleted.",
         "createFailed": "Failed to create blockout",
         "updateFailed": "Failed to update blockout",
-        "deleteFailed": "Failed to delete blockout"
+        "deleteFailed": "Failed to delete blockout",
+        "invalidDateRange": "Invalid date range. End must be after start."
       },
       "title": "Availability Blocks",
-      "description": "Block all vehicles or one specific vehicle for a date range. These blocks are enforced in availability search and booking creation."
+      "description": "Block all vehicles or one specific vehicle for a date range. These blocks are enforced in availability search and booking creation.",
+      "cards": {
+        "active": "Active",
+        "global": "Global",
+        "total": "Total",
+        "upcoming": "Upcoming"
+      },
+      "dialog": {
+        "createDescription": "Block out a period when vehicles are unavailable for booking.",
+        "createTitle": "Create Blockout",
+        "editDescription": "Update the blockout period or reason.",
+        "editTitle": "Edit Blockout"
+      },
+      "workspace": {
+        "description": "Manage periods when vehicles or the entire fleet are unavailable for booking.",
+        "title": "Fleet Blockouts"
+      }
     },
     "quickbooks": {
       "description": "Transfers are queued from billing actions and run separately from booking management.",
@@ -1456,7 +1559,17 @@
       "errors": {
         "delete": "Failed to delete location"
       },
-      "fullAddress": "Full address"
+      "fullAddress": "Full address",
+      "geolocationUnavailable": "Geolocation is not available in your browser.",
+      "locatingCurrentLocation": "Locating your position...",
+      "mapDescription": "Click on the map to set the exact coordinates for this location.",
+      "mapSearchPlaceholder": "Search for an address...",
+      "mapUnavailable": "Map is currently unavailable.",
+      "openMap": "Open Map",
+      "pickOnMap": "Pick on Map",
+      "searchMap": "Search",
+      "useCurrentLocation": "Use My Location",
+      "useMarkedLocation": "Use This Location"
     },
     "settings": {
       "title": "System Settings",
@@ -1951,7 +2064,9 @@
         "markDropoff": "Mark dropoff",
         "markTransferred": "Mark transferred",
         "saving": "Saving...",
-        "saveUpdate": "Save update"
+        "saveUpdate": "Save update",
+        "openInvoice": "Open Invoice",
+        "receiveCloseoutPayment": "Receive Closeout Payment"
       },
       "dialogs": {
         "createTitle": "Create Partner Rental",
@@ -1969,7 +2084,13 @@
         "pickup": "Pickup: {value}",
         "dropoff": "Dropoff: {value}",
         "notReceived": "Not received yet",
-        "notMarked": "Not marked yet"
+        "notMarked": "Not marked yet",
+        "closeoutBreakdown": "Closeout Breakdown",
+        "closeoutDamage": "Damage",
+        "closeoutFuel": "Fuel",
+        "closeoutLate": "Late Return",
+        "closeoutPending": "Closeout Pending",
+        "closeoutTotal": "Closeout Total"
       },
       "messages": {
         "completeSupplier": "Please complete the supplier and vehicle details.",

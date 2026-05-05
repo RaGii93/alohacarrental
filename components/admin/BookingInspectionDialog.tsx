@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Camera, CheckCircle2, ChevronLeft, ChevronRight, Fuel, Gauge, Trash2 } from "lucide-react";
@@ -40,6 +40,7 @@ type Props = {
   dailyRate?: number | null;
   scheduledDropoffAt?: string | Date | null;
   fuelChargePerQuarter?: number | null;
+  initialOdometerKm?: number | null;
   onCompleted?: () => void;
 };
 
@@ -67,6 +68,11 @@ async function compressImage(file: File): Promise<File> {
   return new File([blob], `${nextName}.jpg`, { type: "image/jpeg" });
 }
 
+function formatOdometerInput(value?: number | null) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "";
+  return String(Math.max(0, Math.round(value)));
+}
+
 export function BookingInspectionDialog({
   open,
   onOpenChange,
@@ -78,6 +84,7 @@ export function BookingInspectionDialog({
   dailyRate,
   scheduledDropoffAt,
   fuelChargePerQuarter,
+  initialOdometerKm,
   onCompleted,
 }: Props) {
   const t = useTranslations();
@@ -91,9 +98,33 @@ export function BookingInspectionDialog({
   const [acceptedBy, setAcceptedBy] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [damageCharge, setDamageCharge] = useState("0");
+  const [closeoutPaidOnSpot, setCloseoutPaidOnSpot] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [checklistItemIds, setChecklistItemIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const checklistItems = isReturn
+    ? [
+        { id: "vehicle_exterior_rechecked", label: t("admin.bookings.detail.inspection.returnChecklist.items.vehicleExteriorRechecked") },
+        { id: "vehicle_interior_rechecked", label: t("admin.bookings.detail.inspection.returnChecklist.items.vehicleInteriorRechecked") },
+        { id: "fuel_level_rechecked", label: t("admin.bookings.detail.inspection.returnChecklist.items.fuelLevelRechecked") },
+        { id: "damage_reviewed", label: t("admin.bookings.detail.inspection.returnChecklist.items.damageReviewed") },
+        { id: "late_return_reviewed", label: t("admin.bookings.detail.inspection.returnChecklist.items.lateReturnReviewed") },
+        { id: "extra_charges_explained", label: t("admin.bookings.detail.inspection.returnChecklist.items.extraChargesExplained") },
+        { id: "keys_received", label: t("admin.bookings.detail.inspection.returnChecklist.items.keysReceived") },
+        { id: "client_closeout_confirmed", label: t("admin.bookings.detail.inspection.returnChecklist.items.clientCloseoutConfirmed") },
+      ]
+    : [
+        { id: "license_verified", label: t("admin.bookings.detail.inspection.checklist.items.licenseVerified") },
+        { id: "vehicle_exterior_checked", label: t("admin.bookings.detail.inspection.checklist.items.vehicleExteriorChecked") },
+        { id: "vehicle_interior_checked", label: t("admin.bookings.detail.inspection.checklist.items.vehicleInteriorChecked") },
+        { id: "fuel_level_confirmed", label: t("admin.bookings.detail.inspection.checklist.items.fuelLevelConfirmed") },
+        { id: "accessories_confirmed", label: t("admin.bookings.detail.inspection.checklist.items.accessoriesConfirmed") },
+        { id: "rental_window_confirmed", label: t("admin.bookings.detail.inspection.checklist.items.rentalWindowConfirmed") },
+        { id: "terms_explained", label: t("admin.bookings.detail.inspection.checklist.items.termsExplained") },
+        { id: "client_received_vehicle", label: t("admin.bookings.detail.inspection.checklist.items.clientReceivedVehicle") },
+      ];
+  const finalStep = 3;
 
   const fuelPreview = useMemo(
     () =>
@@ -117,10 +148,12 @@ export function BookingInspectionDialog({
         : { isLate: false, lateMs: 0, lateDays: 0, chargeCents: 0 },
     [dailyRate, isReturn, scheduledDropoffAt]
   );
+  const damageChargeCents = isReturn && hasDamage ? Math.max(0, Math.round((Number(damageCharge || "0") || 0) * 100)) : 0;
+  const totalCloseoutCents = latePreview.chargeCents + fuelPreview.chargeCents + damageChargeCents;
 
   const reset = () => {
     setStep(0);
-    setOdometerKm("");
+    setOdometerKm(formatOdometerInput(initialOdometerKm));
     setFuelLevel(isReturn ? String(pickupFuelLevel ?? 4) : "4");
     setHasDamage(false);
     setDamageNotes("");
@@ -128,10 +161,17 @@ export function BookingInspectionDialog({
     setAcceptedBy("");
     setAccepted(false);
     setDamageCharge("0");
+    setCloseoutPaidOnSpot(false);
     setImageUrls([]);
+    setChecklistItemIds([]);
     setUploading(false);
     setSaving(false);
   };
+
+  useEffect(() => {
+    if (!open) return;
+    setOdometerKm(formatOdometerInput(initialOdometerKm));
+  }, [initialOdometerKm, open]);
 
   const close = (nextOpen: boolean) => {
     if (!nextOpen) reset();
@@ -154,7 +194,12 @@ export function BookingInspectionDialog({
       }
     }
 
-    if (step === 2) {
+    if (step === 1 && checklistItemIds.length !== checklistItems.length) {
+      toast.error(t("admin.bookings.detail.inspection.validation.checklist"));
+      return false;
+    }
+
+    if (step === finalStep) {
       if (!acceptedBy.trim()) {
         toast.error(t("admin.bookings.detail.inspection.validation.acceptedBy"));
         return false;
@@ -201,7 +246,9 @@ export function BookingInspectionDialog({
       agentNotes,
       acceptedBy,
       imageUrls,
-      damageChargeCents: Math.round((Number(damageCharge || "0") || 0) * 100),
+      damageChargeCents,
+      checklistItemIds,
+      closeoutPaidOnSpot,
     };
 
     const result = isReturn
@@ -214,13 +261,17 @@ export function BookingInspectionDialog({
       return;
     }
 
-    toast.success(
-      isReturn
-        ? t("admin.bookings.detail.inspection.toasts.returnCompleted", {
-            amount: formatCurrency((result as any).totalAdjustment || 0),
-          })
-        : t("admin.bookings.detail.inspection.toasts.pickupCompleted")
-    );
+    if ((result as any).warning) {
+      toast.warning((result as any).warning);
+    } else {
+      toast.success(
+        isReturn
+          ? t("admin.bookings.detail.inspection.toasts.returnCompleted", {
+              amount: formatCurrency((result as any).totalAdjustment || 0),
+            })
+          : t("admin.bookings.detail.inspection.toasts.pickupCompleted")
+      );
+    }
     reset();
     onOpenChange(false);
     onCompleted?.();
@@ -231,6 +282,7 @@ export function BookingInspectionDialog({
     : t("admin.bookings.detail.inspection.title.pickup");
   const steps = [
     t("admin.bookings.detail.inspection.steps.condition"),
+    t("admin.bookings.detail.inspection.steps.checklist"),
     t("admin.bookings.detail.inspection.steps.photos"),
     t("admin.bookings.detail.inspection.steps.acceptance"),
   ];
@@ -245,7 +297,7 @@ export function BookingInspectionDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className={`grid gap-3 ${steps.length === 4 ? "sm:grid-cols-2 xl:grid-cols-4" : "sm:grid-cols-3"}`}>
           {steps.map((label, index) => (
             <div
               key={label}
@@ -351,10 +403,12 @@ export function BookingInspectionDialog({
                         {t("admin.bookings.detail.inspection.summary.lateNotice", { days: latePreview.lateDays })}
                       </p>
                     ) : null}
-                    <div>
-                      <label className="mb-1 block text-sm font-medium text-slate-900">{t("admin.bookings.detail.inspection.summary.damageCharge")}</label>
-                      <Input type="number" min={0} step={0.01} value={damageCharge} onChange={(e) => setDamageCharge(e.target.value)} />
-                    </div>
+                    {hasDamage ? (
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-slate-900">{t("admin.bookings.detail.inspection.summary.damageCharge")}</label>
+                        <Input type="number" min={0} step={0.01} value={damageCharge} onChange={(e) => setDamageCharge(e.target.value)} />
+                      </div>
+                    ) : null}
                   </>
                 ) : (
                   <p>{t("admin.bookings.detail.inspection.summary.pickupHelp")}</p>
@@ -366,6 +420,41 @@ export function BookingInspectionDialog({
         ) : null}
 
         {step === 1 ? (
+          <div className="space-y-4 rounded-2xl border border-slate-200 p-4">
+            <div>
+              <div>
+                <p className="font-semibold text-slate-900">
+                  {t(isReturn ? "admin.bookings.detail.inspection.returnChecklist.title" : "admin.bookings.detail.inspection.checklist.title")}
+                </p>
+                <p className="text-sm text-slate-600">
+                  {t(isReturn ? "admin.bookings.detail.inspection.returnChecklist.description" : "admin.bookings.detail.inspection.checklist.description")}
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-3">
+              {checklistItems.map((item) => {
+                const checked = checklistItemIds.includes(item.id);
+                return (
+                  <label key={item.id} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700">
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={(value) => {
+                        setChecklistItemIds((prev) =>
+                          value
+                            ? [...prev, item.id].filter((entry, index, array) => array.indexOf(entry) === index)
+                            : prev.filter((entry) => entry !== item.id)
+                        );
+                      }}
+                    />
+                    <span>{item.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {step === 2 ? (
           <div className="space-y-4 rounded-2xl border border-slate-200 p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -401,7 +490,7 @@ export function BookingInspectionDialog({
           </div>
         ) : null}
 
-        {step === 2 ? (
+        {step === finalStep ? (
           <div className="grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)]">
             <div className="rounded-2xl border border-slate-200 p-4">
               <p className="font-semibold text-slate-900">{t("admin.bookings.detail.inspection.acceptance.clientOverview")}</p>
@@ -409,14 +498,23 @@ export function BookingInspectionDialog({
                 <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.odometer")}</span><span className="font-medium text-slate-900">{odometerKm || "-"}</span></div>
                 <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.fuel")}</span><span className="font-medium text-slate-900">{getFuelLevelLabel(Number(fuelLevel))}</span></div>
                 <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.damageRecorded")}</span><span className="font-medium text-slate-900">{hasDamage ? t("common.yes") : t("common.no")}</span></div>
+                <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.checklistCompleted")}</span><span className="font-medium text-slate-900">{checklistItemIds.length}/{checklistItems.length}</span></div>
                 {damageNotes.trim() ? <p className="rounded-xl bg-slate-50 px-3 py-3">{damageNotes}</p> : null}
                 {isReturn ? (
                   <>
                     <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.category")}</span><span className="font-medium text-slate-900">{categoryName || "-"}</span></div>
                     <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.summary.lateReturnCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(latePreview.chargeCents)}</span></div>
                     <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.fuelCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(fuelPreview.chargeCents)}</span></div>
-                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.summary.damageCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(Math.round((Number(damageCharge || "0") || 0) * 100))}</span></div>
-                    <div className="flex items-center justify-between rounded-xl bg-slate-900 px-3 py-3 text-white"><span>{t("admin.bookings.detail.inspection.acceptance.totalCloseout")}</span><span className="font-semibold">{formatCurrency(latePreview.chargeCents + fuelPreview.chargeCents + Math.round((Number(damageCharge || "0") || 0) * 100))}</span></div>
+                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.summary.damageCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(damageChargeCents)}</span></div>
+                    <div className="flex items-center justify-between rounded-xl bg-slate-900 px-3 py-3 text-white"><span>{t("admin.bookings.detail.inspection.acceptance.totalCloseout")}</span><span className="font-semibold">{formatCurrency(totalCloseoutCents)}</span></div>
+                    {totalCloseoutCents > 0 ? (
+                      <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
+                        <Checkbox checked={closeoutPaidOnSpot} onCheckedChange={(value) => setCloseoutPaidOnSpot(Boolean(value))} id="closeout-paid-now" />
+                        <label htmlFor="closeout-paid-now" className="text-sm text-slate-700">
+                          {t("admin.bookings.detail.inspection.acceptance.closeoutPaidOnSpot")}
+                        </label>
+                      </div>
+                    ) : null}
                   </>
                 ) : null}
               </div>

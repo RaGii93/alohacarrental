@@ -6,7 +6,7 @@ type LegacyFeatureFlags = {
 
 type FeatureNameRef =
   | { name?: string | null; feature?: never }
-  | { feature?: { name?: string | null } | null; name?: never };
+  | { feature?: { name?: string | null; isActive?: boolean | null } | null; name?: never };
 
 export function normalizeVehicleFeatureName(value: string) {
   return value.trim().replace(/\s+/g, " ");
@@ -28,17 +28,37 @@ export function getLegacyVehicleFeatureNames(flags: LegacyFeatureFlags) {
   return names;
 }
 
+function mergeOrderedUnique(names: string[]) {
+  const seen = new Set<string>();
+  const ordered: string[] = [];
+
+  for (const name of names) {
+    const normalized = normalizeVehicleFeatureName(name);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    ordered.push(normalized);
+  }
+
+  return ordered;
+}
+
 export function getCategoryFeatureNames(
   category: LegacyFeatureFlags & {
     features?: FeatureNameRef[] | null;
   }
 ) {
-  const names = [
-    ...(category.features || []).map((entry) => normalizeVehicleFeatureName(entry.feature?.name || entry.name || "")).filter(Boolean),
-    ...getLegacyVehicleFeatureNames(category),
-  ];
+  const relations = category.features || [];
+  const hasFeatureRelations = relations.length > 0;
+  const relationNames = relations
+    .filter((entry) => entry.feature?.isActive !== false)
+    .map((entry) => entry.feature?.name || entry.name || "")
+    .filter(Boolean);
 
-  return Array.from(new Set(names));
+  if (hasFeatureRelations) {
+    return mergeOrderedUnique(relationNames);
+  }
+
+  return mergeOrderedUnique([...relationNames, ...getLegacyVehicleFeatureNames(category)]);
 }
 
 export function getCategoryFeatureIds(category: {

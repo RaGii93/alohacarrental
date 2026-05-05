@@ -150,17 +150,17 @@ export function TaxSettingsCard({
   const [integrationBanner, setIntegrationBanner] = useState(integrationFeedback);
   const [isSaving, setIsSaving] = useState(false);
   const sectionClass =
-    "overflow-hidden rounded-[1.75rem] border border-slate-200/90 bg-[linear-gradient(180deg,#ffffff,rgba(246,249,255,0.96))] shadow-[0_28px_60px_-42px_rgba(15,23,42,0.34)]";
+    "overflow-hidden rounded-[1.75rem] border border-slate-200/90 bg-[linear-gradient(180deg,#ffffff,hsl(var(--primary)/0.03))] shadow-[0_28px_60px_-42px_hsl(var(--primary)/0.14)]";
   const sectionBodyClass = "space-y-5 p-5 sm:p-6";
   const inputClass =
-    "rounded-xl border-slate-200 bg-white/90 shadow-[0_10px_24px_-22px_rgba(15,23,42,0.55)] transition focus-visible:border-sky-300 focus-visible:ring-sky-200";
+    "rounded-xl border-slate-200 bg-white/90 shadow-[0_10px_24px_-22px_hsl(var(--primary)/0.14)] transition focus-visible:border-[hsl(var(--primary)/0.35)] focus-visible:ring-[hsl(var(--primary)/0.18)]";
   const toggleCardClass =
     "flex items-start gap-3 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-32px_rgba(15,23,42,0.4)]";
   const stats = [
     {
       label: t("admin.settings.taxPercentage"),
       value: `${taxPercentage || 0}%`,
-      tone: "from-sky-50 to-white text-sky-700 border-sky-200",
+      tone: "from-red-50 to-white text-red-700 border-red-200",
     },
     {
       label: t("admin.settings.minimumBookingDays"),
@@ -198,7 +198,7 @@ export function TaxSettingsCard({
         : invoiceProvider === "QUICKBOOKS"
           ? t("admin.settings.integrations.providerQuickbooks")
           : t("common.no"),
-      tone: "from-violet-50 to-white text-violet-700 border-violet-200",
+      tone: "from-red-50 to-white text-red-700 border-red-200",
     },
   ];
 
@@ -529,7 +529,7 @@ export function TaxSettingsCard({
   };
 
   return (
-    <div className="space-y-6 pb-24 sm:pb-28">
+    <div className="space-y-6">
       {integrationBanner ? (
         <Card className={`overflow-hidden rounded-[1.5rem] border shadow-[0_22px_50px_-38px_rgba(15,23,42,0.45)] ${
           integrationBanner.status === "connected"
@@ -560,7 +560,7 @@ export function TaxSettingsCard({
         <div className="p-6 sm:p-7">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-red-700 shadow-sm">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 {t("admin.settings.title")}
               </div>
@@ -586,7 +586,7 @@ export function TaxSettingsCard({
       <Card className={sectionClass}>
         <div className={sectionBodyClass}>
           <div className="flex items-start gap-4">
-            <div className="rounded-2xl bg-sky-100 p-3 text-sky-700 ring-1 ring-sky-200">
+            <div className="rounded-2xl bg-red-100 p-3 text-red-700 ring-1 ring-red-200">
               <Banknote className="h-5 w-5" />
             </div>
             <div>
@@ -803,7 +803,7 @@ export function TaxSettingsCard({
                     <select
                       value={belowMinimumRentalSurchargeMode}
                       onChange={(e) => setBelowMinimumRentalSurchargeMode(e.target.value as BelowMinimumRentalSurchargeMode)}
-                      className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-sky-200"
+                      className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-[hsl(var(--primary)/0.18)]"
                     >
                       <option value="percentage_on_base_total">{t("admin.settings.bookingRules.surchargeModes.percentage_on_base_total")}</option>
                       <option value="percentage_on_current_total">{t("admin.settings.bookingRules.surchargeModes.percentage_on_current_total")}</option>
@@ -960,7 +960,7 @@ export function TaxSettingsCard({
       <Card className={sectionClass}>
         <div className={sectionBodyClass}>
           <div className="flex items-start gap-4">
-            <div className="rounded-2xl bg-cyan-100 p-3 text-cyan-700 ring-1 ring-cyan-200">
+            <div className="rounded-2xl bg-red-100 p-3 text-red-700 ring-1 ring-red-200">
               <PlugZap className="h-5 w-5" />
             </div>
             <div>
@@ -969,7 +969,7 @@ export function TaxSettingsCard({
             </div>
           </div>
 
-          <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#f8fbff,#ffffff)] p-5 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.35)]">
+          <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,hsl(var(--primary)/0.03),#ffffff)] p-5 shadow-[0_18px_42px_-34px_hsl(var(--primary)/0.12)]">
             <div className="mb-4">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">
                 {t("admin.settings.integrations.invoiceProvider")}
@@ -990,13 +990,13 @@ export function TaxSettingsCard({
                     onClick={() => setInvoiceProvider(option.value)}
                     className={`rounded-2xl border px-4 py-4 text-left transition ${
                       active
-                        ? "border-sky-300 bg-sky-50 shadow-[0_20px_40px_-30px_rgba(2,132,199,0.45)]"
+                        ? "border-red-300 bg-red-50 shadow-[0_20px_40px_-30px_hsl(var(--primary)/0.24)]"
                         : "border-slate-200 bg-white hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-sm font-bold text-slate-900">{option.label}</span>
-                      {active ? <CheckCircle2 className="h-4 w-4 text-sky-600" /> : <span className="h-4 w-4 rounded-full border border-slate-300" />}
+                      {active ? <CheckCircle2 className="h-4 w-4 text-red-600" /> : <span className="h-4 w-4 rounded-full border border-slate-300" />}
                     </div>
                     <p className="mt-2 text-xs leading-5 text-slate-600">{option.description}</p>
                   </button>
@@ -1195,7 +1195,7 @@ export function TaxSettingsCard({
                   <select
                     value={quickBooksEnvironment}
                     onChange={(e) => setQuickBooksEnvironment(e.target.value as "production" | "sandbox")}
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_10px_24px_-18px_rgba(12,74,160,0.2)] outline-none focus:ring-2 focus:ring-sky-200"
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_10px_24px_-18px_hsl(var(--primary)/0.16)] outline-none focus:ring-2 focus:ring-[hsl(var(--primary)/0.18)]"
                   >
                     <option value="production">Production</option>
                     <option value="sandbox">Sandbox</option>
@@ -1230,15 +1230,15 @@ export function TaxSettingsCard({
         </div>
       </Card>
 
-      <div className="pointer-events-none fixed bottom-4 right-4 z-40 flex justify-end sm:bottom-5 sm:right-5">
-        <div className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white/94 px-4 py-3 shadow-[0_24px_50px_-26px_rgba(15,23,42,0.34)] backdrop-blur-md">
-          <p className="hidden text-sm text-slate-600 xl:block">{t("admin.settings.subtitle")}</p>
+      <div className="sticky bottom-4 z-10 flex justify-end">
+        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/92 px-4 py-3 shadow-[0_24px_50px_-30px_rgba(15,23,42,0.38)] backdrop-blur">
+          <p className="hidden text-sm text-slate-600 md:block">{t("admin.settings.subtitle")}</p>
           <Button
             onClick={onSave}
             disabled={isSaving}
-            className="min-w-[140px] rounded-xl bg-[rgb(19,120,152)] px-5 text-white shadow-[0_18px_34px_-20px_rgba(19,120,152,0.42)] hover:opacity-95"
+            className="rounded-xl bg-[hsl(var(--primary))] px-5 text-white shadow-[0_18px_34px_-20px_hsl(var(--primary)/0.36)] hover:bg-[hsl(var(--primary)/0.92)]"
           >
-            {isSaving ? t("admin.settings.saving") : t("common.save")}
+          {isSaving ? t("admin.settings.saving") : t("common.save")}
           </Button>
         </div>
       </div>

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { formatDate, formatDateTime } from "@/lib/datetime";
+import { buildGoogleMapsUrl } from "@/lib/location-map";
 import { calculateBookingAmounts, calculateLateReturnCharge, getFuelChargePerQuarterForCategory, getFuelLevelLabel } from "@/lib/pricing";
 import {
   confirmBookingAction,
@@ -40,6 +41,7 @@ import {
 
 export function BookingDetailClient({
   booking,
+  pickupChecklistState,
   locale,
   extras,
   discountCodes,
@@ -47,8 +49,17 @@ export function BookingDetailClient({
   vehicleRatesIncludeTax,
   accountingProvider,
   role,
+  hasSignedRentalAgreement = false,
 }: {
   booking: any;
+  pickupChecklistState?: {
+    pickupChecklistData?: any;
+    pickupChecklistDocumentUrl?: string | null;
+    returnChecklistData?: any;
+    returnChecklistDocumentUrl?: string | null;
+    closeoutPaymentDueAt?: string | Date | null;
+    closeoutPaymentReceivedAt?: string | Date | null;
+  };
   locale: string;
   extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }>;
   discountCodes: Array<{ id: string; code: string; percentage: number }>;
@@ -56,6 +67,7 @@ export function BookingDetailClient({
   vehicleRatesIncludeTax: boolean;
   accountingProvider: "NONE" | "QUICKBOOKS" | "ZOHO";
   role: string;
+  hasSignedRentalAgreement?: boolean;
 }) {
   const router = useRouter();
   const t = useTranslations();
@@ -71,6 +83,10 @@ export function BookingDetailClient({
   const [showReturnInspection, setShowReturnInspection] = useState(false);
 
   const invoiceDownloadUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true });
+  const pickupChecklistDownloadUrl = getBlobProxyUrl(pickupChecklistState?.pickupChecklistDocumentUrl, { download: true });
+  const returnChecklistDownloadUrl = getBlobProxyUrl(pickupChecklistState?.returnChecklistDocumentUrl, { download: true });
+  const hasCloseoutInvoice = Boolean(pickupChecklistState?.closeoutPaymentDueAt && booking.invoiceUrl);
+  const closeoutInvoicePaid = Boolean(pickupChecklistState?.closeoutPaymentReceivedAt);
   const rentalDays = Math.max(
     1,
     Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24))
@@ -129,17 +145,23 @@ export function BookingDetailClient({
   const canDecline = booking.status === "PENDING" || booking.status === "CONFIRMED";
   const canSendInvoice = booking.status === "PENDING" || booking.status === "CONFIRMED";
   const canCreateSalesReceipt = booking.status === "PENDING" || booking.status === "CONFIRMED";
-  const canReceivePayment = !!booking.invoiceUrl && !booking.paymentReceivedAt;
+  const canReceivePayment = !!booking.invoiceUrl && (!booking.paymentReceivedAt || Boolean(pickupChecklistState?.closeoutPaymentDueAt && !pickupChecklistState?.closeoutPaymentReceivedAt));
   const canMarkDelivered = !!booking.paymentReceivedAt && !booking.deliveredAt;
+  const canOpenPickupCheckIn = canMarkDelivered && hasSignedRentalAgreement;
   const canMarkReturned = !!booking.deliveredAt && !booking.returnedAt;
   const hasOpenBillingDoc = !!booking.invoiceUrl;
+  const latestOdometerKm = booking.vehicle?.currentOdometerKm ?? booking.returnOdometerKm ?? booking.pickupOdometerKm ?? null;
 
-  const pickupMapUrl = booking?.pickupLocationRef?.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.pickupLocationRef.address)}`
-    : null;
-  const dropoffMapUrl = booking?.dropoffLocationRef?.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.dropoffLocationRef.address)}`
-    : null;
+  const pickupMapUrl = buildGoogleMapsUrl({
+    latitude: booking?.pickupLatitude,
+    longitude: booking?.pickupLongitude,
+    query: booking?.pickupLocationAddress || booking?.pickupLocation || booking?.pickupLocationRef?.address,
+  });
+  const dropoffMapUrl = buildGoogleMapsUrl({
+    latitude: booking?.dropoffLatitude,
+    longitude: booking?.dropoffLongitude,
+    query: booking?.dropoffLocationAddress || booking?.dropoffLocation || booking?.dropoffLocationRef?.address,
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -194,11 +216,15 @@ export function BookingDetailClient({
     await withLoading(async () => {
       const result = await sendInvoiceEstimateAction(booking.id, locale);
       if (result.success) {
-        toast.success(
-          booking.invoiceUrl
-            ? t("admin.bookings.detail.messages.invoiceResent")
-            : t("admin.bookings.detail.messages.invoiceSent")
-        );
+        if ("warning" in result && typeof result.warning === "string" && result.warning) {
+          toast.warning(result.warning);
+        } else {
+          toast.success(
+            booking.invoiceUrl
+              ? t("admin.bookings.detail.messages.invoiceResent")
+              : t("admin.bookings.detail.messages.invoiceSent")
+          );
+        }
         router.refresh();
         return;
       }
@@ -211,11 +237,15 @@ export function BookingDetailClient({
       const result = await createSalesReceiptAction(booking.id, locale, deliverNowForReceipt);
       setShowSalesReceiptDialog(false);
       if (result.success) {
-        toast.success(
-          deliverNowForReceipt
-            ? t("admin.bookings.detail.messages.salesReceiptDelivered")
-            : t("admin.bookings.detail.messages.salesReceiptCreated")
-        );
+        if ("warning" in result && typeof result.warning === "string" && result.warning) {
+          toast.warning(result.warning);
+        } else {
+          toast.success(
+            deliverNowForReceipt
+              ? t("admin.bookings.detail.messages.salesReceiptDelivered")
+              : t("admin.bookings.detail.messages.salesReceiptCreated")
+          );
+        }
         router.refresh();
         return;
       }
@@ -228,7 +258,11 @@ export function BookingDetailClient({
       const result = await receiveInvoicePaymentAction(booking.id, locale);
       setConfirmAction(null);
       if (result.success) {
-        toast.success(t("admin.bookings.detail.messages.paymentReceived"));
+        if ("warning" in result && typeof result.warning === "string" && result.warning) {
+          toast.warning(result.warning);
+        } else {
+          toast.success(t("admin.bookings.detail.messages.paymentReceived"));
+        }
         router.refresh();
         return;
       }
@@ -298,6 +332,7 @@ export function BookingDetailClient({
         scheduledDropoffAt={booking.endDate}
         fuelChargePerQuarter={booking.category?.fuelChargePerQuarter}
         pickupFuelLevel={booking.pickupFuelLevel}
+        initialOdometerKm={booking.pickupOdometerKm ?? latestOdometerKm}
         onCompleted={() => router.refresh()}
       />
 
@@ -312,6 +347,7 @@ export function BookingDetailClient({
         scheduledDropoffAt={booking.endDate}
         fuelChargePerQuarter={booking.category?.fuelChargePerQuarter}
         pickupFuelLevel={booking.pickupFuelLevel}
+        initialOdometerKm={booking.returnOdometerKm ?? latestOdometerKm}
         onCompleted={() => router.refresh()}
       />
 
@@ -415,12 +451,14 @@ export function BookingDetailClient({
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("admin.bookings.detail.trip.fields.pickup")}</p>
                 <p className="mt-2 text-sm font-semibold text-slate-900">{formatDateTime(booking.startDate)}</p>
-                <p className="mt-1 text-xs text-slate-500">{booking.pickupLocationRef?.name || booking.pickupLocation || "-"}</p>
+                <p className="mt-1 text-xs text-slate-500">{booking.pickupLocation || booking.pickupLocationRef?.name || "-"}</p>
+                {booking.pickupLocationAddress ? <p className="mt-1 text-xs text-slate-400">{booking.pickupLocationAddress}</p> : null}
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("admin.bookings.detail.trip.fields.dropoff")}</p>
                 <p className="mt-2 text-sm font-semibold text-slate-900">{formatDateTime(booking.endDate)}</p>
-                <p className="mt-1 text-xs text-slate-500">{booking.dropoffLocationRef?.name || booking.dropoffLocation || "-"}</p>
+                <p className="mt-1 text-xs text-slate-500">{booking.dropoffLocation || booking.dropoffLocationRef?.name || "-"}</p>
+                {booking.dropoffLocationAddress ? <p className="mt-1 text-xs text-slate-400">{booking.dropoffLocationAddress}</p> : null}
               </div>
             </div>
           </div>
@@ -436,6 +474,11 @@ export function BookingDetailClient({
                 {!booking.paymentReceivedAt && !booking.deliveredAt ? (
                   <p className="mt-2 text-sm text-amber-700">
                     {t("admin.bookings.detail.operations.deliverHint")}
+                  </p>
+                ) : null}
+                {canMarkDelivered && !hasSignedRentalAgreement ? (
+                  <p className="mt-2 text-sm text-amber-700">
+                    Signed rental agreement is required before pickup check-in.
                   </p>
                 ) : null}
               </div>
@@ -465,7 +508,7 @@ export function BookingDetailClient({
                   </Button>
                 )}
                 {canMarkDelivered && (
-                  <Button onClick={() => setShowPickupInspection(true)} disabled={isLoading} variant="outline" className="rounded-xl">
+                  <Button onClick={() => setShowPickupInspection(true)} disabled={isLoading || !canOpenPickupCheckIn} variant="outline" className="rounded-xl">
                     <Truck className="h-4 w-4" />
                     {t("admin.bookings.detail.inspection.title.pickup")}
                   </Button>
@@ -567,6 +610,32 @@ export function BookingDetailClient({
               <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.customerProfile.fields.licenseNumber")}</p><p className="mt-1 font-medium text-slate-900">{booking.driverLicenseNumber || "-"}</p></div>
               <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.customerProfile.fields.licenseExpiry")}</p><p className="mt-1 font-medium text-slate-900">{booking.licenseExpiryDate ? formatDate(booking.licenseExpiryDate) : "-"}</p></div>
             </div>
+            {booking.additionalDrivers?.length ? (
+              <div className="mt-5 space-y-4 border-t border-slate-200 pt-5">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("booking.additionalDrivers.title")}</p>
+                  <p className="mt-1 text-sm text-slate-600">{booking.additionalDrivers.length} {t("booking.additionalDrivers.dashboardCount")}</p>
+                </div>
+                {booking.additionalDrivers.map((driver: any, index: number) => (
+                  <div key={driver.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("booking.additionalDrivers.driverLabel", { number: index + 1 })}</p><p className="mt-1 font-medium text-slate-900">{driver.fullName}</p></div>
+                      <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("booking.additionalDrivers.birthDate")}</p><p className="mt-1 font-medium text-slate-900">{formatDate(driver.birthDate)}</p></div>
+                      <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("booking.additionalDrivers.licenseNumber")}</p><p className="mt-1 font-medium text-slate-900">{driver.driverLicenseNumber}</p></div>
+                      <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("booking.additionalDrivers.licenseExpiryDate")}</p><p className="mt-1 font-medium text-slate-900">{formatDate(driver.licenseExpiryDate)}</p></div>
+                    </div>
+                    <div className="mt-4">
+                      <DocumentPreview
+                        url={driver.driverLicenseUrl}
+                        title={driver.fullName}
+                        openLabel={t("booking.openOriginal")}
+                        emptyLabel={t("booking.documentUnavailable")}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </Card>
 
           <Card className="rounded-2xl border-slate-200 p-6 shadow-sm">
@@ -584,12 +653,14 @@ export function BookingDetailClient({
               <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.trip.fields.dropoff")}</p><p className="mt-1 font-medium text-slate-900">{formatDateTime(booking.endDate)}</p></div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.trip.fields.pickupLocation")}</p>
-                <p className="mt-1 font-medium text-slate-900">{booking.pickupLocationRef?.name || booking.pickupLocation || "-"}</p>
+                <p className="mt-1 font-medium text-slate-900">{booking.pickupLocation || booking.pickupLocationRef?.name || "-"}</p>
+                {booking.pickupLocationAddress ? <p className="mt-1 text-sm text-slate-500">{booking.pickupLocationAddress}</p> : null}
                 {pickupMapUrl && <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-sm text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline">{t("admin.bookings.detail.trip.openMap")}</a>}
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.trip.fields.dropoffLocation")}</p>
-                <p className="mt-1 font-medium text-slate-900">{booking.dropoffLocationRef?.name || booking.dropoffLocation || "-"}</p>
+                <p className="mt-1 font-medium text-slate-900">{booking.dropoffLocation || booking.dropoffLocationRef?.name || "-"}</p>
+                {booking.dropoffLocationAddress ? <p className="mt-1 text-sm text-slate-500">{booking.dropoffLocationAddress}</p> : null}
                 {dropoffMapUrl && <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-sm text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline">{t("admin.bookings.detail.trip.openMap")}</a>}
               </div>
             </div>
@@ -718,6 +789,7 @@ export function BookingDetailClient({
             </div>
             <div className="space-y-3 text-sm text-slate-600">
               <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.sync.paymentReceived")}</span><span className="font-medium text-slate-900">{booking.paymentReceivedAt ? formatDateTime(booking.paymentReceivedAt) : t("common.no")}</span></div>
+              <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.sync.closeoutPayment")}</span><span className="font-medium text-slate-900">{pickupChecklistState?.closeoutPaymentReceivedAt ? formatDateTime(pickupChecklistState.closeoutPaymentReceivedAt) : pickupChecklistState?.closeoutPaymentDueAt ? t("admin.bookings.detail.sync.closeoutPaymentPending") : t("common.no")}</span></div>
               <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.sync.billingDocument")}</span><span className="font-medium text-slate-900">{booking.billingDocumentType || t("admin.bookings.detail.sync.notGenerated")}</span></div>
               <div className="flex items-center justify-between">
                 <span>{accountingProvider === "ZOHO" ? t("admin.bookings.detail.sync.zohoTransfer") : t("admin.bookings.detail.sync.quickbooksTransfer")}</span>
@@ -819,12 +891,48 @@ export function BookingDetailClient({
                   {t("admin.bookings.detail.filesCard.openPaymentProof")}
                 </a>
               )}
+              {pickupChecklistState?.pickupChecklistDocumentUrl && (
+                <a href={pickupChecklistDownloadUrl || pickupChecklistState.pickupChecklistDocumentUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="rounded-xl">
+                    <FileText className="h-4 w-4" />
+                    {t("admin.bookings.detail.filesCard.openPickupChecklist")}
+                  </Button>
+                </a>
+              )}
+              {pickupChecklistState?.returnChecklistDocumentUrl && (
+                <a href={returnChecklistDownloadUrl || pickupChecklistState.returnChecklistDocumentUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="rounded-xl">
+                    <FileText className="h-4 w-4" />
+                    {t("admin.bookings.detail.filesCard.openReturnChecklist")}
+                  </Button>
+                </a>
+              )}
+              {hasCloseoutInvoice ? (
+                <div className={`rounded-2xl border px-4 py-4 ${closeoutInvoicePaid ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-semibold text-slate-900">{t("admin.bookings.detail.filesCard.closeoutInvoiceTitle")}</p>
+                      <p className="text-sm text-slate-700">
+                        {closeoutInvoicePaid
+                          ? t("admin.bookings.detail.filesCard.closeoutInvoicePaid")
+                          : t("admin.bookings.detail.filesCard.closeoutInvoicePending")}
+                      </p>
+                    </div>
+                    <a href={invoiceDownloadUrl || booking.invoiceUrl} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" className="rounded-xl bg-white">
+                        <FileText className="h-4 w-4" />
+                        {t("admin.bookings.detail.filesCard.openCloseoutInvoice")}
+                      </Button>
+                    </a>
+                  </div>
+                </div>
+              ) : null}
               {booking.invoiceUrl && (
                 <div className="flex flex-wrap items-center gap-3">
                   <a href={invoiceDownloadUrl || booking.invoiceUrl} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" className="rounded-xl">
                       <FileText className="h-4 w-4" />
-                      {t("admin.bookings.detail.actions.openBillingDoc")}
+                      {hasCloseoutInvoice ? t("admin.bookings.detail.filesCard.openLatestInvoice") : t("admin.bookings.detail.actions.openBillingDoc")}
                     </Button>
                   </a>
                   <SendBillingEmailButton

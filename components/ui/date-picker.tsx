@@ -19,6 +19,8 @@ type DatePickerProps = {
   fromYear?: number;
   toYear?: number;
   disabledDate?: (date: Date) => boolean;
+  minDate?: Date;
+  maxDate?: Date;
   hideIcon?: boolean;
 };
 
@@ -32,9 +34,20 @@ export function DatePicker({
   fromYear,
   toYear,
   disabledDate,
-  hideIcon = true,
+  minDate,
+  maxDate,
+  hideIcon = false,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const resolvedDisabledDate = React.useCallback(
+    (date: Date) => {
+      if (disabledDate?.(date)) return true;
+      if (minDate && date < minDate) return true;
+      if (maxDate && date > maxDate) return true;
+      return false;
+    },
+    [disabledDate, minDate, maxDate]
+  );
 
   return (
     <Popover modal open={open} onOpenChange={setOpen}>
@@ -45,13 +58,13 @@ export function DatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "h-12 w-full justify-start rounded-xl border-[#ece7e2] bg-white px-4 text-left text-base font-medium text-[#111111] shadow-none hover:bg-[#fffaf8]",
             !value && "text-muted-foreground",
             className
           )}
         >
-          {!hideIcon && <CalendarIcon className="mr-2 h-4 w-4" />}
-          {value ? format(value, "PPP") : placeholder}
+          {!hideIcon && <CalendarIcon className="mr-3 h-4 w-4 text-[#FF912C]" />}
+          {value ? format(value, "MMM d, yyyy") : placeholder}
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -59,10 +72,10 @@ export function DatePicker({
         side="bottom"
         sideOffset={10}
         collisionPadding={16}
-        className="z-[80] w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-[1.25rem] border border-[#d7e4f8] bg-white p-0 shadow-[0_28px_65px_-38px_rgba(12,74,160,0.45)]"
+        className="z-[80] isolate w-[min(24rem,calc(100vw-2rem))] rounded-[1.5rem] border border-[#eadfd8] bg-white p-0 opacity-100 shadow-[0_32px_80px_-40px_rgba(17,17,17,0.12)]"
       >
         <Calendar
-          className="w-full border-0 bg-transparent p-3 shadow-none"
+          className="w-full"
           mode="single"
           captionLayout="dropdown"
           showOutsideDays={false}
@@ -73,7 +86,7 @@ export function DatePicker({
           }}
           fromYear={fromYear}
           toYear={toYear}
-          disabled={disabledDate}
+          disabled={resolvedDisabledDate}
           fixedWeeks
           initialFocus
         />

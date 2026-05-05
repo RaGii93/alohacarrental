@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select.tsx";
 import { MapPinIcon } from "lucide-react";
 import { toast } from "sonner";
-import { formatDateForInput, parseKralendijkDate, parseKralendijkDateTime } from "@/lib/datetime";
+import { formatDateInputInLaPaz, parseLaPazDateInput, parseLaPazDateTimeInput } from "@/lib/timezone";
 
 const HERO_BG = "/home/hero-bg.png";
 type HeroSectionProps = {
@@ -28,13 +28,13 @@ export default function HeroSection({ locations }: HeroSectionProps) {
   const router = useRouter();
 
   const defaults = useMemo(() => {
-    const today = formatDateForInput(new Date());
-    const todayDate = parseKralendijkDate(today) || new Date();
+    const today = formatDateInputInLaPaz(new Date());
+    const todayDate = parseLaPazDateInput(today) || new Date();
     const tomorrow = new Date(todayDate);
     tomorrow.setDate(todayDate.getDate() + 1);
     return {
       startDate: today,
-      endDate: formatDateForInput(tomorrow),
+      endDate: formatDateInputInLaPaz(tomorrow),
       pickupLocationId: locations[0]?.id ?? "",
       dropoffLocationId: locations[0]?.id ?? "",
     };
@@ -53,8 +53,8 @@ export default function HeroSection({ locations }: HeroSectionProps) {
       return;
     }
 
-    const start = parseKralendijkDateTime(`${startDate}T${pickupTime}`);
-    const end = parseKralendijkDateTime(`${endDate}T${dropoffTime}`);
+    const start = parseLaPazDateTimeInput(`${startDate}T${pickupTime}`);
+    const end = parseLaPazDateTimeInput(`${endDate}T${dropoffTime}`);
     if (!start || !end) {
       toast.error(t("landing.hero.completeFields"));
       return;

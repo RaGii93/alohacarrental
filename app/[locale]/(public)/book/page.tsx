@@ -1,16 +1,57 @@
-import { BookingWizard } from "@/components/booking/BookingWizard";
-import { db } from "@/lib/db";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { SearchCode, ShieldCheck, Sparkles } from "lucide-react";
+import { BookingWizard } from "@/components/booking/BookingWizard";
+import { Button } from "@/components/ui/button";
+import { db } from "@/lib/db";
 import { buildMetadata } from "@/lib/seo";
+import { DEFAULT_PUBLIC_PROFILE } from "@/lib/deployment-profiles";
+import { getPublicMetadataCopy } from "@/lib/public-metadata-profiles";
+import { getPublicLocations, getPublicVehicleCategories } from "@/lib/public-data";
 import { getBookingJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
 import { getBookingRuleSettings, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
-import { getTermsPdfUrl } from "@/lib/terms";
-import { SearchCode } from "lucide-react";
-import { getCategoryFeatureNames } from "@/lib/vehicle-features";
+import { parseLaPazDateInput } from "@/lib/timezone";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const bookCopy = {
+  en: {
+    eyebrow: "Aloha booking",
+    title: "Reserve your Bonaire vehicle in a few clear steps",
+    description: "The premium layout is new, but the same production booking rules, validation, and submission logic remain intact.",
+    asideTitle: "Why guests book here",
+    asidePoints: [
+      "Secure your travel dates early",
+      "Upload documents before arrival",
+      "Review pricing before submission",
+    ],
+  },
+  es: {
+    eyebrow: "Reservas Aloha",
+    title: "Reserva tu vehiculo en Bonaire en pocos pasos",
+    description: "La interfaz es nueva, pero la logica real de validacion y reserva sigue igual.",
+    asideTitle: "Por que reservar aqui",
+    asidePoints: [
+      "Asegura tus fechas con anticipacion",
+      "Sube documentos antes de llegar",
+      "Revisa el precio antes de enviar",
+    ],
+  },
+  nl: {
+    eyebrow: "Aloha boeking",
+    title: "Reserveer je voertuig op Bonaire in een paar duidelijke stappen",
+    description: "De uitstraling is vernieuwd, maar dezelfde productie-logica voor boeken en valideren blijft actief.",
+    asideTitle: "Waarom hier boeken",
+    asidePoints: [
+      "Leg je reisdata vroeg vast",
+      "Upload documenten voor aankomst",
+      "Controleer prijzen voor verzending",
+    ],
+  },
+} as const;
 
 export async function generateMetadata({
   params,
@@ -19,64 +60,36 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const tenant = await getTenantConfig();
-  const titleMap: Record<string, string> = {
-    en: `Book a Rental Car in Bonaire | ${tenant.tenantName}`,
-    nl: `Huurauto Reserveren op Bonaire | ${tenant.tenantName}`,
-    es: `Reserva un Auto de Alquiler en Bonaire | ${tenant.tenantName}`,
-  };
-  const descriptionMap: Record<string, string> = {
-    en: `Reserve your Bonaire rental car online with transparent pricing, flexible pickup locations, and fast confirmation from ${tenant.tenantName}.`,
-    nl: `Reserveer je huurauto op Bonaire online met transparante prijzen, flexibele pick-uplocaties en snelle bevestiging van ${tenant.tenantName}.`,
-    es: `Reserva tu auto de alquiler en Bonaire en línea con precios transparentes, lugares de recogida flexibles y confirmación rápida de ${tenant.tenantName}.`,
-  };
+  const metadataCopy = getPublicMetadataCopy(DEFAULT_PUBLIC_PROFILE, "book", locale, tenant.tenantName);
   return buildMetadata({
     locale,
     path: "/book",
-    title: titleMap[locale] || titleMap.en,
-    description: descriptionMap[locale] || descriptionMap.en,
+    title: metadataCopy.title,
+    description: metadataCopy.description,
     tenant,
   });
 }
 
 export default async function BookingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ startDate?: string; endDate?: string; pickupTime?: string; dropoffTime?: string; categoryId?: string; pickupLocationId?: string; dropoffLocationId?: string }>;
 }) {
   const { locale } = await params;
+  const { startDate, endDate, pickupTime, dropoffTime, categoryId, pickupLocationId, dropoffLocationId } = await searchParams;
   const t = await getTranslations();
-  const [tenant, taxPercentage, minimumBookingDays, vehicleRatesIncludeTax, bookingRuleSettings, termsPdfUrl] = await Promise.all([
+  const copy = bookCopy[locale as keyof typeof bookCopy] || bookCopy.en;
+  const [tenant, taxPercentage, minimumBookingDays, bookingRules, vehicleRatesIncludeTax] = await Promise.all([
     getTenantConfig(),
     getTaxPercentage(),
     getMinBookingDays(),
-    getVehicleRatesIncludeTax(),
     getBookingRuleSettings(),
-    getTermsPdfUrl(locale),
+    getVehicleRatesIncludeTax(),
   ]);
-  const pageName =
-    locale === "nl"
-      ? "Huurauto Reserveren op Bonaire"
-      : locale === "es"
-        ? "Reserva un Auto de Alquiler en Bonaire"
-        : "Book a Rental Car in Bonaire";
-  const pageDescription =
-    locale === "nl"
-      ? `Reserveer je huurauto op Bonaire online met transparante prijzen, flexibele pick-uplocaties en snelle bevestiging van ${tenant.tenantName}.`
-      : locale === "es"
-        ? `Reserva tu auto de alquiler en Bonaire en línea con precios transparentes, lugares de recogida flexibles y confirmación rápida de ${tenant.tenantName}.`
-        : `Reserve your Bonaire rental car online with transparent pricing, flexible pickup locations, and fast confirmation from ${tenant.tenantName}.`;
-  const jsonLd = getBookingJsonLd({
-    locale,
-    tenant,
-    pageName,
-    description: pageDescription,
-  });
-
-  // Fetch predefined pickup/dropoff locations
-  const locations = await db.location.findMany({
-    select: { id: true, name: true, code: true, address: true },
-    orderBy: { name: "asc" },
-  });
+  const jsonLd = getBookingJsonLd(locale, tenant);
+  const locations = await getPublicLocations();
 
   let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
@@ -101,22 +114,7 @@ export default async function BookingPage({
       extras = [];
     }
   }
-  const categories = await db.vehicleCategory.findMany({
-    where: { isActive: true },
-    select: {
-      id: true,
-      name: true,
-      imageUrl: true,
-      dailyRate: true,
-      seats: true,
-      transmission: true,
-      hasAC: true,
-      hasCarPlay: true,
-      hasBackupCamera: true,
-      features: { include: { feature: true }, orderBy: { feature: { sortOrder: "asc" } } },
-    },
-    orderBy: { sortOrder: "asc" },
-  });
+  const categories = await getPublicVehicleCategories();
 
   return (
     <>
@@ -127,29 +125,75 @@ export default async function BookingPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
       ))}
-      <section className="public-shell-bg relative overflow-hidden pt-24 sm:pt-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(15,39,64,0.1),transparent_32%),radial-gradient(circle_at_85%_18%,rgba(23,184,197,0.12),transparent_26%),radial-gradient(circle_at_12%_82%,rgba(194,178,128,0.08),transparent_26%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-14">
-          <div className="mb-8 flex justify-end">
-            <Link href={`/${locale}/book/review`}>
-              <Button variant="outline" className="public-outline-button h-11 rounded-full text-[rgb(15,39,64)]">
-              <SearchCode className="h-4 w-4" />
-              {t("booking.reviewLookup.cta")}
-              </Button>
-            </Link>
+      <section className="bg-white">
+        <div className="border-b border-[#f2ebe6] bg-[#faf8f6]">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
+            <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-end">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#FF912C] sm:text-[15px]">
+                  {copy.eyebrow}
+                </p>
+                <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-[#111111] sm:text-5xl">
+                  {copy.title}
+                </h1>
+                <p className="mt-5 max-w-2xl text-base leading-8 text-[#57534e]">
+                  {copy.description}
+                </p>
+              </div>
+              <div className="rounded-[1.75rem] border border-[#efe7df] bg-white p-5 shadow-[0_20px_60px_-44px_rgba(0,0,0,0.18)]">
+                <div className="flex items-center gap-3">
+                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFF4E6] text-[#FF912C]">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#111111]">{copy.asideTitle}</p>
+                    <p className="text-sm text-[#78716c]">{tenant.tenantName}</p>
+                  </div>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {copy.asidePoints.map((point) => (
+                    <div key={point} className="flex items-start gap-3 text-sm text-[#57534e]">
+                      <ShieldCheck className="mt-0.5 h-4 w-4 text-[#FF912C]" />
+                      <span>{point}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-end">
+              <Link href={`/${locale}/book/review`}>
+                <Button variant="outline" className="h-11 rounded-full border-[#e7dcd5] bg-white px-5 text-sm font-semibold">
+                <SearchCode className="h-4 w-4 text-[#FF912C]" />
+                Manage Booking
+                </Button>
+              </Link>
+            </div>
           </div>
+        </div>
+
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
           <BookingWizard
             locale={locale}
             locations={locations}
             extras={extras}
-            categories={categories.map((category) => ({ ...category, features: getCategoryFeatureNames(category) })) as any}
+            categories={categories as any}
             taxPercentage={taxPercentage}
-            vehicleRatesIncludeTax={vehicleRatesIncludeTax}
-            minimumBookingDays={minimumBookingDays}
-            bookingRuleSettings={bookingRuleSettings}
-            termsPdfUrl={termsPdfUrl}
-          />
-        </div>
+          vehicleRatesIncludeTax={vehicleRatesIncludeTax}
+          minimumBookingDays={minimumBookingDays}
+          bookingRuleSettings={bookingRules}
+          termsPdfUrl={tenant.termsPdfUrl}
+          initialData={{
+            startDate: startDate ? parseLaPazDateInput(startDate) : null,
+            endDate: endDate ? parseLaPazDateInput(endDate) : null,
+            pickupTime: pickupTime || undefined,
+            dropoffTime: dropoffTime || undefined,
+            categoryId: categoryId || null,
+            pickupLocationId: pickupLocationId || "",
+            dropoffLocationId: dropoffLocationId || "",
+          }}
+        />
+      </div>
       </section>
     </>
   );

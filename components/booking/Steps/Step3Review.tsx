@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -29,14 +29,21 @@ import { AvailabilityResult } from "@/actions/availability";
 import { createCategoryBookingAction } from "@/actions/booking";
 import { calculateDays, evaluateBookingRules, formatCurrency } from "@/lib/pricing";
 import { BookingData } from "../BookingWizard";
-import { formatDate, formatDateForInput, formatDateTime, formatDateTimeLocalInput } from "@/lib/datetime";
+import { formatDate, formatDateTime } from "@/lib/datetime";
 import { combinePhoneNumber } from "@/lib/phone";
 import type { BookingRuleSettings } from "@/lib/settings";
+import { combineLaPazDateAndTime } from "@/lib/timezone";
+import { buildGoogleMapsUrl } from "@/lib/location-map";
+import { serializeAdditionalDrivers } from "@/lib/additional-drivers";
+
+function buildCustomLocationLabel(placeName: string, address: string) {
+  return [placeName.trim(), address.trim()].filter(Boolean).join(", ");
+}
 
 interface Step3ReviewProps {
   bookingData: BookingData;
   updateBookingData: (updates: Partial<BookingData>) => void;
-  locations: { id: string; name: string; code?: string | null; address?: string | null }[];
+  locations: { id: string; name: string; code?: string | null; address?: string | null; latitude?: number | null; longitude?: number | null }[];
   extras: { id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }[];
   locale: string;
   onPrev: () => void;
@@ -67,19 +74,24 @@ export function Step3Review({
   const t = useTranslations();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const mergeDateAndTime = (date: Date | null, time: string): Date | null => {
-    if (!date) return null;
-    const [hours, minutes] = time.split(":").map((v) => Number(v));
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
-    const next = new Date(date);
-    next.setHours(hours, minutes, 0, 0);
-    return next;
-  };
-
-  const pickupDateTime = mergeDateAndTime(bookingData.startDate, bookingData.pickupTime);
-  const dropoffDateTime = mergeDateAndTime(bookingData.endDate, bookingData.dropoffTime);
+  const [hasReadTerms, setHasReadTerms] = useState(bookingSource === "admin");
+  const termsScrollRef = useRef<HTMLDivElement | null>(null);
+  const pickupDateTime = combineLaPazDateAndTime(bookingData.startDate, bookingData.pickupTime);
+  const dropoffDateTime = combineLaPazDateAndTime(bookingData.endDate, bookingData.dropoffTime);
+  const pickupCustomLocation = buildCustomLocationLabel(
+    bookingData.pickupCustomPlaceName,
+    bookingData.pickupCustomAddress
+  );
+  const dropoffCustomLocation = buildCustomLocationLabel(
+    bookingData.dropoffCustomPlaceName,
+    bookingData.dropoffCustomAddress
+  );
 
   const handleSubmit = async () => {
+    if (bookingSource === "public" && !hasReadTerms) {
+      toast.error(t("booking.errors.termsScrollRequired"));
+      return;
+    }
     if (!bookingData.privacyConsentAccepted) {
       toast.error(t("booking.errors.privacyConsentRequired"));
       return;
@@ -105,9 +117,9 @@ export function Step3Review({
       formData.append("customerEmail", bookingData.customerEmail);
       formData.append("customerPhone", customerPhone);
       formData.append("flightNumber", bookingData.flightNumber);
-      formData.append("birthDate", formatDateForInput(bookingData.birthDate));
+      formData.append("birthDate", bookingData.birthDate.toISOString());
       formData.append("driverLicenseNumber", bookingData.driverLicenseNumber);
-      formData.append("licenseExpiryDate", formatDateForInput(bookingData.licenseExpiryDate));
+      formData.append("licenseExpiryDate", bookingData.licenseExpiryDate.toISOString());
       if (!pickupDateTime || !dropoffDateTime || dropoffDateTime <= pickupDateTime) {
         toast.error(t("booking.errors.endBeforeStart"));
         setIsSubmitting(false);
@@ -123,11 +135,20 @@ export function Step3Review({
         setIsSubmitting(false);
         return;
       }
-      formData.append("startDate", formatDateTimeLocalInput(pickupDateTime));
-      formData.append("endDate", formatDateTimeLocalInput(dropoffDateTime));
+      formData.append("startDate", pickupDateTime.toISOString());
+      formData.append("endDate", dropoffDateTime.toISOString());
       formData.append("pickupLocationId", bookingData.pickupLocationId);
       formData.append("dropoffLocationId", bookingData.dropoffLocationId);
+      if (pickupCustomLocation) formData.append("pickupLocation", pickupCustomLocation);
+      if (dropoffCustomLocation) formData.append("dropoffLocation", dropoffCustomLocation);
+      if (bookingData.pickupCustomAddress.trim()) formData.append("pickupLocationAddress", bookingData.pickupCustomAddress.trim());
+      if (bookingData.dropoffCustomAddress.trim()) formData.append("dropoffLocationAddress", bookingData.dropoffCustomAddress.trim());
+      if (bookingData.pickupCustomLatitude !== null) formData.append("pickupLatitude", String(bookingData.pickupCustomLatitude));
+      if (bookingData.pickupCustomLongitude !== null) formData.append("pickupLongitude", String(bookingData.pickupCustomLongitude));
+      if (bookingData.dropoffCustomLatitude !== null) formData.append("dropoffLatitude", String(bookingData.dropoffCustomLatitude));
+      if (bookingData.dropoffCustomLongitude !== null) formData.append("dropoffLongitude", String(bookingData.dropoffCustomLongitude));
       formData.append("driverLicenseUrl", bookingData.driverLicenseUrl);
+      formData.append("additionalDrivers", serializeAdditionalDrivers(bookingData.additionalDrivers));
       formData.append("notes", bookingData.notes);
       formData.append("selectedExtras", JSON.stringify(bookingData.selectedExtras));
       formData.append("privacyConsentAccepted", "true");
@@ -174,32 +195,78 @@ export function Step3Review({
   const subtotalBeforeTax = pricing?.subtotalBeforeTaxCents ?? (baseAmount + extrasAmount);
   const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocationId);
   const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocationId);
-  const pickupLocationMapUrl = pickupLocation?.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupLocation.address)}`
-    : null;
-  const dropoffLocationMapUrl = dropoffLocation?.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dropoffLocation.address)}`
-    : null;
+  const pickupLocationLabel = pickupCustomLocation || pickupLocation?.name || "-";
+  const dropoffLocationLabel = dropoffCustomLocation || dropoffLocation?.name || "-";
+  const pickupLocationMapQuery = bookingData.pickupCustomAddress.trim() || pickupLocation?.address || "";
+  const dropoffLocationMapQuery = bookingData.dropoffCustomAddress.trim() || dropoffLocation?.address || "";
+  const pickupLocationMapUrl = buildGoogleMapsUrl({
+    latitude: bookingData.pickupCustomLatitude ?? pickupLocation?.latitude,
+    longitude: bookingData.pickupCustomLongitude ?? pickupLocation?.longitude,
+    query: pickupLocationMapQuery,
+  });
+  const dropoffLocationMapUrl = buildGoogleMapsUrl({
+    latitude: bookingData.dropoffCustomLatitude ?? dropoffLocation?.latitude,
+    longitude: bookingData.dropoffCustomLongitude ?? dropoffLocation?.longitude,
+    query: dropoffLocationMapQuery,
+  });
   const customerPhone = combinePhoneNumber(bookingData.customerPhoneCountryCode, bookingData.customerPhoneLocalNumber);
+  const handleTermsScroll = () => {
+    if (hasReadTerms) return;
+    const container = termsScrollRef.current;
+    if (!container) return;
+    const reachedBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 16;
+    if (reachedBottom) {
+      setHasReadTerms(true);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.reviewBooking")}</h2>
+        <h2 className="mb-4 text-xl font-semibold text-[#111111]">{t("booking.reviewBooking")}</h2>
 
-        <Card className="public-glass-card rounded-[1.75rem]">
+        <Card className="rounded-[1.75rem] border-[#efe7df] bg-white shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
           <CardHeader>
-            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.summary")}</CardTitle>
+            <CardTitle className="text-[#111111]">{t("booking.summary")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {pricing?.belowMinimumBlocked ? (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
                 {t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })}
               </div>
             ) : null}
             {pricing?.lastMinuteBlocked ? (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
                 {t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })}
+              </div>
+            ) : null}
+            {bookingData.additionalDrivers.length > 0 ? (
+              <div className="rounded-[1.25rem] border border-[#efe7df] bg-[#faf8f6] p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-[#111111]">{t("booking.additionalDrivers.summaryTitle")}</p>
+                  <span className="rounded-full border border-[#e7dcd5] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#44403c]">
+                    {bookingData.additionalDrivers.length} {t("booking.additionalDrivers.countLabel").toLowerCase()}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-[#78716c]">{t("booking.additionalDrivers.reviewLocked")}</p>
+                <div className="mt-3 space-y-3">
+                  {bookingData.additionalDrivers.map((driver, index) => (
+                    <div key={driver.id || index} className="rounded-xl border border-[#ece7e2] bg-white p-3 text-sm text-[#111111]">
+                      <p className="font-semibold">
+                        {t("booking.additionalDrivers.driverLabel", { number: index + 1 })}: {driver.fullName}
+                      </p>
+                      <p className="mt-1 text-[#57534e]">
+                        {t("booking.additionalDrivers.birthDate")}: {driver.birthDate ? formatDate(driver.birthDate) : "-"}
+                      </p>
+                      <p className="text-[#57534e]">
+                        {t("booking.additionalDrivers.licenseNumber")}: {driver.driverLicenseNumber || "-"}
+                      </p>
+                      <p className="text-[#57534e]">
+                        {t("booking.additionalDrivers.licenseExpiryDate")}: {driver.licenseExpiryDate ? formatDate(driver.licenseExpiryDate) : "-"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : null}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -316,9 +383,9 @@ export function Step3Review({
         </Card>
       </div>
 
-      <Card className="public-glass-card rounded-[1.75rem]">
+      <Card className="rounded-[1.75rem] border-[#efe7df] bg-[#faf8f6] shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
         <CardHeader>
-          <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.customerName")}</CardTitle>
+          <CardTitle className="text-[#111111]">{t("booking.customerName")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <p className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /><strong>{t("booking.customerName")}:</strong> {bookingData.customerName}</p>
@@ -333,18 +400,19 @@ export function Step3Review({
       </Card>
 
       {(bookingData.pickupLocationId || bookingData.dropoffLocationId) && (
-        <Card className="public-glass-card rounded-[1.75rem]">
+        <Card className="rounded-[1.75rem] border-[#efe7df] bg-[#faf8f6] shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
           <CardHeader>
-            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.pickupLocation")}</CardTitle>
+            <CardTitle className="text-[#111111]">{t("booking.pickupLocation")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {bookingData.pickupLocationId && (
               <p>
-                <strong>{t("booking.pickupLocation")}:</strong> {pickupLocation?.name}
+                <strong>{t("booking.pickupLocation")}:</strong> {pickupLocationLabel}
+                {pickupLocationMapQuery ? <span className="block text-xs text-[#78716c]">{pickupLocationMapQuery}</span> : null}
                 {pickupLocationMapUrl && (
                   <>
                     {" "}
-                    <a href={pickupLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:text-[hsl(var(--accent-foreground))] hover:underline">
+                    <a href={pickupLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[#FF912C] hover:underline">
                       <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
@@ -353,11 +421,12 @@ export function Step3Review({
             )}
             {bookingData.dropoffLocationId && (
               <p>
-                <strong>{t("booking.dropoffLocation")}:</strong> {dropoffLocation?.name}
+                <strong>{t("booking.dropoffLocation")}:</strong> {dropoffLocationLabel}
+                {dropoffLocationMapQuery ? <span className="block text-xs text-[#78716c]">{dropoffLocationMapQuery}</span> : null}
                 {dropoffLocationMapUrl && (
                   <>
                     {" "}
-                    <a href={dropoffLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:text-[hsl(var(--accent-foreground))] hover:underline">
+                    <a href={dropoffLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[#FF912C] hover:underline">
                       <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
                     </a>
                   </>
@@ -369,16 +438,16 @@ export function Step3Review({
       )}
 
       {extras.length > 0 && (
-        <Card className="public-glass-card rounded-[1.75rem]">
+        <Card className="rounded-[1.75rem] border-[#efe7df] bg-[#faf8f6] shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
           <CardHeader>
-            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.extras")}</CardTitle>
+            <CardTitle className="text-[#111111]">{t("booking.extras")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {extras.map((extra) => {
               const line = bookingData.selectedExtras.find((entry) => entry.extraId === extra.id);
               const checked = !!line;
               return (
-                <div key={extra.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-[rgba(15,39,64,0.08)] bg-[rgba(248,250,252,0.92)] p-3">
+                <div key={extra.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-[#ece7e2] bg-white p-3">
                   <div>
                     <p className="font-medium">{extra.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -413,7 +482,7 @@ export function Step3Review({
                           ),
                         });
                       }}
-                      className="h-8 w-16 rounded-md border border-[rgba(15,39,64,0.1)] bg-white px-2 text-sm text-[hsl(var(--foreground))]"
+                      className="h-8 w-16 rounded-md border border-[#ece7e2] bg-white px-2 text-sm text-[#111111]"
                     />
                   </div>
                 </div>
@@ -424,9 +493,9 @@ export function Step3Review({
       )}
 
       {bookingData.notes && (
-        <Card className="public-glass-card rounded-[1.75rem]">
+        <Card className="rounded-[1.75rem] border-[#efe7df] bg-[#faf8f6] shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
           <CardHeader>
-            <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.notes")}</CardTitle>
+            <CardTitle className="text-[#111111]">{t("booking.notes")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p>{bookingData.notes}</p>
@@ -434,20 +503,43 @@ export function Step3Review({
         </Card>
       )}
 
-      <Card className="public-glass-card rounded-[1.75rem]">
+      <Card className="rounded-[1.75rem] border-[#efe7df] bg-white shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
         <CardHeader>
-          <CardTitle className="text-[hsl(var(--foreground))]">{t("booking.terms")}</CardTitle>
-          <CardDescription className="text-[hsl(var(--muted-foreground))]">
-            {t("booking.termsRequired")}
+          <CardTitle className="text-[#111111]">{t("booking.terms")}</CardTitle>
+          <CardDescription className="text-[#57534e]">
+            {bookingSource === "public" ? t("booking.termsScrollRequired") : t("booking.termsRequired")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="public-glass-card rounded-[1rem] p-4">
-            <p className="text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.termsOfService")}</p>
-            <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">{t("booking.identificationClause")}</p>
-            <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.gdprNotice")}</p>
-            <p className="mt-3 text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.privacyPolicy")}</p>
-            <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.privacyDeletionNotice")}</p>
+          <div className="rounded-[1rem] border border-[#efe7df] bg-[#faf8f6] p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-[#111111]">{t("booking.termsOfService")}</p>
+                <p className="mt-1 text-xs text-[#78716c]">{t("booking.termsScrollHint")}</p>
+              </div>
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                hasReadTerms ? "bg-[#eef9e7] text-[#2e6b19]" : "bg-[#fff1f2] text-[#FF912C]"
+              }`}>
+                {hasReadTerms ? t("booking.termsReadConfirmed") : t("booking.termsReadPending")}
+              </span>
+            </div>
+
+            <div
+              ref={termsScrollRef}
+              onScroll={handleTermsScroll}
+              className="mt-4 h-[28rem] overflow-y-auto rounded-[1rem] border border-[#e7dcd5] bg-white p-3"
+            >
+              <iframe
+                src={`${termsPdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                title={t("booking.terms")}
+                className="min-h-[220rem] w-full rounded-[0.75rem] border-0 bg-white"
+              />
+            </div>
+
+            <p className="mt-3 text-sm text-[#57534e]">{t("booking.identificationClause")}</p>
+            <p className="mt-2 text-xs text-[#78716c]">{t("booking.gdprNotice")}</p>
+            <p className="mt-3 text-sm font-semibold text-[#111111]">{t("booking.privacyPolicy")}</p>
+            <p className="mt-2 text-xs text-[#78716c]">{t("booking.privacyDeletionNotice")}</p>
           </div>
 
           <div className="flex items-start space-x-2">
@@ -467,7 +559,7 @@ export function Step3Review({
               id="terms"
               checked={bookingData.termsAccepted}
               onCheckedChange={(checked) => updateBookingData({ termsAccepted: checked as boolean })}
-              disabled={disabled}
+              disabled={disabled || (bookingSource === "public" && !hasReadTerms)}
             />
             <label htmlFor="terms" className="text-sm">
               {t("booking.acceptTerms")}
@@ -477,7 +569,7 @@ export function Step3Review({
           <Button
             variant="outline"
             onClick={() => window.open(termsPdfUrl, "_blank")}
-            className="public-outline-button h-11 w-full rounded-full"
+            className="h-11 w-full rounded-full border-[#e7dcd5] bg-white text-[#111111] hover:bg-[#faf8f6]"
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             {t("booking.viewTerms")}
@@ -486,14 +578,14 @@ export function Step3Review({
       </Card>
 
       <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onPrev} className="public-outline-button h-12 rounded-full">
+        <Button variant="outline" onClick={onPrev} className="h-12 rounded-full border-[#e7dcd5] bg-white text-[#111111] hover:bg-[#faf8f6]">
           <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled || !!pricing?.belowMinimumBlocked || !!pricing?.lastMinuteBlocked}
-          className="public-primary-button h-12 rounded-full px-6 font-extrabold uppercase tracking-[0.08em]"
+          disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled || !!pricing?.belowMinimumBlocked || !!pricing?.lastMinuteBlocked || (bookingSource === "public" && !hasReadTerms)}
+          className="h-12 rounded-full bg-[#FF912C] px-6 font-semibold text-white shadow-[0_20px_40px_-24px_rgba(255,145,44,0.45)] hover:bg-[#E67F1F]"
         >
           <CheckCircle2 className="h-4 w-4" />
           {isSubmitting ? t("common.loading") : t("booking.confirmBooking")}

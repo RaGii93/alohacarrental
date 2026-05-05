@@ -39,6 +39,8 @@ import {
 import { createExternalRentalAction, markExternalRentalTransferredAction, updateExternalRentalFlowAction } from "@/actions/external-rentals";
 import { formatDateTime } from "@/lib/datetime";
 import { calculateDays, formatCurrency } from "@/lib/pricing";
+import { getBlobProxyUrl } from "@/lib/blob";
+import { PartnerRentalInspectionDialog } from "@/components/admin/PartnerRentalInspectionDialog";
 
 type PartnerRentalRow = {
   id: string;
@@ -63,10 +65,33 @@ type PartnerRentalRow = {
   paymentReceivedAt: string | null;
   pickedUpAt: string | null;
   returnedAt: string | null;
+  pickupOdometerKm: number | null;
+  pickupFuelLevel: number | null;
+  returnOdometerKm: number | null;
+  returnFuelLevel: number | null;
+  pickupChecklistDocumentUrl: string | null;
+  returnChecklistDocumentUrl: string | null;
+  invoiceUrl: string | null;
+  closeoutPaymentDueAt: string | null;
+  closeoutPaymentReceivedAt: string | null;
+  returnLateCharge: number | null;
+  returnFuelCharge: number | null;
+  returnDamageCharge: number | null;
   pickupNotes: string | null;
   returnNotes: string | null;
   createdAt: string;
 };
+
+type InspectionDialogState =
+  | { open: false }
+  | {
+      open: true;
+      id: string;
+      bookingCode: string;
+      mode: "pickup" | "return";
+      initialOdometerKm?: number | null;
+      initialFuelLevel?: number | null;
+    };
 
 type DraftPartnerRental = {
   supplierCompany: string;
@@ -131,7 +156,7 @@ function parseMoneyInput(value: string) {
 
 function statusPillClass(status: string) {
   if (status === "TRANSFERRED") return "rounded-full border-emerald-200 bg-emerald-50 text-emerald-700";
-  if (status === "PAID") return "rounded-full border-sky-200 bg-sky-50 text-sky-700";
+  if (status === "PAID") return "rounded-full border-red-200 bg-red-50 text-red-700";
   if (status === "UNPAID") return "rounded-full border-amber-200 bg-amber-50 text-amber-700";
   return "rounded-full border-slate-200 bg-slate-100 text-slate-700";
 }
@@ -159,12 +184,13 @@ export function PartnerRentalsClient({
   const [draft, setDraft] = useState<DraftPartnerRental>(emptyDraft);
   const [currentStep, setCurrentStep] = useState(0);
   const [flowDialog, setFlowDialog] = useState<FlowDialogState>({ open: false });
+  const [inspectionDialog, setInspectionDialog] = useState<InspectionDialogState>({ open: false });
   const [isUpdatingFlow, startUpdatingFlow] = useTransition();
 
   const statCard =
     "rounded-[1.6rem] border-0 bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]";
   const inputClass =
-    "rounded-xl border-slate-200 bg-white/95 shadow-[0_10px_24px_-22px_rgba(15,23,42,0.55)] transition focus-visible:border-sky-300 focus-visible:ring-sky-200";
+    "rounded-xl border-slate-200 bg-white/95 shadow-[0_10px_24px_-22px_rgba(15,23,42,0.55)] transition focus-visible:border-red-300 focus-visible:ring-red-200";
 
   const startDate = draft.startDate ? new Date(draft.startDate) : null;
   const endDate = draft.endDate ? new Date(draft.endDate) : null;
@@ -325,7 +351,7 @@ export function PartnerRentalsClient({
         </Card>
       </div>
 
-      <Card className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_30%),linear-gradient(180deg,#ffffff,rgba(248,250,252,0.98))] shadow-[0_28px_70px_-46px_rgba(15,23,42,0.28)]">
+      <Card className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.1),transparent_30%),linear-gradient(180deg,#ffffff,rgba(255,255,255,0.98))] shadow-[0_28px_70px_-46px_rgba(15,23,42,0.28)]">
         <div className="flex flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-xl font-black text-slate-900">{t("admin.partnerRentals.bucket.title")}</h2>
@@ -388,7 +414,7 @@ export function PartnerRentalsClient({
                     {currentStep === 0 ? (
                       <Card className="rounded-[1.6rem] border border-slate-200 bg-white/90 p-5">
                         <div className="mb-4 flex items-center gap-3">
-                          <div className="rounded-2xl bg-sky-100 p-3 text-sky-700"><Building2 className="h-5 w-5" /></div>
+                          <div className="rounded-2xl bg-red-100 p-3 text-red-700"><Building2 className="h-5 w-5" /></div>
                           <div>
                             <h3 className="font-bold text-slate-900">{t("admin.partnerRentals.sections.supplierTitle")}</h3>
                             <p className="text-sm text-slate-500">{t("admin.partnerRentals.sections.supplierDescription")}</p>
@@ -604,13 +630,81 @@ export function PartnerRentalsClient({
                       <span>{t("admin.partnerRentals.row.pickup", { value: row.pickedUpAt ? formatDateTime(row.pickedUpAt) : t("admin.partnerRentals.row.notMarked") })}</span>
                       <span>{t("admin.partnerRentals.row.dropoff", { value: row.returnedAt ? formatDateTime(row.returnedAt) : t("admin.partnerRentals.row.notMarked") })}</span>
                     </div>
+                    {row.closeoutPaymentDueAt ? (
+                      <p className="pt-2 text-xs text-slate-500">
+                        {t("admin.partnerRentals.row.closeoutPayment", {
+                          value: row.closeoutPaymentReceivedAt ? formatDateTime(row.closeoutPaymentReceivedAt) : t("admin.partnerRentals.row.closeoutPending"),
+                        })}
+                      </p>
+                    ) : null}
+                    {(row.returnLateCharge || row.returnFuelCharge || row.returnDamageCharge) ? (
+                      <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                          {t("admin.partnerRentals.row.closeoutBreakdown")}
+                        </p>
+                        <div className="mt-2 grid gap-2 text-sm text-slate-700 md:grid-cols-4">
+                          <div className="rounded-xl bg-white px-3 py-2">
+                            <span className="block text-xs text-slate-500">{t("admin.partnerRentals.row.closeoutLate")}</span>
+                            <span className="font-semibold text-slate-900">{currency(row.returnLateCharge || 0)}</span>
+                          </div>
+                          <div className="rounded-xl bg-white px-3 py-2">
+                            <span className="block text-xs text-slate-500">{t("admin.partnerRentals.row.closeoutFuel")}</span>
+                            <span className="font-semibold text-slate-900">{currency(row.returnFuelCharge || 0)}</span>
+                          </div>
+                          <div className="rounded-xl bg-white px-3 py-2">
+                            <span className="block text-xs text-slate-500">{t("admin.partnerRentals.row.closeoutDamage")}</span>
+                            <span className="font-semibold text-slate-900">{currency(row.returnDamageCharge || 0)}</span>
+                          </div>
+                          <div className="rounded-xl bg-slate-900 px-3 py-2 text-white">
+                            <span className="block text-xs text-slate-300">{t("admin.partnerRentals.row.closeoutTotal")}</span>
+                            <span className="font-semibold">
+                              {currency((row.returnLateCharge || 0) + (row.returnFuelCharge || 0) + (row.returnDamageCharge || 0))}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                    {(row.pickupChecklistDocumentUrl || row.returnChecklistDocumentUrl) ? (
+                      <div className="flex flex-wrap gap-2 pt-2 text-xs">
+                        {row.pickupChecklistDocumentUrl ? (
+                          <a
+                            href={getBlobProxyUrl(row.pickupChecklistDocumentUrl, { download: true }) || row.pickupChecklistDocumentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 hover:bg-white"
+                          >
+                            {t("admin.bookings.detail.inspection.openPickupChecklist")}
+                          </a>
+                        ) : null}
+                        {row.returnChecklistDocumentUrl ? (
+                          <a
+                            href={getBlobProxyUrl(row.returnChecklistDocumentUrl, { download: true }) || row.returnChecklistDocumentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 hover:bg-white"
+                          >
+                            {t("admin.bookings.detail.inspection.openReturnChecklist")}
+                          </a>
+                        ) : null}
+                        {row.invoiceUrl ? (
+                          <a
+                            href={getBlobProxyUrl(row.invoiceUrl, { download: true }) || row.invoiceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 hover:bg-white"
+                          >
+                            {t("admin.partnerRentals.actions.openInvoice")}
+                          </a>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </div>
                   <div className="flex flex-wrap items-center gap-2 xl:max-w-[360px] xl:justify-end">
                     <a href={`mailto:${row.customerEmail}`} className="inline-flex items-center gap-1 rounded-xl px-2 py-1 text-sm font-medium text-slate-600 hover:text-slate-900">
                       <ArrowUpRight className="h-4 w-4" />
                       {t("admin.partnerRentals.actions.emailCustomer")}
                     </a>
-                    {row.paymentStatus !== "PAID" ? (
+                    {row.paymentStatus !== "PAID" || (row.closeoutPaymentDueAt && !row.closeoutPaymentReceivedAt) ? (
                       <Button
                         type="button"
                         variant="outline"
@@ -628,7 +722,9 @@ export function PartnerRentalsClient({
                         }
                       >
                         <CreditCard className="h-4 w-4" />
-                        {t("admin.partnerRentals.actions.markPaid")}
+                        {row.paymentStatus !== "PAID"
+                          ? t("admin.partnerRentals.actions.markPaid")
+                          : t("admin.partnerRentals.actions.receiveCloseoutPayment")}
                       </Button>
                     ) : null}
                     {!row.pickedUpAt ? (
@@ -637,14 +733,13 @@ export function PartnerRentalsClient({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          setFlowDialog({
+                          setInspectionDialog({
                             open: true,
                             id: row.id,
-                            action: "PICKED_UP",
                             bookingCode: row.bookingCode,
-                            paymentMethod: "",
-                            paymentReference: "",
-                            note: row.pickupNotes || "",
+                            mode: "pickup",
+                            initialOdometerKm: row.pickupOdometerKm,
+                            initialFuelLevel: row.pickupFuelLevel,
                           })
                         }
                       >
@@ -658,14 +753,13 @@ export function PartnerRentalsClient({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          setFlowDialog({
+                          setInspectionDialog({
                             open: true,
                             id: row.id,
-                            action: "RETURNED",
                             bookingCode: row.bookingCode,
-                            paymentMethod: "",
-                            paymentReference: "",
-                            note: row.returnNotes || "",
+                            mode: "return",
+                            initialOdometerKm: row.returnOdometerKm ?? row.pickupOdometerKm,
+                            initialFuelLevel: row.returnFuelLevel ?? row.pickupFuelLevel,
                           })
                         }
                       >
@@ -759,6 +853,23 @@ export function PartnerRentalsClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {inspectionDialog.open ? (
+        <PartnerRentalInspectionDialog
+          open={inspectionDialog.open}
+          onOpenChange={(nextOpen) => !nextOpen && setInspectionDialog({ open: false })}
+          mode={inspectionDialog.mode}
+          rentalId={inspectionDialog.id}
+          bookingCode={inspectionDialog.bookingCode}
+          locale={locale}
+          initialOdometerKm={inspectionDialog.initialOdometerKm}
+          initialFuelLevel={inspectionDialog.initialFuelLevel}
+          onCompleted={() => {
+            setInspectionDialog({ open: false });
+            router.refresh();
+          }}
+        />
+      ) : null}
     </div>
   );
 }

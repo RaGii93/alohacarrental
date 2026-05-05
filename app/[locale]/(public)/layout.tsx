@@ -20,7 +20,7 @@ export default async function PublicLayout({
         linkedinUrl={tenant.linkedinUrl}
         tiktokUrl={tenant.tiktokUrl}
       />
-      <main className="min-h-screen">{children}</main>
+      <main className="min-h-screen pt-24">{children}</main>
     </>
   );
 }

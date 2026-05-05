@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,7 +25,15 @@ import {
 } from "lucide-react";
 import { BookingData } from "../BookingWizard";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
+import { AdditionalDriversEditor } from "@/components/shared/AdditionalDriversEditor";
 import { combinePhoneNumber, PHONE_COUNTRY_CODES } from "@/lib/phone";
+import {
+  addLaPazDays,
+  getLaPazToday,
+  getLaPazTodayPlusYears,
+  startOfLaPazDay,
+} from "@/lib/timezone";
+import { isAdditionalDriverAdult, isAdditionalDriverLicenseValid } from "@/lib/additional-drivers";
 
 interface Step2CustomerProps {
   bookingData: BookingData;
@@ -34,17 +43,12 @@ interface Step2CustomerProps {
   disabled: boolean;
 }
 
+const LICENSE_EXPIRY_FROM_YEAR = 2026;
+const LICENSE_EXPIRY_TO_YEAR = 2041;
+
 export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, disabled }: Step2CustomerProps) {
   const t = useTranslations();
   const [isUploading, setIsUploading] = useState(false);
-  const toDateInputValue = (date: Date | null) => {
-    if (!date) return "";
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-  const fromDateInputValue = (value: string) => (value ? new Date(`${value}T12:00:00`) : null);
   const updatePhone = (countryCode: string, localNumber: string) => {
     updateBookingData({
       customerPhoneCountryCode: countryCode,
@@ -54,16 +58,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
   };
   const isAtLeast21 = (() => {
     if (!bookingData.birthDate) return false;
-    const today = new Date();
-    const threshold = new Date(today.getFullYear() - 21, today.getMonth(), today.getDate());
+    const threshold = getLaPazTodayPlusYears(-21);
     return bookingData.birthDate <= threshold;
   })();
   const isLicenseValid = (() => {
     if (!bookingData.licenseExpiryDate || !bookingData.startDate) return false;
-    const start = new Date(bookingData.startDate);
-    start.setHours(0, 0, 0, 0);
-    const expiry = new Date(bookingData.licenseExpiryDate);
-    expiry.setHours(0, 0, 0, 0);
+    const start = startOfLaPazDay(bookingData.startDate);
+    const expiry = startOfLaPazDay(bookingData.licenseExpiryDate);
     return expiry > start;
   })();
 
@@ -117,17 +118,29 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                      isAtLeast21 &&
                      isLicenseValid &&
                      bookingData.driverLicenseUrl &&
+                     bookingData.additionalDrivers.every((driver) =>
+                       driver.fullName.trim() &&
+                       driver.birthDate &&
+                       driver.driverLicenseNumber.trim() &&
+                       driver.licenseExpiryDate &&
+                       driver.driverLicenseUrl &&
+                       isAdditionalDriverAdult(driver.birthDate) &&
+                       isAdditionalDriverLicenseValid(
+                         driver.licenseExpiryDate,
+                         bookingData.startDate ? startOfLaPazDay(bookingData.startDate) : null
+                       )
+                     ) &&
                      bookingData.privacyConsentAccepted;
 
   return (
     <div className="space-y-6">
-      <div className="public-glass-card rounded-[1.75rem] p-6">
-        <h2 className="mb-4 text-xl font-black text-[hsl(var(--foreground))]">{t("booking.customerName")}</h2>
+      <div className="rounded-[1.75rem] border border-[#efe7df] bg-[#faf8f6] p-6 shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
+        <h2 className="mb-4 text-xl font-semibold text-[#111111]">{t("booking.customerName")}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="customerName" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <User className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label htmlFor="customerName" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+              <User className="h-4 w-4 text-[#FF912C]" />
               {t("booking.customerName")}
             </Label>
             <Input
@@ -136,13 +149,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ customerName: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
+              className="h-11 rounded-xl border-[#ece7e2] bg-white text-[#111111]"
             />
           </div>
 
           <div>
-            <Label htmlFor="customerEmail" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <Mail className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label htmlFor="customerEmail" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+              <Mail className="h-4 w-4 text-[#FF912C]" />
               {t("booking.customerEmail")}
             </Label>
             <Input
@@ -152,13 +165,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ customerEmail: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
+              className="h-11 rounded-xl border-[#ece7e2] bg-white text-[#111111]"
             />
           </div>
 
           <div>
-            <Label htmlFor="customerPhone" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <Phone className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label htmlFor="customerPhone" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+              <Phone className="h-4 w-4 text-[#FF912C]" />
               {t("booking.customerPhone")}
             </Label>
             <div className="grid grid-cols-[180px_minmax(0,1fr)] gap-2">
@@ -167,7 +180,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 onValueChange={(value) => updatePhone(value, bookingData.customerPhoneLocalNumber)}
                 disabled={disabled}
               >
-                <SelectTrigger className="h-11 w-full rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55">
+                <SelectTrigger className="h-11 w-full rounded-xl border-[#ece7e2] bg-white text-[#111111]">
                   <SelectValue placeholder="Code" />
                 </SelectTrigger>
                 <SelectContent className="max-h-80">
@@ -185,14 +198,14 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 onChange={(e) => updatePhone(bookingData.customerPhoneCountryCode, e.target.value)}
                 disabled={disabled}
                 required
-                className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
+                className="h-11 rounded-xl border-[#ece7e2] bg-white text-[#111111]"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="flightNumber" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <Plane className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label htmlFor="flightNumber" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+              <Plane className="h-4 w-4 text-[#FF912C]" />
               {t("booking.flightNumber")}
             </Label>
             <Input
@@ -200,13 +213,13 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               value={bookingData.flightNumber}
               onChange={(e) => updateBookingData({ flightNumber: e.target.value })}
               disabled={disabled}
-              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
+              className="h-11 rounded-xl border-[#ece7e2] bg-white text-[#111111]"
             />
           </div>
 
           <div>
-            <Label htmlFor="driverLicenseNumber" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <FileBadge2 className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label htmlFor="driverLicenseNumber" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+              <FileBadge2 className="h-4 w-4 text-[#FF912C]" />
               {t("booking.driverLicenseNumber")}
             </Label>
             <Input
@@ -215,63 +228,55 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
               onChange={(e) => updateBookingData({ driverLicenseNumber: e.target.value })}
               disabled={disabled}
               required
-              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
+              className="h-11 rounded-xl border-[#ece7e2] bg-white text-[#111111]"
             />
           </div>
 
           <div>
-            <Label htmlFor="birthDate" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label htmlFor="birthDate" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+              <CalendarDays className="h-4 w-4 text-[#FF912C]" />
               {t("booking.birthDate")}
             </Label>
-            <Input
+            <DatePicker
               id="birthDate"
-              type="date"
-              value={toDateInputValue(bookingData.birthDate)}
-              onChange={(e) => updateBookingData({ birthDate: fromDateInputValue(e.target.value) })}
+              value={bookingData.birthDate}
+              onChange={(date) => updateBookingData({ birthDate: date })}
               disabled={disabled}
-              max={(() => {
-                const now = new Date();
-                const minAdultDate = new Date(now.getFullYear() - 21, now.getMonth(), now.getDate());
-                return toDateInputValue(minAdultDate);
-              })()}
-              className="h-11 rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
+              placeholder={t("booking.birthDate")}
+              maxDate={getLaPazTodayPlusYears(-21)}
+              className="h-11 rounded-xl border-[#ece7e2] bg-white text-[#111111]"
             />
             {bookingData.birthDate && !isAtLeast21 && (
-              <p className="text-xs text-red-600 mt-1">{t("booking.errors.ageMinimum")}</p>
+              <p className="text-xs text-[#FF912C] mt-1">{t("booking.errors.ageMinimum")}</p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="licenseExpiryDate" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-              <CalendarDays className="h-4 w-4 text-[hsl(var(--primary))]" />
+            <Label htmlFor="licenseExpiryDate" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+              <CalendarDays className="h-4 w-4 text-[#FF912C]" />
               {t("booking.licenseExpiryDate")}
             </Label>
-            <Input
+            <DatePicker
               id="licenseExpiryDate"
-              type="date"
-              value={toDateInputValue(bookingData.licenseExpiryDate)}
-              onChange={(e) => updateBookingData({ licenseExpiryDate: fromDateInputValue(e.target.value) })}
+              value={bookingData.licenseExpiryDate}
+              onChange={(date) => updateBookingData({ licenseExpiryDate: date })}
               disabled={disabled}
-              min={(() => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                return toDateInputValue(tomorrow);
-              })()}
-              className="h-11 rounded-xl border-[hsl(var(--border))] bg-[hsl(var(--accent)/0.35)] text-[hsl(var(--foreground))]"
+              placeholder={t("booking.licenseExpiryDate")}
+              fromYear={LICENSE_EXPIRY_FROM_YEAR}
+              toYear={LICENSE_EXPIRY_TO_YEAR}
+              minDate={addLaPazDays(getLaPazToday(), 1)}
+              className="h-11 rounded-xl border-[#ece7e2] bg-white text-[#111111]"
             />
             {bookingData.licenseExpiryDate && !isLicenseValid && (
-              <p className="text-xs text-red-600 mt-1">{t("booking.errors.licenseInvalid")}</p>
+              <p className="text-xs text-[#FF912C] mt-1">{t("booking.errors.licenseInvalid")}</p>
             )}
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="mb-4 text-lg font-black text-[hsl(var(--foreground))]">{t("booking.driverLicense")}</h3>
-        <Card className="public-glass-card rounded-[1.75rem]">
+        <h3 className="mb-4 text-lg font-semibold text-[#111111]">{t("booking.driverLicense")}</h3>
+        <Card className="rounded-[1.75rem] border-[#efe7df] bg-white shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div>
@@ -287,14 +292,14 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                   />
                   <Label
                     htmlFor="driverLicense"
-                    className="flex h-32 w-full cursor-pointer items-center justify-center rounded-[1.25rem] border-2 border-dashed border-[rgba(15,39,64,0.14)] bg-[rgba(248,250,252,0.92)] transition-colors hover:border-[rgba(19,120,152,0.45)] hover:bg-white"
+                    className="flex h-32 w-full cursor-pointer items-center justify-center rounded-[1.25rem] border-2 border-dashed border-[#e7dcd5] bg-[#faf8f6] transition-colors hover:border-[#FF912C]/40 hover:bg-white"
                   >
                     <div className="text-center">
-                      <Upload className="mx-auto mb-2 h-8 w-8 text-[rgb(19,120,152)]" />
-                      <p className="text-sm font-semibold text-[rgb(15,39,64)]">
+                      <Upload className="mx-auto mb-2 h-8 w-8 text-[#FF912C]" />
+                      <p className="text-sm font-semibold text-[#111111]">
                         {isUploading ? t("common.loading") : t("booking.driverLicense")}
                       </p>
-                      <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+                      <p className="mt-1 text-xs text-[#78716c]">
                         JPG, PNG, PDF (max 8MB)
                       </p>
                     </div>
@@ -304,8 +309,8 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
 
               {bookingData.driverLicenseUrl && (
                 <div className="space-y-3">
-                  <div className="rounded-[1rem] border border-emerald-200 bg-emerald-50/90 p-3">
-                    <p className="text-sm font-semibold text-emerald-700">
+                  <div className="rounded-[1rem] border border-[#bad8a7] bg-[#eef9e7] p-3">
+                    <p className="text-sm font-semibold text-[#2e6b19]">
                       ✓ {t("booking.driverLicense")} {t("common.success").toLowerCase()}
                     </p>
                   </div>
@@ -318,12 +323,12 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                 </div>
               )}
 
-              <div className="public-glass-card rounded-[1rem] p-4">
-                <p className="text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.termsOfService")}</p>
-                <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">{t("booking.identificationClause")}</p>
-                <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.gdprNotice")}</p>
-                <p className="mt-3 text-sm font-bold text-[hsl(var(--foreground))]">{t("booking.privacyPolicy")}</p>
-                <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">{t("booking.privacyDeletionNotice")}</p>
+              <div className="rounded-[1rem] border border-[#efe7df] bg-[#faf8f6] p-4">
+                <p className="text-sm font-semibold text-[#111111]">{t("booking.termsOfService")}</p>
+                <p className="mt-2 text-sm text-[#57534e]">{t("booking.identificationClause")}</p>
+                <p className="mt-2 text-xs text-[#78716c]">{t("booking.gdprNotice")}</p>
+                <p className="mt-3 text-sm font-semibold text-[#111111]">{t("booking.privacyPolicy")}</p>
+                <p className="mt-2 text-xs text-[#78716c]">{t("booking.privacyDeletionNotice")}</p>
                 <div className="mt-4 flex items-start space-x-2">
                   <Checkbox
                     id="privacyConsent"
@@ -331,7 +336,7 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
                     onCheckedChange={(checked) => updateBookingData({ privacyConsentAccepted: checked as boolean })}
                     disabled={disabled}
                   />
-                  <label htmlFor="privacyConsent" className="text-sm text-[hsl(var(--foreground))]">
+                  <label htmlFor="privacyConsent" className="text-sm text-[#111111]">
                     {t("booking.privacyConsentCheckbox")}
                   </label>
                 </div>
@@ -341,9 +346,16 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
         </Card>
       </div>
 
-      <div className="public-glass-card rounded-[1.75rem] p-6">
-        <Label htmlFor="notes" className="mb-2 flex items-center gap-2 font-bold text-[hsl(var(--accent-foreground))]">
-          <ClipboardPenLine className="h-4 w-4 text-[hsl(var(--primary))]" />
+      <AdditionalDriversEditor
+        drivers={bookingData.additionalDrivers}
+        onChange={(additionalDrivers) => updateBookingData({ additionalDrivers })}
+        rentalStartDate={bookingData.startDate}
+        disabled={disabled}
+      />
+
+      <div className="rounded-[1.75rem] border border-[#efe7df] bg-[#faf8f6] p-6 shadow-[0_24px_60px_-46px_rgba(0,0,0,0.16)]">
+        <Label htmlFor="notes" className="mb-2 flex items-center gap-2 font-semibold text-[#44403c]">
+          <ClipboardPenLine className="h-4 w-4 text-[#FF912C]" />
           {t("booking.notes")}
         </Label>
         <Textarea
@@ -352,16 +364,16 @@ export function Step2Customer({ bookingData, updateBookingData, onNext, onPrev, 
           onChange={(e) => updateBookingData({ notes: e.target.value })}
           disabled={disabled}
           rows={3}
-          className="rounded-xl border-white/60 bg-white/88 text-[hsl(var(--foreground))] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/55"
+          className="rounded-xl border-[#ece7e2] bg-white text-[#111111]"
         />
       </div>
 
       <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={onPrev} className="public-outline-button h-12 rounded-full">
+        <Button variant="outline" onClick={onPrev} className="h-12 rounded-full border-[#e7dcd5] bg-white text-[#111111] hover:bg-[#faf8f6]">
           <ArrowLeft className="h-4 w-4" />
           {t("booking.back")}
         </Button>
-        <Button onClick={onNext} disabled={!canContinue || disabled} className="public-primary-button h-12 rounded-full px-6 font-extrabold uppercase tracking-[0.08em]">
+        <Button onClick={onNext} disabled={!canContinue || disabled} className="h-12 rounded-full bg-[#111111] px-6 font-semibold text-white hover:bg-[#292524]">
           <ArrowRight className="h-4 w-4" />
           {t("booking.continue")}
         </Button>

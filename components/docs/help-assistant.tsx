@@ -73,7 +73,7 @@ export function HelpAssistant({
   };
 
   return (
-    <Card className={`rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_24px_56px_-34px_hsl(215_28%_17%/0.16)] ${className || ""}`}>
+    <Card className={`rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_24px_56px_-34px_hsl(var(--primary)/0.12)] ${className || ""}`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-[hsl(var(--primary)/0.12)] text-[hsl(var(--primary))]">

@@ -129,7 +129,7 @@ export default async function AdminLogsPage({
   return (
     <div className={ADMIN_PAGE_SHELL}>
       <div className={ADMIN_PAGE_STACK}>
-        <section className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff_0%,hsl(var(--accent)/0.22)_42%,hsl(var(--primary)/0.08)_100%)] shadow-[0_30px_80px_-48px_hsl(var(--primary)/0.2)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff_0%,hsl(var(--primary)/0.04)_42%,#ffffff_100%)] shadow-[0_30px_80px_-48px_hsl(var(--primary)/0.18)]">
           <div className="grid gap-6 p-6 lg:grid-cols-[1.5fr_1fr] lg:p-8">
             <div>
               <p className={ADMIN_PAGE_KICKER}>{t("admin.logs.page.kicker")}</p>
@@ -139,11 +139,11 @@ export default async function AdminLogsPage({
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-700">
-                  <Search className="h-4 w-4 text-[hsl(var(--primary))]" />
+                  <Search className="h-4 w-4 text-red-600" />
                   {t("admin.logs.page.searchHint")}
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-700">
-                  <Filter className="h-4 w-4 text-[hsl(var(--primary))]" />
+                  <Filter className="h-4 w-4 text-red-600" />
                   {t("admin.logs.page.filterHint")}
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default async function AdminLogsPage({
               <Card className="rounded-2xl border-0 bg-slate-950 p-4 text-white shadow-[0_20px_45px_-28px_rgba(15,23,42,0.9)]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/55">{t("admin.logs.cards.filtered")}</span>
-                  <Activity className="h-4 w-4 text-[hsl(var(--accent))]" />
+                  <Activity className="h-4 w-4 text-red-300" />
                 </div>
                 <p className="mt-4 text-3xl font-black">{total}</p>
                 <p className="mt-1 text-xs text-white/60">{t("admin.logs.cards.matchingEvents")}</p>
@@ -161,7 +161,7 @@ export default async function AdminLogsPage({
               <Card className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_16px_36px_-28px_rgba(15,23,42,0.35)]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{t("admin.logs.cards.activity24h")}</span>
-                  <CalendarClock className="h-4 w-4 text-[hsl(var(--primary))]" />
+                  <CalendarClock className="h-4 w-4 text-red-600" />
                 </div>
                 <p className="mt-4 text-3xl font-black text-slate-950">{totalToday}</p>
                 <p className="mt-1 text-xs text-slate-500">{t("admin.logs.cards.eventsToday")}</p>
@@ -169,7 +169,7 @@ export default async function AdminLogsPage({
               <Card className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_16px_36px_-28px_rgba(15,23,42,0.35)]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{t("admin.logs.cards.bookingLinked")}</span>
-                  <ShieldCheck className="h-4 w-4 text-[hsl(var(--primary))]" />
+                  <ShieldCheck className="h-4 w-4 text-red-600" />
                 </div>
                 <p className="mt-4 text-3xl font-black text-slate-950">{linkedBookings}</p>
                 <p className="mt-1 text-xs text-slate-500">{t("admin.logs.cards.linkedDescription")}</p>
@@ -192,7 +192,7 @@ export default async function AdminLogsPage({
             <select
               name="role"
               defaultValue={roleFilter || ""}
-              className="h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_10px_24px_-18px_rgba(12,74,160,0.2)] outline-none focus:ring-2 focus:ring-[hsl(var(--ring))/0.25]"
+              className="h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_10px_24px_-18px_hsl(var(--primary)/0.16)] outline-none focus:ring-2 focus:ring-[hsl(var(--ring))/0.25]"
             >
               <option value="">{t("admin.logs.filters.allRoles")}</option>
               {ROLE_OPTIONS.map((option) => (
@@ -204,7 +204,7 @@ export default async function AdminLogsPage({
             <select
               name="action"
               defaultValue={actionFilter}
-              className="h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_10px_24px_-18px_rgba(12,74,160,0.2)] outline-none focus:ring-2 focus:ring-[hsl(var(--ring))/0.25]"
+              className="h-11 rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_10px_24px_-18px_hsl(var(--primary)/0.16)] outline-none focus:ring-2 focus:ring-[hsl(var(--ring))/0.25]"
             >
               <option value="">{t("admin.logs.filters.allActions")}</option>
               {actionOptions.map((option) => (
@@ -230,7 +230,7 @@ export default async function AdminLogsPage({
           {hasFilters ? (
             <div className="mt-4 flex flex-wrap gap-2">
               {query ? (
-                <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+                <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
                   {t("admin.logs.pills.search", { value: query })}
                 </span>
               ) : null}
@@ -285,7 +285,7 @@ export default async function AdminLogsPage({
                         {formatActionLabel(entry.action)}
                       </span>
                       {entry.booking?.bookingCode ? (
-                        <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+                        <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
                           {t("admin.logs.entry.booking", { code: entry.booking.bookingCode })}
                         </span>
                       ) : null}

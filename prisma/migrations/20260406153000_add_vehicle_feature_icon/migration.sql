@@ -1,0 +1,2 @@
+ALTER TABLE "VehicleFeature"
+ADD COLUMN IF NOT EXISTS "iconName" TEXT;

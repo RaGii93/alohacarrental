@@ -1,14 +1,15 @@
-import { getTranslations } from "next-intl/server";
-import type { Metadata } from "next";
 import Link from "next/link";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { CarFront, CheckCircle, Home, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
 import { db } from "@/lib/db";
 import { buildMetadata } from "@/lib/seo";
 import { getTenantConfig } from "@/lib/tenant";
 import { formatDate, formatDateTime } from "@/lib/datetime";
-import { CarFront, Home, MapPin } from "lucide-react";
+import { buildGoogleMapsUrl } from "@/lib/location-map";
+import { ensureBookingAdditionalDriversTable } from "@/lib/additional-drivers.server";
 
 export async function generateMetadata({
   params,
@@ -38,140 +39,140 @@ export default async function SuccessPage({
 }) {
   const { locale, id: bookingCode } = await params;
   const t = await getTranslations();
+  await ensureBookingAdditionalDriversTable();
 
   const booking = await db.booking.findUnique({
     where: { bookingCode },
-    include: { vehicle: true, pickupLocationRef: true, dropoffLocationRef: true },
+    include: { vehicle: true, pickupLocationRef: true, dropoffLocationRef: true, additionalDrivers: true },
   });
 
   if (!booking) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <h1 className="text-2xl font-bold">{t("errors.notFound")}</h1>
+      <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 lg:px-8">
+        <h1 className="text-2xl font-semibold text-[#111111]">{t("errors.notFound")}</h1>
       </div>
     );
   }
 
-  const pickupMapUrl = booking.pickupLocationRef?.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.pickupLocationRef.address)}`
-    : null;
-  const dropoffMapUrl = booking.dropoffLocationRef?.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(booking.dropoffLocationRef.address)}`
-    : null;
+  const pickupMapUrl = buildGoogleMapsUrl({
+    latitude: booking.pickupLatitude,
+    longitude: booking.pickupLongitude,
+    query: booking.pickupLocationAddress || booking.pickupLocation || booking.pickupLocationRef?.address,
+  });
+  const dropoffMapUrl = buildGoogleMapsUrl({
+    latitude: booking.dropoffLatitude,
+    longitude: booking.dropoffLongitude,
+    query: booking.dropoffLocationAddress || booking.dropoffLocation || booking.dropoffLocationRef?.address,
+  });
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="public-glass-card-strong overflow-hidden rounded-[2rem] p-8 text-center">
-        <div className="mb-6 flex justify-center">
-          <div className="public-accent-icon flex h-20 w-20 items-center justify-center rounded-[1.75rem]">
-            <CheckCircle className="h-12 w-12 text-[rgb(15,99,120)]" />
+    <section className="bg-white">
+      <div className="border-b border-[#f2ebe6] bg-[#faf8f6]">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#dcfce7] text-[#15803d]">
+            <CheckCircle className="h-8 w-8" />
           </div>
+          <h1 className="mt-6 text-4xl font-semibold tracking-[-0.04em] text-[#111111]">
+            {t("booking.success.title")}
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-8 text-[#57534e]">
+            {t("booking.success.message", { orderId: booking.bookingCode })}
+          </p>
         </div>
+      </div>
 
-        <h1 className="mb-2 text-3xl font-bold text-[hsl(var(--foreground))]">
-          {t("booking.success.title")}
-        </h1>
-        <p className="mb-6 text-lg text-[hsl(var(--muted-foreground))]">
-          {t("booking.success.message", { orderId: booking.bookingCode })}
-        </p>
-        <div className="public-glass-card mb-6 rounded-[1.5rem] p-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">{t("booking.bookingCode")}</p>
-          <p className="text-xl font-semibold tracking-wide">{booking.bookingCode}</p>
-        </div>
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
+        <Card className="rounded-[1.75rem] border-[#efe7df] bg-white p-6 shadow-[0_24px_60px_-44px_rgba(0,0,0,0.16)]">
+          <div className="rounded-[1.25rem] border border-[#efe7df] bg-[#faf8f6] p-5">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#b91c1c] sm:text-[15px]">
+              {t("booking.bookingCode")}
+            </p>
+            <p className="mt-2 text-2xl font-semibold tracking-[0.06em] text-[#111111]">
+              {booking.bookingCode}
+            </p>
+          </div>
 
-        <div className="public-glass-card mb-6 rounded-[1.75rem] p-6 text-left">
-          <h2 className="mb-4 font-semibold text-[hsl(var(--foreground))]">{t("admin.bookings.detail.bookingInfo")}</h2>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("common.name")}:</dt>
-              <dd className="font-medium">{booking.customerName}</dd>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {[
+              [t("common.name"), booking.customerName],
+              [t("common.email"), booking.customerEmail],
+              [t("booking.flightNumber"), booking.flightNumber || "-"],
+              [t("booking.birthDate"), booking.birthDate ? formatDate(booking.birthDate) : "-"],
+              [t("booking.selectVehicle"), booking.vehicle?.name ?? "-"],
+              [t("booking.startDate"), formatDateTime(booking.startDate)],
+              [t("booking.endDate"), formatDateTime(booking.endDate)],
+              [t("booking.licenseExpiryDate"), booking.licenseExpiryDate ? formatDate(booking.licenseExpiryDate) : "-"],
+            ].map(([label, value]) => (
+              <div key={label as string} className="rounded-[1.25rem] border border-[#efe7df] bg-white p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#a8a29e]">{label}</p>
+                <p className="mt-2 text-sm text-[#111111]">{value}</p>
+              </div>
+            ))}
+            <div className="rounded-[1.25rem] border border-[#efe7df] bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#a8a29e]">{t("booking.pickupLocation")}</p>
+              <p className="mt-2 text-sm text-[#111111]">
+                {booking.pickupLocation || booking.pickupLocationRef?.name || "-"}
+                {booking.pickupLocationAddress ? <span className="block text-xs text-[#78716c]">{booking.pickupLocationAddress}</span> : null}
+                {pickupMapUrl ? (
+                  <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-[#b91c1c] hover:underline">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {t("booking.map")}
+                  </a>
+                ) : null}
+              </p>
             </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("common.email")}:</dt>
-              <dd className="font-medium">{booking.customerEmail}</dd>
+            <div className="rounded-[1.25rem] border border-[#efe7df] bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#a8a29e]">{t("booking.dropoffLocation")}</p>
+              <p className="mt-2 text-sm text-[#111111]">
+                {booking.dropoffLocation || booking.dropoffLocationRef?.name || "-"}
+                {booking.dropoffLocationAddress ? <span className="block text-xs text-[#78716c]">{booking.dropoffLocationAddress}</span> : null}
+                {dropoffMapUrl ? (
+                  <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-[#b91c1c] hover:underline">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {t("booking.map")}
+                  </a>
+                ) : null}
+              </p>
             </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.flightNumber")}:</dt>
-              <dd className="font-medium">{booking.flightNumber || "-"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.birthDate")}:</dt>
-              <dd className="font-medium">{booking.birthDate ? formatDate(booking.birthDate) : "-"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.selectVehicle")}:</dt>
-              <dd className="font-medium">{booking.vehicle?.name ?? "-"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.startDate")}:</dt>
-              <dd className="font-medium">
-                {formatDateTime(booking.startDate)}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.endDate")}:</dt>
-              <dd className="font-medium">
-                {formatDateTime(booking.endDate)}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.pickupLocation")}:</dt>
-              <dd className="font-medium">
-                {booking.pickupLocationRef?.name || booking.pickupLocation || "-"}
-                {pickupMapUrl && (
-                  <>
-                    {" "}
-                    <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:underline">
-                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
-                    </a>
-                  </>
-                )}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.dropoffLocation")}:</dt>
-              <dd className="font-medium">
-                {booking.dropoffLocationRef?.name || booking.dropoffLocation || "-"}
-                {dropoffMapUrl && (
-                  <>
-                    {" "}
-                    <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--primary))] hover:underline">
-                      <span className="inline-flex items-center gap-1">(<MapPin className="h-3.5 w-3.5" /> {t("booking.map")})</span>
-                    </a>
-                  </>
-                )}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("booking.licenseExpiryDate")}:</dt>
-              <dd className="font-medium">{booking.licenseExpiryDate ? formatDate(booking.licenseExpiryDate) : "-"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-[hsl(var(--muted-foreground))]">{t("admin.bookings.table.total")}:</dt>
-              <dd className="font-medium">
-                ${(booking.totalAmount / 100).toFixed(2)}
-              </dd>
-            </div>
-          </dl>
-        </div>
+          </div>
 
-        <p className="mb-6 text-[hsl(var(--muted-foreground))]">{t("booking.success.next")}</p>
+          <div className="mt-6 rounded-[1.25rem] border border-[#efe7df] bg-[#faf8f6] p-5">
+            <p className="text-sm text-[#57534e]">{t("booking.success.next")}</p>
+            <p className="mt-3 text-xl font-semibold text-[#111111]">${(booking.totalAmount / 100).toFixed(2)}</p>
+          </div>
 
-        <div className="flex justify-center gap-4">
-          <Link href={`/${locale}`}>
-            <Button variant="outline" className="public-outline-button rounded-full">
-              <Home className="h-4 w-4" />
-              {t("nav.home")}
-            </Button>
-          </Link>
-          <Link href={`/${locale}/book`}>
-            <Button className="public-primary-button rounded-full">
-              <CarFront className="h-4 w-4" />
-              {t("nav.booking")}
-            </Button>
-          </Link>
-        </div>
-      </Card>
-    </div>
+          {booking.additionalDrivers.length > 0 ? (
+            <div className="mt-6 rounded-[1.25rem] border border-[#efe7df] bg-white p-5">
+              <p className="text-sm font-semibold text-[#111111]">{t("booking.additionalDrivers.summaryTitle")}</p>
+              <div className="mt-3 space-y-3">
+                {booking.additionalDrivers.map((driver) => (
+                  <div key={driver.id} className="rounded-xl border border-[#efe7df] bg-[#faf8f6] p-4 text-sm text-[#111111]">
+                    <p className="font-semibold">{driver.fullName}</p>
+                    <p className="mt-1 text-[#57534e]">{t("booking.additionalDrivers.birthDate")}: {formatDate(driver.birthDate)}</p>
+                    <p className="text-[#57534e]">{t("booking.additionalDrivers.licenseNumber")}: {driver.driverLicenseNumber}</p>
+                    <p className="text-[#57534e]">{t("booking.additionalDrivers.licenseExpiryDate")}: {formatDate(driver.licenseExpiryDate)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+            <Link href={`/${locale}`}>
+              <Button variant="outline" className="h-11 rounded-full border-[#e7dcd5] px-5 font-semibold">
+                <Home className="h-4 w-4" />
+                {t("nav.home")}
+              </Button>
+            </Link>
+            <Link href={`/${locale}/book`}>
+              <Button className="h-11 rounded-full bg-[#b91c1c] px-5 font-semibold text-white hover:bg-[#991b1b]">
+                <CarFront className="h-4 w-4" />
+                {t("nav.booking")}
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </div>
+    </section>
   );
 }

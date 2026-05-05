@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -110,6 +110,18 @@ export function CategoryDialog({
     },
   ] as const;
 
+  const goToPreviousStep = (event?: MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setCurrentStep((step) => Math.max(0, step - 1));
+  };
+
+  const goToNextStep = (event?: MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setCurrentStep((step) => Math.min(steps.length - 1, step + 1));
+  };
+
   const onSubmit = async (values: any) => {
     setIsSubmitting(true);
     try {
@@ -146,7 +158,7 @@ export function CategoryDialog({
                   onClick={() => setCurrentStep(index)}
                   className={`rounded-2xl border px-4 py-3 text-left transition ${
                     currentStep === index
-                      ? "border-sky-300 bg-sky-50 shadow-sm"
+                      ? "border-red-300 bg-red-50 shadow-sm"
                       : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                   }`}
                 >
@@ -372,7 +384,7 @@ export function CategoryDialog({
                               <label
                                 key={feature.id}
                                 className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm shadow-sm transition ${
-                                  selected.has(feature.id) ? "border-sky-200 bg-sky-50" : "border-white bg-white"
+                                  selected.has(feature.id) ? "border-red-200 bg-red-50" : "border-white bg-white"
                                 }`}
                               >
                                 <span className="flex items-center gap-2">
@@ -406,12 +418,12 @@ export function CategoryDialog({
             <div className="flex justify-end gap-2 border-t border-slate-200 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>{t("common.cancel")}</Button>
               {currentStep > 0 ? (
-                <Button type="button" variant="outline" onClick={() => setCurrentStep((step) => Math.max(0, step - 1))}>
+                <Button type="button" variant="outline" onClick={goToPreviousStep}>
                   {t("common.previous")}
                 </Button>
               ) : null}
               {currentStep < steps.length - 1 ? (
-                <Button type="button" onClick={() => setCurrentStep((step) => Math.min(steps.length - 1, step + 1))}>
+                <Button type="button" onClick={goToNextStep}>
                   {t("common.next")}
                 </Button>
               ) : (

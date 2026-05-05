@@ -120,7 +120,7 @@ export function ZohoTransfersClient({
               <TableRow key={row.id}>
                 <TableCell>
                   <div className="font-medium">{row.bookingCode}</div>
-                  <a href={`/${locale}/admin/bookings/${row.id}`} className="text-xs text-blue-600 hover:underline">
+                  <a href={`/${locale}/admin/bookings/${row.id}`} className="text-xs text-red-600 hover:underline">
                     {t("admin.zoho.table.openBooking")}
                   </a>
                 </TableCell>

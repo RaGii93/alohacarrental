@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
@@ -12,7 +11,6 @@ import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { calculateDriverLicenseDeleteAfter } from "@/lib/driver-license-retention";
-import { formatDate, parseKralendijkDate, parseKralendijkDateTime } from "@/lib/datetime";
 import { getBookingHoldDays, getBookingRuleSettings, getInvoiceProvider, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { logAdminAction } from "@/lib/audit";
 import { calculateBookingAmounts, calculateFuelDifferenceCharge, calculateLateReturnCharge, evaluateBookingRules, getFuelChargePerQuarterForCategory } from "@/lib/pricing";
@@ -25,24 +23,12 @@ import {
 } from "@/lib/quickbooks-bookings";
 import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { ensureZohoBookingColumns, markBookingBillingDocumentZoho, queueBookingZohoTransfer } from "@/lib/zoho-bookings";
+import { triggerAutomationEvent } from "@/lib/automations";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
-function shouldSkipExpiredHoldCleanup(error: unknown) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    return error.code === "ETIMEDOUT" || error.code === "P2021";
-  }
-
-  if (error instanceof Error) {
-    const message = error.message.toLowerCase();
-    return message.includes("timeout") || message.includes("timed out") || message.includes("\"booking\"");
-  }
-
-  return false;
-}
-
-async function getCustomerTermsEmailData(locale?: string) {
-  const terms = await getTermsEmailAttachment(locale);
+async function getCustomerTermsEmailData() {
+  const terms = await getTermsEmailAttachment();
   return {
     termsUrl: terms.url,
     attachments: terms.attachment ? [terms.attachment] : [],
@@ -298,41 +284,23 @@ async function selectAvailableVehicleForBooking(params: {
 }
 
 export async function cancelExpiredHolds() {
-  let expiredBookings: Array<{
-    id: string;
-    customerEmail: string;
-    customerName: string;
-    bookingCode: string;
-    startDate: Date;
-    endDate: Date;
-    totalAmount: number;
-  }> = [];
-
-  try {
-    expiredBookings = await db.booking.findMany({
-      where: {
-        status: "PENDING",
-        holdExpiresAt: {
-          lt: new Date(),
-        },
+  const expiredBookings = await db.booking.findMany({
+    where: {
+      status: "PENDING",
+      holdExpiresAt: {
+        lt: new Date(),
       },
-      select: {
-        id: true,
-        customerEmail: true,
-        customerName: true,
-        bookingCode: true,
-        startDate: true,
-        endDate: true,
-        totalAmount: true,
-      },
-    });
-  } catch (error) {
-    if (shouldSkipExpiredHoldCleanup(error)) {
-      console.warn("Skipping expired hold cleanup because bookings could not be queried.", error);
-      return 0;
-    }
-    throw error;
-  }
+    },
+    select: {
+      id: true,
+      customerEmail: true,
+      customerName: true,
+      bookingCode: true,
+      startDate: true,
+      endDate: true,
+      totalAmount: true,
+    },
+  });
 
   if (expiredBookings.length === 0) return 0;
 
@@ -418,7 +386,7 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
 
     try {
       const rentalAgreement = await buildAndUploadBookingDocument(bookingId, "RENTAL_AGREEMENT");
-      const termsEmailData = await getCustomerTermsEmailData(locale);
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: booking.customerEmail,
         subject: `Booking Confirmed - ${booking.bookingCode}`,
@@ -445,6 +413,9 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
         ],
       });
     } catch {}
+
+    // Automation: booking_confirmed event
+    triggerAutomationEvent("booking_confirmed", bookingId).catch(() => {});
 
     return { success: true, booking };
   } catch (error: any) {
@@ -688,7 +659,7 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
     });
 
     try {
-      const termsEmailData = await getCustomerTermsEmailData(locale);
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: updated.customerEmail,
         subject: `Invoice for Payment - ${updated.bookingCode}`,
@@ -746,7 +717,7 @@ export async function sendBillingDocumentEmailAction(bookingId: string, locale: 
 
     const billingDocumentUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true }) || booking.invoiceUrl;
     const { extras: adjustmentExtras } = await loadBookingAdjustments(bookingId);
-    const termsEmailData = await getCustomerTermsEmailData(locale);
+    const termsEmailData = await getCustomerTermsEmailData();
 
     const mailResult = await sendEmail({
       to: booking.customerEmail,
@@ -854,7 +825,7 @@ export async function createSalesReceiptAction(
     });
 
     try {
-      const termsEmailData = await getCustomerTermsEmailData(locale);
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: updated.customerEmail,
         subject: `Sales Receipt - ${updated.bookingCode}`,
@@ -933,7 +904,7 @@ export async function receiveInvoicePaymentAction(bookingId: string, locale: str
     });
 
     try {
-      const termsEmailData = await getCustomerTermsEmailData(locale);
+      const termsEmailData = await getCustomerTermsEmailData();
       await sendEmail({
         to: updated.customerEmail,
         subject: `Payment Received - ${updated.bookingCode}`,
@@ -956,6 +927,9 @@ export async function receiveInvoicePaymentAction(bookingId: string, locale: str
         attachments: termsEmailData.attachments,
       });
     } catch {}
+
+    // Automation: payment_received event
+    triggerAutomationEvent("payment_received", bookingId).catch(() => {});
 
     return { success: true, booking: updated };
   } catch (error: any) {
@@ -1016,6 +990,20 @@ export async function completePickupInspectionAction(
     if (!booking) return { success: false, error: "Booking not found" };
     if (booking.status !== "CONFIRMED") return { success: false, error: "BOOKING_NOT_DELIVERABLE" };
     if (!booking.paymentReceivedAt) return { success: false, error: "PAYMENT_REQUIRED_BEFORE_DELIVERY" };
+
+    const agreement = await db.rentalAgreement.findUnique({
+      where: { bookingId },
+      select: {
+        status: true,
+        signedAt: true,
+      },
+    });
+    if (!agreement || agreement.status !== "SIGNED" || !agreement.signedAt) {
+      return {
+        success: false,
+        error: "Signed rental agreement is required before pickup check-in can be completed",
+      };
+    }
 
     const operational = await getBookingOperationalState(db, bookingId);
     if (operational.deliveredAt) return { success: false, error: "BOOKING_ALREADY_DELIVERED" };
@@ -1249,6 +1237,9 @@ export async function markBookingReturnedAction(bookingId: string, locale: strin
       });
     });
 
+    // Automation: return_completed event
+    triggerAutomationEvent("return_completed", bookingId).catch(() => {});
+
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to mark booking as returned" };
@@ -1438,11 +1429,11 @@ export async function createCategoryBookingAction(
     const customerEmail = formData.get("customerEmail") as string;
     const customerPhone = formData.get("customerPhone") as string;
     const flightNumber = ((formData.get("flightNumber") as string | null) || "").trim();
-    const birthDate = parseKralendijkDate(String(formData.get("birthDate") || ""));
+    const birthDate = new Date(formData.get("birthDate") as string);
     const driverLicenseNumber = formData.get("driverLicenseNumber") as string;
-    const licenseExpiryDate = parseKralendijkDate(String(formData.get("licenseExpiryDate") || ""), true);
-    const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
-    const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
+    const licenseExpiryDate = new Date(formData.get("licenseExpiryDate") as string);
+    const startDate = new Date(formData.get("startDate") as string);
+    const endDate = new Date(formData.get("endDate") as string);
     const pickupLocationId = (formData.get("pickupLocationId") as string | null) || null;
     const dropoffLocationId = (formData.get("dropoffLocationId") as string | null) || null;
     const pickupLocation = (formData.get("pickupLocation") as string | null) || null;
@@ -1484,12 +1475,11 @@ export async function createCategoryBookingAction(
       return { success: false, error: "Terms must be accepted" };
     }
 
-    if (!birthDate || !licenseExpiryDate || !startDate || !endDate) {
-      return { success: false, error: "Invalid booking date values" };
-    }
-
     if (startDate >= endDate) {
       return { success: false, error: "Invalid date range" };
+    }
+    if (Number.isNaN(birthDate.getTime()) || Number.isNaN(licenseExpiryDate.getTime())) {
+      return { success: false, error: "Invalid birth date or license expiry date" };
     }
 
     const validated = await categoryBookingFormSchemaRefined.parseAsync({
@@ -1780,7 +1770,7 @@ export async function createCategoryBookingAction(
       await createNotification({
         type: "BOOKING_CREATED",
         title: "New booking request received",
-        message: `${booking.customerName} requested ${category.name} from ${formatDate(booking.startDate)} to ${formatDate(booking.endDate)}.`,
+        message: `${booking.customerName} requested ${category.name} from ${booking.startDate.toLocaleDateString()} to ${booking.endDate.toLocaleDateString()}.`,
         href: `/${locale}/admin/bookings/${booking.id}`,
         severity: "INFO",
       });
@@ -1790,7 +1780,7 @@ export async function createCategoryBookingAction(
       const tenant = await getTenantConfig();
       const subject = `New Booking Created - ${booking.bookingCode}`;
       const createdExtras = await loadBookingAdjustments(booking.id);
-      const termsEmailData = await getCustomerTermsEmailData(locale);
+      const termsEmailData = await getCustomerTermsEmailData();
       const customerHtml = await bookingEmailHtml({
         title: "Booking request received",
         customerName: booking.customerName,
@@ -1817,6 +1807,9 @@ export async function createCategoryBookingAction(
         html: customerHtml,
       });
     } catch {}
+
+    // Automation: booking_created event
+    triggerAutomationEvent("booking_created", booking.id).catch(() => {});
 
     return {
       success: true,
@@ -1872,20 +1865,16 @@ export async function updateCategoryBookingAction(
     const customerEmail = String(formData.get("customerEmail") || "");
     const customerPhone = String(formData.get("customerPhone") || "");
     const flightNumber = String(formData.get("flightNumber") || "").trim();
-    const birthDate = parseKralendijkDate(String(formData.get("birthDate") || ""));
+    const birthDate = new Date(String(formData.get("birthDate") || ""));
     const driverLicenseNumber = String(formData.get("driverLicenseNumber") || "");
-    const licenseExpiryDate = parseKralendijkDate(String(formData.get("licenseExpiryDate") || ""), true);
-    const startDate = parseKralendijkDateTime(String(formData.get("startDate") || ""));
-    const endDate = parseKralendijkDateTime(String(formData.get("endDate") || ""));
+    const licenseExpiryDate = new Date(String(formData.get("licenseExpiryDate") || ""));
+    const startDate = new Date(String(formData.get("startDate") || ""));
+    const endDate = new Date(String(formData.get("endDate") || ""));
     const vehicleId = String(formData.get("vehicleId") || "").trim();
     const pickupLocationId = String(formData.get("pickupLocationId") || "");
     const dropoffLocationId = String(formData.get("dropoffLocationId") || "");
     const notes = String(formData.get("notes") || "");
     const extrasPayload = String(formData.get("selectedExtras") || "[]");
-
-    if (!birthDate || !licenseExpiryDate || !startDate || !endDate) {
-      return { success: false, error: "Invalid booking date values" };
-    }
 
     const validated = await adminCategoryBookingUpdateSchemaRefined.parseAsync({
       categoryId,

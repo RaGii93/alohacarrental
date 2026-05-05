@@ -34,7 +34,7 @@ import {
 import { createAdminUserAction, updateAdminUserAction } from "@/actions/users";
 
 const userSchema = z.object({
-  email: z.string().trim().email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
   role: z.enum(["OWNER", "STAFF"]),
   password: z.string().optional(),
 });
@@ -63,7 +63,7 @@ export function UserDialog({
   const form = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      email: user?.email?.trim() || "",
+      email: user?.email || "",
       role: (user?.role === "OWNER" || user?.role === "STAFF" ? user.role : "STAFF") as "OWNER" | "STAFF",
       password: "",
     },
@@ -73,7 +73,7 @@ export function UserDialog({
     setIsOpen(!!user);
     if (user) {
       form.reset({
-        email: user.email?.trim() || "",
+        email: user.email || "",
         role: (user.role === "OWNER" || user.role === "STAFF" ? user.role : "STAFF") as "OWNER" | "STAFF",
         password: "",
       });

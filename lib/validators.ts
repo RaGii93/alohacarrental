@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { additionalDriversSchema, isAdditionalDriverAdult, isAdditionalDriverLicenseValid, MINIMUM_DRIVER_AGE } from "@/lib/additional-drivers";
 
 export const loginFormSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -52,6 +53,8 @@ export const locationFormSchema = z.object({
     .optional()
     .or(z.literal("")),
   address: z.string().max(255, "Address must be 255 characters or less").optional().or(z.literal("")),
+  latitude: z.number().min(-90).max(90).nullable().optional(),
+  longitude: z.number().min(-180).max(180).nullable().optional(),
 });
 
 // Refine booking schema to ensure endDate > startDate
@@ -81,6 +84,7 @@ export const categoryBookingFormSchema = z.object({
   pickupLocation: z.string().optional(),
   dropoffLocation: z.string().optional(),
   driverLicenseUrl: z.string().url("Driver license upload is required"),
+  additionalDrivers: additionalDriversSchema.default([]),
   privacyConsentAccepted: z.boolean().refine((val) => val === true, {
     message: "You must accept the privacy consent",
   }),
@@ -100,6 +104,7 @@ export const adminCategoryBookingUpdateSchema = z.object({
   birthDate: z.date(),
   driverLicenseNumber: z.string().min(1, "Driver license number is required"),
   licenseExpiryDate: z.date(),
+  additionalDrivers: additionalDriversSchema.default([]),
   startDate: z.date(),
   endDate: z.date(),
   pickupLocationId: z.string().min(1, "Pickup location is required"),
@@ -130,6 +135,18 @@ export const categoryBookingFormSchemaRefined = categoryBookingFormSchema.refine
     message: "License must be valid for the rental period start date",
     path: ["licenseExpiryDate"],
   }
+).refine(
+  (data) => data.additionalDrivers.every((driver) => isAdditionalDriverAdult(driver.birthDate)),
+  {
+    message: `Additional drivers must be at least ${MINIMUM_DRIVER_AGE} years old`,
+    path: ["additionalDrivers"],
+  }
+).refine(
+  (data) => data.additionalDrivers.every((driver) => isAdditionalDriverLicenseValid(driver.licenseExpiryDate, data.startDate)),
+  {
+    message: "Additional driver licenses must be valid for the rental period start date",
+    path: ["additionalDrivers"],
+  }
 );
 
 export const adminCategoryBookingUpdateSchemaRefined = adminCategoryBookingUpdateSchema.refine(
@@ -153,6 +170,18 @@ export const adminCategoryBookingUpdateSchemaRefined = adminCategoryBookingUpdat
   {
     message: "License must be valid for the rental period start date",
     path: ["licenseExpiryDate"],
+  }
+).refine(
+  (data) => data.additionalDrivers.every((driver) => isAdditionalDriverAdult(driver.birthDate)),
+  {
+    message: `Additional drivers must be at least ${MINIMUM_DRIVER_AGE} years old`,
+    path: ["additionalDrivers"],
+  }
+).refine(
+  (data) => data.additionalDrivers.every((driver) => isAdditionalDriverLicenseValid(driver.licenseExpiryDate, data.startDate)),
+  {
+    message: "Additional driver licenses must be valid for the rental period start date",
+    path: ["additionalDrivers"],
   }
 );
 

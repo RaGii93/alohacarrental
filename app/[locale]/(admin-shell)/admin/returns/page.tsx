@@ -138,11 +138,11 @@ export default async function AdminReturnsPage({
 
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { label: t("admin.returns.cards.visible"), value: total, icon: Undo2, tone: "bg-sky-50 text-sky-700" },
+            { label: t("admin.returns.cards.visible"), value: total, icon: Undo2, tone: "bg-red-50 text-red-700" },
             { label: t("admin.returns.cards.today"), value: todayCount, icon: Clock3, tone: "bg-amber-50 text-amber-700" },
             { label: t("admin.returns.cards.range"), value: t("admin.activities.range", { start: toInputDate(rangeStart), end: toInputDate(rangeEnd) }), icon: CalendarDays, tone: "bg-slate-100 text-slate-700" },
           ].map((item) => (
-            <div key={item.label} className="admin-surface-soft rounded-[1.7rem] border-transparent p-5">
+            <div key={item.label} className="rounded-[1.7rem] border border-slate-200 bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)]">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm text-slate-500">{item.label}</p>
@@ -165,12 +165,12 @@ export default async function AdminReturnsPage({
           pageParam="returns_page"
         />
 
-        <div className="admin-surface rounded-[1.6rem] border-transparent p-4">
+        <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#ffffff,hsl(var(--primary)/0.03))] p-4 shadow-[0_20px_48px_-30px_hsl(var(--primary)/0.12)]">
           <div className={ADMIN_PAGE_META_ROW}>
             <div className={ADMIN_PAGE_META_TEXT}>{t("admin.activities.showing", { start: startRow, end: endRow, total })}</div>
             <div className={ADMIN_PAGE_ROWS_WRAP}>
               {pills.map((pill) => (
-                <span key={pill} className="admin-pill rounded-full px-3 py-1 text-xs font-medium">
+                <span key={pill} className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
                   {pill}
                 </span>
               ))}

@@ -1,0 +1,7 @@
+ALTER TABLE "Booking"
+ADD COLUMN IF NOT EXISTS "pickupChecklistData" JSONB NULL,
+ADD COLUMN IF NOT EXISTS "pickupChecklistDocumentUrl" TEXT NULL,
+ADD COLUMN IF NOT EXISTS "returnChecklistData" JSONB NULL,
+ADD COLUMN IF NOT EXISTS "returnChecklistDocumentUrl" TEXT NULL,
+ADD COLUMN IF NOT EXISTS "closeoutPaymentDueAt" TIMESTAMP NULL,
+ADD COLUMN IF NOT EXISTS "closeoutPaymentReceivedAt" TIMESTAMP NULL;

@@ -9,12 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
 import { archiveVehicleFeatureAction } from "@/actions/vehicle-features";
+import { getFeatureIconComponent } from "@/lib/feature-icons";
 import { VehicleFeatureDialog } from "./VehicleFeatureDialog";
 
 type VehicleFeatureRow = {
   id: string;
   name: string;
   slug: string;
+  iconName?: string | null;
   sortOrder: number;
   isActive: boolean;
   _count?: { categories?: number };
@@ -81,6 +83,7 @@ export function VehicleFeaturesTable({
           <TableHeader>
             <TableRow>
               <TableHead>{t("admin.features.name")}</TableHead>
+              <TableHead>{t("admin.features.icon")}</TableHead>
               <TableHead>{t("admin.features.slug")}</TableHead>
               <TableHead>{t("admin.features.sortOrder")}</TableHead>
               <TableHead>{t("admin.features.table.categories")}</TableHead>
@@ -92,6 +95,12 @@ export function VehicleFeaturesTable({
             {rows.map((feature) => (
               <TableRow key={feature.id}>
                 <TableCell className="font-medium">{feature.name}</TableCell>
+                <TableCell>
+                  {(() => {
+                    const Icon = getFeatureIconComponent(feature.iconName);
+                    return <Icon className="h-4 w-4 text-[#b91c1c]" />;
+                  })()}
+                </TableCell>
                 <TableCell>{feature.slug}</TableCell>
                 <TableCell>{feature.sortOrder}</TableCell>
                 <TableCell>{feature._count?.categories ?? 0}</TableCell>

@@ -13,6 +13,7 @@ import {
 } from "@/actions/fleet-operations";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Dialog,
   DialogContent,
@@ -22,11 +23,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatDate } from "@/lib/datetime";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatCurrency } from "@/lib/pricing";
+import { formatDateInputInLaPaz, parseLaPazDateInput } from "@/lib/timezone";
 
 type VehicleOption = {
   id: string;
@@ -97,7 +98,7 @@ function statusTone(status: ReminderVehicle["maintenanceStatus"]) {
 }
 
 function isoDate(value: string) {
-  return formatDate(value);
+  return new Date(value).toLocaleDateString();
 }
 
 function vehicleHistoryHref(locale: string, vehicleId: string) {
@@ -270,11 +271,11 @@ export function MaintenanceOverviewClient({
         {[
           { label: t("admin.maintenance.cards.overdueVehicles"), value: summary.overdueVehicles, icon: AlertTriangle, tone: "text-rose-600 bg-rose-50" },
           { label: t("admin.maintenance.cards.dueSoon"), value: summary.dueSoonVehicles, icon: CalendarClock, tone: "text-amber-600 bg-amber-50" },
-          { label: t("admin.maintenance.cards.trackedCosts"), value: formatCurrency(summary.totalTrackedVehicleCosts), icon: BadgeDollarSign, tone: "text-sky-600 bg-sky-50" },
+          { label: t("admin.maintenance.cards.trackedCosts"), value: formatCurrency(summary.totalTrackedVehicleCosts), icon: BadgeDollarSign, tone: "text-red-600 bg-red-50" },
           { label: t("admin.maintenance.cards.vehicleRevenue"), value: formatCurrency(summary.totalRevenue), icon: HandCoins, tone: "text-violet-600 bg-violet-50" },
           { label: t("admin.maintenance.cards.netContribution"), value: formatCurrency(summary.netContribution), icon: ShieldCheck, tone: "text-emerald-600 bg-emerald-50" },
         ].map((item) => (
-          <Card key={item.label} className="admin-surface-soft rounded-[1.6rem] border-transparent p-5">
+          <Card key={item.label} className="rounded-[1.6rem] border-slate-200 p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm text-slate-500">{item.label}</p>
@@ -289,10 +290,10 @@ export function MaintenanceOverviewClient({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-        <Card className="admin-surface rounded-[1.8rem] border-transparent p-6">
+        <Card className="rounded-[1.8rem] border-slate-200 p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">{t("admin.maintenance.workspace.kicker")}</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">{t("admin.maintenance.workspace.kicker")}</p>
               <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">{t("admin.maintenance.workspace.title")}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
                 {t("admin.maintenance.workspace.description")}
@@ -370,7 +371,7 @@ export function MaintenanceOverviewClient({
                       </div>
                       <div>
                         <label className="mb-1 block text-sm font-medium">{t("admin.maintenance.form.serviceDate")}</label>
-                        <Input type="date" value={serviceDate} onChange={(e) => setServiceDate(e.target.value)} />
+                        <DatePicker value={parseLaPazDateInput(serviceDate)} onChange={(date) => setServiceDate(formatDateInputInLaPaz(date))} placeholder={t("admin.maintenance.form.serviceDate")} />
                       </div>
                       <div>
                         <label className="mb-1 block text-sm font-medium">{t("admin.maintenance.form.title")}</label>
@@ -494,8 +495,8 @@ export function MaintenanceOverviewClient({
                         </label>
                         {createUnavailability ? (
                           <div className="mt-3 grid gap-3">
-                            <Input type="date" value={unavailableStart} onChange={(e) => setUnavailableStart(e.target.value)} />
-                            <Input type="date" value={unavailableEnd} onChange={(e) => setUnavailableEnd(e.target.value)} />
+                            <DatePicker value={parseLaPazDateInput(unavailableStart)} onChange={(date) => setUnavailableStart(formatDateInputInLaPaz(date))} placeholder={t("booking.startDate")} />
+                            <DatePicker value={parseLaPazDateInput(unavailableEnd)} onChange={(date) => setUnavailableEnd(formatDateInputInLaPaz(date))} placeholder={t("booking.endDate")} />
                           </div>
                         ) : null}
                       </div>
@@ -532,8 +533,8 @@ export function MaintenanceOverviewClient({
                     <Input value={insuranceProvider} onChange={(e) => setInsuranceProvider(e.target.value)} placeholder={t("admin.maintenance.insurance.provider")} />
                     <Input value={insurancePolicyNumber} onChange={(e) => setInsurancePolicyNumber(e.target.value)} placeholder={t("admin.maintenance.insurance.policyNumber")} />
                     <Input value={insuranceCoverageType} onChange={(e) => setInsuranceCoverageType(e.target.value)} placeholder={t("admin.maintenance.insurance.coverageType")} />
-                    <Input type="date" value={insuranceStartDate} onChange={(e) => setInsuranceStartDate(e.target.value)} />
-                    <Input type="date" value={insuranceEndDate} onChange={(e) => setInsuranceEndDate(e.target.value)} />
+                    <DatePicker value={parseLaPazDateInput(insuranceStartDate)} onChange={(date) => setInsuranceStartDate(formatDateInputInLaPaz(date))} placeholder={t("booking.startDate")} />
+                    <DatePicker value={parseLaPazDateInput(insuranceEndDate)} onChange={(date) => setInsuranceEndDate(formatDateInputInLaPaz(date))} placeholder={t("booking.endDate")} />
                     <Input type="number" min={0} step="0.01" value={insurancePremium} onChange={(e) => setInsurancePremium(e.target.value)} placeholder={t("admin.maintenance.insurance.premiumAmount")} />
                   </div>
                   <Textarea value={insuranceNotes} onChange={(e) => setInsuranceNotes(e.target.value)} placeholder={t("admin.maintenance.insurance.notes")} />
@@ -561,8 +562,8 @@ export function MaintenanceOverviewClient({
                       <SelectContent>{vehicles.map((vehicle) => <SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>)}</SelectContent>
                     </Select>
                     <Input value={inspectionType} onChange={(e) => setInspectionType(e.target.value)} placeholder={t("admin.maintenance.inspection.type")} />
-                    <Input type="date" value={inspectionDate} onChange={(e) => setInspectionDate(e.target.value)} />
-                    <Input type="date" value={inspectionExpiryDate} onChange={(e) => setInspectionExpiryDate(e.target.value)} />
+                    <DatePicker value={parseLaPazDateInput(inspectionDate)} onChange={(date) => setInspectionDate(formatDateInputInLaPaz(date))} placeholder={t("booking.startDate")} />
+                    <DatePicker value={parseLaPazDateInput(inspectionExpiryDate)} onChange={(date) => setInspectionExpiryDate(formatDateInputInLaPaz(date))} placeholder={t("booking.endDate")} />
                     <Input value={inspectionVendor} onChange={(e) => setInspectionVendor(e.target.value)} placeholder={t("admin.maintenance.inspection.vendor")} />
                     <Input type="number" min={0} step="0.01" value={inspectionCost} onChange={(e) => setInspectionCost(e.target.value)} placeholder={t("admin.maintenance.inspection.cost")} />
                   </div>
@@ -602,7 +603,7 @@ export function MaintenanceOverviewClient({
               <div key={vehicle.id} className="rounded-2xl border border-rose-100 bg-rose-50/60 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <Link href={vehicleHistoryHref(locale, vehicle.id)} className="font-semibold text-slate-900 hover:text-sky-700 hover:underline">
+                    <Link href={vehicleHistoryHref(locale, vehicle.id)} className="font-semibold text-slate-900 hover:text-red-700 hover:underline">
                       {vehicle.name} {vehicle.plateNumber ? `(${vehicle.plateNumber})` : ""}
                     </Link>
                     <p className="mt-1 text-xs text-slate-600">
@@ -625,7 +626,7 @@ export function MaintenanceOverviewClient({
               <div key={vehicle.id} className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <Link href={vehicleHistoryHref(locale, vehicle.id)} className="font-semibold text-slate-900 hover:text-sky-700 hover:underline">
+                    <Link href={vehicleHistoryHref(locale, vehicle.id)} className="font-semibold text-slate-900 hover:text-red-700 hover:underline">
                       {vehicle.name} {vehicle.plateNumber ? `(${vehicle.plateNumber})` : ""}
                     </Link>
                     <p className="mt-1 text-xs text-slate-600">
@@ -661,7 +662,7 @@ export function MaintenanceOverviewClient({
                 <tr key={record.id}>
                   <td className="py-3 text-slate-600">{isoDate(record.serviceDate)}</td>
                   <td className="py-3 font-medium text-slate-900">
-                    <Link href={vehicleHistoryHref(locale, record.vehicleId)} className="hover:text-sky-700 hover:underline">
+                    <Link href={vehicleHistoryHref(locale, record.vehicleId)} className="hover:text-red-700 hover:underline">
                       {record.vehicleName} {record.plateNumber ? `(${record.plateNumber})` : ""}
                     </Link>
                   </td>

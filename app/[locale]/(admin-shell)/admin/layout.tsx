@@ -62,12 +62,12 @@ export default async function AdminLayout({
         invoiceProvider={invoiceProvider}
         variant="inset"
       />
-      <SidebarInset className="min-w-0 bg-[hsl(220_33%_98%)]">
-        <header className="shrink-0 border-b border-[hsl(214_32%_92%)] px-4 py-4 lg:px-6">
-          <div className="flex w-full flex-col gap-4 rounded-2xl bg-white px-4 py-4 shadow-[0_16px_34px_-24px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.04)] md:flex-row md:items-start md:justify-between">
+      <SidebarInset className="min-w-0 bg-[#faf8f6]">
+        <header className="shrink-0 border-b border-[#efe7df] px-4 py-4 lg:px-6">
+          <div className="flex w-full flex-col gap-4 rounded-2xl bg-white px-4 py-4 shadow-[0_16px_34px_-24px_rgba(0,0,0,0.12)] ring-1 ring-[rgba(0,0,0,0.04)] md:flex-row md:items-start md:justify-between">
             <div className="flex min-w-0 flex-1 flex-col gap-3">
               <div className="flex items-center gap-3">
-                <SidebarTrigger className="h-10 w-10 rounded-xl border border-[hsl(214_32%_88%)] bg-[hsl(220_33%_98%)] text-[hsl(var(--foreground))] shadow-sm hover:bg-[hsl(214_60%_97%)]" />
+                <SidebarTrigger className="h-10 w-10 rounded-xl border border-[#ead7d2] bg-[#fff7f5] text-[#b91c1c] shadow-sm hover:bg-[#fdf0ed]" />
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-[hsl(var(--foreground))]">
                     {t("nav.admin")}
@@ -82,7 +82,7 @@ export default async function AdminLayout({
                   {t("admin.dashboard.header.welcome", { user: admin.email })}
                 </p>
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  <span className="rounded-full bg-[hsl(var(--secondary))] px-2 py-0.5 text-[11px] font-medium text-[hsl(var(--secondary-foreground))]">
+                  <span className="rounded-full bg-[#fef2f2] px-2 py-0.5 text-[11px] font-medium text-[#991b1b]">
                     {t("admin.dashboard.header.role", { role: admin.role })}
                   </span>
                   <span

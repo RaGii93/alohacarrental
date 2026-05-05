@@ -23,6 +23,7 @@ interface Booking {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  additionalDrivers?: Array<{ id: string }>;
   vehicle?: {
     id: string;
     name?: string | null;
@@ -128,7 +129,7 @@ export function BookingsTable({
   };
 
   return (
-    <div className="admin-surface overflow-hidden rounded-[1.6rem] border-transparent">
+    <div className="overflow-hidden rounded-[1.6rem] bg-white shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] ring-1 ring-[hsl(215_25%_27%/0.05)]">
       <Table className="bg-transparent">
         <TableHeader>
           <TableRow>
@@ -156,6 +157,11 @@ export function BookingsTable({
               <TableCell>
                 <div className="font-medium">{booking.customerName}</div>
                 <div className="text-sm text-gray-500">{booking.bookingCode} · {booking.customerEmail}</div>
+                {(booking.additionalDrivers?.length || 0) > 0 ? (
+                  <div className="text-xs text-gray-500">
+                    {booking.additionalDrivers?.length} {t("booking.additionalDrivers.dashboardCount")}
+                  </div>
+                ) : null}
               </TableCell>
               <TableCell>{booking.vehicle?.name ?? t("admin.bookings.table.noVehicle")}</TableCell>
               <TableCell>
@@ -187,7 +193,7 @@ export function BookingsTable({
                     booking.deliveredAt ? (
                       <span className="text-xs text-muted-foreground">{t("admin.bookings.actions.delivered")}</span>
                     ) : booking.paymentReceivedAt ? (
-                      <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700" onClick={() => router.push(`/${locale}/admin/bookings/${booking.id}`)}>
+                      <Button size="sm" className="bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.92)]" onClick={() => router.push(`/${locale}/admin/bookings/${booking.id}`)}>
                         <Truck className="h-4 w-4" />
                         {t("admin.bookings.detail.inspection.title.pickup")}
                       </Button>

@@ -224,8 +224,8 @@ export default async function AdminFleetPage({
             customerName: booking.customerName,
             startDate: booking.startDate.toISOString(),
             endDate: booking.endDate.toISOString(),
-            pickupLocation: booking.pickupLocationRef?.name || booking.pickupLocation || null,
-            dropoffLocation: booking.dropoffLocationRef?.name || booking.dropoffLocation || null,
+            pickupLocation: booking.pickupLocation || booking.pickupLocationRef?.name || null,
+            dropoffLocation: booking.dropoffLocation || booking.dropoffLocationRef?.name || null,
             displayStatus,
           };
         })}

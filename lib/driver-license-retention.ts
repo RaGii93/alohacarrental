@@ -1,10 +1,12 @@
 import { del } from "@vercel/blob";
 import { db } from "@/lib/db";
+import { ensureBookingAdditionalDriversTable } from "@/lib/additional-drivers.server";
 
 const DRIVER_LICENSE_RETENTION_DAYS = 30;
 
 type DriverLicenseRecord = {
   id: string;
+  additionalDriverId: string | null;
   bookingCode: string;
   driverLicenseUrl: string | null;
   driverLicenseDeleteAfter: Date | null;
@@ -18,15 +20,33 @@ export function calculateDriverLicenseDeleteAfter(endDate: Date): Date {
 }
 
 export async function findDriverLicenseRecordByUrl(url: string): Promise<DriverLicenseRecord | null> {
+  await ensureBookingAdditionalDriversTable();
   const rows = await db.$queryRaw<DriverLicenseRecord[]>`
-    SELECT
-      id,
-      "bookingCode",
-      "driverLicenseUrl",
-      "driverLicenseDeleteAfter",
-      "driverLicenseDeletedAt"
-    FROM "Booking"
-    WHERE "driverLicenseUrl" = ${url}
+    SELECT *
+    FROM (
+      SELECT
+        b.id,
+        NULL::TEXT as "additionalDriverId",
+        b."bookingCode",
+        b."driverLicenseUrl",
+        b."driverLicenseDeleteAfter",
+        b."driverLicenseDeletedAt"
+      FROM "Booking" b
+      WHERE b."driverLicenseUrl" = ${url}
+
+      UNION ALL
+
+      SELECT
+        b.id,
+        ad.id as "additionalDriverId",
+        b."bookingCode",
+        ad."driverLicenseUrl",
+        b."driverLicenseDeleteAfter",
+        ad."driverLicenseDeletedAt"
+      FROM "BookingAdditionalDriver" ad
+      JOIN "Booking" b ON b.id = ad."bookingId"
+      WHERE ad."driverLicenseUrl" = ${url}
+    ) matches
     LIMIT 1
   `;
 
@@ -44,6 +64,17 @@ export async function deleteDriverLicenseForBooking(record: DriverLicenseRecord,
     });
   }
 
+  if (record.additionalDriverId) {
+    await db.$executeRaw`
+      UPDATE "BookingAdditionalDriver"
+      SET
+        "driverLicenseUrl" = NULL,
+        "driverLicenseDeletedAt" = ${deletedAt}
+      WHERE id = ${record.additionalDriverId}
+    `;
+    return;
+  }
+
   await db.$executeRaw`
     UPDATE "Booking"
     SET
@@ -54,19 +85,40 @@ export async function deleteDriverLicenseForBooking(record: DriverLicenseRecord,
 }
 
 export async function cleanupExpiredDriverLicenses(limit = 50) {
+  await ensureBookingAdditionalDriversTable();
   const now = new Date();
   const due = await db.$queryRaw<DriverLicenseRecord[]>`
-    SELECT
-      id,
-      "bookingCode",
-      "driverLicenseUrl",
-      "driverLicenseDeleteAfter",
-      "driverLicenseDeletedAt"
-    FROM "Booking"
-    WHERE "driverLicenseUrl" IS NOT NULL
-      AND "driverLicenseDeletedAt" IS NULL
-      AND "driverLicenseDeleteAfter" IS NOT NULL
-      AND "driverLicenseDeleteAfter" <= ${now}
+    SELECT *
+    FROM (
+      SELECT
+        b.id,
+        NULL::TEXT as "additionalDriverId",
+        b."bookingCode",
+        b."driverLicenseUrl",
+        b."driverLicenseDeleteAfter",
+        b."driverLicenseDeletedAt"
+      FROM "Booking" b
+      WHERE b."driverLicenseUrl" IS NOT NULL
+        AND b."driverLicenseDeletedAt" IS NULL
+        AND b."driverLicenseDeleteAfter" IS NOT NULL
+        AND b."driverLicenseDeleteAfter" <= ${now}
+
+      UNION ALL
+
+      SELECT
+        b.id,
+        ad.id as "additionalDriverId",
+        b."bookingCode",
+        ad."driverLicenseUrl",
+        b."driverLicenseDeleteAfter",
+        ad."driverLicenseDeletedAt"
+      FROM "BookingAdditionalDriver" ad
+      JOIN "Booking" b ON b.id = ad."bookingId"
+      WHERE ad."driverLicenseUrl" IS NOT NULL
+        AND ad."driverLicenseDeletedAt" IS NULL
+        AND b."driverLicenseDeleteAfter" IS NOT NULL
+        AND b."driverLicenseDeleteAfter" <= ${now}
+    ) due
     ORDER BY "driverLicenseDeleteAfter" ASC
     LIMIT ${limit}
   `;

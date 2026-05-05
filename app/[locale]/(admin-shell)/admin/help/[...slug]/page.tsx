@@ -99,7 +99,7 @@ export default async function AdminHelpDocPage({
             {doc.sections.map((section) => (
               <Card
                 key={section.id}
-                className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_22px_56px_-36px_hsl(215_28%_17%/0.14)]"
+                className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_22px_56px_-36px_hsl(var(--primary)/0.1)]"
               >
                 <div className="space-y-4">
                   <h2 id={section.id} className="text-xl font-black tracking-[-0.03em] text-[hsl(var(--foreground))]">
@@ -121,7 +121,7 @@ export default async function AdminHelpDocPage({
           </article>
 
           <aside className="space-y-6 xl:sticky xl:top-24">
-            <Card className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_22px_56px_-36px_hsl(215_28%_17%/0.14)]">
+            <Card className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_22px_56px_-36px_hsl(var(--primary)/0.1)]">
               <div className="flex items-center gap-3">
                 <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-[hsl(var(--primary)/0.12)] text-[hsl(var(--primary))]">
                   <BookText className="size-5" />
@@ -143,7 +143,7 @@ export default async function AdminHelpDocPage({
               </div>
             </Card>
 
-            <Card className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_22px_56px_-36px_hsl(215_28%_17%/0.14)]">
+            <Card className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_22px_56px_-36px_hsl(var(--primary)/0.1)]">
               <DocsSearch locale={locale} copy={copy} />
             </Card>
           </aside>

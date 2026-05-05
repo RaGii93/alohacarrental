@@ -9,5 +9,4 @@ WHERE COALESCE("fuelChargePerQuarter", 2500) = 2500
     OR lower(COALESCE(name, '')) LIKE '%bus%'
     OR lower(COALESCE(description, '')) LIKE '%van%'
     OR lower(COALESCE(description, '')) LIKE '%bus%'
-    OR seats >= 9
   );

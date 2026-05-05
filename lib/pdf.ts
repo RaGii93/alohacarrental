@@ -1,9 +1,9 @@
 import { PDFDocument, rgb } from "pdf-lib";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { TenantConfig } from "./tenant";
-import { documentBranding, hexToRgbUnit, resolveTenantAssetUrl } from "./document-branding";
-import { formatDate, formatDateTime } from "./datetime";
-
-const TENANT_SLOGAN = "Your Local Island Ride";
+import { tenantThemeTokenToPdfRgb } from "./tenant";
+import { formatDate, formatDateTime } from "@/lib/datetime";
 
 export interface InvoiceData {
   documentType?: "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
@@ -12,6 +12,12 @@ export interface InvoiceData {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  additionalDrivers?: Array<{
+    fullName: string;
+    birthDate: Date;
+    driverLicenseNumber: string;
+    licenseExpiryDate: Date;
+  }>;
   vehicleName: string;
   categoryName: string;
   pickupLocation?: string;
@@ -26,13 +32,55 @@ export interface InvoiceData {
   totalAmount: number;
   discountCode?: string;
   extras?: Array<{ name: string; quantity: number; lineTotal: number }>;
+  closeoutCharges?: Array<{ label: string; amount: number }>;
+  alreadyPaidAmount?: number;
+  outstandingAmount?: number;
   paymentInstructions: string;
   tenantConfig: TenantConfig;
 }
 
-async function loadLogoImageForPdf(pdfDoc: PDFDocument, logoUrl: string) {
-  if (!logoUrl) return null;
+function resolveLogoUrl(rawUrl: string | undefined) {
+  const logoUrl = String(rawUrl || "/home/logo.png").trim();
+  if (!logoUrl) return "";
+  if (logoUrl.startsWith("http://") || logoUrl.startsWith("https://")) return logoUrl;
+  if (!logoUrl.startsWith("/")) return "";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "";
+  if (!baseUrl) return "";
+  return `${baseUrl.replace(/\/$/, "")}${logoUrl}`;
+}
+
+function shortDocumentNumber(documentType: InvoiceData["documentType"], bookingCode: string) {
+  const prefix =
+    documentType === "SALES_RECEIPT"
+      ? "RCPT"
+      : documentType === "RENTAL_AGREEMENT"
+        ? "AGR"
+        : "INV";
+  const compactCode = String(bookingCode || "")
+    .replace(/[^a-z0-9]/gi, "")
+    .toUpperCase();
+  return `${prefix}-${compactCode.slice(-6) || "000000"}`;
+}
+
+async function loadLogoImageForPdf(pdfDoc: PDFDocument, logoUrl: string, rawLogoUrl?: string) {
+  const candidatePaths = Array.from(new Set([String(rawLogoUrl || "").trim(), "/home/logo.png"].filter(Boolean)));
+  for (const candidatePath of candidatePaths) {
+    if (candidatePath.startsWith("/")) {
+      try {
+        const filePath = path.join(process.cwd(), "public", candidatePath.replace(/^\/+/, ""));
+        const bytes = await readFile(filePath);
+        const isPng = candidatePath.toLowerCase().endsWith(".png");
+        const isJpg =
+          candidatePath.toLowerCase().endsWith(".jpg") ||
+          candidatePath.toLowerCase().endsWith(".jpeg");
+        if (isPng) return await pdfDoc.embedPng(bytes);
+        if (isJpg) return await pdfDoc.embedJpg(bytes);
+      } catch {}
+    }
+  }
+
   try {
+    if (!logoUrl) return null;
     const response = await fetch(logoUrl);
     if (!response.ok) return null;
     const contentType = (response.headers.get("content-type") || "").toLowerCase();
@@ -64,129 +112,113 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       ? "PAYMENT STATUS: RECEIVED"
       : documentType === "RENTAL_AGREEMENT"
         ? "BOOKING STATUS: CONFIRMED"
-        : "PAYMENT STATUS: PENDING";
+        : (data.outstandingAmount || 0) <= 0 && (data.alreadyPaidAmount || 0) > 0
+          ? "PAYMENT STATUS: RECEIVED"
+          : (data.outstandingAmount || 0) > 0 && (data.alreadyPaidAmount || 0) > 0
+            ? "PAYMENT STATUS: PARTIALLY PAID"
+            : "PAYMENT STATUS: PENDING";
 
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]); // A4
   const { width, height } = page.getSize();
   const margin = 42;
   const contentWidth = width - margin * 2;
-  const pdfColor = (hex: string) => {
-    const { r, g, b } = hexToRgbUnit(hex);
+  const primary = (() => {
+    const { r, g, b } = tenantThemeTokenToPdfRgb(data.tenantConfig.theme.primary);
     return rgb(r, g, b);
-  };
-  const blue = pdfColor(documentBranding.body);
-  const warm = pdfColor(documentBranding.warmSurface);
-  const blush = pdfColor(documentBranding.blushSurface);
-  const paper = pdfColor(documentBranding.surface);
-  const dark = pdfColor(documentBranding.title);
-  const muted = pdfColor(documentBranding.muted);
-  const border = pdfColor(documentBranding.line);
-  const accentOrange = pdfColor(documentBranding.orange);
-  const accentPink = pdfColor(documentBranding.pink);
-  const accentYellow = pdfColor(documentBranding.yellow);
-  const okBg = pdfColor(documentBranding.successBg);
-  const okText = pdfColor(documentBranding.successText);
+  })();
+  const primaryForeground = (() => {
+    const { r, g, b } = tenantThemeTokenToPdfRgb(data.tenantConfig.theme.primaryForeground);
+    return rgb(r, g, b);
+  })();
+  const accent = (() => {
+    const { r, g, b } = tenantThemeTokenToPdfRgb(data.tenantConfig.theme.accent);
+    return rgb(r, g, b);
+  })();
+  const accentForeground = (() => {
+    const { r, g, b } = tenantThemeTokenToPdfRgb(data.tenantConfig.theme.accentForeground);
+    return rgb(r, g, b);
+  })();
+  const dark = rgb(0.1, 0.1, 0.12);
+  const muted = rgb(0.38, 0.4, 0.45);
+  const border = rgb(0.91, 0.87, 0.85);
+  const statusBg =
+    documentType === "SALES_RECEIPT"
+      ? accent
+      : documentType === "RENTAL_AGREEMENT"
+        ? accent
+        : accent;
+  const statusText =
+    documentType === "SALES_RECEIPT"
+      ? accentForeground
+      : accentForeground;
 
   const currency = (cents: number) =>
     `${data.tenantConfig.currency} ${(Math.max(0, cents) / 100).toFixed(2)}`;
   const formatPercentage = (value: number) =>
     Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
-  const fmtDate = (d: Date) => formatDateTime(d);
   const rentalDays = Math.max(
     1,
     Math.ceil((data.endDate.getTime() - data.startDate.getTime()) / (1000 * 60 * 60 * 24))
   );
+  const documentNumber = shortDocumentNumber(documentType, data.bookingCode);
 
+  // White document header: logo left, document meta right.
   page.drawRectangle({
     x: 0,
-    y: 0,
+    y: height - 120,
     width,
-    height,
-    color: pdfColor(documentBranding.canvas),
+    height: 120,
+    color: rgb(1, 1, 1),
   });
-
-  // Header bar
-  page.drawRectangle({
-    x: 0,
-    y: height - 132,
-    width,
-    height: 132,
-    color: warm,
-  });
-  page.drawRectangle({
-    x: 0,
-    y: height - 12,
-    width,
-    height: 12,
-    color: accentPink,
-  });
-  page.drawRectangle({
-    x: 0,
-    y: height - 28,
-    width,
-    height: 16,
-    color: accentOrange,
-  });
-  const resolvedLogoUrl = resolveTenantAssetUrl(data.tenantConfig.logoUrl);
-  const embeddedLogo = await loadLogoImageForPdf(pdfDoc, resolvedLogoUrl);
+  const resolvedLogoUrl = resolveLogoUrl(data.tenantConfig.logoUrl);
+  const embeddedLogo = await loadLogoImageForPdf(pdfDoc, resolvedLogoUrl, data.tenantConfig.logoUrl);
   if (embeddedLogo) {
-    const logoMaxHeight = 52;
+    const logoMaxHeight = 58;
     const logoScale = logoMaxHeight / embeddedLogo.height;
     const logoWidth = embeddedLogo.width * logoScale;
     page.drawImage(embeddedLogo, {
       x: margin,
-      y: height - 94,
+      y: height - 88,
       width: logoWidth,
       height: logoMaxHeight,
     });
   } else {
-    page.drawText(data.tenantConfig.logoUrl || "LOGO", {
+    page.drawText(data.tenantConfig.tenantName || "LOGO", {
       x: margin,
-      y: height - 61,
+      y: height - 55,
       size: 14,
       color: dark,
     });
   }
-  page.drawText(data.tenantConfig.tenantName, {
-    x: embeddedLogo ? margin + 88 : margin,
-    y: height - 56,
-    size: 18,
-    color: blue,
+  const metaX = width - margin - 190;
+  page.drawText(documentTitle, {
+    x: metaX,
+    y: height - 48,
+    size: 15,
+    color: dark,
   });
-  page.drawText(TENANT_SLOGAN, {
-    x: embeddedLogo ? margin + 88 : margin,
-    y: height - 72,
+  page.drawText(`No: ${documentNumber}`, {
+    x: metaX,
+    y: height - 66,
     size: 10,
     color: muted,
   });
-  page.drawText(documentTitle, {
-    x: margin,
-    y: height - 110,
-    size: 12,
-    color: accentPink,
-  });
-  page.drawText(`Invoice Date: ${formatDate(new Date())}`, {
-    x: width - margin - 170,
-    y: height - 58,
+  page.drawText(`Date: ${formatDate(new Date())}`, {
+    x: metaX,
+    y: height - 82,
     size: 10,
-    color: dark,
+    color: muted,
   });
-  page.drawText(`Booking Code: ${data.bookingCode}`, {
-    x: width - margin - 170,
-    y: height - 75,
+  page.drawText(`Booking: ${data.bookingCode}`, {
+    x: metaX,
+    y: height - 98,
     size: 10,
-    color: dark,
-  });
-  page.drawText(`Invoice ID: ${data.orderId}`, {
-    x: width - margin - 170,
-    y: height - 92,
-    size: 10,
-    color: blue,
+    color: muted,
   });
 
   // Company meta
-  let y = height - 162;
+  let y = height - 146;
   page.drawText(data.tenantConfig.address || "-", {
     x: margin,
     y,
@@ -211,7 +243,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: y - cardHeight,
     width: cardW,
     height: cardHeight,
-    color: blush,
+    color: accent,
     borderColor: border,
     borderWidth: 1,
   });
@@ -220,22 +252,22 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: y - cardHeight,
     width: cardW,
     height: cardHeight,
-    color: paper,
+    color: rgb(1, 1, 1),
     borderColor: border,
     borderWidth: 1,
   });
 
-  page.drawText("BILL TO", { x: margin + 12, y: y - 20, size: 11, color: blue });
+  page.drawText("BILL TO", { x: margin + 12, y: y - 20, size: 11, color: primary });
   page.drawText(data.customerName, { x: margin + 12, y: y - 39, size: 12, color: dark });
   page.drawText(data.customerEmail, { x: margin + 12, y: y - 56, size: 10, color: muted });
   page.drawText(data.customerPhone, { x: margin + 12, y: y - 72, size: 10, color: muted });
 
   const rx = margin + cardW + gap + 12;
-  page.drawText("RENTAL INFO", { x: rx, y: y - 20, size: 11, color: blue });
+  page.drawText("RENTAL INFO", { x: rx, y: y - 20, size: 11, color: primary });
   page.drawText(`Vehicle: ${data.vehicleName}`, { x: rx, y: y - 39, size: 10, color: dark });
   page.drawText(`Category: ${data.categoryName}`, { x: rx, y: y - 54, size: 10, color: dark });
-  page.drawText(`Pickup: ${fmtDate(data.startDate)}`, { x: rx, y: y - 69, size: 9.5, color: muted });
-  page.drawText(`Dropoff: ${fmtDate(data.endDate)}`, { x: rx, y: y - 83, size: 9.5, color: muted });
+  page.drawText(`Pickup: ${formatDateTime(data.startDate)}`, { x: rx, y: y - 69, size: 9.5, color: muted });
+  page.drawText(`Dropoff: ${formatDateTime(data.endDate)}`, { x: rx, y: y - 83, size: 9.5, color: muted });
   page.drawText(`Days: ${rentalDays}`, { x: rx, y: y - 98, size: 9.5, color: muted });
 
   y -= cardHeight + 20;
@@ -255,6 +287,30 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     color: dark,
   });
 
+  if ((data.additionalDrivers?.length || 0) > 0) {
+    y -= 24;
+    page.drawText("AUTHORIZED ADDITIONAL DRIVERS", {
+      x: margin,
+      y,
+      size: 10,
+      color: primary,
+    });
+    y -= 14;
+
+    data.additionalDrivers?.forEach((driver, index) => {
+      page.drawText(
+        `${index + 1}. ${driver.fullName} | DOB: ${formatDate(driver.birthDate)} | License: ${driver.driverLicenseNumber} | Expires: ${formatDate(driver.licenseExpiryDate)}`,
+        {
+          x: margin,
+          y,
+          size: 8.7,
+          color: dark,
+        }
+      );
+      y -= 13;
+    });
+  }
+
   // Price table
   y -= 28;
   const tableX = margin;
@@ -268,10 +324,10 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: ty - 28,
     width: tableW,
     height: 28,
-    color: accentOrange,
+    color: primary,
   });
-  page.drawText("DESCRIPTION", { x: tableX + leftPadding, y: ty - 18, size: 10, color: dark });
-  page.drawText("AMOUNT", { x: rightX, y: ty - 18, size: 10, color: dark });
+  page.drawText("DESCRIPTION", { x: tableX + leftPadding, y: ty - 18, size: 10, color: primaryForeground });
+  page.drawText("AMOUNT", { x: rightX, y: ty - 18, size: 10, color: primaryForeground });
   ty -= 28;
 
   const drawRow = (label: string, amount: string, emphasis = false) => {
@@ -281,7 +337,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       y: ty - h,
       width: tableW,
       height: h,
-      color: emphasis ? warm : paper,
+      color: emphasis ? accent : rgb(1, 1, 1),
       borderColor: border,
       borderWidth: 1,
     });
@@ -317,7 +373,21 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     const percentage = data.taxPercentage ?? 0;
     drawRow(`Tax on extras (${formatPercentage(percentage)}%)`, currency(data.taxAmount || 0));
   }
+  for (const charge of data.closeoutCharges || []) {
+    if (charge.amount > 0) drawRow(charge.label, currency(charge.amount));
+  }
   drawRow("Total Amount", currency(data.totalAmount), true);
+
+  if (documentType !== "RENTAL_AGREEMENT") {
+    if ((data.alreadyPaidAmount || 0) > 0) {
+      drawRow("Amount Already Paid", `-${currency(data.alreadyPaidAmount || 0)}`);
+    }
+    drawRow(
+      (data.outstandingAmount || 0) > 0 ? "Remaining Balance" : "Balance Due",
+      currency(Math.max(0, data.outstandingAmount || 0)),
+      true
+    );
+  }
 
   // Payment badge + footer note
   ty -= 22;
@@ -326,19 +396,19 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     y: ty - 24,
     width: 182,
     height: 24,
-    color: okBg,
-    borderColor: accentYellow,
+    color: statusBg,
+    borderColor: border,
     borderWidth: 1,
   });
   page.drawText(paymentStatusText, {
     x: margin + 10,
     y: ty - 16,
     size: 9.5,
-    color: okText,
+    color: statusText,
   });
 
   ty -= 40;
-  page.drawText("Payment Instructions:", { x: margin, y: ty, size: 10, color: blue });
+  page.drawText("Payment Instructions:", { x: margin, y: ty, size: 10, color: primary });
   ty -= 13;
   page.drawText(data.paymentInstructions || "-", { x: margin, y: ty, size: 9.5, color: muted });
   ty -= 16;

@@ -19,12 +19,38 @@ export type ExternalRentalRecord = {
   paymentStatus: string;
   paymentMethod: string | null;
   paymentReference: string | null;
+  invoiceUrl: string | null;
   financialTransferStatus: string;
   notes: string | null;
   paymentReceivedAt: Date | null;
   pickedUpAt: Date | null;
   returnedAt: Date | null;
+  pickupOdometerKm: number | null;
+  pickupFuelLevel: number | null;
+  pickupHasDamage: boolean | null;
+  pickupDamageNotes: string | null;
+  pickupAcceptedBy: string | null;
+  pickupAcceptedAt: Date | null;
+  pickupAgentNotes: string | null;
+  pickupChecklistData: string | null;
+  pickupChecklistDocumentUrl: string | null;
+  pickupImageUrls: string | null;
   pickupNotes: string | null;
+  returnOdometerKm: number | null;
+  returnFuelLevel: number | null;
+  returnHasDamage: boolean | null;
+  returnDamageNotes: string | null;
+  returnAcceptedBy: string | null;
+  returnAcceptedAt: Date | null;
+  returnAgentNotes: string | null;
+  returnChecklistData: string | null;
+  returnChecklistDocumentUrl: string | null;
+  returnImageUrls: string | null;
+  returnLateCharge: number | null;
+  returnFuelCharge: number | null;
+  returnDamageCharge: number | null;
+  closeoutPaymentDueAt: Date | null;
+  closeoutPaymentReceivedAt: Date | null;
   returnNotes: string | null;
   createdAt: Date;
   emailSentAt: Date | null;
@@ -52,12 +78,38 @@ export async function ensureExternalRentalTable() {
       "paymentStatus" TEXT NOT NULL DEFAULT 'UNPAID',
       "paymentMethod" TEXT NULL,
       "paymentReference" TEXT NULL,
+      "invoiceUrl" TEXT NULL,
       "financialTransferStatus" TEXT NOT NULL DEFAULT 'PENDING',
       notes TEXT,
       "paymentReceivedAt" TIMESTAMP NULL,
       "pickedUpAt" TIMESTAMP NULL,
       "returnedAt" TIMESTAMP NULL,
+      "pickupOdometerKm" INTEGER NULL,
+      "pickupFuelLevel" INTEGER NULL,
+      "pickupHasDamage" BOOLEAN NULL,
+      "pickupDamageNotes" TEXT NULL,
+      "pickupAcceptedBy" TEXT NULL,
+      "pickupAcceptedAt" TIMESTAMP NULL,
+      "pickupAgentNotes" TEXT NULL,
+      "pickupChecklistData" TEXT NULL,
+      "pickupChecklistDocumentUrl" TEXT NULL,
+      "pickupImageUrls" TEXT NULL,
       "pickupNotes" TEXT NULL,
+      "returnOdometerKm" INTEGER NULL,
+      "returnFuelLevel" INTEGER NULL,
+      "returnHasDamage" BOOLEAN NULL,
+      "returnDamageNotes" TEXT NULL,
+      "returnAcceptedBy" TEXT NULL,
+      "returnAcceptedAt" TIMESTAMP NULL,
+      "returnAgentNotes" TEXT NULL,
+      "returnChecklistData" TEXT NULL,
+      "returnChecklistDocumentUrl" TEXT NULL,
+      "returnImageUrls" TEXT NULL,
+      "returnLateCharge" INTEGER NULL,
+      "returnFuelCharge" INTEGER NULL,
+      "returnDamageCharge" INTEGER NULL,
+      "closeoutPaymentDueAt" TIMESTAMP NULL,
+      "closeoutPaymentReceivedAt" TIMESTAMP NULL,
       "returnNotes" TEXT NULL,
       "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
       "emailSentAt" TIMESTAMP NULL,
@@ -79,6 +131,10 @@ export async function ensureExternalRentalTable() {
   `);
   await db.$executeRawUnsafe(`
     ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "invoiceUrl" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
     ADD COLUMN IF NOT EXISTS "paymentReceivedAt" TIMESTAMP NULL
   `);
   await db.$executeRawUnsafe(`
@@ -95,7 +151,107 @@ export async function ensureExternalRentalTable() {
   `);
   await db.$executeRawUnsafe(`
     ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupOdometerKm" INTEGER NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupFuelLevel" INTEGER NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupHasDamage" BOOLEAN NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupDamageNotes" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupAcceptedBy" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupAcceptedAt" TIMESTAMP NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupAgentNotes" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupChecklistData" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupChecklistDocumentUrl" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "pickupImageUrls" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
     ADD COLUMN IF NOT EXISTS "returnNotes" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnOdometerKm" INTEGER NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnFuelLevel" INTEGER NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnHasDamage" BOOLEAN NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnDamageNotes" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnAcceptedBy" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnAcceptedAt" TIMESTAMP NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnAgentNotes" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnChecklistData" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnChecklistDocumentUrl" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnImageUrls" TEXT NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnLateCharge" INTEGER NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnFuelCharge" INTEGER NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "returnDamageCharge" INTEGER NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "closeoutPaymentDueAt" TIMESTAMP NULL
+  `);
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "ExternalRentalBooking"
+    ADD COLUMN IF NOT EXISTS "closeoutPaymentReceivedAt" TIMESTAMP NULL
   `);
 
   await db.$executeRawUnsafe(`
@@ -134,12 +290,38 @@ export async function getExternalRentalRecords(start: Date, end: Date) {
       "paymentStatus",
       "paymentMethod",
       "paymentReference",
+      "invoiceUrl",
       "financialTransferStatus",
       notes,
       "paymentReceivedAt",
       "pickedUpAt",
       "returnedAt",
+      "pickupOdometerKm",
+      "pickupFuelLevel",
+      "pickupHasDamage",
+      "pickupDamageNotes",
+      "pickupAcceptedBy",
+      "pickupAcceptedAt",
+      "pickupAgentNotes",
+      "pickupChecklistData",
+      "pickupChecklistDocumentUrl",
+      "pickupImageUrls",
       "pickupNotes",
+      "returnOdometerKm",
+      "returnFuelLevel",
+      "returnHasDamage",
+      "returnDamageNotes",
+      "returnAcceptedBy",
+      "returnAcceptedAt",
+      "returnAgentNotes",
+      "returnChecklistData",
+      "returnChecklistDocumentUrl",
+      "returnImageUrls",
+      "returnLateCharge",
+      "returnFuelCharge",
+      "returnDamageCharge",
+      "closeoutPaymentDueAt",
+      "closeoutPaymentReceivedAt",
       "returnNotes",
       "createdAt",
       "emailSentAt",

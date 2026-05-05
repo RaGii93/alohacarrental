@@ -146,7 +146,7 @@ export default async function AdminMaintenanceVehicleHistoryPage({
 
         <div className="grid gap-4 xl:grid-cols-5">
           {[
-            { label: "Tracked costs", value: formatCurrency(profitability.costs.totalTrackedVehicleCosts), icon: BadgeDollarSign, tone: "text-sky-600 bg-sky-50" },
+            { label: "Tracked costs", value: formatCurrency(profitability.costs.totalTrackedVehicleCosts), icon: BadgeDollarSign, tone: "text-red-600 bg-red-50" },
             { label: "Revenue", value: formatCurrency(profitability.revenue.totalRevenue), icon: HandCoins, tone: "text-violet-600 bg-violet-50" },
             { label: "Net contribution", value: formatCurrency(profitability.netContribution), icon: ShieldCheck, tone: "text-emerald-600 bg-emerald-50" },
             { label: "Confirmed bookings", value: profitability.revenue.assignedBookingCount, icon: CalendarRange, tone: "text-amber-600 bg-amber-50" },
@@ -208,7 +208,7 @@ export default async function AdminMaintenanceVehicleHistoryPage({
         <div className="grid gap-6 xl:grid-cols-2">
           <Card className="rounded-[1.8rem] border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
+              <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-red-50 text-red-700">
                 <Wrench className="size-5" />
               </div>
               <div>
@@ -254,7 +254,7 @@ export default async function AdminMaintenanceVehicleHistoryPage({
                 <div key={booking.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <Link href={`/${locale}/admin/bookings/${booking.id}`} className="font-semibold text-slate-900 hover:text-sky-700 hover:underline">
+                      <Link href={`/${locale}/admin/bookings/${booking.id}`} className="font-semibold text-slate-900 hover:text-red-700 hover:underline">
                         Booking {booking.bookingCode}
                       </Link>
                       <p className="mt-1 text-xs text-slate-600">

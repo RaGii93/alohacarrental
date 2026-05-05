@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -99,6 +99,18 @@ export function VehicleDialog({
     }
   }, [vehicle, form]);
 
+  const goToPreviousStep = (event?: MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setCurrentStep((step) => Math.max(0, step - 1));
+  };
+
+  const goToNextStep = (event?: MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setCurrentStep((step) => Math.min(steps.length - 1, step + 1));
+  };
+
   const steps = [
     {
       key: "identity",
@@ -172,7 +184,7 @@ export function VehicleDialog({
                   onClick={() => setCurrentStep(index)}
                   className={`rounded-2xl border px-4 py-3 text-left transition ${
                     currentStep === index
-                      ? "border-sky-300 bg-sky-50 shadow-sm"
+                      ? "border-red-300 bg-red-50 shadow-sm"
                       : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                   }`}
                 >
@@ -338,12 +350,12 @@ export function VehicleDialog({
                 {t("common.cancel")}
               </Button>
               {currentStep > 0 ? (
-                <Button type="button" variant="outline" onClick={() => setCurrentStep((step) => Math.max(0, step - 1))}>
+                <Button type="button" variant="outline" onClick={goToPreviousStep}>
                   {t("common.previous")}
                 </Button>
               ) : null}
               {currentStep < steps.length - 1 ? (
-                <Button type="button" onClick={() => setCurrentStep((step) => Math.min(steps.length - 1, step + 1))}>
+                <Button type="button" onClick={goToNextStep}>
                   {t("common.next")}
                 </Button>
               ) : (

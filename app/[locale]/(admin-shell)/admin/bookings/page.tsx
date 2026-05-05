@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { Clock3, XCircle, CheckCircle2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
+import { ensureBookingAdditionalDriversTable } from "@/lib/additional-drivers.server";
 import { BookingsFilters } from "@/components/admin/BookingsFilters";
 import { BookingsTable } from "@/components/admin/BookingsTable";
 import {
@@ -60,6 +61,7 @@ export default async function AdminBookingsPage({
   const { bookings_status, pending_page, confirmed_page, declined_page, page_size, q, start, end } = await searchParams;
   const t = await getTranslations();
   const auth = await requireAdminSection(locale, "bookings");
+  await ensureBookingAdditionalDriversTable();
   const tOr = (key: string, values: Record<string, any>, fallback: string) =>
     t.has(key as any) ? t(key as any, values as any) : fallback;
 
@@ -111,7 +113,32 @@ export default async function AdminBookingsPage({
 
   const rows = await db.booking.findMany({
     where,
-    include: { vehicle: true, category: true },
+    select: {
+      id: true,
+      bookingCode: true,
+      customerName: true,
+      customerEmail: true,
+      customerPhone: true,
+      startDate: true,
+      endDate: true,
+      totalAmount: true,
+      status: true,
+      createdAt: true,
+      paymentReceivedAt: true,
+      deliveredAt: true,
+      returnedAt: true,
+      vehicle: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      additionalDrivers: {
+        select: {
+          id: true,
+        },
+      },
+    },
     orderBy: [{ startDate: "asc" }, { createdAt: "desc" }],
     skip: (page - 1) * pageSize,
     take: pageSize,
@@ -176,7 +203,7 @@ export default async function AdminBookingsPage({
           {(auth.admin.role === "ROOT" || auth.admin.role === "OWNER") && (
             <Link
               href={`/${locale}/admin/bookings/new`}
-              className="admin-primary-button inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold transition-all"
+              className="inline-flex h-11 items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
             >
               {tOr("admin.bookings.create", {}, "New booking")}
             </Link>
@@ -212,16 +239,16 @@ export default async function AdminBookingsPage({
               <Link
                 key={item.key}
                 href={buildStatusHref(item.key as "pending" | "confirmed" | "declined")}
-              className={`rounded-[1.7rem] p-5 shadow-[0_24px_56px_-32px_hsl(var(--primary)/0.14)] transition ${
-                  isActive ? "admin-active-card" : "admin-surface-soft border-transparent hover:border-[hsl(var(--primary)/0.14)]"
+                className={`rounded-[1.7rem] border p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)] transition ${
+                  isActive ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white hover:border-slate-300"
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className={`text-sm font-medium ${isActive ? "text-white/85" : "text-slate-500"}`}>{item.label}</p>
-                    <p className={`mt-2 text-3xl font-black tracking-tight ${isActive ? "text-white" : "text-slate-900"}`}>{item.total}</p>
+                    <p className={`text-sm ${isActive ? "text-slate-300" : "text-slate-500"}`}>{item.label}</p>
+                    <p className="mt-2 text-3xl font-black tracking-tight">{item.total}</p>
                   </div>
-                  <div className={`inline-flex size-12 items-center justify-center rounded-2xl ${isActive ? "bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] ring-1 ring-white/10" : item.tone}`}>
+                  <div className={`inline-flex size-12 items-center justify-center rounded-2xl ${isActive ? "bg-white/10 text-white" : item.tone}`}>
                     <item.icon className="size-5" />
                   </div>
                 </div>
@@ -236,14 +263,14 @@ export default async function AdminBookingsPage({
           initialQuery={searchTerm}
         />
 
-        <div className="admin-surface rounded-[1.6rem] border-transparent p-4">
+        <div className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#ffffff,hsl(var(--primary)/0.03))] p-4 shadow-[0_20px_48px_-30px_hsl(var(--primary)/0.12)]">
           <div className={ADMIN_PAGE_META_ROW}>
             <div className={ADMIN_PAGE_META_TEXT}>
               {t("admin.bookings.list.showingStatus", { status: statusLabel, start: startRow, end: endRow, total })}
             </div>
             <div className={ADMIN_PAGE_ROWS_WRAP}>
               {activeFilterPills.map((pill) => (
-                <span key={pill} className="admin-pill rounded-full px-3 py-1 text-xs font-medium">
+                <span key={pill} className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
                   {pill}
                 </span>
               ))}

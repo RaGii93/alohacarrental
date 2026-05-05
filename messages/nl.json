@@ -246,12 +246,8 @@
       "supportLabel": "Ondersteuning"
     },
     "whyChoose": {
-      "title": "Een lokale auto voor elke hoek van Bonaire.",
-      "subtitle": "We hebben onze service afgestemd op de manier waarop jij het eiland echt verkent. Geniet van de vrijheid om in je eigen tempo te ontdekken, met flexibele hulp wanneer plannen op het eiland veranderen.",
-      "photoCard": {
-        "description": "Kristalhelder zeelicht, een turquoise horizon en rustige momenten waarin je geniet van de natuurlijke schoonheid van de kust.",
-        "label": "Jouw lokale eilandrit"
-      },
+      "title": "Een lokale auto voor Bonaire's stranden, zoutpannen en stops in de stad",
+      "subtitle": "We hebben de ervaring afgestemd op hoe mensen zich echt over Bonaire verplaatsen: pickups op het vliegveld, rustige ritten langs de zuidelijke slavenhutten en flexibele hulp als plannen veranderen.",
       "benefitsTitle": "Belangrijke voordelen van huren bij ons",
       "benefitsSubtitle": "We houden de huurervaring eenvoudig, consistent en betrouwbaar van reservering tot inlevering.",
       "features": {
@@ -293,11 +289,15 @@
           "title": "Transparante prijzen",
           "description": "Wat je ziet is wat je krijgt, zonder verborgen kosten en met duidelijke brandstofregels vanaf het begin."
         }
+      },
+      "photoCard": {
+        "description": "Kristalheldere wateren en maagdelijke stranden wachten op je",
+        "label": "Paradijs Gevonden"
       }
     },
     "ctaSection": {
       "title": "Maak het eiland jouw route van de dag",
-      "subtitle": "Vind een auto die past bij wat je nodig hebt, van avonturen met kantduiken en de ruige schoonheid van Washington Slagbaai National Park tot luchtige middagen aan zee. Of je nu zuidelijke baaitjes ontdekt of op jacht gaat naar de perfecte zonsondergang, wij hebben de ideale auto voor elk Bonaire-moment.",
+      "subtitle": "Reserveer de auto die past bij je plannen op Bonaire, van strandochtenden en duikstops tot zonsondergangritten langs de zuidkust.",
       "button": "Nu Reserveren"
     },
     "hero": {
@@ -357,8 +357,8 @@
       }
     },
     "fleet": {
-      "title": "Verken het eiland op jouw manier.",
-      "description": "Wij geloven dat de beste manier om het eiland te zien is met de vrijheid om te stoppen waar je maar wilt. Vind het voertuig dat past bij jouw plannen en begin vandaag nog de schoonheid van Bonaire te ontdekken.",
+      "title": "Kies het voertuig dat past bij jouw Bonaire-ritme",
+      "description": "Vind de auto die werkt voor airport pickups, ritten door Kralendijk, fotostops aan de zuidkust en ontspannen middagen aan zee.",
       "seats": "{count} zitplaatsen",
       "reserveNow": "Nu reserveren",
       "seeMore": "Meer bekijken"
@@ -513,12 +513,8 @@
     },
     "reviews": {
       "eyebrow": "Klantverhalen",
-      "title": "Gastverhalen van over het hele eiland.",
-      "subtitle": "Echte feedback van reizigers die Aloha gebruikten om moeiteloos tussen hun favoriete plekken en de meest iconische uitzichten van het eiland te reizen.",
-      "photoCard": {
-        "description": "De beste eilandverhalen beginnen met een eenvoudig plan: pak de sleutels, ga richting het water en laat Bonaire je de weg wijzen.",
-        "label": "Jouw reis, onze prioriteit."
-      },
+      "title": "Gastverhalen met Bonaire als decor",
+      "subtitle": "Echte feedback van reizigers die Aloha gebruikten om tussen stranden, duikplekken, de stad en de bekende kustwegen van het eiland te reizen.",
       "leaveButton": "Review Achterlaten",
       "empty": "Er zijn nog geen reviews gepubliceerd.",
       "faqPreview": "Snelle antwoorden voor huurders voordat ze boeken, allemaal op één plek.",
@@ -542,6 +538,10 @@
       },
       "success": {
         "pendingApproval": "Review verzonden. Deze wordt zichtbaar na goedkeuring door beheer."
+      },
+      "photoCard": {
+        "description": "Vertrouwd door duizenden gelukkige reizigers wereldwijd",
+        "label": "Door Gasten Goedgekeurd"
       }
     },
     "footer": {
@@ -692,17 +692,59 @@
       "licenseInvalid": "Rijbewijs moet geldig zijn op de ophaaldatum",
       "minimumDuration": "Minimale reserveringsduur is {days} dag(en).",
       "minimumDurationAdminOnly": "Boekingen onder {days} dag(en) zijn alleen via admin beschikbaar.",
-      "lastMinuteAdminOnly": "Boekingen die binnen {hours} uur starten zijn alleen via admin beschikbaar."
+      "lastMinuteAdminOnly": "Boekingen die binnen {hours} uur starten zijn alleen via admin beschikbaar.",
+      "accommodationDetailsRequired": "Vul uw verblijfsgegevens in.",
+      "termsScrollRequired": "Scroll door de voorwaarden voordat u accepteert."
     },
     "success": {
       "title": "Reservering Ingediend!",
-      "message": "Je referentienummer is: {orderId}",
+      "message": "Je referentienummer is: {{orderId}}",
       "next": "We nemen binnenkort contact met je op ter bevestiging."
     },
     "baseTotal": "Basistotaal",
     "subtotal": "Subtotaal",
     "belowMinimumSurcharge": "Korte-huurtoeslag",
-    "lastMinuteSurcharge": "Last-minute toeslag"
+    "lastMinuteSurcharge": "Last-minute toeslag",
+    "accommodationAddress": "Verblijfsadres",
+    "accommodationAddressHelp": "Voer uw verblijfsadres in zodat we de levering van het voertuig kunnen regelen.",
+    "accommodationAddressPlaceholder": "Straatnaam, hotel, resort...",
+    "accommodationPlaceName": "Naam verblijf",
+    "accommodationPlaceNamePlaceholder": "Hotelnaam, resort, privéadres...",
+    "geolocationUnavailable": "Geolocatie is niet beschikbaar in uw browser.",
+    "locatingCurrentLocation": "Uw positie bepalen...",
+    "mapPickerDescription": "Klik op de kaart om een bezorglocatie te selecteren.",
+    "mapSearchAction": "Zoeken",
+    "mapSearchPlaceholder": "Zoek een adres...",
+    "mapUnavailable": "Kaart is momenteel niet beschikbaar.",
+    "openMapPicker": "Kaart openen",
+    "pickDropoffOnMap": "Inleverlocatie op kaart aanwijzen",
+    "pickPickupOnMap": "Ophaallocatie op kaart aanwijzen",
+    "selectedCoordinates": "Geselecteerd: {lat}, {lng}",
+    "termsReadConfirmed": "U heeft de huurvoorwaarden gelezen.",
+    "termsReadPending": "Scroll naar het einde van de voorwaarden om door te gaan.",
+    "termsScrollHint": "Scroll naar het einde van de voorwaarden om te accepteren.",
+    "termsScrollRequired": "U moet door de huurvoorwaarden scrollen voordat u accepteert.",
+    "unavailableBanner": "Dit voertuig is niet beschikbaar voor de geselecteerde datums.",
+    "useCurrentLocation": "Mijn locatie gebruiken",
+    "useMarkedLocation": "Deze locatie gebruiken",
+    "additionalDrivers": {
+      "birthDate": "Geboortedatum",
+      "countHelp": "Extra bestuurders moeten bij afhaling een geldig rijbewijs tonen.",
+      "countLabel": "Aantal extra bestuurders",
+      "dashboardCount": "{count, plural, =0 {Geen extra bestuurders} one {1 extra bestuurder} other {{count} extra bestuurders}}",
+      "description": "Voeg extra bestuurders toe die het voertuig ook gedurende de huurperiode zullen gebruiken.",
+      "documentTitle": "Extra bestuurder {number}",
+      "driverLabel": "Bestuurder {number}",
+      "empty": "Geen extra bestuurders toegevoegd.",
+      "fullName": "Volledige naam",
+      "licenseExpiryDate": "Rijbewijs vervaldatum",
+      "licenseNumber": "Rijbewijsnummer",
+      "requiredHint": "Vul de verplichte velden in voor alle extra bestuurders.",
+      "reviewLocked": "Extra bestuurdersgegevens zijn vergrendeld nadat de boeking is bevestigd.",
+      "summaryTitle": "Extra bestuurders ({count})",
+      "title": "Extra bestuurders",
+      "upload": "Rijbewijs uploaden"
+    }
   },
   "admin": {
     "title": "Beheerpaneel",
@@ -968,7 +1010,9 @@
               "pickup": "Uitgifte-inspectie voltooien mislukt",
               "return": "Inlever-inspectie voltooien mislukt"
             }
-          }
+          },
+          "openPickupChecklist": "Ophaalchecklist openen",
+          "openReturnChecklist": "Retourchecklist openen"
         },
         "conditionLog": {
           "title": "Voertuigstatuslog",
@@ -997,7 +1041,9 @@
           "quickbooksError": "QuickBooks-fout",
           "zohoError": "Zoho Invoice-fout",
           "openQuickbooksTransfers": "QuickBooks-overdrachten openen",
-          "openZohoTransfers": "Zoho Invoice-overdrachten openen"
+          "openZohoTransfers": "Zoho Invoice-overdrachten openen",
+          "closeoutPayment": "Slotbetaling ontvangen",
+          "closeoutPaymentPending": "Slotbetaling in behandeling"
         },
         "filesActions": {
           "sendByEmail": "Per e-mail verzenden",
@@ -1023,7 +1069,13 @@
         },
         "filesCard": {
           "description": "Klantdocumenten en gegenereerde factuurbestanden.",
-          "openPaymentProof": "Betalingsbewijs openen"
+          "openPaymentProof": "Betalingsbewijs openen",
+          "closeoutInvoicePaid": "Slotfactuur (Betaald)",
+          "closeoutInvoicePending": "Slotfactuur (Lopend)",
+          "closeoutInvoiceTitle": "Slotfactuur",
+          "openCloseoutInvoice": "Slotfactuur openen",
+          "openPickupChecklist": "Ophaalchecklist openen",
+          "openReturnChecklist": "Retourchocklist openen"
         }
       },
       "edit": {
@@ -1256,7 +1308,18 @@
         "optionalNote": "Optionele notitie",
         "saving": "Opslaan...",
         "create": "Blokkade aanmaken",
-        "update": "Blokkade bijwerken"
+        "update": "Blokkade bijwerken",
+        "durationPending": "Selecteer begin en einde om de duur te zien",
+        "globalHelper": "Een globale blokkering geldt voor alle voertuigen en overschrijft individuele beschikbaarheid.",
+        "helperTitle": "Blokkeringsoverzicht",
+        "invalidRange": "Einddatum moet na begindatum liggen.",
+        "reasonHelper": "Beschrijf waarom voertuigen niet beschikbaar zijn (bijv. feestdag, onderhoud).",
+        "singleVehicle": "Enkel voertuig",
+        "summaryDuration": "Duur: {duration}",
+        "summaryScope": "Bereik: {scope}",
+        "summaryWindow": "Periode: {start} – {end}",
+        "vehicleHelper": "Deze blokkering geldt alleen voor het geselecteerde voertuig.",
+        "windowPending": "Selecteer begin- en einddatum"
       },
       "actions": {
         "new": "Nieuwe blokkade",
@@ -1271,7 +1334,20 @@
         "global": "Alleen globaal",
         "vehicleSpecific": "Alleen voertuigspecifiek",
         "allStatuses": "Alle statussen",
-        "empty": "Geen blokkades komen overeen met de huidige filters."
+        "empty": "Geen blokkades komen overeen met de huidige filters.",
+        "active": "Actief",
+        "allScopes": "Alle bereiken",
+        "allTimelines": "Alle perioden",
+        "allVehicles": "Alle voertuigen",
+        "clear": "Filters wissen",
+        "globalOnly": "Alleen globaal",
+        "past": "Verleden",
+        "results": "{count} resultaten",
+        "searchLabel": "Zoeken",
+        "timelineLabel": "Periode",
+        "upcoming": "Aankomend",
+        "vehicleLabel": "Voertuig",
+        "vehicleOnly": "Alleen voertuig"
       },
       "status": {
         "active": "Actief",
@@ -1293,7 +1369,12 @@
         "created": "Aangemaakt",
         "action": "Actie",
         "fullReason": "Volledige reden",
-        "deleting": "Verwijderen..."
+        "deleting": "Verwijderen...",
+        "allFleetLabel": "Gehele vloot",
+        "emptyDescription": "Geen blokkeringen komen overeen met de huidige filters.",
+        "emptyTitle": "Geen blokkeringen gevonden",
+        "globalLabel": "Globaal",
+        "vehicleLabel": "Voertuig"
       },
       "messages": {
         "created": "Blokkade aangemaakt.",
@@ -1301,10 +1382,27 @@
         "deleted": "Blokkade verwijderd.",
         "createFailed": "Blokkade aanmaken mislukt",
         "updateFailed": "Blokkade bijwerken mislukt",
-        "deleteFailed": "Blokkade verwijderen mislukt"
+        "deleteFailed": "Blokkade verwijderen mislukt",
+        "invalidDateRange": "Ongeldig datumbereik. Einde moet na begin liggen."
       },
       "title": "Beschikbaarheidsblokkeringen",
-      "description": "Blokkeer alle voertuigen of één specifiek voertuig voor een datumbereik. Deze blokkeringen worden toegepast in de beschikbaarheidszoekopdracht en bij het maken van boekingen."
+      "description": "Blokkeer alle voertuigen of één specifiek voertuig voor een datumbereik. Deze blokkeringen worden toegepast in de beschikbaarheidszoekopdracht en bij het maken van boekingen.",
+      "cards": {
+        "active": "Actief",
+        "global": "Globaal",
+        "total": "Totaal",
+        "upcoming": "Aankomend"
+      },
+      "dialog": {
+        "createDescription": "Blokkeer een periode waarin voertuigen niet beschikbaar zijn voor reservering.",
+        "createTitle": "Blokkering aanmaken",
+        "editDescription": "Werk de blokkeringsperiode of reden bij.",
+        "editTitle": "Blokkering bewerken"
+      },
+      "workspace": {
+        "description": "Beheer perioden waarin voertuigen of de gehele vloot niet beschikbaar zijn.",
+        "title": "Vloot blokkeringen"
+      }
     },
     "quickbooks": {
       "description": "Overdrachten worden vanuit facturatie-acties in de wachtrij gezet en draaien los van reserveringsbeheer.",
@@ -1431,7 +1529,17 @@
       "errors": {
         "delete": "Locatie verwijderen mislukt"
       },
-      "fullAddress": "Volledig adres"
+      "fullAddress": "Volledig adres",
+      "geolocationUnavailable": "Geolocatie is niet beschikbaar in uw browser.",
+      "locatingCurrentLocation": "Uw positie bepalen...",
+      "mapDescription": "Klik op de kaart om de exacte coördinaten van deze locatie in te stellen.",
+      "mapSearchPlaceholder": "Zoek een adres...",
+      "mapUnavailable": "Kaart is momenteel niet beschikbaar.",
+      "openMap": "Kaart openen",
+      "pickOnMap": "Op kaart aanwijzen",
+      "searchMap": "Zoeken",
+      "useCurrentLocation": "Mijn locatie gebruiken",
+      "useMarkedLocation": "Deze locatie gebruiken"
     },
     "settings": {
       "title": "Systeeminstellingen",
@@ -1926,7 +2034,9 @@
         "markDropoff": "Markeer als ingeleverd",
         "markTransferred": "Markeer als overgedragen",
         "saving": "Opslaan...",
-        "saveUpdate": "Update opslaan"
+        "saveUpdate": "Update opslaan",
+        "openInvoice": "Factuur openen",
+        "receiveCloseoutPayment": "Slotbetaling ontvangen"
       },
       "dialogs": {
         "createTitle": "Partnerverhuur aanmaken",
@@ -1944,7 +2054,13 @@
         "pickup": "Ophalen: {value}",
         "dropoff": "Inleveren: {value}",
         "notReceived": "Nog niet ontvangen",
-        "notMarked": "Nog niet gemarkeerd"
+        "notMarked": "Nog niet gemarkeerd",
+        "closeoutBreakdown": "Slotoverzicht",
+        "closeoutDamage": "Schade",
+        "closeoutFuel": "Brandstof",
+        "closeoutLate": "Te late inlevering",
+        "closeoutPending": "Sluiting in behandeling",
+        "closeoutTotal": "Slottotaal"
       },
       "messages": {
         "completeSupplier": "Vul de leverancier- en voertuiggegevens in.",

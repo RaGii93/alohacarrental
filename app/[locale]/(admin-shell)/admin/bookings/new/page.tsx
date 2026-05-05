@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { db } from "@/lib/db";
+import { getTenantConfig } from "@/lib/tenant";
 import { getBookingRuleSettings, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
-import { getTermsPdfUrl } from "@/lib/terms";
 import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 
@@ -18,13 +18,14 @@ export default async function AdminNewBookingPage({
     redirect(`/${locale}/admin/bookings`);
   }
 
-  const [taxPercentage, minimumBookingDays, bookingRules, vehicleRatesIncludeTax, locations, categories, termsPdfUrl] = await Promise.all([
+  const [tenant, taxPercentage, minimumBookingDays, bookingRules, vehicleRatesIncludeTax, locations, categories] = await Promise.all([
+    getTenantConfig(),
     getTaxPercentage(),
     getMinBookingDays(),
     getBookingRuleSettings(),
     getVehicleRatesIncludeTax(),
     db.location.findMany({
-      select: { id: true, name: true, code: true, address: true },
+      select: { id: true, name: true, code: true, address: true, latitude: true, longitude: true },
       orderBy: { name: "asc" },
     }),
     db.vehicleCategory.findMany({
@@ -43,7 +44,6 @@ export default async function AdminNewBookingPage({
       },
       orderBy: { sortOrder: "asc" },
     }),
-    getTermsPdfUrl(locale),
   ]);
 
   let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
@@ -82,7 +82,7 @@ export default async function AdminNewBookingPage({
           vehicleRatesIncludeTax={vehicleRatesIncludeTax}
           minimumBookingDays={minimumBookingDays}
           bookingRuleSettings={bookingRules}
-          termsPdfUrl={termsPdfUrl}
+          termsPdfUrl={tenant.termsPdfUrl}
           bookingSource="admin"
         />
       </div>

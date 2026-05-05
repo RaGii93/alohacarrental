@@ -108,7 +108,7 @@ export function VehiclesTable({
       case "MAINTENANCE":
         return "bg-yellow-100 text-yellow-800";
       case "ON_RENT":
-        return "bg-blue-100 text-blue-800";
+        return "bg-red-100 text-red-800";
       case "INACTIVE":
         return "bg-red-100 text-red-800";
       default:
@@ -190,7 +190,7 @@ export function VehiclesTable({
             {pageRows.map((vehicle) => (
               <TableRow key={vehicle.id}>
                 <TableCell className="font-medium">
-                  <Link href={vehicleHistoryHref(vehicle.id)} className="hover:text-sky-700 hover:underline">
+                  <Link href={vehicleHistoryHref(vehicle.id)} className="hover:text-red-700 hover:underline">
                     {vehicle.name}
                   </Link>
                 </TableCell>

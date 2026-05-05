@@ -169,7 +169,7 @@ function eventToneClass(tone: ScheduleEvent["tone"]) {
     case "BLOCKOUT":
       return "bg-fuchsia-100 text-fuchsia-800 ring-1 ring-inset ring-fuchsia-200";
     default:
-      return "bg-blue-600 text-white shadow-[0_18px_30px_-20px_rgba(37,99,235,0.8)]";
+      return "bg-[hsl(var(--primary))] text-white shadow-[0_18px_30px_-20px_hsl(var(--primary)/0.38)]";
   }
 }
 
@@ -328,7 +328,7 @@ export function FleetDashboard({
       prev: utilizationPrevPct,
       suffix: "%",
       icon: Gauge,
-      iconWrap: "bg-blue-100 text-blue-700",
+      iconWrap: "bg-red-100 text-red-700",
     },
     {
       title: t("admin.fleet.cards.pickups", { days: rangeDayCount }),
@@ -366,7 +366,7 @@ export function FleetDashboard({
       value: expectedDemandTotal,
       prev: expectedDemandPrevTotal,
       icon: CalendarDays,
-      iconWrap: "bg-indigo-100 text-indigo-700",
+      iconWrap: "bg-red-100 text-red-700",
     },
     {
       title: t("admin.fleet.cards.topDemand"),
@@ -394,7 +394,7 @@ export function FleetDashboard({
 
   return (
     <Tabs value={initialView} onValueChange={setView} className="w-full gap-5">
-      <Card className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.14),transparent_28%),linear-gradient(180deg,#ffffff,rgba(248,250,252,0.98))] shadow-[0_35px_90px_-52px_rgba(15,23,42,0.35)]">
+      <Card className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.12),transparent_28%),linear-gradient(180deg,#ffffff,rgba(255,255,255,0.98))] shadow-[0_35px_90px_-52px_rgba(15,23,42,0.35)]">
         <div className="flex flex-col gap-5 p-5 sm:p-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="space-y-2">
@@ -494,11 +494,11 @@ export function FleetDashboard({
                       <div className="space-y-2">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <Link href={vehicleHistoryHref(vehicle.id)} className="font-mono text-xl font-semibold tracking-tight text-slate-900 hover:text-sky-700 hover:underline">
+                            <Link href={vehicleHistoryHref(vehicle.id)} className="font-mono text-xl font-semibold tracking-tight text-slate-900 hover:text-red-700 hover:underline">
                               {vehicle.plateNumber || t("admin.fleet.calendar.noPlate")}
                             </Link>
                             <p className="mt-1 truncate text-sm text-slate-600">
-                              <Link href={vehicleHistoryHref(vehicle.id)} className="hover:text-sky-700 hover:underline">
+                              <Link href={vehicleHistoryHref(vehicle.id)} className="hover:text-red-700 hover:underline">
                                 {vehicle.name}
                               </Link>
                             </p>
@@ -514,7 +514,7 @@ export function FleetDashboard({
                                   ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                                   : vehicle.status === "INACTIVE"
                                     ? "border-slate-200 bg-slate-100 text-slate-600"
-                                    : "border-sky-200 bg-sky-50 text-sky-700"
+                                    : "border-red-200 bg-red-50 text-red-700"
                             )}
                           >
                             {getVehicleStatusLabel(vehicle.status)}
@@ -678,7 +678,7 @@ export function FleetDashboard({
                               ? "border-amber-200 bg-amber-50 text-amber-700"
                               : booking.displayStatus === "COMPLETED"
                                 ? "border-slate-200 bg-slate-100 text-slate-600"
-                                : "border-blue-200 bg-blue-50 text-blue-700"
+                                : "border-red-200 bg-red-50 text-red-700"
                         )}
                       >
                         {getBookingStatusLabel(booking.displayStatus)}
@@ -769,7 +769,7 @@ export function FleetDashboard({
                   </div>
                   <div className="h-2 rounded-full bg-slate-100">
                     <div
-                      className="h-2 rounded-full bg-indigo-500"
+                      className="h-2 rounded-full bg-[hsl(var(--primary))]"
                       style={{ width: `${(row.count / demandMax) * 100}%` }}
                     />
                   </div>

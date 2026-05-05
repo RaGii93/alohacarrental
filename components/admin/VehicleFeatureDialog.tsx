@@ -8,11 +8,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createVehicleFeatureAction, updateVehicleFeatureAction } from "@/actions/vehicle-features";
+import { FEATURE_ICON_CHOICES, getFeatureIconComponent } from "@/lib/feature-icons";
 
 type VehicleFeature = {
   id?: string;
   name?: string;
+  iconName?: string | null;
   sortOrder?: number;
   isActive?: boolean;
 };
@@ -28,6 +31,7 @@ export function VehicleFeatureDialog({
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(Boolean(feature));
   const [name, setName] = useState(feature?.name || "");
+  const [iconName, setIconName] = useState(feature?.iconName || "check-circle-2");
   const [sortOrder, setSortOrder] = useState(feature?.sortOrder ?? 0);
   const [isActive, setIsActive] = useState(feature?.isActive ?? true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +39,7 @@ export function VehicleFeatureDialog({
   useEffect(() => {
     setIsOpen(Boolean(feature));
     setName(feature?.name || "");
+    setIconName(feature?.iconName || "check-circle-2");
     setSortOrder(feature?.sortOrder ?? 0);
     setIsActive(feature?.isActive ?? true);
   }, [feature]);
@@ -42,7 +47,7 @@ export function VehicleFeatureDialog({
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const payload = { name, sortOrder, isActive };
+      const payload = { name, iconName, sortOrder, isActive };
       const result = feature?.id
         ? await updateVehicleFeatureAction(feature.id, payload)
         : await createVehicleFeatureAction(payload);
@@ -75,6 +80,38 @@ export function VehicleFeatureDialog({
         </DialogHeader>
         <div className="space-y-4">
           <Input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("admin.features.name")} />
+          <div className="space-y-2">
+            <p className="text-sm font-medium">{t("admin.features.icon")}</p>
+            <Select value={iconName} onValueChange={setIconName}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("admin.features.icon")} />
+              </SelectTrigger>
+              <SelectContent>
+                {FEATURE_ICON_CHOICES.map((choice) => {
+                  const Icon = choice.icon;
+                  return (
+                    <SelectItem key={choice.value} value={choice.value}>
+                      <span className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-[#b91c1c]" />
+                        {choice.label}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+              {(() => {
+                const Icon = getFeatureIconComponent(iconName);
+                return (
+                  <span className="inline-flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-[#b91c1c]" />
+                    {name || t("admin.features.preview")}
+                  </span>
+                );
+              })()}
+            </div>
+          </div>
           <Input
             type="number"
             min={0}

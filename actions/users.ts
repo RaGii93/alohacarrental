@@ -7,13 +7,13 @@ import { hashPassword } from "@/lib/password";
 import { logAdminAction } from "@/lib/audit";
 
 const createUserSchema = z.object({
-  email: z.string().trim().email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   role: z.enum(["OWNER", "STAFF"]),
 });
 
 const updateUserSchema = z.object({
-  email: z.string().trim().email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
   password: z.string().optional(),
   role: z.enum(["OWNER", "STAFF"]),
 });

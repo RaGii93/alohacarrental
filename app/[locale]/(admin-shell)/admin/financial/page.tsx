@@ -60,7 +60,7 @@ export default async function AdminFinancialPage({
   const selectedTransferState = transfer_state === "PENDING" || transfer_state === "TRANSFERRED" ? transfer_state : "";
 
   const currency = (amountCents: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountCents / 100);
-  const statCard = "admin-surface-soft rounded-[1.7rem] border-transparent p-5";
+  const statCard = "rounded-[1.7rem] border border-slate-200 bg-white p-5 shadow-[0_24px_56px_-32px_hsl(215_28%_17%/0.12)]";
 
   const bookingSearchWhere: Prisma.BookingWhereInput = {
     createdAt: { gte: financialStartDate, lte: financialEndDate },
@@ -181,16 +181,16 @@ export default async function AdminFinancialPage({
           initialTransferState={selectedTransferState || "all"}
         />
 
-        <Card className="admin-surface rounded-[1.8rem] border-transparent p-5">
+        <Card className="rounded-[1.8rem] border-slate-200 bg-[linear-gradient(180deg,#ffffff,hsl(var(--primary)/0.03))] p-5 shadow-[0_26px_60px_-34px_hsl(var(--primary)/0.14)]">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <p className={ADMIN_PAGE_META_TEXT}>
               {t("admin.financial.page.filterRange", { start: formatDateTime(financialStartDate), end: formatDateTime(financialEndDate) })}
             </p>
             <div className="flex flex-wrap gap-2 text-xs">
               {activeFilterPills.length === 0 ? (
-                <span className="admin-pill rounded-full px-3 py-1 font-medium">{t("admin.financial.page.noExtraFilters")}</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-600">{t("admin.financial.page.noExtraFilters")}</span>
               ) : activeFilterPills.map((pill) => (
-                <span key={pill} className="admin-pill rounded-full px-3 py-1 font-medium">
+                <span key={pill} className="rounded-full bg-red-50 px-3 py-1 font-medium text-red-700">
                   {pill}
                 </span>
               ))}
@@ -200,7 +200,7 @@ export default async function AdminFinancialPage({
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[
-            { label: t("admin.financial.cards.confirmedRevenue"), value: currency(confirmedRevenueAgg._sum.totalAmount ?? 0), icon: BadgeDollarSign, tone: "bg-sky-50 text-sky-700" },
+            { label: t("admin.financial.cards.confirmedRevenue"), value: currency(confirmedRevenueAgg._sum.totalAmount ?? 0), icon: BadgeDollarSign, tone: "bg-red-50 text-red-700" },
             { label: t("admin.financial.cards.invoicedRevenue"), value: currency(invoicedRevenueAgg._sum.totalAmount ?? 0), icon: FileText, tone: "bg-violet-50 text-violet-700" },
             { label: t("admin.financial.cards.pendingPipeline"), value: currency(pendingPipelineAgg._sum.totalAmount ?? 0), icon: Clock3, tone: "bg-amber-50 text-amber-700" },
             { label: t("admin.financial.cards.partnerRentalProfit"), value: currency(externalSummary.totalProfit), icon: TrendingUp, tone: "bg-emerald-50 text-emerald-700" },
@@ -223,7 +223,7 @@ export default async function AdminFinancialPage({
           {[
             { label: t("admin.financial.cards.uninvoicedConfirmed"), value: uninvoicedConfirmedCount, icon: ReceiptText, tone: "bg-rose-50 text-rose-700" },
             { label: t("admin.financial.cards.averageConfirmedBooking"), value: currency(avgConfirmedValue), icon: Wallet, tone: "bg-slate-100 text-slate-700" },
-            { label: t("admin.financial.cards.pendingToConfirmed"), value: `${conversionRate}%`, icon: ArrowRightLeft, tone: "bg-blue-50 text-blue-700" },
+            { label: t("admin.financial.cards.pendingToConfirmed"), value: `${conversionRate}%`, icon: ArrowRightLeft, tone: "bg-red-50 text-red-700" },
             { label: t("admin.financial.cards.partnerTransfersPending"), value: externalSummary.pendingTransferCount, icon: HandCoins, tone: "bg-fuchsia-50 text-fuchsia-700" },
           ].map((item) => (
             <Card key={item.label} className={statCard}>
@@ -241,20 +241,20 @@ export default async function AdminFinancialPage({
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <Card className="admin-surface rounded-[1.8rem] border-transparent p-6">
+          <Card className="rounded-[1.8rem] border-slate-200 p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900">Recent billing documents</h2>
                 <p className="mt-1 text-sm text-slate-600">{t("admin.financial.sections.billingDocumentsDescription")}</p>
               </div>
-              <span className="admin-pill rounded-full px-3 py-1 text-xs font-medium">{t("admin.financial.sections.visibleCount", { count: recentInvoices.length })}</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">{t("admin.financial.sections.visibleCount", { count: recentInvoices.length })}</span>
             </div>
 
             <div className="mt-4 space-y-3">
               {recentInvoices.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("admin.financial.sections.noBillingDocuments")}</p>
               ) : recentInvoices.map((invoice) => (
-                <div key={invoice.id} className="admin-surface-soft rounded-2xl border-transparent p-4">
+                <div key={invoice.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                       <p className="font-semibold text-slate-900">{invoice.bookingCode} · {invoice.customerName}</p>
@@ -283,20 +283,20 @@ export default async function AdminFinancialPage({
             </div>
           </Card>
 
-          <Card className="admin-surface rounded-[1.8rem] border-transparent p-6">
+          <Card className="rounded-[1.8rem] border-slate-200 p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900">{t("admin.financial.sections.partnerLedgerTitle")}</h2>
                 <p className="mt-1 text-sm text-slate-600">{t("admin.financial.sections.partnerLedgerDescription")}</p>
               </div>
-              <span className="admin-pill rounded-full px-3 py-1 text-xs font-medium">{t("admin.financial.sections.visibleCount", { count: filteredExternalRows.length })}</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">{t("admin.financial.sections.visibleCount", { count: filteredExternalRows.length })}</span>
             </div>
 
             <div className="mt-4 space-y-3">
               {filteredExternalRows.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("admin.financial.sections.noPartnerRentals")}</p>
               ) : filteredExternalRows.map((row) => (
-                <div key={row.id} className="admin-surface-soft rounded-2xl border-transparent p-4">
+                <div key={row.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
                       <div>

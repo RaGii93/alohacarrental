@@ -1,0 +1,11 @@
+ALTER TABLE "Location"
+ADD COLUMN "latitude" DOUBLE PRECISION,
+ADD COLUMN "longitude" DOUBLE PRECISION;
+
+ALTER TABLE "Booking"
+ADD COLUMN "pickupLocationAddress" TEXT,
+ADD COLUMN "pickupLatitude" DOUBLE PRECISION,
+ADD COLUMN "pickupLongitude" DOUBLE PRECISION,
+ADD COLUMN "dropoffLocationAddress" TEXT,
+ADD COLUMN "dropoffLatitude" DOUBLE PRECISION,
+ADD COLUMN "dropoffLongitude" DOUBLE PRECISION;

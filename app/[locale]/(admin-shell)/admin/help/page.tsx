@@ -53,7 +53,7 @@ export default async function AdminHelpPage({
   return (
     <div className={ADMIN_PAGE_SHELL}>
       <div className={ADMIN_PAGE_STACK}>
-        <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff,hsl(var(--accent)/0.24)_48%,#ffffff)] p-8 shadow-[0_28px_72px_-40px_hsl(var(--primary)/0.14)]">
+        <div className="overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[linear-gradient(135deg,#ffffff,hsl(var(--primary)/0.05)_48%,#ffffff)] p-8 shadow-[0_28px_72px_-40px_hsl(var(--primary)/0.14)]">
           <p className={ADMIN_PAGE_KICKER}>{t("admin.dashboard.tabs.help")}</p>
           <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl space-y-4">
@@ -79,7 +79,7 @@ export default async function AdminHelpPage({
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]">
-          <Card className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_24px_56px_-34px_hsl(215_28%_17%/0.14)]">
+          <Card className="rounded-[1.8rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_24px_56px_-34px_hsl(var(--primary)/0.12)]">
             <DocsSearch locale={locale} copy={copy} />
           </Card>
 
@@ -87,7 +87,7 @@ export default async function AdminHelpPage({
         </div>
 
         {navigationGuide ? (
-          <Card className="rounded-[1.8rem] border-[hsl(var(--primary)/0.18)] bg-[linear-gradient(135deg,hsl(var(--primary)/0.08),white_42%,white)] p-6 shadow-[0_24px_56px_-34px_hsl(215_28%_17%/0.14)]">
+          <Card className="rounded-[1.8rem] border-[hsl(var(--primary)/0.18)] bg-[linear-gradient(135deg,hsl(var(--primary)/0.08),white_42%,white)] p-6 shadow-[0_24px_56px_-34px_hsl(var(--primary)/0.14)]">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-3xl space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[hsl(var(--primary))]">
@@ -138,7 +138,7 @@ export default async function AdminHelpPage({
               {[quickBooksGuide, zohoGuide].filter(Boolean).map((doc) => (
                 <Card
                   key={doc!.id}
-                  className="rounded-[1.6rem] border-[hsl(var(--primary)/0.18)] bg-[linear-gradient(135deg,hsl(var(--primary)/0.08),white_42%,white)] p-6 shadow-[0_18px_48px_-34px_hsl(215_28%_17%/0.14)]"
+                  className="rounded-[1.6rem] border-[hsl(var(--primary)/0.18)] bg-[linear-gradient(135deg,hsl(var(--primary)/0.08),white_42%,white)] p-6 shadow-[0_18px_48px_-34px_hsl(var(--primary)/0.14)]"
                 >
                   <div className="space-y-3">
                     <div className="inline-flex rounded-full bg-[hsl(var(--primary)/0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--primary))]">
@@ -148,12 +148,12 @@ export default async function AdminHelpPage({
                     <p className="text-sm leading-7 text-[hsl(var(--foreground)/0.72)]">{doc!.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {doc!.sections.slice(0, 3).map((section) => (
-                        <span
-                          key={`${doc!.id}-${section.id}`}
-                          className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[hsl(var(--foreground)/0.72)] ring-1 ring-[hsl(var(--border))]"
-                        >
-                          {section.heading}
-                        </span>
+                      <span
+                        key={`${doc!.id}-${section.id}`}
+                        className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-200"
+                      >
+                        {section.heading}
+                      </span>
                       ))}
                     </div>
                     <Button asChild className="mt-2 rounded-xl">
@@ -183,7 +183,7 @@ export default async function AdminHelpPage({
             {featuredDocs.map((doc) => (
               <Card
                 key={doc.id}
-                className="rounded-[1.6rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_18px_48px_-34px_hsl(215_28%_17%/0.14)]"
+                className="rounded-[1.6rem] border-[hsl(var(--border))] bg-white p-6 shadow-[0_18px_48px_-34px_hsl(var(--primary)/0.1)]"
               >
                 <div className="space-y-3">
                   <h3 className="text-lg font-bold text-[hsl(var(--foreground))]">{doc.title}</h3>
@@ -192,7 +192,7 @@ export default async function AdminHelpPage({
                     {doc.sections.slice(0, 2).map((section) => (
                       <span
                         key={`${doc.id}-${section.id}`}
-                        className="rounded-full bg-[hsl(var(--secondary))] px-3 py-1 text-xs font-semibold text-[hsl(var(--foreground)/0.72)]"
+                        className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-200"
                       >
                         {section.heading}
                       </span>

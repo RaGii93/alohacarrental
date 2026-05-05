@@ -7,7 +7,9 @@ import { toast } from "sonner";
 import { createDiscountCodeAction, updateDiscountCodeAction } from "@/actions/discounts";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
+import { formatDateInputInLaPaz, parseLaPazDateInput } from "@/lib/timezone";
 import { Save, TicketPercent, X } from "lucide-react";
 
 export function DiscountCodeDialog({
@@ -64,7 +66,11 @@ export function DiscountCodeDialog({
           <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("admin.discounts.description")} />
           <Input type="number" min={1} max={100} value={percentage} onChange={(e) => setPercentage(parseInt(e.target.value || "10", 10))} placeholder={t("admin.discounts.percentage")} />
           <Input type="number" min={1} value={maxUses} onChange={(e) => setMaxUses(e.target.value)} placeholder={t("admin.discounts.maxUses")} />
-          <Input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+          <DatePicker
+            value={parseLaPazDateInput(expiresAt)}
+            onChange={(date) => setExpiresAt(formatDateInputInLaPaz(date))}
+            placeholder={t("admin.discounts.table.expires")}
+          />
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
             {t("admin.discounts.active")}

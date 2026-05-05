@@ -5,35 +5,20 @@ import { getTenantConfig } from "@/lib/tenant";
 
 export async function GET() {
   try {
-    const where = { isVisible: true };
-    const [reviews, summary] = await Promise.all([
-      db.review.findMany({
-        where,
-        select: {
-          id: true,
-          customerName: true,
-          rating: true,
-          comment: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" },
-        take: 8,
-      }),
-      db.review.aggregate({
-        where,
-        _count: { id: true },
-        _avg: { rating: true },
-      }),
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      reviews,
-      summary: {
-        count: summary._count.id ?? 0,
-        averageRating: summary._avg.rating ? Number(summary._avg.rating.toFixed(1)) : 0,
+    const reviews = await db.review.findMany({
+      where: { isVisible: true },
+      select: {
+        id: true,
+        customerName: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
       },
+      orderBy: { createdAt: "desc" },
+      take: 8,
     });
+
+    return NextResponse.json({ success: true, reviews });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error?.message || "Failed to load reviews" },
@@ -104,13 +89,42 @@ export async function POST(request: Request) {
         to: tenant.email,
         subject: `New Review Submitted - ${booking.bookingCode}`,
         html: `
-          <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;">
-            <h2>New customer review submitted</h2>
-            <p><strong>Booking code:</strong> ${booking.bookingCode}</p>
-            <p><strong>Customer:</strong> ${booking.customerName}</p>
-            <p><strong>Rating:</strong> ${rating}/5</p>
-            <p><strong>Comment:</strong><br/>${comment.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
-            <p>This review is hidden by default. You can publish it from the admin dashboard.</p>
+          <div style="margin:0;background:#f8f7f4;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;color:#111111;" class="email-shell">
+            <style>
+              @media only screen and (max-width: 620px) {
+                .email-shell { padding:16px 8px !important; }
+                .email-card { border-radius:14px !important; }
+                .email-section { padding:16px !important; }
+                .email-word-break { word-break:break-word !important; overflow-wrap:anywhere !important; }
+              }
+            </style>
+            <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #d7d0c4;border-radius:18px;overflow:hidden;" class="email-card">
+              <div style="height:4px;background:#c1121f;"></div>
+              <div style="padding:22px 24px;" class="email-section">
+                <h2 style="margin:0 0 16px 0;font-size:24px;line-height:1.25;">New customer review submitted</h2>
+                <table role="presentation" style="width:100%;border-collapse:collapse;">
+                  <tr>
+                    <td style="padding:10px 0;font-size:14px;color:#5b6472;width:140px;">Booking code</td>
+                    <td style="padding:10px 0;font-size:14px;font-weight:700;color:#111111;" class="email-word-break">${booking.bookingCode}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0;font-size:14px;color:#5b6472;border-top:1px solid #d7d0c4;">Customer</td>
+                    <td style="padding:10px 0;font-size:14px;color:#111111;border-top:1px solid #d7d0c4;" class="email-word-break">${booking.customerName}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0;font-size:14px;color:#5b6472;border-top:1px solid #d7d0c4;">Rating</td>
+                    <td style="padding:10px 0;font-size:14px;color:#111111;border-top:1px solid #d7d0c4;">${rating}/5</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 0 0 0;font-size:14px;color:#5b6472;border-top:1px solid #d7d0c4;vertical-align:top;">Comment</td>
+                    <td style="padding:10px 0 0 0;font-size:14px;color:#111111;border-top:1px solid #d7d0c4;line-height:1.6;" class="email-word-break">${comment.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>
+                  </tr>
+                </table>
+                <p style="margin:18px 0 0 0;font-size:13px;line-height:1.6;color:#5b6472;">
+                  This review is hidden by default. You can publish it from the admin dashboard.
+                </p>
+              </div>
+            </div>
           </div>
         `,
       });
