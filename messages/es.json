@@ -246,8 +246,8 @@
       "supportLabel": "Soporte"
     },
     "whyChoose": {
-      "title": "Un vehículo local para playas, salinas y paradas en Bonaire",
-      "subtitle": "Diseñamos la experiencia según cómo la gente realmente se mueve por Bonaire: recogidas en el aeropuerto, paseos tranquilos junto a las casitas de esclavos del sur y apoyo flexible cuando cambian los planes.",
+      "title": "Un vehículo local para cada rincón de Bonaire.",
+      "subtitle": "Diseñamos nuestro servicio en torno a la forma en que realmente exploras. Disfruta de la libertad de descubrir a tu ritmo, con apoyo flexible cuando cambian los planes.",
       "benefitsTitle": "Beneficios clave de alquilar con nosotros",
       "benefitsSubtitle": "Mantenemos la experiencia de alquiler simple, constante y fácil de confiar desde la reserva hasta la devolución.",
       "features": {
@@ -291,13 +291,13 @@
         }
       },
       "photoCard": {
-        "description": "Aguas cristalinas y playas vírgenes te esperan",
-        "label": "Paraíso Encontrado"
+        "description": "Luz de mar cristalina, horizonte turquesa y momentos tranquilos disfrutando de la belleza natural de la costa.",
+        "label": "Tu Transporte Local en la Isla"
       }
     },
     "ctaSection": {
       "title": "Haz de la isla tu ruta del día",
-      "subtitle": "Reserva el auto que encaja con tus planes en Bonaire, desde mañanas de playa y paradas de buceo hasta atardeceres por la costa sur.",
+      "subtitle": "Encuentra el auto ideal para tus necesidades, desde aventuras de buceo costero y la belleza salvaje del Parque Nacional Washington Slagbaai hasta tardes de brisa junto al mar. Ya sea que descubras las calas del sur o persigas el atardecer perfecto, tenemos el vehículo ideal para cada momento en Bonaire.",
       "button": "Reservar Ahora"
     },
     "hero": {
@@ -357,8 +357,8 @@
       }
     },
     "fleet": {
-      "title": "Elige el vehículo que siga tu ritmo en Bonaire",
-      "description": "Encuentra el vehículo ideal para recogidas en el aeropuerto, vueltas por Kralendijk, paradas fotográficas en la costa sur y tardes tranquilas junto al mar.",
+      "title": "Explora la isla a tu manera.",
+      "description": "Creemos que la mejor manera de ver la isla es con la libertad de detenerte donde quieras. Encuentra el vehículo que se adapte a tus planes y empieza a explorar la belleza de Bonaire hoy.",
       "seats": "{count} asientos",
       "reserveNow": "Reservar ahora",
       "seeMore": "Ver mas"
@@ -513,8 +513,8 @@
     },
     "reviews": {
       "eyebrow": "Historias de clientes",
-      "title": "Historias de huéspedes con paisaje de Bonaire",
-      "subtitle": "Opiniones reales de viajeros que usaron Aloha para moverse entre playas, sitios de buceo, la ciudad y las carreteras costeras más icónicas de la isla.",
+      "title": "Historias de huéspedes desde toda la isla.",
+      "subtitle": "Opiniones reales de viajeros que usaron Aloha para moverse sin esfuerzo entre sus lugares favoritos y las vistas más icónicas de la isla.",
       "leaveButton": "Dejar una Reseña",
       "empty": "Todavía no hay reseñas publicadas.",
       "faqPreview": "Respuestas rapidas para los clientes antes de reservar, en un solo lugar.",
@@ -540,8 +540,8 @@
         "pendingApproval": "Reseña enviada. Será visible después de la aprobación del administrador."
       },
       "photoCard": {
-        "description": "Confiado por miles de viajeros felices en todo el mundo",
-        "label": "Aprobado por Huéspedes"
+        "description": "Las mejores historias de la isla empiezan con un plan sencillo: toma las llaves, ve al mar y deja que Bonaire te muestre el camino.",
+        "label": "Tu viaje, nuestra prioridad."
       }
     },
     "footer": {

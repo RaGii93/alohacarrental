@@ -246,8 +246,8 @@
       "supportLabel": "Support"
     },
     "whyChoose": {
-      "title": "A local ride for Bonaire's beaches, salt flats, and town stops",
-      "subtitle": "We shaped the experience around the way people actually move across Bonaire: airport pickups, easy drives past the southern slave huts, and flexible support when the island plan changes.",
+      "title": "A local ride for every corner of Bonaire.",
+      "subtitle": "We shaped our service around the way you actually explore. Enjoy the freedom to discover at your own pace, with flexible support when the island plan changes.",
       "benefitsTitle": "Key benefits of renting with us",
       "benefitsSubtitle": "We keep the rental experience simple, consistent, and easy to trust from booking to return.",
       "features": {
@@ -291,13 +291,13 @@
         }
       },
       "photoCard": {
-        "description": "Crystal waters and pristine beaches await your arrival",
-        "label": "Paradise Found"
+        "description": "Crystal sea light, turquoise horizon and quiet moments spent enjoying the natural beauty of the coast.",
+        "label": "Your Local Island Ride"
       }
     },
     "ctaSection": {
       "title": "Make the island your route for the day",
-      "subtitle": "Reserve the car that fits your Bonaire plans, from beach mornings and diving stops to sunset drives along the southern coast.",
+      "subtitle": "Find a ride that fits your needs-from shore diving adventures and the wild beauty of Washington Slagbaai National Park to breezy afternoons by the sea. Whether you're discovering southern coves or chasing the perfect sunset, we have the ideal ride for every Bonaire moment.",
       "button": "Book Now"
     },
     "hero": {
@@ -357,8 +357,8 @@
       }
     },
     "fleet": {
-      "title": "Choose the vehicle that fits your Bonaire rhythm",
-      "description": "Find the ride that works for airport pickups, downtown Kralendijk errands, southern coast photo stops, and easy afternoons by the water.",
+      "title": "Explore the island your way.",
+      "description": "We believe the best way to see the island is with the freedom to stop wherever you like. Find the vehicle that matches your plans and start exploring the beauty of Bonaire today.",
       "seats": "{count} seats",
       "reserveNow": "Reserve now",
       "seeMore": "See more"
@@ -513,8 +513,8 @@
     },
     "reviews": {
       "eyebrow": "Customer Stories",
-      "title": "Guest stories with a Bonaire backdrop",
-      "subtitle": "Real feedback from travelers who used Aloha to move between beaches, dive spots, town, and the island's landmark coastal roads.",
+      "title": "Guest stories from across the island.",
+      "subtitle": "Real feedback from travelers who used Aloha to move effortlessly between their favorite locations and the island's most iconic views.",
       "leaveButton": "Leave a Review",
       "empty": "No reviews are published yet.",
       "faqPreview": "Quick answers for renters before they book, all in one place.",
@@ -540,8 +540,8 @@
         "pendingApproval": "Review submitted. It will be visible after admin approval."
       },
       "photoCard": {
-        "description": "Trusted by thousands of happy travelers worldwide",
-        "label": "Guest Approved"
+        "description": "The best island stories start with a simple plan: grab the keys, head for the water, and let Bonaire show you the way.",
+        "label": "Your Journey, Our Priority."
       }
     },
     "footer": {

@@ -427,6 +427,42 @@
 
 /* ── Aloha public-site component classes ─────────────────────────── */
 
+/* Section shell background */
+.public-shell-bg {
+  background: linear-gradient(180deg, rgba(241, 249, 255, 0.94) 0%, rgba(248, 252, 255, 0.96) 100%);
+}
+
+/* Postcard-style section headings — warm pink/rose */
+.public-postcard-title {
+  color: rgb(196, 69, 142);
+}
+
+/* Postcard-style section body copy — deep navy */
+.public-postcard-copy {
+  color: rgba(46, 64, 134, 0.82);
+}
+
+/* Pill chips (e.g. story stops) — dark navy with white text */
+.public-chip {
+  background: rgba(28, 44, 96, 0.88);
+  color: #ffffff;
+}
+
+/* Photo card frame container — warm cream card */
+.public-photo-frame {
+  background: rgba(255, 251, 245, 0.92);
+  border: 1px solid rgba(255, 145, 44, 0.16);
+  box-shadow: 0 24px 64px -32px rgba(96, 45, 10, 0.18);
+}
+
+/* Photo location label overlays */
+.public-photo-label {
+  background: rgba(12, 22, 52, 0.74);
+  color: #ffffff;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
 /* Booking search widget panel (hero section) */
 .public-hero-panel {
   background: rgba(255, 255, 255, 0.88);
