@@ -94,7 +94,7 @@ export default function HeroSection({ locations }: HeroSectionProps) {
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-32">
         <div className="grid items-center gap-8 lg:grid-cols-[1.12fr_0.88fr]">
           <div className="space-y-6 text-white">
-            <h1 className="max-w-4xl text-5xl font-extrabold italic leading-[1.08] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl">
+            <h1 className="max-w-4xl text-5xl font-extrabold italic leading-[1.08] tracking-tight text-white drop-shadow-[0_14px_34px_rgba(0,0,0,0.45)] sm:text-6xl [font-family:var(--font-display)]">
               {t("landing.hero.headline.line1")}{" "}
               <span className="text-[rgb(255,210,63)] drop-shadow-[0_14px_24px_rgba(0,0,0,0.34)]">
                 Aloha

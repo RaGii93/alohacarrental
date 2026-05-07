@@ -2,7 +2,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
 import { getMessages, setRequestLocale } from "next-intl/server";
+import { Playfair_Display } from "next/font/google";
 import "@/app/globals.css";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+  display: "swap",
+});
 import {NextIntlClientProvider} from 'next-intl';
 import {routing} from '@/i18n/routing';
 import { buildMetadata } from "@/lib/seo";
@@ -47,7 +56,7 @@ export default async function RootLayout({children, params}: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning className={playfair.variable}>
       <body className="antialiased" style={tenantThemeStyles}>
         <NextIntlClientProvider messages={messages}>
           {children}
