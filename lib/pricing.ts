@@ -1,4 +1,9 @@
 import type { BookingRuleSettings, BelowMinimumRentalSurchargeMode } from "@/lib/settings";
+import {
+  addLaPazDays,
+  parseLaPazDateInput,
+  startOfLaPazDay,
+} from "@/lib/timezone";
 
 /**
  * Calculate the number of days between two dates (endDate exclusive)
@@ -30,6 +35,7 @@ export type BookingRuleEvaluation = {
   baseTotalCents: number;
   extrasTotalCents: number;
   hoursUntilStart: number;
+  effectiveMinimumRentalDays: number;
   isBelowMinimumRental: boolean;
   isLastMinuteBooking: boolean;
   belowMinimumBlocked: boolean;
@@ -41,6 +47,55 @@ export type BookingRuleEvaluation = {
   totalAmountCents: number;
   appliedRules: Array<"below_minimum" | "last_minute">;
 };
+
+function overlapsSeasonalMinimumRule(startDate: Date, endDate: Date, ruleStartDate: string, ruleEndDate: string) {
+  const bookingStart = startOfLaPazDay(startDate);
+  const bookingEnd = endDate;
+  const seasonalStart = parseLaPazDateInput(ruleStartDate, 0);
+  const seasonalEnd = parseLaPazDateInput(ruleEndDate, 0);
+
+  if (!seasonalStart || !seasonalEnd) return false;
+
+  const seasonalEndExclusive = addLaPazDays(startOfLaPazDay(seasonalEnd), 1);
+
+  return bookingStart < seasonalEndExclusive && bookingEnd > seasonalStart;
+}
+
+export function getEffectiveMinimumRentalDays(params: {
+  startDate: Date;
+  endDate: Date;
+  settings: BookingRuleSettings;
+}) {
+  let effectiveMinimumRentalDays = Math.max(1, params.settings.minimumRentalDays);
+
+  for (const rule of params.settings.seasonalMinimumRentalRules || []) {
+    if (!rule.startDate || !rule.endDate) continue;
+    if (!overlapsSeasonalMinimumRule(params.startDate, params.endDate, rule.startDate, rule.endDate)) {
+      continue;
+    }
+    effectiveMinimumRentalDays = Math.max(effectiveMinimumRentalDays, rule.minimumRentalDays);
+  }
+
+  return effectiveMinimumRentalDays;
+}
+
+export function getMinimumDropoffDateForBooking(params: {
+  startDate: Date;
+  settings: BookingRuleSettings;
+  selectedEndDate?: Date | null;
+}) {
+  const selectedEndDate = params.selectedEndDate && params.selectedEndDate > params.startDate
+    ? params.selectedEndDate
+    : addLaPazDays(startOfLaPazDay(params.startDate), params.settings.minimumRentalDays);
+
+  const effectiveMinimumRentalDays = getEffectiveMinimumRentalDays({
+    startDate: params.startDate,
+    endDate: selectedEndDate,
+    settings: params.settings,
+  });
+
+  return addLaPazDays(startOfLaPazDay(params.startDate), effectiveMinimumRentalDays);
+}
 
 function applyBelowMinimumSurchargeMode(params: {
   mode: BelowMinimumRentalSurchargeMode;
@@ -70,11 +125,16 @@ export function evaluateBookingRules(params: {
   now?: Date;
 }) : BookingRuleEvaluation {
   const days = calculateDays(params.startDate, params.endDate);
+  const effectiveMinimumRentalDays = getEffectiveMinimumRentalDays({
+    startDate: params.startDate,
+    endDate: params.endDate,
+    settings: params.settings,
+  });
   const baseTotalCents = Math.max(0, Math.round(params.basePriceCents)) * days;
   const extrasTotalCents = Math.max(0, Math.round(params.extrasCents || 0));
   const now = params.now ?? new Date();
   const hoursUntilStart = (params.startDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-  const isBelowMinimumRental = days < params.settings.minimumRentalDays;
+  const isBelowMinimumRental = days < effectiveMinimumRentalDays;
   const isLastMinuteBooking =
     params.settings.lastMinuteBookingEnabled &&
     hoursUntilStart >= 0 &&
@@ -123,6 +183,7 @@ export function evaluateBookingRules(params: {
     baseTotalCents,
     extrasTotalCents,
     hoursUntilStart,
+    effectiveMinimumRentalDays,
     isBelowMinimumRental,
     isLastMinuteBooking,
     belowMinimumBlocked,

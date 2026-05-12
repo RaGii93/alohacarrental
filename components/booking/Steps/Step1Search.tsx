@@ -11,16 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapLocationPickerDialog } from "@/components/shared/MapLocationPickerDialog";
 import { cn } from "@/lib/utils";
 import { searchAvailabilityAction, AvailabilityResult } from "@/actions/availability";
-import { calculateDays, evaluateBookingRules, formatCurrency, type BookingSource } from "@/lib/pricing";
+import {
+  calculateDays,
+  evaluateBookingRules,
+  formatCurrency,
+  getMinimumDropoffDateForBooking,
+  type BookingSource,
+} from "@/lib/pricing";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { BookingData } from "../BookingWizard";
 import type { BookingRuleSettings } from "@/lib/settings";
-import {
-  addLaPazDays,
-  combineLaPazDateAndTime,
-  getLaPazToday,
-  startOfLaPazDay,
-} from "@/lib/timezone";
+import { combineLaPazDateAndTime, getLaPazToday } from "@/lib/timezone";
 import {
   CalendarDays,
   CheckCircle2,
@@ -50,7 +51,6 @@ interface Step1SearchProps {
   setAvailability: (availability: AvailabilityResult[]) => void;
   availability: AvailabilityResult[];
   locations: { id: string; name: string; code?: string | null; address?: string | null; latitude?: number | null; longitude?: number | null }[];
-  minimumBookingDays: number;
   bookingSource: BookingSource;
   bookingRuleSettings: BookingRuleSettings;
 }
@@ -63,7 +63,6 @@ export function Step1Search({
   setAvailability,
   availability,
   locations,
-  minimumBookingDays,
   bookingSource,
   bookingRuleSettings,
 }: Step1SearchProps) {
@@ -78,7 +77,11 @@ export function Step1Search({
 
   const minimumEndDate = bookingData.startDate ? new Date(bookingData.startDate) : null;
   if (minimumEndDate && bookingSource === "public" && bookingRuleSettings.belowMinimumRentalAdminOnly) {
-    const nextMinimumEndDate = addLaPazDays(startOfLaPazDay(minimumEndDate), minimumBookingDays);
+    const nextMinimumEndDate = getMinimumDropoffDateForBooking({
+      startDate: minimumEndDate,
+      selectedEndDate: bookingData.endDate,
+      settings: bookingRuleSettings,
+    });
     minimumEndDate.setTime(nextMinimumEndDate.getTime());
   }
 
@@ -98,7 +101,7 @@ export function Step1Search({
       })
     : null;
   const blockedMessage = bookingRules?.belowMinimumBlocked
-    ? t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })
+    ? t("booking.errors.minimumDurationAdminOnly", { days: bookingRules.effectiveMinimumRentalDays })
     : bookingRules?.lastMinuteBlocked
       ? t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })
       : null;
@@ -428,7 +431,7 @@ export function Step1Search({
               const isAvailable = cat.availableCount > 0;
               const days = pickupDateTime && dropoffDateTime ? calculateDays(pickupDateTime, dropoffDateTime) : 1;
               const cardBlockedMessage = cat.belowMinimumBlocked
-                ? t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })
+                ? t("booking.errors.minimumDurationAdminOnly", { days: cat.effectiveMinimumRentalDays })
                 : cat.lastMinuteBlocked
                   ? t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })
                   : null;

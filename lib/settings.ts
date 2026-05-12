@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 
 const TAX_KEY = "tax_percentage";
 const MIN_BOOKING_DAYS_KEY = "minimum_booking_days";
+const SEASONAL_MINIMUM_RENTAL_RULES_KEY = "seasonal_minimum_rental_rules";
 const BOOKING_HOLD_DAYS_KEY = "booking_hold_days";
 const BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY = "below_minimum_rental_admin_only";
 const BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY = "below_minimum_rental_pricing_enabled";
@@ -138,6 +139,7 @@ export type BelowMinimumRentalSurchargeMode =
 
 export type BookingRuleSettings = {
   minimumRentalDays: number;
+  seasonalMinimumRentalRules: SeasonalMinimumRentalRule[];
   belowMinimumRentalAdminOnly: boolean;
   belowMinimumRentalPricingEnabled: boolean;
   belowMinimumRentalSurchargeMode: BelowMinimumRentalSurchargeMode;
@@ -146,6 +148,13 @@ export type BookingRuleSettings = {
   lastMinuteBookingAdminOnly: boolean;
   lastMinuteBookingThresholdHours: number;
   lastMinuteBookingExtraPercent: number;
+};
+
+export type SeasonalMinimumRentalRule = {
+  id: string;
+  startDate: string;
+  endDate: string;
+  minimumRentalDays: number;
 };
 
 export type FleetOperationsSettings = {
@@ -325,6 +334,60 @@ function clampMinBookingDays(input: number): number {
 
 function defaultMinBookingDays(): number {
   return clampMinBookingDays(Number(process.env.DEFAULT_MIN_BOOKING_DAYS || 1));
+}
+
+function normalizeDateOnlyString(value: string | null | undefined): string {
+  const normalized = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? normalized : "";
+}
+
+function normalizeSeasonalMinimumRentalRule(
+  input: Partial<SeasonalMinimumRentalRule> | null | undefined,
+  index: number
+): SeasonalMinimumRentalRule | null {
+  const startDate = normalizeDateOnlyString(input?.startDate);
+  const endDate = normalizeDateOnlyString(input?.endDate);
+  const minimumRentalDays = clampMinBookingDays(Number(input?.minimumRentalDays));
+
+  if (!startDate || !endDate || startDate > endDate) {
+    return null;
+  }
+
+  const id = String(input?.id || "").trim() || `seasonal-minimum-${index + 1}`;
+
+  return {
+    id,
+    startDate,
+    endDate,
+    minimumRentalDays,
+  };
+}
+
+function normalizeSeasonalMinimumRentalRules(
+  input: unknown
+): SeasonalMinimumRentalRule[] {
+  if (!Array.isArray(input)) return [];
+
+  return input
+    .map((rule, index) => normalizeSeasonalMinimumRentalRule((rule || {}) as Partial<SeasonalMinimumRentalRule>, index))
+    .filter((rule): rule is SeasonalMinimumRentalRule => Boolean(rule))
+    .sort((left, right) => {
+      if (left.startDate !== right.startDate) return left.startDate.localeCompare(right.startDate);
+      if (left.endDate !== right.endDate) return left.endDate.localeCompare(right.endDate);
+      return left.minimumRentalDays - right.minimumRentalDays;
+    });
+}
+
+function parseSeasonalMinimumRentalRules(value: string | null | undefined): SeasonalMinimumRentalRule[] {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return [];
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    return normalizeSeasonalMinimumRentalRules(parsed);
+  } catch {
+    return [];
+  }
 }
 
 function clampBookingHoldDays(input: number): number {
@@ -568,6 +631,7 @@ export async function setBookingHoldDays(nextBookingHoldDays: number): Promise<n
 export async function getBookingRuleSettings(): Promise<BookingRuleSettings> {
   const values = await getAppSettingsMap([
     MIN_BOOKING_DAYS_KEY,
+    SEASONAL_MINIMUM_RENTAL_RULES_KEY,
     BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY,
     BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY,
     BELOW_MINIMUM_RENTAL_SURCHARGE_MODE_KEY,
@@ -582,6 +646,7 @@ export async function getBookingRuleSettings(): Promise<BookingRuleSettings> {
     minimumRentalDays: values[MIN_BOOKING_DAYS_KEY]
       ? clampMinBookingDays(Number(values[MIN_BOOKING_DAYS_KEY]))
       : defaultMinBookingDays(),
+    seasonalMinimumRentalRules: parseSeasonalMinimumRentalRules(values[SEASONAL_MINIMUM_RENTAL_RULES_KEY]),
     belowMinimumRentalAdminOnly: values[BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY]
       ? parseBool(values[BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY], defaultBelowMinimumRentalAdminOnly())
       : defaultBelowMinimumRentalAdminOnly(),
@@ -612,6 +677,7 @@ export async function getBookingRuleSettings(): Promise<BookingRuleSettings> {
 export async function setBookingRuleSettings(input: BookingRuleSettings): Promise<BookingRuleSettings> {
   const normalized: BookingRuleSettings = {
     minimumRentalDays: clampMinBookingDays(input.minimumRentalDays),
+    seasonalMinimumRentalRules: normalizeSeasonalMinimumRentalRules(input.seasonalMinimumRentalRules),
     belowMinimumRentalAdminOnly: Boolean(input.belowMinimumRentalAdminOnly),
     belowMinimumRentalPricingEnabled: Boolean(input.belowMinimumRentalPricingEnabled),
     belowMinimumRentalSurchargeMode: normalizeBelowMinimumRentalSurchargeMode(input.belowMinimumRentalSurchargeMode),
@@ -624,6 +690,7 @@ export async function setBookingRuleSettings(input: BookingRuleSettings): Promis
 
   await setAppSettingValues({
     [MIN_BOOKING_DAYS_KEY]: String(normalized.minimumRentalDays),
+    [SEASONAL_MINIMUM_RENTAL_RULES_KEY]: JSON.stringify(normalized.seasonalMinimumRentalRules),
     [BELOW_MINIMUM_RENTAL_ADMIN_ONLY_KEY]: normalized.belowMinimumRentalAdminOnly ? "true" : "false",
     [BELOW_MINIMUM_RENTAL_PRICING_ENABLED_KEY]: normalized.belowMinimumRentalPricingEnabled ? "true" : "false",
     [BELOW_MINIMUM_RENTAL_SURCHARGE_MODE_KEY]: normalized.belowMinimumRentalSurchargeMode,

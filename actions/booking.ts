@@ -225,7 +225,7 @@ async function evaluateBookingPricingRules(params: {
   if (evaluation.belowMinimumBlocked) {
     return {
       ok: false as const,
-      error: `This booking is below the ${settings.minimumRentalDays}-day minimum and can only be created by an admin.`,
+      error: `This booking is below the ${evaluation.effectiveMinimumRentalDays}-day minimum and can only be created by an admin.`,
     };
   }
 

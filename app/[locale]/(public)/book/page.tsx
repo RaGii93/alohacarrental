@@ -11,7 +11,7 @@ import { getPublicMetadataCopy } from "@/lib/public-metadata-profiles";
 import { getPublicLocations, getPublicVehicleCategories } from "@/lib/public-data";
 import { getBookingJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
-import { getBookingRuleSettings, getMinBookingDays, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
+import { getBookingRuleSettings, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { parseLaPazDateInput } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
@@ -81,10 +81,9 @@ export default async function BookingPage({
   const { startDate, endDate, pickupTime, dropoffTime, categoryId, pickupLocationId, dropoffLocationId } = await searchParams;
   const t = await getTranslations();
   const copy = bookCopy[locale as keyof typeof bookCopy] || bookCopy.en;
-  const [tenant, taxPercentage, minimumBookingDays, bookingRules, vehicleRatesIncludeTax] = await Promise.all([
+  const [tenant, taxPercentage, bookingRules, vehicleRatesIncludeTax] = await Promise.all([
     getTenantConfig(),
     getTaxPercentage(),
-    getMinBookingDays(),
     getBookingRuleSettings(),
     getVehicleRatesIncludeTax(),
   ]);
@@ -179,21 +178,20 @@ export default async function BookingPage({
             extras={extras}
             categories={categories as any}
             taxPercentage={taxPercentage}
-          vehicleRatesIncludeTax={vehicleRatesIncludeTax}
-          minimumBookingDays={minimumBookingDays}
-          bookingRuleSettings={bookingRules}
-          termsPdfUrl={tenant.termsPdfUrl}
-          initialData={{
-            startDate: startDate ? parseLaPazDateInput(startDate) : null,
-            endDate: endDate ? parseLaPazDateInput(endDate) : null,
-            pickupTime: pickupTime || undefined,
-            dropoffTime: dropoffTime || undefined,
-            categoryId: categoryId || null,
-            pickupLocationId: pickupLocationId || "",
-            dropoffLocationId: dropoffLocationId || "",
-          }}
-        />
-      </div>
+            vehicleRatesIncludeTax={vehicleRatesIncludeTax}
+            bookingRuleSettings={bookingRules}
+            termsPdfUrl={tenant.termsPdfUrl}
+            initialData={{
+              startDate: startDate ? parseLaPazDateInput(startDate) : null,
+              endDate: endDate ? parseLaPazDateInput(endDate) : null,
+              pickupTime: pickupTime || undefined,
+              dropoffTime: dropoffTime || undefined,
+              categoryId: categoryId || null,
+              pickupLocationId: pickupLocationId || "",
+              dropoffLocationId: dropoffLocationId || "",
+            }}
+          />
+        </div>
       </section>
     </>
   );

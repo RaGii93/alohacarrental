@@ -8,13 +8,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2, Gauge, Home, Settings2, User } from "lucide-react";
 import { isLicenseActive } from "@/lib/license";
 import { getBlobProxyUrl } from "@/lib/blob";
-import { calculateDays, evaluateBookingRules, formatCurrency } from "@/lib/pricing";
+import {
+  calculateDays,
+  evaluateBookingRules,
+  formatCurrency,
+  getMinimumDropoffDateForBooking,
+} from "@/lib/pricing";
 import { Step1Search } from "./Steps/Step1Search";
 import { Step2Customer } from "./Steps/Step2Customer";
 import { Step3Review } from "./Steps/Step3Review";
 import { AvailabilityResult } from "@/actions/availability";
 import type { BookingRuleSettings } from "@/lib/settings";
-import { addLaPazDays, combineLaPazDateAndTime, startOfLaPazDay } from "@/lib/timezone";
+import { combineLaPazDateAndTime } from "@/lib/timezone";
 import type { AdditionalDriverFormValue } from "@/components/shared/AdditionalDriversEditor";
 
 export interface BookingData {
@@ -67,7 +72,6 @@ export function BookingWizard({
   categories,
   taxPercentage,
   vehicleRatesIncludeTax,
-  minimumBookingDays,
   bookingRuleSettings,
   termsPdfUrl,
   bookingSource = "public",
@@ -87,7 +91,6 @@ export function BookingWizard({
   }>;
   taxPercentage: number;
   vehicleRatesIncludeTax: boolean;
-  minimumBookingDays: number;
   bookingRuleSettings: BookingRuleSettings;
   termsPdfUrl: string;
   bookingSource?: "public" | "admin";
@@ -141,7 +144,11 @@ export function BookingWizard({
         const currentEndDate = updates.endDate ?? prev.endDate;
 
         if (nextStartDate && bookingSource === "public" && bookingRuleSettings.belowMinimumRentalAdminOnly) {
-          const minimumDropoffDate = addLaPazDays(startOfLaPazDay(nextStartDate), minimumBookingDays);
+          const minimumDropoffDate = getMinimumDropoffDateForBooking({
+            startDate: nextStartDate,
+            selectedEndDate: currentEndDate,
+            settings: bookingRuleSettings,
+          });
 
           if (!currentEndDate || currentEndDate < minimumDropoffDate) {
             next.endDate = minimumDropoffDate;
@@ -181,7 +188,7 @@ export function BookingWizard({
   const totalAmount = pricing?.totalAmountCents ?? 0;
   const subtotalBeforeTax = pricing?.subtotalBeforeTaxCents ?? (baseAmount + extrasAmount);
   const summaryBlockedMessage = pricing?.belowMinimumBlocked
-    ? t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })
+    ? t("booking.errors.minimumDurationAdminOnly", { days: pricing.effectiveMinimumRentalDays })
     : pricing?.lastMinuteBlocked
       ? t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })
       : null;
@@ -237,7 +244,6 @@ export function BookingWizard({
               setAvailability={setAvailability}
               availability={availability}
               locations={locations}
-              minimumBookingDays={minimumBookingDays}
               bookingSource={bookingSource}
               bookingRuleSettings={bookingRuleSettings}
             />

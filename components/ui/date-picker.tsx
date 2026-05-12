@@ -39,6 +39,17 @@ export function DatePicker({
   hideIcon = false,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const today = React.useMemo(() => new Date(), []);
+  const resolvedFromYear = React.useMemo(() => {
+    if (typeof fromYear === "number") return fromYear;
+    if (minDate) return minDate.getFullYear();
+    return today.getFullYear() - 100;
+  }, [fromYear, minDate, today]);
+  const resolvedToYear = React.useMemo(() => {
+    if (typeof toYear === "number") return toYear;
+    if (maxDate) return maxDate.getFullYear();
+    return today.getFullYear() + 10;
+  }, [toYear, maxDate, today]);
   const resolvedDisabledDate = React.useCallback(
     (date: Date) => {
       if (disabledDate?.(date)) return true;
@@ -84,8 +95,8 @@ export function DatePicker({
             onChange(date ?? null);
             if (date) setOpen(false);
           }}
-          fromYear={fromYear}
-          toYear={toYear}
+          fromYear={resolvedFromYear}
+          toYear={resolvedToYear}
           disabled={resolvedDisabledDate}
           fixedWeeks
           initialFocus

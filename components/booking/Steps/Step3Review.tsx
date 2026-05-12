@@ -126,7 +126,7 @@ export function Step3Review({
         return;
       }
       if (pricing?.belowMinimumBlocked) {
-        toast.error(t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays }));
+        toast.error(t("booking.errors.minimumDurationAdminOnly", { days: pricing.effectiveMinimumRentalDays }));
         setIsSubmitting(false);
         return;
       }
@@ -232,7 +232,7 @@ export function Step3Review({
           <CardContent className="space-y-4">
             {pricing?.belowMinimumBlocked ? (
               <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
-                {t("booking.errors.minimumDurationAdminOnly", { days: bookingRuleSettings.minimumRentalDays })}
+                {t("booking.errors.minimumDurationAdminOnly", { days: pricing.effectiveMinimumRentalDays })}
               </div>
             ) : null}
             {pricing?.lastMinuteBlocked ? (

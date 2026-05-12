@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Banknote, Building2, CheckCircle2, Palette, PlugZap, ShieldCheck } from "lucide-react";
+import { Banknote, Building2, CheckCircle2, Palette, PlugZap, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ import type {
   InvoiceProvider,
   QuickBooksFeatureSettings,
   QuickBooksSetupSettings,
+  SeasonalMinimumRentalRule,
   TenantSettings,
   ZohoInvoiceFeatureSettings,
   ZohoSetupSettings,
@@ -59,6 +60,8 @@ type ProviderHealthState = {
   details?: string[];
 };
 
+type SeasonalMinimumRuleDraft = SeasonalMinimumRentalRule;
+
 export function TaxSettingsCard({
   locale,
   initialTaxPercentage,
@@ -82,6 +85,9 @@ export function TaxSettingsCard({
   const [taxPercentage, setTaxPercentage] = useState(String(initialTaxPercentage));
   const [vehicleRatesIncludeTax, setVehicleRatesIncludeTax] = useState(initialVehicleRatesIncludeTax);
   const [minimumBookingDays, setMinimumBookingDays] = useState(String(initialMinimumBookingDays));
+  const [seasonalMinimumRentalRules, setSeasonalMinimumRentalRules] = useState<SeasonalMinimumRuleDraft[]>(
+    initialBookingRules.seasonalMinimumRentalRules
+  );
   const [bookingHoldDays, setBookingHoldDays] = useState(String(initialBookingHoldDays));
   const [belowMinimumRentalAdminOnly, setBelowMinimumRentalAdminOnly] = useState(initialBookingRules.belowMinimumRentalAdminOnly);
   const [belowMinimumRentalPricingEnabled, setBelowMinimumRentalPricingEnabled] = useState(initialBookingRules.belowMinimumRentalPricingEnabled);
@@ -156,6 +162,31 @@ export function TaxSettingsCard({
     "rounded-xl border-slate-200 bg-white/90 shadow-[0_10px_24px_-22px_hsl(var(--primary)/0.14)] transition focus-visible:border-[hsl(var(--primary)/0.35)] focus-visible:ring-[hsl(var(--primary)/0.18)]";
   const toggleCardClass =
     "flex items-start gap-3 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_18px_38px_-32px_rgba(15,23,42,0.4)]";
+
+  const addSeasonalMinimumRule = () => {
+    setSeasonalMinimumRentalRules((current) => [
+      ...current,
+      {
+        id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `seasonal-${Date.now()}`,
+        startDate: "",
+        endDate: "",
+        minimumRentalDays: Number(minimumBookingDays) || 1,
+      },
+    ]);
+  };
+
+  const updateSeasonalMinimumRule = (
+    id: string,
+    updates: Partial<SeasonalMinimumRuleDraft>
+  ) => {
+    setSeasonalMinimumRentalRules((current) =>
+      current.map((rule) => (rule.id === id ? { ...rule, ...updates } : rule))
+    );
+  };
+
+  const removeSeasonalMinimumRule = (id: string) => {
+    setSeasonalMinimumRentalRules((current) => current.filter((rule) => rule.id !== id));
+  };
   const stats = [
     {
       label: t("admin.settings.taxPercentage"),
@@ -335,6 +366,28 @@ export function TaxSettingsCard({
       toast.error(t("admin.settings.errors.invalidLastMinutePercent"));
       return;
     }
+    const parsedSeasonalMinimumRentalRules = seasonalMinimumRentalRules.map((rule, index) => {
+      const parsedRuleMinimum = Number(rule.minimumRentalDays);
+      return {
+        id: rule.id,
+        startDate: rule.startDate.trim(),
+        endDate: rule.endDate.trim(),
+        minimumRentalDays: parsedRuleMinimum,
+        index,
+      };
+    });
+    const hasInvalidSeasonalRule = parsedSeasonalMinimumRentalRules.some((rule) => (
+      !rule.startDate ||
+      !rule.endDate ||
+      rule.startDate > rule.endDate ||
+      !Number.isFinite(rule.minimumRentalDays) ||
+      rule.minimumRentalDays < 1 ||
+      rule.minimumRentalDays > 365
+    ));
+    if (hasInvalidSeasonalRule) {
+      toast.error(t("admin.settings.errors.invalidSeasonalMinimumRule"));
+      return;
+    }
     const parsedSmallServiceKm = Number(defaultSmallServiceIntervalKm);
     const parsedBigServiceKm = Number(defaultBigServiceIntervalKm);
     const parsedInsuranceReminderDays = Number(insuranceReminderDaysBefore);
@@ -377,6 +430,12 @@ export function TaxSettingsCard({
       updateBookingRuleSettingsAction(
         {
           minimumRentalDays: parsedMinimumDays,
+          seasonalMinimumRentalRules: parsedSeasonalMinimumRentalRules.map((rule) => ({
+            id: rule.id,
+            startDate: rule.startDate,
+            endDate: rule.endDate,
+            minimumRentalDays: rule.minimumRentalDays,
+          })),
           belowMinimumRentalAdminOnly,
           belowMinimumRentalPricingEnabled,
           belowMinimumRentalSurchargeMode,
@@ -484,6 +543,7 @@ export function TaxSettingsCard({
     setTaxPercentage(String(taxResult.taxPercentage));
     setVehicleRatesIncludeTax(vehicleTaxModeResult.vehicleRatesIncludeTax);
     setMinimumBookingDays(String(minDaysResult.minimumBookingDays));
+    setSeasonalMinimumRentalRules(bookingRulesResult.bookingRules.seasonalMinimumRentalRules);
     setBookingHoldDays(String(bookingHoldDaysResult.bookingHoldDays));
     setBelowMinimumRentalAdminOnly(bookingRulesResult.bookingRules.belowMinimumRentalAdminOnly);
     setBelowMinimumRentalPricingEnabled(bookingRulesResult.bookingRules.belowMinimumRentalPricingEnabled);
@@ -781,6 +841,83 @@ export function TaxSettingsCard({
               </div>
 
               <div className="mt-5 grid gap-4">
+                <div className="rounded-2xl border border-dashed border-teal-200 bg-teal-50/60 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-semibold text-slate-900">{t("admin.settings.bookingRules.seasonalMinimumRulesTitle")}</p>
+                      <p className="mt-1 text-sm text-slate-600">{t("admin.settings.bookingRules.seasonalMinimumRulesDescription")}</p>
+                    </div>
+                    <Button type="button" variant="outline" className="rounded-xl" onClick={addSeasonalMinimumRule}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      {t("admin.settings.bookingRules.addSeasonalMinimumRule")}
+                    </Button>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    {seasonalMinimumRentalRules.length === 0 ? (
+                      <p className="text-sm text-slate-600">{t("admin.settings.bookingRules.seasonalMinimumRulesEmpty")}</p>
+                    ) : null}
+
+                    {seasonalMinimumRentalRules.map((rule, index) => (
+                      <div key={rule.id} className="grid gap-3 rounded-2xl border border-teal-100 bg-white p-4 md:grid-cols-[1fr_1fr_160px_auto]">
+                        <label className="space-y-2">
+                          <span className="block text-sm font-semibold text-slate-700">
+                            {t("admin.settings.bookingRules.seasonalMinimumRuleStartDate")}
+                          </span>
+                          <Input
+                            type="date"
+                            value={rule.startDate}
+                            onChange={(e) => updateSeasonalMinimumRule(rule.id, { startDate: e.target.value })}
+                            className={inputClass}
+                          />
+                        </label>
+
+                        <label className="space-y-2">
+                          <span className="block text-sm font-semibold text-slate-700">
+                            {t("admin.settings.bookingRules.seasonalMinimumRuleEndDate")}
+                          </span>
+                          <Input
+                            type="date"
+                            value={rule.endDate}
+                            onChange={(e) => updateSeasonalMinimumRule(rule.id, { endDate: e.target.value })}
+                            className={inputClass}
+                          />
+                        </label>
+
+                        <label className="space-y-2">
+                          <span className="block text-sm font-semibold text-slate-700">
+                            {t("admin.settings.bookingRules.seasonalMinimumRuleDays")}
+                          </span>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={365}
+                            step={1}
+                            value={String(rule.minimumRentalDays)}
+                            onChange={(e) => updateSeasonalMinimumRule(rule.id, { minimumRentalDays: Number(e.target.value) || 0 })}
+                            className={inputClass}
+                          />
+                        </label>
+
+                        <div className="flex items-end justify-between gap-2">
+                          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">
+                            #{index + 1}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-xl text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                            onClick={() => removeSeasonalMinimumRule(rule.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <label className={toggleCardClass}>
                   <span className="w-full space-y-1">
                     <span className="block font-semibold text-slate-900">{t("admin.settings.bookingRules.belowMinimumRentalAdminOnly")}</span>

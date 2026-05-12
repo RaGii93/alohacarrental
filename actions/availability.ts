@@ -20,6 +20,7 @@ export interface AvailabilityResult {
   baseTotalForRange: number;
   belowMinimumSurcharge: number;
   lastMinuteSurcharge: number;
+  effectiveMinimumRentalDays: number;
   isBelowMinimumRental: boolean;
   isLastMinuteBooking: boolean;
   belowMinimumBlocked: boolean;
@@ -180,6 +181,7 @@ export async function searchAvailabilityAction(
       baseTotalForRange: pricing.baseTotalCents,
       belowMinimumSurcharge: pricing.belowMinimumSurchargeCents,
       lastMinuteSurcharge: pricing.lastMinuteSurchargeCents,
+      effectiveMinimumRentalDays: pricing.effectiveMinimumRentalDays,
       isBelowMinimumRental: pricing.isBelowMinimumRental,
       isLastMinuteBooking: pricing.isLastMinuteBooking,
       belowMinimumBlocked: pricing.belowMinimumBlocked,
