@@ -10,6 +10,7 @@ import { buildMetadata } from "@/lib/seo";
 import { getTenantConfig } from "@/lib/tenant";
 import { formatDate, formatDateTime } from "@/lib/datetime";
 import { buildGoogleMapsUrl } from "@/lib/location-map";
+import { resolveLocationDisplay } from "@/lib/location-display";
 import { ensureBookingAdditionalDriversTable } from "@/lib/additional-drivers.server";
 
 export async function generateMetadata({
@@ -62,18 +63,35 @@ export default async function BookingReviewPage({
       })
     : null;
 
+  const pickupLocationDisplay = booking
+    ? resolveLocationDisplay({
+        label: booking.pickupLocation,
+        fallbackName: booking.pickupLocationRef?.name,
+        address: booking.pickupLocationAddress,
+        fallbackAddress: booking.pickupLocationRef?.address,
+      })
+    : null;
+  const dropoffLocationDisplay = booking
+    ? resolveLocationDisplay({
+        label: booking.dropoffLocation,
+        fallbackName: booking.dropoffLocationRef?.name,
+        address: booking.dropoffLocationAddress,
+        fallbackAddress: booking.dropoffLocationRef?.address,
+      })
+    : null;
+
   const pickupMapUrl = booking
     ? buildGoogleMapsUrl({
         latitude: booking.pickupLatitude,
         longitude: booking.pickupLongitude,
-        query: booking.pickupLocationAddress || booking.pickupLocation || booking.pickupLocationRef?.address,
+        query: pickupLocationDisplay?.mapQuery,
       })
     : null;
   const dropoffMapUrl = booking
     ? buildGoogleMapsUrl({
         latitude: booking.dropoffLatitude,
         longitude: booking.dropoffLongitude,
-        query: booking.dropoffLocationAddress || booking.dropoffLocation || booking.dropoffLocationRef?.address,
+        query: dropoffLocationDisplay?.mapQuery,
       })
     : null;
 
@@ -146,8 +164,8 @@ export default async function BookingReviewPage({
               <div className="rounded-[1.25rem] border border-[#efe7df] bg-[#faf8f6] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-[#a8a29e]">{t("booking.pickupLocation")}</dt>
                 <dd className="mt-2 text-sm text-[#111111]">
-                  {booking.pickupLocation || booking.pickupLocationRef?.name || "-"}
-                  {booking.pickupLocationAddress ? <span className="block text-xs text-[#78716c]">{booking.pickupLocationAddress}</span> : null}
+                  {pickupLocationDisplay?.primary}
+                  {pickupLocationDisplay?.secondary ? <span className="block text-xs text-[#78716c]">{pickupLocationDisplay.secondary}</span> : null}
                   {pickupMapUrl ? (
                     <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-[#FF912C] hover:underline">
                       <MapPin className="h-3.5 w-3.5" />
@@ -159,8 +177,8 @@ export default async function BookingReviewPage({
               <div className="rounded-[1.25rem] border border-[#efe7df] bg-[#faf8f6] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-[#a8a29e]">{t("booking.dropoffLocation")}</dt>
                 <dd className="mt-2 text-sm text-[#111111]">
-                  {booking.dropoffLocation || booking.dropoffLocationRef?.name || "-"}
-                  {booking.dropoffLocationAddress ? <span className="block text-xs text-[#78716c]">{booking.dropoffLocationAddress}</span> : null}
+                  {dropoffLocationDisplay?.primary}
+                  {dropoffLocationDisplay?.secondary ? <span className="block text-xs text-[#78716c]">{dropoffLocationDisplay.secondary}</span> : null}
                   {dropoffMapUrl ? (
                     <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-[#FF912C] hover:underline">
                       <MapPin className="h-3.5 w-3.5" />

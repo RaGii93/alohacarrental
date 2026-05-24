@@ -28,6 +28,7 @@ import {
 import { getBlobProxyUrl } from "@/lib/blob";
 import { formatDate, formatDateTime } from "@/lib/datetime";
 import { buildGoogleMapsUrl } from "@/lib/location-map";
+import { resolveLocationDisplay } from "@/lib/location-display";
 import { calculateBookingAmounts, calculateLateReturnCharge, getFuelChargePerQuarterForCategory, getFuelLevelLabel } from "@/lib/pricing";
 import {
   confirmBookingAction,
@@ -152,45 +153,18 @@ export function BookingDetailClient({
   const hasOpenBillingDoc = !!booking.invoiceUrl;
   const latestOdometerKm = booking.vehicle?.currentOdometerKm ?? booking.returnOdometerKm ?? booking.pickupOdometerKm ?? null;
 
-  const GENERIC_ACCOMMODATION_LABELS = new Set(["your accomodation", "your accommodation"]);
-  const getLocationDisplay = (
-    label?: string | null,
-    fallbackName?: string | null,
-    bookingAddress?: string | null,
-    refAddress?: string | null,
-  ) => {
-    const primaryLabel = label || fallbackName || "-";
-    const normalizedLabel = primaryLabel.trim().toLowerCase();
-    const resolvedAddress = bookingAddress || refAddress || null;
-    const usesGenericLabel = GENERIC_ACCOMMODATION_LABELS.has(normalizedLabel);
-
-    if (usesGenericLabel && resolvedAddress) {
-      return {
-        primary: resolvedAddress,
-        secondary: primaryLabel,
-        mapQuery: resolvedAddress,
-      };
-    }
-
-    return {
-      primary: primaryLabel,
-      secondary: resolvedAddress,
-      mapQuery: resolvedAddress || primaryLabel,
-    };
-  };
-
-  const pickupLocationDisplay = getLocationDisplay(
-    booking?.pickupLocation,
-    booking?.pickupLocationRef?.name,
-    booking?.pickupLocationAddress,
-    booking?.pickupLocationRef?.address,
-  );
-  const dropoffLocationDisplay = getLocationDisplay(
-    booking?.dropoffLocation,
-    booking?.dropoffLocationRef?.name,
-    booking?.dropoffLocationAddress,
-    booking?.dropoffLocationRef?.address,
-  );
+  const pickupLocationDisplay = resolveLocationDisplay({
+    label: booking?.pickupLocation,
+    fallbackName: booking?.pickupLocationRef?.name,
+    address: booking?.pickupLocationAddress,
+    fallbackAddress: booking?.pickupLocationRef?.address,
+  });
+  const dropoffLocationDisplay = resolveLocationDisplay({
+    label: booking?.dropoffLocation,
+    fallbackName: booking?.dropoffLocationRef?.name,
+    address: booking?.dropoffLocationAddress,
+    fallbackAddress: booking?.dropoffLocationRef?.address,
+  });
 
   const pickupMapUrl = buildGoogleMapsUrl({
     latitude: booking?.pickupLatitude,

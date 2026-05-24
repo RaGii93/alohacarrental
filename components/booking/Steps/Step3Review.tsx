@@ -34,6 +34,7 @@ import { combinePhoneNumber } from "@/lib/phone";
 import type { BookingRuleSettings } from "@/lib/settings";
 import { combineLaPazDateAndTime } from "@/lib/timezone";
 import { buildGoogleMapsUrl } from "@/lib/location-map";
+import { resolveLocationDisplay } from "@/lib/location-display";
 import { serializeAdditionalDrivers } from "@/lib/additional-drivers";
 
 function buildCustomLocationLabel(placeName: string, address: string) {
@@ -195,19 +196,27 @@ export function Step3Review({
   const subtotalBeforeTax = pricing?.subtotalBeforeTaxCents ?? (baseAmount + extrasAmount);
   const pickupLocation = locations.find((location) => location.id === bookingData.pickupLocationId);
   const dropoffLocation = locations.find((location) => location.id === bookingData.dropoffLocationId);
-  const pickupLocationLabel = pickupCustomLocation || pickupLocation?.name || "-";
-  const dropoffLocationLabel = dropoffCustomLocation || dropoffLocation?.name || "-";
-  const pickupLocationMapQuery = bookingData.pickupCustomAddress.trim() || pickupLocation?.address || "";
-  const dropoffLocationMapQuery = bookingData.dropoffCustomAddress.trim() || dropoffLocation?.address || "";
+  const pickupLocationDisplay = resolveLocationDisplay({
+    label: pickupCustomLocation,
+    fallbackName: pickupLocation?.name,
+    address: bookingData.pickupCustomAddress.trim(),
+    fallbackAddress: pickupLocation?.address,
+  });
+  const dropoffLocationDisplay = resolveLocationDisplay({
+    label: dropoffCustomLocation,
+    fallbackName: dropoffLocation?.name,
+    address: bookingData.dropoffCustomAddress.trim(),
+    fallbackAddress: dropoffLocation?.address,
+  });
   const pickupLocationMapUrl = buildGoogleMapsUrl({
     latitude: bookingData.pickupCustomLatitude ?? pickupLocation?.latitude,
     longitude: bookingData.pickupCustomLongitude ?? pickupLocation?.longitude,
-    query: pickupLocationMapQuery,
+    query: pickupLocationDisplay.mapQuery,
   });
   const dropoffLocationMapUrl = buildGoogleMapsUrl({
     latitude: bookingData.dropoffCustomLatitude ?? dropoffLocation?.latitude,
     longitude: bookingData.dropoffCustomLongitude ?? dropoffLocation?.longitude,
-    query: dropoffLocationMapQuery,
+    query: dropoffLocationDisplay.mapQuery,
   });
   const customerPhone = combinePhoneNumber(bookingData.customerPhoneCountryCode, bookingData.customerPhoneLocalNumber);
   const handleTermsScroll = () => {
@@ -407,8 +416,8 @@ export function Step3Review({
           <CardContent className="space-y-2">
             {bookingData.pickupLocationId && (
               <p>
-                <strong>{t("booking.pickupLocation")}:</strong> {pickupLocationLabel}
-                {pickupLocationMapQuery ? <span className="block text-xs text-[#78716c]">{pickupLocationMapQuery}</span> : null}
+                <strong>{t("booking.pickupLocation")}:</strong> {pickupLocationDisplay.primary}
+                {pickupLocationDisplay.secondary ? <span className="block text-xs text-[#78716c]">{pickupLocationDisplay.secondary}</span> : null}
                 {pickupLocationMapUrl && (
                   <>
                     {" "}
@@ -421,8 +430,8 @@ export function Step3Review({
             )}
             {bookingData.dropoffLocationId && (
               <p>
-                <strong>{t("booking.dropoffLocation")}:</strong> {dropoffLocationLabel}
-                {dropoffLocationMapQuery ? <span className="block text-xs text-[#78716c]">{dropoffLocationMapQuery}</span> : null}
+                <strong>{t("booking.dropoffLocation")}:</strong> {dropoffLocationDisplay.primary}
+                {dropoffLocationDisplay.secondary ? <span className="block text-xs text-[#78716c]">{dropoffLocationDisplay.secondary}</span> : null}
                 {dropoffLocationMapUrl && (
                   <>
                     {" "}
