@@ -1438,12 +1438,22 @@ export async function createCategoryBookingAction(
     const dropoffLocationId = (formData.get("dropoffLocationId") as string | null) || null;
     const pickupLocation = (formData.get("pickupLocation") as string | null) || null;
     const dropoffLocation = (formData.get("dropoffLocation") as string | null) || null;
+    const pickupLocationAddress = ((formData.get("pickupLocationAddress") as string | null) || "").trim() || null;
+    const dropoffLocationAddress = ((formData.get("dropoffLocationAddress") as string | null) || "").trim() || null;
+    const pickupLatitudeRaw = (formData.get("pickupLatitude") as string | null) || null;
+    const pickupLongitudeRaw = (formData.get("pickupLongitude") as string | null) || null;
+    const dropoffLatitudeRaw = (formData.get("dropoffLatitude") as string | null) || null;
+    const dropoffLongitudeRaw = (formData.get("dropoffLongitude") as string | null) || null;
     const notes = formData.get("notes") as string | null;
     const extrasPayload = (formData.get("selectedExtras") as string | null) || "[]";
     const driverLicenseUrl = formData.get("driverLicenseUrl") as string;
     const bookingSource = (formData.get("bookingSource") as string | null) || "public";
     const privacyConsentAccepted = formData.get("privacyConsentAccepted") === "true";
     const termsAccepted = formData.get("termsAccepted") === "true";
+    const pickupLatitude = pickupLatitudeRaw ? Number(pickupLatitudeRaw) : null;
+    const pickupLongitude = pickupLongitudeRaw ? Number(pickupLongitudeRaw) : null;
+    const dropoffLatitude = dropoffLatitudeRaw ? Number(dropoffLatitudeRaw) : null;
+    const dropoffLongitude = dropoffLongitudeRaw ? Number(dropoffLongitudeRaw) : null;
 
     if (bookingSource === "admin") {
       if (!session || !isPrivilegedAdminRole(session.role)) {
@@ -1480,6 +1490,14 @@ export async function createCategoryBookingAction(
     }
     if (Number.isNaN(birthDate.getTime()) || Number.isNaN(licenseExpiryDate.getTime())) {
       return { success: false, error: "Invalid birth date or license expiry date" };
+    }
+    if (
+      (pickupLatitudeRaw && Number.isNaN(pickupLatitude!)) ||
+      (pickupLongitudeRaw && Number.isNaN(pickupLongitude!)) ||
+      (dropoffLatitudeRaw && Number.isNaN(dropoffLatitude!)) ||
+      (dropoffLongitudeRaw && Number.isNaN(dropoffLongitude!))
+    ) {
+      return { success: false, error: "Invalid location coordinates" };
     }
 
     const validated = await categoryBookingFormSchemaRefined.parseAsync({
@@ -1520,10 +1538,10 @@ export async function createCategoryBookingAction(
     // Resolve locations by ID (if sent)
     const [pickupLocationRecord, dropoffLocationRecord] = await Promise.all([
       pickupLocationId
-        ? db.location.findUnique({ where: { id: pickupLocationId }, select: { id: true, name: true } })
+        ? db.location.findUnique({ where: { id: pickupLocationId }, select: { id: true, name: true, address: true, latitude: true, longitude: true } })
         : Promise.resolve(null),
       dropoffLocationId
-        ? db.location.findUnique({ where: { id: dropoffLocationId }, select: { id: true, name: true } })
+        ? db.location.findUnique({ where: { id: dropoffLocationId }, select: { id: true, name: true, address: true, latitude: true, longitude: true } })
         : Promise.resolve(null),
     ]);
 
@@ -1674,7 +1692,13 @@ export async function createCategoryBookingAction(
           pickupLocationId: pickupLocationRecord?.id ?? null,
           dropoffLocationId: dropoffLocationRecord?.id ?? null,
           pickupLocation: pickupLocationRecord?.name ?? pickupLocation,
+          pickupLocationAddress: pickupLocationAddress ?? pickupLocationRecord?.address ?? null,
+          pickupLatitude: pickupLatitude ?? pickupLocationRecord?.latitude ?? null,
+          pickupLongitude: pickupLongitude ?? pickupLocationRecord?.longitude ?? null,
           dropoffLocation: dropoffLocationRecord?.name ?? dropoffLocation,
+          dropoffLocationAddress: dropoffLocationAddress ?? dropoffLocationRecord?.address ?? null,
+          dropoffLatitude: dropoffLatitude ?? dropoffLocationRecord?.latitude ?? null,
+          dropoffLongitude: dropoffLongitude ?? dropoffLocationRecord?.longitude ?? null,
           totalAmount,
           status: "PENDING" as const,
           bookingCode,
@@ -1698,7 +1722,13 @@ export async function createCategoryBookingAction(
           if (
             !message.includes("Unknown argument `birthDate`") &&
             !message.includes("Unknown argument `licenseExpiryDate`") &&
-            !message.includes("Unknown argument `flightNumber`")
+            !message.includes("Unknown argument `flightNumber`") &&
+            !message.includes("Unknown argument `pickupLocationAddress`") &&
+            !message.includes("Unknown argument `pickupLatitude`") &&
+            !message.includes("Unknown argument `pickupLongitude`") &&
+            !message.includes("Unknown argument `dropoffLocationAddress`") &&
+            !message.includes("Unknown argument `dropoffLatitude`") &&
+            !message.includes("Unknown argument `dropoffLongitude`")
           ) {
             throw createError;
           }
@@ -1711,7 +1741,13 @@ export async function createCategoryBookingAction(
               SET
                 "birthDate" = ${validated.birthDate},
                 "licenseExpiryDate" = ${validated.licenseExpiryDate},
-                "flightNumber" = ${validated.flightNumber || null}
+                "flightNumber" = ${validated.flightNumber || null},
+                "pickupLocationAddress" = ${pickupLocationAddress ?? pickupLocationRecord?.address ?? null},
+                "pickupLatitude" = ${pickupLatitude ?? pickupLocationRecord?.latitude ?? null},
+                "pickupLongitude" = ${pickupLongitude ?? pickupLocationRecord?.longitude ?? null},
+                "dropoffLocationAddress" = ${dropoffLocationAddress ?? dropoffLocationRecord?.address ?? null},
+                "dropoffLatitude" = ${dropoffLatitude ?? dropoffLocationRecord?.latitude ?? null},
+                "dropoffLongitude" = ${dropoffLongitude ?? dropoffLocationRecord?.longitude ?? null}
               WHERE id = ${created.id}
             `;
           } catch {
