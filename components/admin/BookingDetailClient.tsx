@@ -152,15 +152,55 @@ export function BookingDetailClient({
   const hasOpenBillingDoc = !!booking.invoiceUrl;
   const latestOdometerKm = booking.vehicle?.currentOdometerKm ?? booking.returnOdometerKm ?? booking.pickupOdometerKm ?? null;
 
+  const GENERIC_ACCOMMODATION_LABELS = new Set(["your accomodation", "your accommodation"]);
+  const getLocationDisplay = (
+    label?: string | null,
+    fallbackName?: string | null,
+    bookingAddress?: string | null,
+    refAddress?: string | null,
+  ) => {
+    const primaryLabel = label || fallbackName || "-";
+    const normalizedLabel = primaryLabel.trim().toLowerCase();
+    const resolvedAddress = bookingAddress || refAddress || null;
+    const usesGenericLabel = GENERIC_ACCOMMODATION_LABELS.has(normalizedLabel);
+
+    if (usesGenericLabel && resolvedAddress) {
+      return {
+        primary: resolvedAddress,
+        secondary: primaryLabel,
+        mapQuery: resolvedAddress,
+      };
+    }
+
+    return {
+      primary: primaryLabel,
+      secondary: resolvedAddress,
+      mapQuery: resolvedAddress || primaryLabel,
+    };
+  };
+
+  const pickupLocationDisplay = getLocationDisplay(
+    booking?.pickupLocation,
+    booking?.pickupLocationRef?.name,
+    booking?.pickupLocationAddress,
+    booking?.pickupLocationRef?.address,
+  );
+  const dropoffLocationDisplay = getLocationDisplay(
+    booking?.dropoffLocation,
+    booking?.dropoffLocationRef?.name,
+    booking?.dropoffLocationAddress,
+    booking?.dropoffLocationRef?.address,
+  );
+
   const pickupMapUrl = buildGoogleMapsUrl({
     latitude: booking?.pickupLatitude,
     longitude: booking?.pickupLongitude,
-    query: booking?.pickupLocationAddress || booking?.pickupLocation || booking?.pickupLocationRef?.address,
+    query: pickupLocationDisplay.mapQuery,
   });
   const dropoffMapUrl = buildGoogleMapsUrl({
     latitude: booking?.dropoffLatitude,
     longitude: booking?.dropoffLongitude,
-    query: booking?.dropoffLocationAddress || booking?.dropoffLocation || booking?.dropoffLocationRef?.address,
+    query: dropoffLocationDisplay.mapQuery,
   });
 
   const getStatusColor = (status: string) => {
@@ -451,14 +491,14 @@ export function BookingDetailClient({
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("admin.bookings.detail.trip.fields.pickup")}</p>
                 <p className="mt-2 text-sm font-semibold text-slate-900">{formatDateTime(booking.startDate)}</p>
-                <p className="mt-1 text-xs text-slate-500">{booking.pickupLocation || booking.pickupLocationRef?.name || "-"}</p>
-                {booking.pickupLocationAddress ? <p className="mt-1 text-xs text-slate-400">{booking.pickupLocationAddress}</p> : null}
+                <p className="mt-1 text-xs text-slate-500">{pickupLocationDisplay.primary}</p>
+                {pickupLocationDisplay.secondary ? <p className="mt-1 text-xs text-slate-400">{pickupLocationDisplay.secondary}</p> : null}
               </div>
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("admin.bookings.detail.trip.fields.dropoff")}</p>
                 <p className="mt-2 text-sm font-semibold text-slate-900">{formatDateTime(booking.endDate)}</p>
-                <p className="mt-1 text-xs text-slate-500">{booking.dropoffLocation || booking.dropoffLocationRef?.name || "-"}</p>
-                {booking.dropoffLocationAddress ? <p className="mt-1 text-xs text-slate-400">{booking.dropoffLocationAddress}</p> : null}
+                <p className="mt-1 text-xs text-slate-500">{dropoffLocationDisplay.primary}</p>
+                {dropoffLocationDisplay.secondary ? <p className="mt-1 text-xs text-slate-400">{dropoffLocationDisplay.secondary}</p> : null}
               </div>
             </div>
           </div>
@@ -653,14 +693,14 @@ export function BookingDetailClient({
               <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.trip.fields.dropoff")}</p><p className="mt-1 font-medium text-slate-900">{formatDateTime(booking.endDate)}</p></div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.trip.fields.pickupLocation")}</p>
-                <p className="mt-1 font-medium text-slate-900">{booking.pickupLocation || booking.pickupLocationRef?.name || "-"}</p>
-                {booking.pickupLocationAddress ? <p className="mt-1 text-sm text-slate-500">{booking.pickupLocationAddress}</p> : null}
+                <p className="mt-1 font-medium text-slate-900">{pickupLocationDisplay.primary}</p>
+                {pickupLocationDisplay.secondary ? <p className="mt-1 text-sm text-slate-500">{pickupLocationDisplay.secondary}</p> : null}
                 {pickupMapUrl && <a href={pickupMapUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-sm text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline">{t("admin.bookings.detail.trip.openMap")}</a>}
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.trip.fields.dropoffLocation")}</p>
-                <p className="mt-1 font-medium text-slate-900">{booking.dropoffLocation || booking.dropoffLocationRef?.name || "-"}</p>
-                {booking.dropoffLocationAddress ? <p className="mt-1 text-sm text-slate-500">{booking.dropoffLocationAddress}</p> : null}
+                <p className="mt-1 font-medium text-slate-900">{dropoffLocationDisplay.primary}</p>
+                {dropoffLocationDisplay.secondary ? <p className="mt-1 text-sm text-slate-500">{dropoffLocationDisplay.secondary}</p> : null}
                 {dropoffMapUrl && <a href={dropoffMapUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-sm text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline">{t("admin.bookings.detail.trip.openMap")}</a>}
               </div>
             </div>
