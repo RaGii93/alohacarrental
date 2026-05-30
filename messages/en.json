@@ -144,6 +144,8 @@
     "helpCenterEyebrow": "Help Center",
     "helpCenterTitle": "Frequently asked questions",
     "helpCenterDescription": "Every answer below is aligned with Aloha Car Rental's terms and conditions, booking rules, and support process.",
+    "termsNotice": "FAQ answers are for guidance. The official Aloha Car Rental Terms and Conditions PDF remains the binding source.",
+    "termsCta": "Open Terms & Conditions",
     "supportTitle": "Still need help?",
     "supportDescription": "Reach {tenantName} directly for booking questions, schedule changes, pickup coordination, or urgent rental support.",
     "openingHoursLabel": "Opening hours",

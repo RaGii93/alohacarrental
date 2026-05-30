@@ -127,6 +127,13 @@ export default async function FAQPage({
                 </p>
               </div>
 
+              <div className="mb-5 rounded-[1.25rem] border border-[hsl(var(--primary)/0.14)] bg-[hsl(var(--primary)/0.06)] p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
+                <p className="text-sm leading-7 text-[hsl(var(--foreground)/0.75)]">{faqT("termsNotice")}</p>
+                <Button asChild variant="outline" className="mt-3 h-10 rounded-xl border-[hsl(var(--primary)/0.24)] bg-white text-sm font-semibold sm:mt-0">
+                  <Link href={`/${locale}/terms`}>{faqT("termsCta")}</Link>
+                </Button>
+              </div>
+
               <Accordion defaultValue={faqEntries[0]?.id ?? null}>
                 {faqEntries.map((item) => (
                   <AccordionItem key={item.id} value={item.id}>

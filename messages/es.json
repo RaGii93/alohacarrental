@@ -144,6 +144,8 @@
     "helpCenterEyebrow": "Centro de ayuda",
     "helpCenterTitle": "Preguntas frecuentes",
     "helpCenterDescription": "Cada respuesta aquí está alineada con los términos y condiciones, las reglas de reserva y el proceso de soporte de Aloha Car Rental.",
+    "termsNotice": "Las respuestas del FAQ son orientativas. El PDF oficial de Términos y Condiciones de Aloha Car Rental sigue siendo la fuente vinculante.",
+    "termsCta": "Abrir Términos y Condiciones",
     "supportTitle": "¿Aún necesitas ayuda?",
     "supportDescription": "Comunícate directamente con {tenantName} para preguntas sobre reservas, cambios de horario, coordinación de recogida o soporte urgente.",
     "openingHoursLabel": "Horario",
