@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CalendarRange, Clock3, Globe2, Plus, Search, SquarePen } from "lucide-react";
+import { CalendarDays, CalendarRange, Clock3, Globe2, Plus, Search, SquarePen } from "lucide-react";
 import { toast } from "sonner";
 import { createVehicleBlockoutAction, deleteVehicleBlockoutAction, updateVehicleBlockoutAction } from "@/actions/blockouts";
 import { CompactText } from "@/components/shared/CompactText";
@@ -104,6 +104,8 @@ export function BlockoutsClient({
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>("all");
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [vehicleFilterId, setVehicleFilterId] = useState("all");
+  const startDateInputRef = useRef<HTMLInputElement>(null);
+  const endDateInputRef = useRef<HTMLInputElement>(null);
 
   const parsedStart = parseLaPazDateTimeInput(startDate);
   const parsedEnd = parseLaPazDateTimeInput(endDate);
@@ -198,6 +200,18 @@ export function BlockoutsClient({
     router.refresh();
   };
 
+  const openNativePicker = (ref: React.RefObject<HTMLInputElement | null>) => {
+    const input = ref.current;
+    if (!input) return;
+    if (typeof (input as HTMLInputElement & { showPicker?: () => void }).showPicker === "function") {
+      (input as HTMLInputElement & { showPicker: () => void }).showPicker();
+      return;
+    }
+
+    input.focus();
+    input.click();
+  };
+
   return (
     <div className="space-y-6">
       <ConfirmActionDialog
@@ -256,29 +270,51 @@ export function BlockoutsClient({
                     <label htmlFor="blockout-start" className="text-sm font-semibold text-slate-800">
                       {t("admin.blockouts.form.start")}
                     </label>
-                    <Input
-                      id="blockout-start"
-                      name="startDate"
-                      type="datetime-local"
-                      value={startDate}
-                      onChange={(event) => setStartDate(event.target.value)}
-                      className="h-11 rounded-xl border-slate-200"
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        ref={startDateInputRef}
+                        id="blockout-start"
+                        name="startDate"
+                        type="datetime-local"
+                        value={startDate}
+                        onChange={(event) => setStartDate(event.target.value)}
+                        className="h-11 rounded-xl border-slate-200 pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => openNativePicker(startDateInputRef)}
+                        aria-label={`${t("admin.blockouts.form.start")} picker`}
+                        className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-500 transition hover:text-slate-700"
+                      >
+                        <CalendarDays className="size-4" />
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="blockout-end" className="text-sm font-semibold text-slate-800">
                       {t("admin.blockouts.form.end")}
                     </label>
-                    <Input
-                      id="blockout-end"
-                      name="endDate"
-                      type="datetime-local"
-                      value={endDate}
-                      onChange={(event) => setEndDate(event.target.value)}
-                      className="h-11 rounded-xl border-slate-200"
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        ref={endDateInputRef}
+                        id="blockout-end"
+                        name="endDate"
+                        type="datetime-local"
+                        value={endDate}
+                        onChange={(event) => setEndDate(event.target.value)}
+                        className="h-11 rounded-xl border-slate-200 pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => openNativePicker(endDateInputRef)}
+                        aria-label={`${t("admin.blockouts.form.end")} picker`}
+                        className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-500 transition hover:text-slate-700"
+                      >
+                        <CalendarDays className="size-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 

@@ -157,7 +157,17 @@ export async function searchAvailabilityAction(
           AND "startDate" < ${endDate}
           AND "endDate" > ${startDate}
       `;
-      availableCount = globalBlockRows?.[0]?.count ? 0 : Math.max(0, totalVehicles - (bookingRows?.[0]?.count ?? 0));
+      const blockedVehicleRows = await db.$queryRaw<Array<{ count: number }>>`
+        SELECT COUNT(DISTINCT "vehicleId")::int AS count
+        FROM "VehicleBlockout"
+        WHERE "vehicleId" IS NOT NULL
+          AND "startDate" < ${endDate}
+          AND "endDate" > ${startDate}
+      `;
+      const hasGlobalBlock = (globalBlockRows?.[0]?.count ?? 0) > 0;
+      const categoryBookings = bookingRows?.[0]?.count ?? 0;
+      const blockedVehicles = blockedVehicleRows?.[0]?.count ?? 0;
+      availableCount = hasGlobalBlock ? 0 : Math.max(0, totalVehicles - categoryBookings - blockedVehicles);
     }
     const pricing = evaluateBookingRules({
       startDate,

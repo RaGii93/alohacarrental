@@ -7,6 +7,7 @@ import { getSession } from "@/lib/session";
 import { isLicenseActive } from "@/lib/license";
 import { logAdminAction } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { parseLaPazDateTimeInput } from "@/lib/timezone";
 import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 
 async function requireBlockoutAdmin() {
@@ -23,11 +24,11 @@ export async function createVehicleBlockoutAction(formData: FormData, locale: st
 
   const vehicleIdRaw = String(formData.get("vehicleId") || "").trim();
   const vehicleId = vehicleIdRaw || null;
-  const startDate = new Date(String(formData.get("startDate") || ""));
-  const endDate = new Date(String(formData.get("endDate") || ""));
+  const startDate = parseLaPazDateTimeInput(String(formData.get("startDate") || ""));
+  const endDate = parseLaPazDateTimeInput(String(formData.get("endDate") || ""));
   const note = String(formData.get("note") || "").trim() || null;
 
-  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate <= startDate) {
+  if (!startDate || !endDate || endDate <= startDate) {
     return { success: false as const, error: "Invalid date range" };
   }
 
@@ -54,11 +55,11 @@ export async function updateVehicleBlockoutAction(formData: FormData, locale: st
 
   const vehicleIdRaw = String(formData.get("vehicleId") || "").trim();
   const vehicleId = vehicleIdRaw || null;
-  const startDate = new Date(String(formData.get("startDate") || ""));
-  const endDate = new Date(String(formData.get("endDate") || ""));
+  const startDate = parseLaPazDateTimeInput(String(formData.get("startDate") || ""));
+  const endDate = parseLaPazDateTimeInput(String(formData.get("endDate") || ""));
   const note = String(formData.get("note") || "").trim() || null;
 
-  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate <= startDate) {
+  if (!startDate || !endDate || endDate <= startDate) {
     return { success: false as const, error: "Invalid date range" };
   }
 
