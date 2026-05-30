@@ -56,7 +56,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Call Emergency Services:"), t(" Dial "), b("911"), t(" if anyone is injured or needs urgent medical help.")],
-          [b("Contact Support Immediately:"), t(" Contact support as soon as it is safe so the system process can guide local reporting and insurance steps.")],
+          [b("Contact Aloha Support Immediately:"), t(" Contact Aloha Car Rental support as soon as it is safe so our team can guide local reporting and insurance steps.")],
           [b("Do Not Move the Vehicle:"), t(" Leave the vehicle where it is unless emergency services or police instruct you to move it.")],
           [b("Do Not Leave the Scene:"), t(" Stay there until the incident is properly documented. Leaving too early can affect insurance coverage.")],
         ),
@@ -70,7 +70,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Do Not Move the Car:"), t(" Leave the vehicle where the damage happened, whether it was a post, stone, windshield damage, parking damage, or road accident.")],
-          [b("Contact Support Immediately:"), t(" Reach out right away so support can explain the local reporting process and next steps.")],
+          [b("Contact Aloha Support Immediately:"), t(" Reach out right away so Aloha Car Rental support can explain the local reporting process and next steps.")],
           [b("Follow Instructions:"), t(" Move the car only after police, emergency responders, or support confirms it is safe.")],
         ),
         p(t("This procedure keeps the incident documented correctly and helps keep your insurance valid.")),
@@ -82,7 +82,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       keywords: ["theft", "stolen", "police", "punda", "otrobanda", "911"],
       blocks: [
         list(
-          [b("Contact Us Immediately:"), t(" Call "), b("+5999 673-3248"), t(" as soon as you realize the vehicle is missing.")],
+          [b("Contact Us Immediately:"), t(" Call Aloha Car Rental immediately using the support phone number shown on this FAQ page (and on your booking confirmation) as soon as you realize the vehicle is missing.")],
           [b("Report It to the Police:"), t(" Call "), b("911"), t(" and file a police report as soon as possible.")],
           [b("Act Quickly:"), t(" Delays can make you fully responsible for the theft if negligence is involved.")],
         ),
@@ -119,7 +119,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Do you accept cash or credit cards?",
       keywords: ["cash", "credit card", "cards", "maestro", "amex", "visa", "mastercard", "payment"],
       blocks: [
-        p(t("Yes. We accept cash, Maestro, Kompa Leon, Visa/Mastercard, Discover/Diners, Amex, and other major credit cards. A "), b("5% administration"), t(" fee applies to credit card payments.")),
+        p(t("Yes. Aloha Car Rental accepts cash, Maestro, Kompa Leon, Visa/Mastercard, Discover/Diners, Amex, and other major credit cards. A "), b("5% administration"), t(" fee applies to credit card payments.")),
       ],
     },
     {
@@ -136,7 +136,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "What is your fuel policy?",
       keywords: ["fuel", "gas", "petrol", "tank", "full to full", "full-to-full"],
       blocks: [
-        p(t("Our fuel policy is "), b("full-to-full"), t(".")),
+        p(t("Aloha Car Rental fuel policy is "), b("full-to-full"), t(".")),
         p(t("Vehicles are delivered with a full tank and must be returned with a full tank. If the vehicle was not delivered full, you may return it with the same level received.")),
         p(b("Important:"), t(" If the fuel level is too low at return, a minimum charge of "), b("$25"), t(" for vehicles and "), b("$35"), t(" for vans applies for every "), b("1/4 tank"), t(" or part of it.")),
       ],
@@ -157,32 +157,32 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       id: "long-term",
       question: "Do you offer long-term rentals?",
       keywords: ["long-term", "long term", "monthly", "extended rental"],
-      blocks: [p(t("Yes. Contact us by email or WhatsApp to discuss long-term availability and pricing."))],
+      blocks: [p(t("Yes. Contact Aloha Car Rental by email, phone, or WhatsApp using the support details on this FAQ page to discuss long-term availability and pricing."))],
     },
     {
       id: "delivery",
       question: "Do you deliver the car to a specific location?",
       keywords: ["delivery", "deliver", "specific location", "hotel", "address"],
-      blocks: [p(t("Yes, we can deliver the rental car to your preferred location."))],
+      blocks: [p(t("Yes, Aloha Car Rental can deliver your rental car to your preferred location."))],
     },
     {
       id: "airport",
       question: "Can I receive the rental car at the airport?",
       keywords: ["airport", "arrival", "pickup airport", "receive car"],
-      blocks: [p(t("Yes. Depending on your flight time, we can have the car ready near the airport and send detailed instructions before arrival."))],
+      blocks: [p(t("Yes. Depending on your flight time, Aloha Car Rental can have the car ready near the airport and send detailed instructions before arrival."))],
     },
     {
       id: "advance-booking",
       question: "How far in advance should I reserve my rental car?",
       keywords: ["reserve", "book in advance", "advance", "last minute", "24 hours"],
-      blocks: [p(t("You can reserve up to one year in advance. For last-minute bookings within 24 hours, contact us directly by WhatsApp or phone."))],
+      blocks: [p(t("You can reserve up to one year in advance. For last-minute bookings within 24 hours, contact Aloha Car Rental directly by WhatsApp or phone using the support number shown on this FAQ page."))],
     },
     {
       id: "minimum-rental-rules",
       question: "Why can’t I book a very short rental online?",
       keywords: ["minimum rental", "minimum days", "short rental", "admin only", "booking rules"],
       blocks: [
-        p(t("Some rentals have a minimum number of days configured in the booking flow.")),
+        p(t("Some Aloha Car Rental rentals have a minimum number of days configured in the booking flow.")),
         p(t("If a booking is shorter than that minimum, the site may apply an extra short-rental surcharge or require staff assistance instead of letting the public request continue online.")),
       ],
     },
@@ -191,7 +191,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Can I make a last-minute booking online?",
       keywords: ["last minute", "same day", "same-day", "urgent booking", "24 hours"],
       blocks: [
-        p(t("That depends on the active booking rules.")),
+        p(t("That depends on Aloha Car Rental active booking rules.")),
         p(t("If your pickup is inside the configured last-minute window, the website may add an extra percentage or require the booking to be handled directly by staff.")),
       ],
     },
@@ -200,7 +200,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Do you sometimes arrange rentals with partner vehicles?",
       keywords: ["partner rentals", "outside company", "supplier car", "other company", "partner vehicle"],
       blocks: [
-        p(t("Yes. In some cases a booking may be fulfilled with a partner-supplied vehicle instead of our own saved fleet.")),
+        p(t("Yes. In some cases an Aloha Car Rental booking may be fulfilled with a partner-supplied vehicle instead of our own saved fleet.")),
         p(t("Those rentals are handled separately on the operational side so they do not mix into the normal public fleet inventory, while the customer still receives the normal booking communication.")),
       ],
     },
@@ -213,7 +213,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Bel de hulpdiensten:"), t(" Bel "), b("911"), t(" als er gewonden zijn of als medische hulp direct nodig is.")],
-          [b("Neem direct contact op met support:"), t(" Neem contact op zodra het veilig is, zodat het systeemproces je door de lokale meldings- en verzekeringsstappen kan begeleiden.")],
+          [b("Neem direct contact op met Aloha support:"), t(" Neem contact op zodra het veilig is, zodat het team van Aloha Car Rental je door de lokale meldings- en verzekeringsstappen kan begeleiden.")],
           [b("Verplaats het voertuig niet:"), t(" Laat de auto staan tenzij hulpdiensten of de politie aangeven dat je hem mag verplaatsen.")],
           [b("Verlaat de plaats niet:"), t(" Blijf ter plaatse totdat het incident correct is vastgelegd. Te vroeg vertrekken kan gevolgen hebben voor de verzekering.")],
         ),
@@ -227,7 +227,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Verplaats de auto niet:"), t(" Laat het voertuig staan waar de schade is ontstaan, of het nu gaat om een paal, steen, ruitschade, parkeerschade of een verkeersongeval.")],
-          [b("Neem direct contact op met support:"), t(" Laat het direct weten zodat support de lokale meldingsprocedure en vervolgstappen kan uitleggen.")],
+          [b("Neem direct contact op met Aloha support:"), t(" Laat het direct weten zodat Aloha Car Rental support de lokale meldingsprocedure en vervolgstappen kan uitleggen.")],
           [b("Volg de instructies:"), t(" Verplaats de auto pas nadat politie, hulpdiensten of support aangeven dat het veilig is.")],
         ),
         p(t("Zo wordt de schade correct vastgelegd en blijft de verzekering geldig.")),
@@ -239,7 +239,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       keywords: ["diefstal", "gestolen", "politie", "punda", "otrobanda", "911"],
       blocks: [
         list(
-          [b("Neem direct contact met ons op:"), t(" Bel "), b("+5999 673-3248"), t(" zodra je merkt dat het voertuig weg is.")],
+          [b("Neem direct contact met ons op:"), t(" Bel Aloha Car Rental direct via het supporttelefoonnummer op deze FAQ-pagina (en op je boekingsbevestiging) zodra je merkt dat het voertuig weg is.")],
           [b("Doe direct aangifte bij de politie:"), t(" Bel "), b("911"), t(" en laat zo snel mogelijk een politierapport opmaken.")],
           [b("Handel snel:"), t(" Als je te laat reageert, kun je aansprakelijk worden gehouden bij nalatigheid.")],
         ),
@@ -276,7 +276,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Accepteren jullie contant geld of creditcards?",
       keywords: ["contant", "cash", "creditcard", "kaart", "maestro", "amex", "visa", "mastercard"],
       blocks: [
-        p(t("Ja. Wij accepteren cash, Maestro, Kompa Leon, Visa/Mastercard, Discover/Diners, Amex en andere grote creditcards. Op creditcardbetalingen geldt een "), b("5% administratie"), t(" toeslag.")),
+        p(t("Ja. Aloha Car Rental accepteert cash, Maestro, Kompa Leon, Visa/Mastercard, Discover/Diners, Amex en andere grote creditcards. Op creditcardbetalingen geldt een "), b("5% administratie"), t(" toeslag.")),
       ],
     },
     {
@@ -293,7 +293,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Wat is jullie brandstofbeleid?",
       keywords: ["brandstof", "benzine", "tank", "full to full", "vol-vol"],
       blocks: [
-        p(t("Ons brandstofbeleid is "), b("full-to-full"), t(".")),
+        p(t("Het brandstofbeleid van Aloha Car Rental is "), b("full-to-full"), t(".")),
         p(t("Voertuigen worden met een volle tank geleverd en moeten ook weer vol worden ingeleverd. Als het voertuig niet vol is geleverd, mag je het terugbrengen met hetzelfde niveau.")),
         p(b("Belangrijk:"), t(" Als het brandstofniveau bij inlevering te laag is, geldt een minimumbedrag van "), b("$25"), t(" voor voertuigen en "), b("$35"), t(" voor vans per "), b("1/4 tank"), t(" of deel daarvan.")),
       ],
@@ -314,32 +314,32 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       id: "long-term",
       question: "Bieden jullie langetermijnverhuur aan?",
       keywords: ["langetermijn", "lange termijn", "maandhuur", "extended rental"],
-      blocks: [p(t("Ja. Neem contact met ons op via e-mail of WhatsApp om beschikbaarheid en prijzen voor langetermijnhuur te bespreken."))],
+      blocks: [p(t("Ja. Neem contact op met Aloha Car Rental via e-mail, telefoon of WhatsApp met de supportgegevens op deze FAQ-pagina om beschikbaarheid en prijzen voor langetermijnhuur te bespreken."))],
     },
     {
       id: "delivery",
       question: "Leveren jullie de auto op een specifieke locatie af?",
       keywords: ["leveren", "afleveren", "specifieke locatie", "hotel", "adres"],
-      blocks: [p(t("Ja, we kunnen de huurauto op jouw gewenste locatie afleveren."))],
+      blocks: [p(t("Ja, Aloha Car Rental kan de huurauto op jouw gewenste locatie afleveren."))],
     },
     {
       id: "airport",
       question: "Kan ik de huurauto op de luchthaven ontvangen?",
       keywords: ["luchthaven", "airport", "aankomst", "ophalen"],
-      blocks: [p(t("Ja. Afhankelijk van je vluchttijd kunnen we de auto vlak bij de luchthaven voor je klaarzetten en sturen we vooraf de instructies."))],
+      blocks: [p(t("Ja. Afhankelijk van je vluchttijd kan Aloha Car Rental de auto vlak bij de luchthaven voor je klaarzetten en sturen we vooraf de instructies."))],
     },
     {
       id: "advance-booking",
       question: "Hoe ver van tevoren moet ik mijn huurauto reserveren?",
       keywords: ["reserveren", "van tevoren", "vooraf", "last minute", "24 uur"],
-      blocks: [p(t("Je kunt tot één jaar van tevoren reserveren. Voor last-minute boekingen binnen 24 uur kun je ons het beste direct bellen of appen."))],
+      blocks: [p(t("Je kunt tot één jaar van tevoren reserveren. Voor last-minute boekingen binnen 24 uur kun je Aloha Car Rental het beste direct bellen of appen via het supportnummer op deze FAQ-pagina."))],
     },
     {
       id: "minimum-rental-rules",
       question: "Waarom kan ik een heel korte huurperiode niet online boeken?",
       keywords: ["minimum huur", "minimum dagen", "korte huur", "alleen admin", "boekingsregels"],
       blocks: [
-        p(t("Voor sommige huurperiodes is een minimum aantal dagen ingesteld in de boekingsflow.")),
+        p(t("Voor sommige Aloha Car Rental-huurperiodes is een minimum aantal dagen ingesteld in de boekingsflow.")),
         p(t("Als een boeking korter is dan dat minimum, kan de site een extra korte-huurtoeslag toevoegen of vragen dat medewerkers de boeking handmatig afhandelen in plaats van online door te gaan.")),
       ],
     },
@@ -348,7 +348,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Kan ik een last-minute boeking online maken?",
       keywords: ["last minute", "zelfde dag", "spoedboeking", "24 uur"],
       blocks: [
-        p(t("Dat hangt af van de actieve boekingsregels.")),
+        p(t("Dat hangt af van de actieve boekingsregels van Aloha Car Rental.")),
         p(t("Als je pickup binnen het ingestelde last-minute venster valt, kan de website een extra percentage toevoegen of vereisen dat medewerkers de boeking rechtstreeks verwerken.")),
       ],
     },
@@ -357,7 +357,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Regelen jullie soms huur met partner-voertuigen?",
       keywords: ["partnerverhuur", "ander bedrijf", "leveranciersauto", "partnervoertuig"],
       blocks: [
-        p(t("Ja. In sommige gevallen kan een boeking worden uitgevoerd met een voertuig van een partner in plaats van uit onze eigen opgeslagen vloot.")),
+        p(t("Ja. In sommige gevallen kan een Aloha Car Rental-boeking worden uitgevoerd met een voertuig van een partner in plaats van uit onze eigen opgeslagen vloot.")),
         p(t("Die huur wordt operationeel apart afgehandeld zodat ze niet in de normale publieke vlootinventaris terechtkomt, terwijl de klant wel de normale boekingscommunicatie ontvangt.")),
       ],
     },
@@ -370,7 +370,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Llame a emergencias:"), t(" Marque "), b("911"), t(" si hay heridos o si alguien necesita atención médica urgente.")],
-          [b("Contacte soporte de inmediato:"), t(" Contacte soporte apenas sea seguro para que el proceso del sistema le guíe con el reporte local y el seguro.")],
+          [b("Contacte soporte de Aloha de inmediato:"), t(" Contacte a Aloha Car Rental apenas sea seguro para que nuestro equipo le guíe con el reporte local y el seguro.")],
           [b("No mueva el vehículo:"), t(" Deje el auto en su lugar salvo que emergencias o la policía le indiquen moverlo.")],
           [b("No abandone el lugar:"), t(" Permanezca allí hasta que el incidente quede bien documentado. Irse demasiado pronto puede afectar la cobertura del seguro.")],
         ),
@@ -384,7 +384,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("No mueva el auto:"), t(" Deje el vehículo donde ocurrió el daño, ya sea por un poste, piedra, parabrisas, estacionamiento o accidente de tránsito.")],
-          [b("Contacte soporte de inmediato:"), t(" Avise enseguida para que soporte explique el proceso local de reporte y los siguientes pasos.")],
+          [b("Contacte soporte de Aloha de inmediato:"), t(" Avise enseguida para que el soporte de Aloha Car Rental explique el proceso local de reporte y los siguientes pasos.")],
           [b("Siga las instrucciones:"), t(" Mueva el auto solo cuando policía, emergencias o soporte indiquen que es seguro hacerlo.")],
         ),
         p(t("Este procedimiento mantiene el caso bien documentado y ayuda a conservar la validez del seguro.")),
@@ -396,7 +396,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       keywords: ["robo", "robado", "policía", "punda", "otrobanda", "911"],
       blocks: [
         list(
-          [b("Contáctenos inmediatamente:"), t(" Llame al "), b("+5999 673-3248"), t(" apenas note que el vehículo desapareció.")],
+          [b("Contáctenos inmediatamente:"), t(" Llame a Aloha Car Rental de inmediato usando el número de soporte que aparece en esta página FAQ (y en su confirmación de reserva) apenas note que el vehículo desapareció.")],
           [b("Repórtelo a la policía:"), t(" Llame al "), b("911"), t(" y presente una denuncia policial lo antes posible.")],
           [b("Actúe rápido:"), t(" Si tarda demasiado, podría ser considerado responsable por negligencia.")],
         ),
@@ -433,7 +433,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿Aceptan efectivo o tarjetas de crédito?",
       keywords: ["efectivo", "cash", "tarjeta", "tarjetas", "maestro", "amex", "visa", "mastercard", "pago"],
       blocks: [
-        p(t("Sí. Aceptamos efectivo, Maestro, Kompa Leon, Visa/Mastercard, Discover/Diners, Amex y otras tarjetas principales. Los pagos con tarjeta tienen un cargo administrativo de "), b("5%"), t(".")),
+        p(t("Sí. Aloha Car Rental acepta efectivo, Maestro, Kompa Leon, Visa/Mastercard, Discover/Diners, Amex y otras tarjetas principales. Los pagos con tarjeta tienen un cargo administrativo de "), b("5%"), t(".")),
       ],
     },
     {
@@ -450,7 +450,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿Cuál es su política de combustible?",
       keywords: ["combustible", "gasolina", "tanque", "full to full", "lleno a lleno"],
       blocks: [
-        p(t("Nuestra política de combustible es "), b("lleno a lleno"), t(".")),
+        p(t("La política de combustible de Aloha Car Rental es "), b("lleno a lleno"), t(".")),
         p(t("Los vehículos se entregan con el tanque lleno y deben devolverse llenos. Si no se entregó lleno, puede devolverlo con el mismo nivel recibido.")),
         p(b("Importante:"), t(" Si el nivel de combustible es insuficiente al devolverlo, se aplica un cargo mínimo de "), b("$25"), t(" para vehículos y "), b("$35"), t(" para vans por cada "), b("1/4 de tanque"), t(" o fracción.")),
       ],
@@ -471,32 +471,32 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       id: "long-term",
       question: "¿Ofrecen alquileres a largo plazo?",
       keywords: ["largo plazo", "alquiler largo", "mensual", "extended rental"],
-      blocks: [p(t("Sí. Contáctenos por correo o WhatsApp para consultar disponibilidad y precios de alquiler a largo plazo."))],
+      blocks: [p(t("Sí. Contacte a Aloha Car Rental por correo, teléfono o WhatsApp usando los datos de soporte de esta página FAQ para consultar disponibilidad y precios de alquiler a largo plazo."))],
     },
     {
       id: "delivery",
       question: "¿Entregan el auto en una ubicación específica?",
       keywords: ["entrega", "entregar", "ubicación específica", "hotel", "dirección"],
-      blocks: [p(t("Sí, podemos entregar el auto de alquiler en la ubicación que prefiera."))],
+      blocks: [p(t("Sí, Aloha Car Rental puede entregar el auto de alquiler en la ubicación que prefiera."))],
     },
     {
       id: "airport",
       question: "¿Puedo recibir el auto de alquiler en el aeropuerto?",
       keywords: ["aeropuerto", "llegada", "recibir auto", "recoger"],
-      blocks: [p(t("Sí. Dependiendo del horario de su vuelo, podemos tener el auto listo cerca del aeropuerto y enviarle instrucciones antes de su llegada."))],
+      blocks: [p(t("Sí. Dependiendo del horario de su vuelo, Aloha Car Rental puede tener el auto listo cerca del aeropuerto y enviarle instrucciones antes de su llegada."))],
     },
     {
       id: "advance-booking",
       question: "¿Con cuánta anticipación debo reservar mi auto de alquiler?",
       keywords: ["reservar", "anticipación", "adelantado", "último minuto", "24 horas"],
-      blocks: [p(t("Puede reservar hasta con un año de anticipación. Para reservas de último minuto dentro de 24 horas, contáctenos directamente por WhatsApp o teléfono."))],
+      blocks: [p(t("Puede reservar hasta con un año de anticipación. Para reservas de último minuto dentro de 24 horas, contacte a Aloha Car Rental directamente por WhatsApp o teléfono usando el número de soporte que aparece en esta página FAQ."))],
     },
     {
       id: "minimum-rental-rules",
       question: "¿Por qué no puedo reservar un alquiler muy corto en línea?",
       keywords: ["alquiler mínimo", "días mínimos", "alquiler corto", "solo admin", "reglas de reserva"],
       blocks: [
-        p(t("Algunos alquileres tienen un número mínimo de días configurado en el flujo de reservas.")),
+        p(t("Algunos alquileres de Aloha Car Rental tienen un número mínimo de días configurado en el flujo de reservas.")),
         p(t("Si una reserva es más corta que ese mínimo, el sitio puede aplicar un recargo por alquiler corto o pedir que el personal la gestione manualmente en lugar de dejar continuar al público en línea.")),
       ],
     },
@@ -505,7 +505,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿Puedo hacer una reserva de última hora en línea?",
       keywords: ["última hora", "mismo día", "reserva urgente", "24 horas"],
       blocks: [
-        p(t("Depende de las reglas activas de reserva.")),
+        p(t("Depende de las reglas activas de reserva de Aloha Car Rental.")),
         p(t("Si la recogida cae dentro de la ventana configurada de última hora, el sitio puede añadir un porcentaje extra o requerir que el personal gestione la reserva directamente.")),
       ],
     },
@@ -514,7 +514,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿A veces gestionan alquileres con vehículos de socios?",
       keywords: ["alquiler de socios", "otra empresa", "vehículo de proveedor", "vehículo socio"],
       blocks: [
-        p(t("Sí. En algunos casos una reserva puede cumplirse con un vehículo suministrado por un socio en lugar de uno de nuestra flota guardada.")),
+        p(t("Sí. En algunos casos una reserva de Aloha Car Rental puede cumplirse con un vehículo suministrado por un socio en lugar de uno de nuestra flota guardada.")),
         p(t("Esos alquileres se gestionan por separado en la parte operativa para no mezclarse con el inventario público normal, mientras el cliente sigue recibiendo la comunicación habitual de la reserva.")),
       ],
     },

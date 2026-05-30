@@ -21,7 +21,7 @@ export const tenantConfig: TenantConfig = {
   paymentInstructions:
     process.env.TENANT_PAYMENT_INSTRUCTIONS ||
     "Please pay via bank transfer using your booking reference as the transaction reference.",
-  termsPdfUrl: process.env.TENANT_TERMS_PDF_URL || "/terms.pdf",
+  termsPdfUrl: process.env.TENANT_TERMS_PDF_URL || "/terms-en.pdf",
   theme: {
     primary: process.env.TENANT_THEME_PRIMARY || "294 64% 46%",
     primaryForeground: process.env.TENANT_THEME_PRIMARY_FOREGROUND || "0 0% 98%",

@@ -73,7 +73,7 @@ export default async function FAQPage({
     : tenant.phone.trim().replace(/\D/g, "");
   const phoneHref = phoneForTel ? `tel:${phoneForTel}` : undefined;
   const emailHref = tenant.email ? `mailto:${tenant.email}` : undefined;
-  const faqEntries = getFaqEntries(locale);
+  const faqEntries = getFaqEntries(locale, "rental");
   const highlightedEntries = faqEntries.slice(0, 3);
 
   return (

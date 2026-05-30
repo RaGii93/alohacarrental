@@ -234,7 +234,7 @@ export function BookingEditForm({
           </div>
           <div className="grid gap-5 md:grid-cols-2">
             <div className={fieldClass}>
-              <Label>{t("common.name")}</Label>
+              <Label>{t("booking.customerName")}</Label>
               <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} className={inputClass} />
             </div>
             <div className={fieldClass}>

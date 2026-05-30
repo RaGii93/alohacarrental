@@ -108,7 +108,7 @@ export default async function SuccessPage({
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {[
-              [t("common.name"), booking.customerName],
+              [t("booking.customerName"), booking.customerName],
               [t("common.email"), booking.customerEmail],
               [t("booking.flightNumber"), booking.flightNumber || "-"],
               [t("booking.birthDate"), booking.birthDate ? formatDate(booking.birthDate) : "-"],

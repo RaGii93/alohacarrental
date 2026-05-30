@@ -11,6 +11,7 @@ import { getPublicMetadataCopy } from "@/lib/public-metadata-profiles";
 import { getPublicLocations, getPublicVehicleCategories } from "@/lib/public-data";
 import { getBookingJsonLd } from "@/lib/structured-data";
 import { getTenantConfig } from "@/lib/tenant";
+import { getLocalizedTermsPdfUrl } from "@/lib/terms-locale";
 import { getBookingRuleSettings, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { parseLaPazDateInput } from "@/lib/timezone";
 
@@ -87,6 +88,7 @@ export default async function BookingPage({
     getBookingRuleSettings(),
     getVehicleRatesIncludeTax(),
   ]);
+  const localizedTermsPdfUrl = getLocalizedTermsPdfUrl(locale, tenant.termsPdfUrl);
   const jsonLd = getBookingJsonLd(locale, tenant);
   const locations = await getPublicLocations();
 
@@ -180,7 +182,7 @@ export default async function BookingPage({
             taxPercentage={taxPercentage}
             vehicleRatesIncludeTax={vehicleRatesIncludeTax}
             bookingRuleSettings={bookingRules}
-            termsPdfUrl={tenant.termsPdfUrl}
+            termsPdfUrl={localizedTermsPdfUrl}
             initialData={{
               startDate: startDate ? parseLaPazDateInput(startDate) : null,
               endDate: endDate ? parseLaPazDateInput(endDate) : null,

@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { getLocalizedTermsPdfUrl } from "@/lib/terms-locale";
 import Reveal from "./Reveal";
 
 const LOGO_URL = "/home/logo.png";
@@ -10,7 +11,9 @@ const BRAND_LOGO_ALT = "Aloha Bonaire Car Rental logo";
 
 export default function SiteFooter() {
   const t = useTranslations();
+  const locale = useLocale();
   const year = new Date().getFullYear();
+  const termsPdfUrl = getLocalizedTermsPdfUrl(locale);
   const footerLinks = [
     { href: "/", label: t("nav.home") },
     { href: "/book", label: t("nav.booking") },
@@ -47,6 +50,14 @@ export default function SiteFooter() {
                   {link.label}
                 </Link>
               ))}
+              <a
+                href={termsPdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white/88 transition-colors hover:bg-white/14 hover:text-white"
+              >
+                {t("booking.terms")}
+              </a>
             </div>
           </div>
 

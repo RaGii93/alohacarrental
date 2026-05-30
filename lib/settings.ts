@@ -988,7 +988,7 @@ export function getDefaultTenantSettings(): TenantSettings {
       process.env.TENANT_PAYMENT_INSTRUCTIONS,
       "Payment via bank transfer or credit card. Please reference your booking ID."
     ),
-    termsPdfUrl: sanitizeRequiredText(process.env.TENANT_TERMS_PDF_URL, "/terms.pdf"),
+    termsPdfUrl: sanitizeRequiredText(process.env.TENANT_TERMS_PDF_URL, "/terms-en.pdf"),
     theme: {
       primary,
       primaryForeground,

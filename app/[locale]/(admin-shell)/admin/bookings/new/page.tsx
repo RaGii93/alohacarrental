@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { db } from "@/lib/db";
 import { getTenantConfig } from "@/lib/tenant";
+import { getLocalizedTermsPdfUrl } from "@/lib/terms-locale";
 import { getBookingRuleSettings, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
@@ -44,6 +45,7 @@ export default async function AdminNewBookingPage({
       orderBy: { sortOrder: "asc" },
     }),
   ]);
+  const localizedTermsPdfUrl = getLocalizedTermsPdfUrl(locale, tenant.termsPdfUrl);
 
   let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
@@ -80,7 +82,7 @@ export default async function AdminNewBookingPage({
           taxPercentage={taxPercentage}
           vehicleRatesIncludeTax={vehicleRatesIncludeTax}
           bookingRuleSettings={bookingRules}
-          termsPdfUrl={tenant.termsPdfUrl}
+          termsPdfUrl={localizedTermsPdfUrl}
           bookingSource="admin"
         />
       </div>

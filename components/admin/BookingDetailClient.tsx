@@ -616,7 +616,7 @@ export function BookingDetailClient({
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("common.name")}</p><p className="mt-1 font-medium text-slate-900">{booking.customerName}</p></div>
+              <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("booking.customerName")}</p><p className="mt-1 font-medium text-slate-900">{booking.customerName}</p></div>
               <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("common.email")}</p><p className="mt-1 font-medium text-slate-900">{booking.customerEmail}</p></div>
               <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("common.phone")}</p><p className="mt-1 font-medium text-slate-900">{booking.customerPhone}</p></div>
               <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("admin.bookings.detail.customerProfile.fields.flightNumber")}</p><p className="mt-1 font-medium text-slate-900">{booking.flightNumber || "-"}</p></div>
