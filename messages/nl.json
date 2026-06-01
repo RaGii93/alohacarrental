@@ -704,6 +704,8 @@
       "next": "We nemen binnenkort contact met je op ter bevestiging."
     },
     "baseTotal": "Basistotaal",
+    "cruiseBookingToggle": "Cruiseboeking (gebruik cruisetarieven)",
+    "fullInsuranceMinimumDays": "Volledige verzekering is alleen beschikbaar voor boekingen van {days} dagen of langer.",
     "subtotal": "Subtotaal",
     "belowMinimumSurcharge": "Korte-huurtoeslag",
     "lastMinuteSurcharge": "Last-minute toeslag",
@@ -1142,6 +1144,8 @@
         "fields": {
           "pickupDateTime": "Ophaaldatum en tijd",
           "dropoffDateTime": "Inleverdatum en tijd",
+          "cruiseBookingLabel": "Cruiseboeking",
+          "cruiseBookingHelp": "Gebruik cruisetarieven voor deze boeking",
           "assignedVehicle": "Toegewezen voertuig",
           "selectVehicle": "Selecteer voertuig",
           "selectPickupLocation": "Selecteer ophaallocatie",
@@ -1786,6 +1790,7 @@
       "imageUrl": "Afbeeldings-URL",
       "previewAlt": "Voorbeeld van categorie",
       "dailyRate": "Dagtarief ($)",
+      "cruiseDailyRate": "Cruise dagtarief",
       "fuelChargePerQuarter": "Brandstoftoeslag per 1/4 tank ($)",
       "sortOrder": "Sorteervolgorde",
       "seats": "Zitplaatsen",
@@ -1827,6 +1832,7 @@
       "table": {
         "image": "Afbeelding",
         "features": "Kenmerken",
+        "cruiseRate": "Cruisetarief",
         "fuelCharge": "Brandstoftoeslag",
         "vehicles": "Voertuigen",
         "bookings": "Boekingen",
@@ -1838,6 +1844,7 @@
       },
       "pricingCard": {
         "features": "{seats} zitplaatsen • {transmission} • {features}",
+        "cruiseRate": "Cruisetarief: {amount}",
         "fuelRefill": "Brandstofaanvulling: {amount} per 1/4 tank"
       },
       "messages": {

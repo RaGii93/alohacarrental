@@ -28,7 +28,6 @@ interface Vehicle {
   categoryId?: string;
   // category can be a plain string (legacy) or a relation object { id, name }
   category?: string | { id?: string; name?: string } | null;
-  dailyRate: number;
   status: string;
   notes?: string;
   createdAt: Date;
@@ -53,7 +52,7 @@ export function VehiclesTable({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Partial<Vehicle> | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [sortKey, setSortKey] = useState<"name" | "plateNumber" | "category" | "dailyRate" | "status">("name");
+  const [sortKey, setSortKey] = useState<"name" | "plateNumber" | "category" | "status">("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const toggleSort = (key: typeof sortKey) => {
@@ -79,9 +78,7 @@ export function VehiclesTable({
             ? (a.plateNumber || "").toLowerCase()
             : sortKey === "category"
               ? categoryA.toLowerCase()
-              : sortKey === "dailyRate"
-                ? a.dailyRate
-                : (a.status || "").toLowerCase();
+              : (a.status || "").toLowerCase();
       const valB =
         sortKey === "name"
           ? (b.name || "").toLowerCase()
@@ -89,9 +86,7 @@ export function VehiclesTable({
             ? (b.plateNumber || "").toLowerCase()
             : sortKey === "category"
               ? categoryB.toLowerCase()
-              : sortKey === "dailyRate"
-                ? b.dailyRate
-                : (b.status || "").toLowerCase();
+              : (b.status || "").toLowerCase();
       if (valA < valB) return sortDir === "asc" ? -1 : 1;
       if (valA > valB) return sortDir === "asc" ? 1 : -1;
       return 0;
@@ -181,7 +176,6 @@ export function VehiclesTable({
               <TableHead><button type="button" onClick={() => toggleSort("name")}>{t("admin.vehicles.table.name")}{sortIndicator("name")}</button></TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("plateNumber")}>{t("admin.vehicles.table.plate")}{sortIndicator("plateNumber")}</button></TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("category")}>{t("admin.vehicles.table.category")}{sortIndicator("category")}</button></TableHead>
-              <TableHead><button type="button" onClick={() => toggleSort("dailyRate")}>{t("admin.vehicles.table.rate")}{sortIndicator("dailyRate")}</button></TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("status")}>{t("admin.vehicles.table.status")}{sortIndicator("status")}</button></TableHead>
               <TableHead>{t("admin.vehicles.table.actions")}</TableHead>
             </TableRow>
@@ -200,9 +194,6 @@ export function VehiclesTable({
                     ? vehicle.category
                     : vehicle.category?.name || "-"
                 }</TableCell>
-                <TableCell>
-                  ${(vehicle.dailyRate / 100).toFixed(2)}
-                </TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(vehicle.status)}>
                     {vehicle.status}

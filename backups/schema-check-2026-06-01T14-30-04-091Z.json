@@ -1,0 +1,22 @@
+{
+  "createdAt": "2026-06-01T14:30:09.300Z",
+  "checks": {
+    "location_latitude": true,
+    "location_longitude": true,
+    "booking_pickupLocationAddress": true,
+    "booking_dropoffLocationAddress": true,
+    "vehicleFeature_iconName": true,
+    "appSetting_table": true,
+    "bookingAdditionalDriver_table": true,
+    "booking_pickupChecklistData": true,
+    "booking_closeoutPaymentDueAt": true,
+    "automationRule_table": true,
+    "automationExecutionLog_table": true,
+    "rentalAgreement_table": true,
+    "rentalAgreementSignature_table": true,
+    "type_automationTrigger": true,
+    "type_rentalAgreementStatus": true,
+    "vehicleCategory_cruiseDailyRate": false,
+    "booking_isCruise": false
+  }
+}

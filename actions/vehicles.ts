@@ -18,6 +18,11 @@ export async function createVehicleAction(formData: any, locale: string) {
     }
 
     const validated = vehicleFormSchema.parse(formData);
+    const category = await db.vehicleCategory.findUnique({
+      where: { id: validated.categoryId },
+      select: { name: true, dailyRate: true },
+    });
+    if (!category) return { success: false, error: "Invalid category" };
 
     let vehicle: any;
     try {
@@ -26,7 +31,8 @@ export async function createVehicleAction(formData: any, locale: string) {
           name: validated.name,
           plateNumber: validated.plateNumber,
           categoryId: validated.categoryId,
-          dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
+          // Vehicle dailyRate mirrors the selected category rate.
+          dailyRate: category.dailyRate,
           status: validated.status,
           notes: validated.notes,
         } as any,
@@ -34,12 +40,10 @@ export async function createVehicleAction(formData: any, locale: string) {
     } catch (e: any) {
       const message = String(e?.message || "");
       if (!message.includes("Unknown argument `categoryId`")) throw e;
-      const category = await db.vehicleCategory.findUnique({ where: { id: validated.categoryId }, select: { name: true } });
-      if (!category) return { success: false, error: "Invalid category" };
       const generatedId = crypto.randomUUID().replaceAll("-", "");
       const rows = await db.$queryRaw<Array<any>>`
         INSERT INTO "Vehicle" (id, name, "plateNumber", category, "dailyRate", status, notes)
-        VALUES (${generatedId}, ${validated.name}, ${validated.plateNumber || null}, ${category.name}, ${Math.round(validated.dailyRate * 100)}, ${validated.status}::"VehicleStatus", ${validated.notes || null})
+        VALUES (${generatedId}, ${validated.name}, ${validated.plateNumber || null}, ${category.name}, ${category.dailyRate}, ${validated.status}::"VehicleStatus", ${validated.notes || null})
         RETURNING *
       `;
       vehicle = rows[0];
@@ -76,6 +80,11 @@ export async function updateVehicleAction(
     }
 
     const validated = vehicleFormSchema.parse(formData);
+    const category = await db.vehicleCategory.findUnique({
+      where: { id: validated.categoryId },
+      select: { name: true, dailyRate: true },
+    });
+    if (!category) return { success: false, error: "Invalid category" };
 
     const existingVehicle = await db.vehicle.findUnique({
       where: { id: vehicleId },
@@ -96,7 +105,8 @@ export async function updateVehicleAction(
           name: validated.name,
           plateNumber: validated.plateNumber,
           categoryId: validated.categoryId,
-          dailyRate: Math.round(validated.dailyRate * 100), // Convert to cents
+          // Vehicle dailyRate mirrors the selected category rate.
+          dailyRate: category.dailyRate,
           status: validated.status,
           notes: validated.notes,
         } as any,
@@ -104,15 +114,13 @@ export async function updateVehicleAction(
     } catch (e: any) {
       const message = String(e?.message || "");
       if (!message.includes("Unknown argument `categoryId`")) throw e;
-      const category = await db.vehicleCategory.findUnique({ where: { id: validated.categoryId }, select: { name: true } });
-      if (!category) return { success: false, error: "Invalid category" };
       await db.$executeRaw`
         UPDATE "Vehicle"
         SET
           name = ${validated.name},
           "plateNumber" = ${validated.plateNumber || null},
           category = ${category.name},
-          "dailyRate" = ${Math.round(validated.dailyRate * 100)},
+          "dailyRate" = ${category.dailyRate},
           status = ${validated.status}::"VehicleStatus",
           notes = ${validated.notes || null}
         WHERE id = ${vehicleId}

@@ -28,6 +28,11 @@ import {
 import { AvailabilityResult } from "@/actions/availability";
 import { createCategoryBookingAction } from "@/actions/booking";
 import { calculateDays, evaluateBookingRules, formatCurrency } from "@/lib/pricing";
+import {
+  computeExtraLineTotal,
+  FULL_INSURANCE_MIN_DAYS,
+  hasIneligibleFullInsuranceSelection,
+} from "@/lib/booking-pricing-rules";
 import { BookingData } from "../BookingWizard";
 import { formatDate, formatDateTime } from "@/lib/datetime";
 import { combinePhoneNumber } from "@/lib/phone";
@@ -54,6 +59,7 @@ interface Step3ReviewProps {
   vehicleRatesIncludeTax: boolean;
   termsPdfUrl: string;
   bookingSource?: "public" | "admin";
+  isCruise?: boolean;
   bookingRuleSettings: BookingRuleSettings;
 }
 
@@ -70,6 +76,7 @@ export function Step3Review({
   vehicleRatesIncludeTax,
   termsPdfUrl,
   bookingSource = "public",
+  isCruise = false,
   bookingRuleSettings,
 }: Step3ReviewProps) {
   const t = useTranslations();
@@ -103,6 +110,10 @@ export function Step3Review({
     }
     if (!bookingData.birthDate || !bookingData.licenseExpiryDate) {
       toast.error(t("booking.errors.birthLicenseRequired"));
+      return;
+    }
+    if (hasInvalidFullInsurance) {
+      toast.error(t("booking.fullInsuranceMinimumDays", { days: FULL_INSURANCE_MIN_DAYS }));
       return;
     }
 
@@ -155,6 +166,7 @@ export function Step3Review({
       formData.append("privacyConsentAccepted", "true");
       formData.append("termsAccepted", "true");
       formData.append("bookingSource", bookingSource);
+      formData.append("isCruise", isCruise ? "true" : "false");
 
       const result = await createCategoryBookingAction(formData, locale);
       if (result.success) {
@@ -177,8 +189,22 @@ export function Step3Review({
   const extrasAmount = bookingData.selectedExtras.reduce((sum, item) => {
     const extra = extras.find((row) => row.id === item.extraId);
     if (!extra) return sum;
-    return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
+    return sum + computeExtraLineTotal({
+      extraName: extra.name,
+      pricingType: extra.pricingType,
+      amountCents: extra.amount,
+      quantity: item.quantity,
+      days,
+      baseTotalCents: baseAmount,
+    });
   }, 0);
+  const hasInvalidFullInsurance = hasIneligibleFullInsuranceSelection({
+    days,
+    selectedExtras: bookingData.selectedExtras
+      .map((item) => extras.find((row) => row.id === item.extraId))
+      .filter(Boolean)
+      .map((extra) => ({ name: (extra as { name: string }).name })),
+  });
   const pricing = pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime
     ? evaluateBookingRules({
         startDate: pickupDateTime,
@@ -247,6 +273,11 @@ export function Step3Review({
             {pricing?.lastMinuteBlocked ? (
               <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
                 {t("booking.errors.lastMinuteAdminOnly", { hours: bookingRuleSettings.lastMinuteBookingThresholdHours })}
+              </div>
+            ) : null}
+            {hasInvalidFullInsurance ? (
+              <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
+                {t("booking.fullInsuranceMinimumDays", { days: FULL_INSURANCE_MIN_DAYS })}
               </div>
             ) : null}
             {bookingData.additionalDrivers.length > 0 ? (
@@ -332,7 +363,14 @@ export function Step3Review({
                     const extra = extras.find((row) => row.id === item.extraId);
                     if (!extra) return null;
                     const lineTotal =
-                      extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity;
+                      computeExtraLineTotal({
+                        extraName: extra.name,
+                        pricingType: extra.pricingType,
+                        amountCents: extra.amount,
+                        quantity: item.quantity,
+                        days,
+                        baseTotalCents: baseAmount,
+                      });
                     return (
                       <p key={item.extraId} className="flex justify-between gap-4">
                         <span>{extra.name} x{item.quantity}</span>
@@ -593,7 +631,7 @@ export function Step3Review({
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled || !!pricing?.belowMinimumBlocked || !!pricing?.lastMinuteBlocked || (bookingSource === "public" && !hasReadTerms)}
+          disabled={!bookingData.privacyConsentAccepted || !bookingData.termsAccepted || !bookingData.birthDate || !bookingData.licenseExpiryDate || isSubmitting || disabled || !!pricing?.belowMinimumBlocked || !!pricing?.lastMinuteBlocked || hasInvalidFullInsurance || (bookingSource === "public" && !hasReadTerms)}
           className="h-12 rounded-full bg-[#FF912C] px-6 font-semibold text-white shadow-[0_20px_40px_-24px_rgba(255,145,44,0.45)] hover:bg-[#E67F1F]"
         >
           <CheckCircle2 className="h-4 w-4" />

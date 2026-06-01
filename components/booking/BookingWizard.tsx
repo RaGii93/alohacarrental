@@ -14,6 +14,7 @@ import {
   formatCurrency,
   getMinimumDropoffDateForBooking,
 } from "@/lib/pricing";
+import { computeExtraLineTotal, resolveCategoryDailyRate } from "@/lib/booking-pricing-rules";
 import { Step1Search } from "./Steps/Step1Search";
 import { Step2Customer } from "./Steps/Step2Customer";
 import { Step3Review } from "./Steps/Step3Review";
@@ -53,6 +54,7 @@ export interface BookingData {
   termsAccepted: boolean;
   privacyConsentAccepted: boolean;
   selectedExtras: Array<{ extraId: string; quantity: number }>;
+  isCruise: boolean;
 }
 
 type BookingWizardInitialData = {
@@ -63,6 +65,7 @@ type BookingWizardInitialData = {
   categoryId?: string | null;
   pickupLocationId?: string;
   dropoffLocationId?: string;
+  isCruise?: boolean;
 };
 
 export function BookingWizard({
@@ -88,6 +91,7 @@ export function BookingWizard({
     seats: number;
     transmission: "AUTOMATIC" | "MANUAL";
     features: Array<{ name: string; iconName: string | null }>;
+    cruiseDailyRate?: number | null;
   }>;
   taxPercentage: number;
   vehicleRatesIncludeTax: boolean;
@@ -130,6 +134,7 @@ export function BookingWizard({
     termsAccepted: false,
     privacyConsentAccepted: false,
     selectedExtras: [],
+    isCruise: false,
     ...initialData,
   });
 
@@ -166,17 +171,32 @@ export function BookingWizard({
     pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime
       ? calculateDays(pickupDateTime, dropoffDateTime)
       : 1;
-  const baseAmount = selectedCategory ? selectedCategory.dailyRate * days : 0;
+  const effectiveDailyRate = selectedCategory
+    ? resolveCategoryDailyRate({
+        dailyRateCents: selectedCategory.dailyRate,
+        cruiseDailyRateCents: selectedCategory.cruiseDailyRate,
+        bookingSource,
+        isCruise: bookingData.isCruise,
+      })
+    : 0;
+  const baseAmount = effectiveDailyRate * days;
   const extrasAmount = bookingData.selectedExtras.reduce((sum, item) => {
     const extra = extras.find((row) => row.id === item.extraId);
     if (!extra) return sum;
-    return sum + (extra.pricingType === "DAILY" ? extra.amount * days * item.quantity : extra.amount * item.quantity);
+    return sum + computeExtraLineTotal({
+      extraName: extra.name,
+      pricingType: extra.pricingType,
+      amountCents: extra.amount,
+      quantity: item.quantity,
+      days,
+      baseTotalCents: baseAmount,
+    });
   }, 0);
   const pricing = pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime
     ? evaluateBookingRules({
         startDate: pickupDateTime,
         endDate: dropoffDateTime,
-        basePriceCents: selectedCategory?.dailyRate || 0,
+        basePriceCents: effectiveDailyRate,
         extrasCents: extrasAmount,
         taxPercentage,
         baseRentalIncludesTax: vehicleRatesIncludeTax,
@@ -245,6 +265,7 @@ export function BookingWizard({
               availability={availability}
               locations={locations}
               bookingSource={bookingSource}
+              isCruise={bookingData.isCruise}
               bookingRuleSettings={bookingRuleSettings}
             />
           )}
@@ -273,6 +294,7 @@ export function BookingWizard({
               vehicleRatesIncludeTax={vehicleRatesIncludeTax}
               termsPdfUrl={termsPdfUrl}
               bookingSource={bookingSource}
+              isCruise={bookingData.isCruise}
               bookingRuleSettings={bookingRuleSettings}
             />
           )}
@@ -337,7 +359,7 @@ export function BookingWizard({
               <p className="text-[#78716c]">-</p>
             )}
             <div className="mt-4 space-y-2 rounded-[1.25rem] border border-[#efe7df] bg-white p-4">
-              <div className="flex justify-between text-[#57534e]"><span>{t("booking.pricePerDay")}</span><span className="font-semibold text-[#111111]">{selectedCategory ? formatCurrency(selectedCategory.dailyRate) : "-"}</span></div>
+              <div className="flex justify-between text-[#57534e]"><span>{t("booking.pricePerDay")}</span><span className="font-semibold text-[#111111]">{selectedCategory ? formatCurrency(effectiveDailyRate) : "-"}</span></div>
               <div className="flex justify-between text-[#57534e]"><span>{t("booking.days")}</span><span className="font-semibold text-[#111111]">{days}</span></div>
               <div className="flex justify-between text-[#57534e]"><span>{t("booking.baseTotal")}</span><span className="font-semibold text-[#111111]">{formatCurrency(baseAmount)}</span></div>
               {pricing?.belowMinimumSurchargeCents ? (

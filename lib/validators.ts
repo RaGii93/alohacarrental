@@ -26,7 +26,6 @@ export const vehicleFormSchema = z.object({
   name: z.string().min(2, "Vehicle name must be at least 2 characters"),
   plateNumber: z.string().optional(),
   categoryId: z.string().min(1, "Please select a category"),
-  dailyRate: z.number().min(1, "Daily rate must be greater than 0"),
   status: z.enum(["ACTIVE", "ON_RENT", "MAINTENANCE", "INACTIVE"]),
   notes: z.string().optional(),
 });
@@ -39,10 +38,17 @@ export const categoryFormSchema = z.object({
   transmission: z.enum(["AUTOMATIC", "MANUAL"]),
   featureIds: z.array(z.string()).default([]),
   dailyRate: z.number().min(1, "Daily rate must be greater than 0"),
+  cruiseDailyRate: z.number().min(0, "Cruise daily rate must be 0 or greater").optional(),
   fuelChargePerQuarter: z.number().min(0, "Fuel charge must be 0 or greater"),
   sortOrder: z.number().int().min(0),
   isActive: z.boolean(),
-});
+}).refine(
+  (data) => (data.cruiseDailyRate || 0) === 0 || (data.cruiseDailyRate || 0) > data.dailyRate,
+  {
+    message: "Cruise daily rate must be higher than the standard daily rate",
+    path: ["cruiseDailyRate"],
+  }
+);
 
 export const locationFormSchema = z.object({
   name: z.string().min(2, "Location name must be at least 2 characters"),

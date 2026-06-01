@@ -14,6 +14,12 @@ import { calculateDriverLicenseDeleteAfter } from "@/lib/driver-license-retentio
 import { getBookingHoldDays, getBookingRuleSettings, getInvoiceProvider, getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { logAdminAction } from "@/lib/audit";
 import { calculateBookingAmounts, calculateFuelDifferenceCharge, calculateLateReturnCharge, evaluateBookingRules, getFuelChargePerQuarterForCategory } from "@/lib/pricing";
+import {
+  computeExtraLineTotal,
+  FULL_INSURANCE_MIN_DAYS,
+  hasIneligibleFullInsuranceSelection,
+  resolveCategoryDailyRate,
+} from "@/lib/booking-pricing-rules";
 import { createNotification } from "@/lib/notifications";
 import { getTermsEmailAttachment } from "@/lib/terms";
 import {
@@ -199,6 +205,45 @@ async function resolveActiveLocation(locationId: string | null | undefined) {
     where: { id: locationId },
     select: { id: true, name: true },
   });
+}
+
+async function ensureCruisePricingColumns(client: typeof db = db) {
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "VehicleCategory"
+    ADD COLUMN IF NOT EXISTS "cruiseDailyRate" INT NULL
+  `);
+  await client.$executeRawUnsafe(`
+    ALTER TABLE "Booking"
+    ADD COLUMN IF NOT EXISTS "isCruise" BOOLEAN NOT NULL DEFAULT false
+  `);
+}
+
+async function getCategoryCruiseDailyRateCents(categoryId: string): Promise<number | null> {
+  try {
+    const rows = await db.$queryRaw<Array<{ cruiseDailyRate: number | null }>>`
+      SELECT "cruiseDailyRate"
+      FROM "VehicleCategory"
+      WHERE id = ${categoryId}
+      LIMIT 1
+    `;
+    return rows[0]?.cruiseDailyRate ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function getBookingIsCruise(bookingId: string): Promise<boolean> {
+  try {
+    const rows = await db.$queryRaw<Array<{ isCruise: boolean | null }>>`
+      SELECT "isCruise"
+      FROM "Booking"
+      WHERE id = ${bookingId}
+      LIMIT 1
+    `;
+    return Boolean(rows[0]?.isCruise);
+  } catch {
+    return false;
+  }
 }
 
 async function evaluateBookingPricingRules(params: {
@@ -535,7 +580,17 @@ async function buildAndUploadBookingDocument(
 
   const { extras: adjustmentExtras, discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
   const rentalDays = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
-  const baseRental = booking.category.dailyRate * rentalDays;
+  const [isCruise, cruiseDailyRate] = await Promise.all([
+    getBookingIsCruise(bookingId),
+    getCategoryCruiseDailyRateCents(booking.categoryId),
+  ]);
+  const effectiveDailyRate = resolveCategoryDailyRate({
+    dailyRateCents: booking.category.dailyRate,
+    cruiseDailyRateCents: cruiseDailyRate,
+    bookingSource: "admin",
+    isCruise,
+  });
+  const baseRental = effectiveDailyRate * rentalDays;
   const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
   const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
   const [taxPercentage, vehicleRatesIncludeTax] = await Promise.all([
@@ -1087,6 +1142,16 @@ export async function completeReturnInspectionAction(
     if (operational.returnedAt) return { success: false, error: "BOOKING_ALREADY_RETURNED" };
 
     const returnedAt = new Date();
+    const [isCruise, cruiseDailyRate] = await Promise.all([
+      getBookingIsCruise(bookingId),
+      getCategoryCruiseDailyRateCents(booking.category.id),
+    ]);
+    const effectiveDailyRate = resolveCategoryDailyRate({
+      dailyRateCents: booking.category?.dailyRate || 0,
+      cruiseDailyRateCents: cruiseDailyRate,
+      bookingSource: "admin",
+      isCruise,
+    });
 
     const fuelCharge = calculateFuelDifferenceCharge({
       pickupFuelLevel: booking.pickupFuelLevel,
@@ -1096,7 +1161,7 @@ export async function completeReturnInspectionAction(
     const lateReturn = calculateLateReturnCharge({
       scheduledDropoffAt: booking.endDate,
       actualReturnedAt: returnedAt,
-      dailyRateCents: booking.category?.dailyRate || 0,
+      dailyRateCents: effectiveDailyRate,
     });
     const lateCharge = lateReturn.chargeCents;
     const damageCharge = Math.max(0, Math.round(input.damageChargeCents || 0));
@@ -1259,7 +1324,17 @@ async function recomputeBookingTotals(bookingId: string) {
 
   const { extras: adjustmentExtras, discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
   const days = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
-  const baseRental = booking.category.dailyRate * days;
+  const [isCruise, cruiseDailyRate] = await Promise.all([
+    getBookingIsCruise(bookingId),
+    getCategoryCruiseDailyRateCents(booking.categoryId),
+  ]);
+  const effectiveDailyRate = resolveCategoryDailyRate({
+    dailyRateCents: booking.category.dailyRate,
+    cruiseDailyRateCents: cruiseDailyRate,
+    bookingSource: "admin",
+    isCruise,
+  });
+  const baseRental = effectiveDailyRate * days;
   const extrasTotal = adjustmentExtras.reduce((sum, line) => sum + line.lineTotal, 0);
   const percentage = bookingDiscount?.percentage ?? 0;
   const discountAmount = Math.round((baseRental * percentage) / 100);
@@ -1356,8 +1431,29 @@ export async function addExtraToBookingAction(bookingId: string, extraId: string
     if (!extra || !extra.isActive) return { success: false, error: "Extra not available" };
 
     const days = Math.max(1, Math.ceil((booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)));
+    if (hasIneligibleFullInsuranceSelection({ days, selectedExtras: [{ name: extra.name }] })) {
+      return { success: false, error: `Full insurance is only available for bookings of ${FULL_INSURANCE_MIN_DAYS} days or more.` };
+    }
+    const [isCruise, cruiseDailyRate] = await Promise.all([
+      getBookingIsCruise(bookingId),
+      getCategoryCruiseDailyRateCents(booking.categoryId),
+    ]);
+    const effectiveDailyRate = resolveCategoryDailyRate({
+      dailyRateCents: booking.category.dailyRate,
+      cruiseDailyRateCents: cruiseDailyRate,
+      bookingSource: "admin",
+      isCruise,
+    });
+    const baseTotalCents = effectiveDailyRate * days;
     const qty = Math.max(1, Math.round(quantity || 1));
-    const lineTotal = extra.pricingType === "DAILY" ? extra.amount * days * qty : extra.amount * qty;
+    const lineTotal = computeExtraLineTotal({
+      extraName: extra.name,
+      pricingType: extra.pricingType,
+      amountCents: extra.amount,
+      quantity: qty,
+      days,
+      baseTotalCents,
+    });
 
     await db.bookingExtra.upsert({
       where: { bookingId_extraId: { bookingId, extraId } },
@@ -1448,6 +1544,7 @@ export async function createCategoryBookingAction(
     const extrasPayload = (formData.get("selectedExtras") as string | null) || "[]";
     const driverLicenseUrl = formData.get("driverLicenseUrl") as string;
     const bookingSource = (formData.get("bookingSource") as string | null) || "public";
+    const requestedCruise = formData.get("isCruise") === "true";
     const privacyConsentAccepted = formData.get("privacyConsentAccepted") === "true";
     const termsAccepted = formData.get("termsAccepted") === "true";
     const pickupLatitude = pickupLatitudeRaw ? Number(pickupLatitudeRaw) : null;
@@ -1460,6 +1557,8 @@ export async function createCategoryBookingAction(
         return { success: false, error: "Unauthorized" };
       }
     }
+    const isCruise = bookingSource === "admin" ? requestedCruise : false;
+    await ensureCruisePricingColumns();
 
     // Basic validation
     if (
@@ -1564,23 +1663,38 @@ export async function createCategoryBookingAction(
 
     // Calculate days and total
     const days = Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const baseTotal = category.dailyRate * Math.max(1, days);
+    const rentalDays = Math.max(1, days);
+    const cruiseDailyRate = isCruise ? await getCategoryCruiseDailyRateCents(category.id) : null;
+    const effectiveDailyRate = resolveCategoryDailyRate({
+      dailyRateCents: category.dailyRate,
+      cruiseDailyRateCents: cruiseDailyRate,
+      bookingSource: bookingSource === "admin" ? "admin" : "public",
+      isCruise,
+    });
+    const baseTotal = effectiveDailyRate * rentalDays;
     let extrasTotal = 0;
     let resolvedExtras: Array<{ extraId: string; quantity: number; lineTotal: number }> = [];
     if (selectedExtras.length > 0) {
       if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
-        const extraRows: Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }> = await (db as any).extra.findMany({
+        const extraRows: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }> = await (db as any).extra.findMany({
           where: { id: { in: selectedExtras.map((entry) => entry.extraId) }, isActive: true },
-          select: { id: true, pricingType: true, amount: true },
+          select: { id: true, name: true, pricingType: true, amount: true },
         });
-        const extraMap = new Map<string, { id: string; pricingType: "DAILY" | "FLAT"; amount: number }>(
+        const extraMap = new Map<string, { id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }>(
           extraRows.map((row) => [row.id, row])
         );
         resolvedExtras = selectedExtras
           .map((entry) => {
             const extra = extraMap.get(entry.extraId);
             if (!extra) return null;
-            const lineTotal = extra.pricingType === "DAILY" ? extra.amount * Math.max(1, days) * entry.quantity : extra.amount * entry.quantity;
+            const lineTotal = computeExtraLineTotal({
+              extraName: extra.name,
+              pricingType: extra.pricingType,
+              amountCents: extra.amount,
+              quantity: entry.quantity,
+              days: rentalDays,
+              baseTotalCents: baseTotal,
+            });
             return { extraId: entry.extraId, quantity: entry.quantity, lineTotal };
           })
           .filter(Boolean) as Array<{ extraId: string; quantity: number; lineTotal: number }>;
@@ -1588,8 +1702,8 @@ export async function createCategoryBookingAction(
         const ids = selectedExtras.map((entry) => entry.extraId).filter(Boolean);
         const extraRows =
           ids.length > 0
-            ? await db.$queryRawUnsafe<Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }>>(
-                `SELECT id, "pricingType", amount
+            ? await db.$queryRawUnsafe<Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }>>(
+                `SELECT id, name, "pricingType", amount
                  FROM "Extra"
                  WHERE "isActive" = true
                    AND id IN (${ids.map((_, i) => `$${i + 1}`).join(",")})`,
@@ -1601,10 +1715,41 @@ export async function createCategoryBookingAction(
           .map((entry) => {
             const extra = extraMap.get(entry.extraId);
             if (!extra) return null;
-            const lineTotal = extra.pricingType === "DAILY" ? extra.amount * Math.max(1, days) * entry.quantity : extra.amount * entry.quantity;
+            const lineTotal = computeExtraLineTotal({
+              extraName: extra.name,
+              pricingType: extra.pricingType,
+              amountCents: extra.amount,
+              quantity: entry.quantity,
+              days: rentalDays,
+              baseTotalCents: baseTotal,
+            });
             return { extraId: entry.extraId, quantity: entry.quantity, lineTotal };
           })
           .filter(Boolean) as Array<{ extraId: string; quantity: number; lineTotal: number }>;
+      }
+      const selectedExtraRows = resolvedExtras
+        .map((line) => {
+          const selected = selectedExtras.find((item) => item.extraId === line.extraId);
+          if (!selected) return null;
+          return selected;
+        })
+        .filter(Boolean) as Array<{ extraId: string; quantity: number }>;
+
+      if (selectedExtraRows.length > 0) {
+        const selectedExtraDetails =
+          (db as any).extra && typeof (db as any).extra.findMany === "function"
+            ? await (db as any).extra.findMany({
+                where: { id: { in: selectedExtraRows.map((entry) => entry.extraId) } },
+                select: { name: true },
+              })
+            : await db.$queryRawUnsafe<Array<{ name: string }>>(
+                `SELECT name FROM "Extra" WHERE id IN (${selectedExtraRows.map((_, i) => `$${i + 1}`).join(",")})`,
+                ...selectedExtraRows.map((entry) => entry.extraId)
+              );
+
+        if (hasIneligibleFullInsuranceSelection({ days: rentalDays, selectedExtras: selectedExtraDetails })) {
+          return { success: false, error: `Full insurance is only available for bookings of ${FULL_INSURANCE_MIN_DAYS} days or more.` };
+        }
       }
       extrasTotal = resolvedExtras.reduce((sum, line) => sum + line.lineTotal, 0);
     }
@@ -1615,7 +1760,7 @@ export async function createCategoryBookingAction(
     const pricingRules = await evaluateBookingPricingRules({
       startDate: validated.startDate,
       endDate: validated.endDate,
-      basePriceCents: category.dailyRate,
+      basePriceCents: effectiveDailyRate,
       extrasCents: extrasTotal,
       taxPercentage,
       baseRentalIncludesTax: vehicleRatesIncludeTax,
@@ -1757,7 +1902,8 @@ export async function createCategoryBookingAction(
 
         await tx.$executeRaw`
           UPDATE "Booking"
-          SET "driverLicenseDeleteAfter" = ${driverLicenseDeleteAfter}
+          SET "driverLicenseDeleteAfter" = ${driverLicenseDeleteAfter},
+              "isCruise" = ${isCruise}
           WHERE id = ${created.id}
         `;
 
@@ -1891,7 +2037,11 @@ export async function updateCategoryBookingAction(
     if (!existing) {
       return { success: false, error: "Booking not found" };
     }
+    const requestedCruiseRaw = formData.get("isCruise");
     const operational = await getBookingOperationalState(db, bookingId);
+    await ensureCruisePricingColumns();
+    const persistedIsCruise = await getBookingIsCruise(bookingId);
+    const isCruise = requestedCruiseRaw === null ? persistedIsCruise : requestedCruiseRaw === "true";
     if (operational.returnedAt) {
       return { success: false, error: "Returned bookings cannot be edited" };
     }
@@ -1958,6 +2108,13 @@ export async function updateCategoryBookingAction(
     }
 
     const days = Math.max(1, Math.ceil((validated.endDate.getTime() - validated.startDate.getTime()) / (1000 * 60 * 60 * 24)));
+    const cruiseDailyRate = isCruise ? await getCategoryCruiseDailyRateCents(validated.categoryId) : null;
+    const effectiveDailyRate = resolveCategoryDailyRate({
+      dailyRateCents: category.dailyRate,
+      cruiseDailyRateCents: cruiseDailyRate,
+      bookingSource: "admin",
+      isCruise,
+    });
 
     let refreshedExtras: Array<{
       extraId: string;
@@ -1965,16 +2122,17 @@ export async function updateCategoryBookingAction(
       lineTotal: number;
       pricingType: "DAILY" | "FLAT";
       amount: number;
+      name: string;
     }> = [];
     if (selectedExtras.length > 0) {
-      const extraRows: Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }> =
+      const extraRows: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }> =
         (db as any).extra && typeof (db as any).extra.findMany === "function"
           ? await (db as any).extra.findMany({
               where: { id: { in: selectedExtras.map((entry) => entry.extraId) }, isActive: true },
-              select: { id: true, pricingType: true, amount: true },
+              select: { id: true, name: true, pricingType: true, amount: true },
             })
-          : await db.$queryRawUnsafe<Array<{ id: string; pricingType: "DAILY" | "FLAT"; amount: number }>>(
-              `SELECT id, "pricingType", amount FROM "Extra" WHERE "isActive" = true AND id IN (${selectedExtras.map((_, i) => `$${i + 1}`).join(",")})`,
+          : await db.$queryRawUnsafe<Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }>>(
+              `SELECT id, name, "pricingType", amount FROM "Extra" WHERE "isActive" = true AND id IN (${selectedExtras.map((_, i) => `$${i + 1}`).join(",")})`,
               ...selectedExtras.map((entry) => entry.extraId)
             );
       const extraMap = new Map(extraRows.map((row) => [row.id, row]));
@@ -1985,16 +2143,28 @@ export async function updateCategoryBookingAction(
           return {
             extraId: line.extraId,
             quantity: line.quantity,
+            name: extra.name,
             pricingType: extra.pricingType,
             amount: extra.amount,
-            lineTotal: extra.pricingType === "DAILY" ? extra.amount * days * line.quantity : extra.amount * line.quantity,
+            lineTotal: computeExtraLineTotal({
+              extraName: extra.name,
+              pricingType: extra.pricingType,
+              amountCents: extra.amount,
+              quantity: line.quantity,
+              days,
+              baseTotalCents: effectiveDailyRate * days,
+            }),
           };
         })
         .filter(Boolean) as typeof refreshedExtras;
+
+      if (hasIneligibleFullInsuranceSelection({ days, selectedExtras: refreshedExtras.map((line) => ({ name: line.name })) })) {
+        return { success: false, error: `Full insurance is only available for bookings of ${FULL_INSURANCE_MIN_DAYS} days or more.` };
+      }
     }
     const { discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
     const extrasTotal = refreshedExtras.reduce((sum, line) => sum + line.lineTotal, 0);
-    const baseRental = category.dailyRate * days;
+    const baseRental = effectiveDailyRate * days;
     const discountAmount = bookingDiscount ? Math.round((baseRental * bookingDiscount.percentage) / 100) : 0;
     const [taxPercentage, vehicleRatesIncludeTax] = await Promise.all([
       getTaxPercentage(),
@@ -2003,7 +2173,7 @@ export async function updateCategoryBookingAction(
     const pricingRules = await evaluateBookingPricingRules({
       startDate: validated.startDate,
       endDate: validated.endDate,
-      basePriceCents: category.dailyRate,
+      basePriceCents: effectiveDailyRate,
       extrasCents: extrasTotal,
       taxPercentage,
       baseRentalIncludesTax: vehicleRatesIncludeTax,
@@ -2060,6 +2230,12 @@ export async function updateCategoryBookingAction(
           driverLicenseUrl: existing.driverLicenseUrl,
         } as any,
       });
+
+      await tx.$executeRaw`
+        UPDATE "Booking"
+        SET "isCruise" = ${isCruise}
+        WHERE id = ${bookingId}
+      `;
 
       if ((tx as any).bookingExtra && typeof (tx as any).bookingExtra.deleteMany === "function") {
         await (tx as any).bookingExtra.deleteMany({ where: { bookingId } });

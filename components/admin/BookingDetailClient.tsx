@@ -30,6 +30,7 @@ import { formatDate, formatDateTime } from "@/lib/datetime";
 import { buildGoogleMapsUrl } from "@/lib/location-map";
 import { resolveLocationDisplay } from "@/lib/location-display";
 import { calculateBookingAmounts, calculateLateReturnCharge, getFuelChargePerQuarterForCategory, getFuelLevelLabel } from "@/lib/pricing";
+import { resolveCategoryDailyRate } from "@/lib/booking-pricing-rules";
 import {
   confirmBookingAction,
   declineBookingAction,
@@ -92,7 +93,13 @@ export function BookingDetailClient({
     1,
     Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24))
   );
-  const baseAmount = (booking.category?.dailyRate || 0) * rentalDays;
+  const effectiveDailyRate = resolveCategoryDailyRate({
+    dailyRateCents: booking.category?.dailyRate || 0,
+    cruiseDailyRateCents: booking.category?.cruiseDailyRate,
+    bookingSource: "admin",
+    isCruise: Boolean(booking.isCruise),
+  });
+  const baseAmount = effectiveDailyRate * rentalDays;
   const extrasAmount = (booking.bookingExtras || []).reduce((sum: number, line: any) => sum + (line?.lineTotal || 0), 0);
   const discountAmount = booking.bookingDiscount?.amount || 0;
   const { subtotalBeforeTax, taxAmount } = calculateBookingAmounts({
@@ -105,7 +112,7 @@ export function BookingDetailClient({
   const liveLateReturnPreview = calculateLateReturnCharge({
     scheduledDropoffAt: booking.endDate,
     actualReturnedAt: new Date(),
-    dailyRateCents: booking.category?.dailyRate || 0,
+    dailyRateCents: effectiveDailyRate,
   });
   const closeoutLateCharge = booking.returnLateCharge || 0;
   const closeoutFuelCharge = booking.returnFuelCharge || 0;

@@ -24,6 +24,7 @@ type Category = {
   transmission?: "AUTOMATIC" | "MANUAL";
   features?: Array<{ featureId?: string; feature?: { id?: string; name?: string | null } | null }>;
   dailyRate: number;
+  cruiseDailyRate?: number | null;
   fuelChargePerQuarter?: number;
   sortOrder: number;
   isActive: boolean;
@@ -130,6 +131,7 @@ export function CategoriesTable({
               <TableHead>{t("admin.categories.description")}</TableHead>
               <TableHead>{t("admin.categories.table.features")}</TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("dailyRate")}>{t("admin.categories.dailyRate")}{sortIndicator("dailyRate")}</button></TableHead>
+              <TableHead>{t("admin.categories.table.cruiseRate")}</TableHead>
               <TableHead>{t("admin.categories.table.fuelCharge")}</TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("vehicles")}>{t("admin.categories.table.vehicles")}{sortIndicator("vehicles")}</button></TableHead>
               <TableHead><button type="button" onClick={() => toggleSort("bookings")}>{t("admin.categories.table.bookings")}{sortIndicator("bookings")}</button></TableHead>
@@ -178,6 +180,7 @@ export function CategoriesTable({
                   </div>
                 </TableCell>
                 <TableCell>${(category.dailyRate / 100).toFixed(2)}</TableCell>
+                <TableCell>{category.cruiseDailyRate ? `$${(category.cruiseDailyRate / 100).toFixed(2)}` : "-"}</TableCell>
                 <TableCell>{t("admin.categories.table.fuelChargeValue", { amount: ((category.fuelChargePerQuarter ?? 2500) / 100).toFixed(2) })}</TableCell>
                 <TableCell>{category._count?.vehicles ?? 0}</TableCell>
                 <TableCell>{category._count?.bookings ?? 0}</TableCell>

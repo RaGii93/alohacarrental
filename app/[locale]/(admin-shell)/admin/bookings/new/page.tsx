@@ -46,6 +46,19 @@ export default async function AdminNewBookingPage({
     }),
   ]);
   const localizedTermsPdfUrl = getLocalizedTermsPdfUrl(locale, tenant.termsPdfUrl);
+  const cruiseRatesByCategoryId = new Map<string, number | null>();
+  try {
+    const rows = await db.$queryRaw<Array<{ id: string; cruiseDailyRate: number | null }>>`
+      SELECT id, "cruiseDailyRate"
+      FROM "VehicleCategory"
+      WHERE "isActive" = true
+    `;
+    for (const row of rows) {
+      cruiseRatesByCategoryId.set(row.id, row.cruiseDailyRate ?? null);
+    }
+  } catch {
+    // Ignore when cruise pricing column is not available yet.
+  }
 
   let extras: Array<{ id: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number; description?: string | null }> = [];
   if ((db as any).extra && typeof (db as any).extra.findMany === "function") {
@@ -78,7 +91,11 @@ export default async function AdminNewBookingPage({
           locale={locale}
           locations={locations}
           extras={extras}
-          categories={categories.map((category) => ({ ...category, features: getCategoryFeatureNames(category) })) as any}
+          categories={categories.map((category) => ({
+            ...category,
+            cruiseDailyRate: cruiseRatesByCategoryId.get(category.id) ?? null,
+            features: getCategoryFeatureNames(category),
+          })) as any}
           taxPercentage={taxPercentage}
           vehicleRatesIncludeTax={vehicleRatesIncludeTax}
           bookingRuleSettings={bookingRules}

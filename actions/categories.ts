@@ -18,12 +18,20 @@ async function assertAdmin() {
   return { ok: true as const, session };
 }
 
+async function ensureCategoryCruiseRateColumn() {
+  await db.$executeRawUnsafe(`
+    ALTER TABLE "VehicleCategory"
+    ADD COLUMN IF NOT EXISTS "cruiseDailyRate" INT NULL
+  `);
+}
+
 export async function createCategoryAction(formData: any, locale: string) {
   const auth = await assertAdmin();
   if (!auth.ok) return { success: false, error: auth.error };
 
   try {
     const validated = categoryFormSchema.parse(formData);
+    await ensureCategoryCruiseRateColumn();
     const selectedFeatureIds = Array.from(new Set(validated.featureIds));
     const selectedFeatures = selectedFeatureIds.length
       ? await db.vehicleFeature.findMany({
@@ -56,6 +64,12 @@ export async function createCategoryAction(formData: any, locale: string) {
           : undefined,
       },
     });
+    const cruiseDailyRateCents = Math.max(0, Math.round((validated.cruiseDailyRate || 0) * 100));
+    await db.$executeRaw`
+      UPDATE "VehicleCategory"
+      SET "cruiseDailyRate" = ${cruiseDailyRateCents > 0 ? cruiseDailyRateCents : null}
+      WHERE id = ${created.id}
+    `;
     await db.auditLog.create({
       data: {
         adminUserId: auth.session.adminUserId,
@@ -74,6 +88,7 @@ export async function updateCategoryAction(categoryId: string, formData: any, lo
 
   try {
     const validated = categoryFormSchema.parse(formData);
+    await ensureCategoryCruiseRateColumn();
     const selectedFeatureIds = Array.from(new Set(validated.featureIds));
     const selectedFeatures = selectedFeatureIds.length
       ? await db.vehicleFeature.findMany({
@@ -110,6 +125,12 @@ export async function updateCategoryAction(categoryId: string, formData: any, lo
             },
       },
     });
+    const cruiseDailyRateCents = Math.max(0, Math.round((validated.cruiseDailyRate || 0) * 100));
+    await db.$executeRaw`
+      UPDATE "VehicleCategory"
+      SET "cruiseDailyRate" = ${cruiseDailyRateCents > 0 ? cruiseDailyRateCents : null}
+      WHERE id = ${updated.id}
+    `;
     await db.auditLog.create({
       data: {
         adminUserId: auth.session.adminUserId,

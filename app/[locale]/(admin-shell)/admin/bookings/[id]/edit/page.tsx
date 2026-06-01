@@ -75,6 +75,32 @@ export default async function BookingEditPage({
     getTaxPercentage(),
     getVehicleRatesIncludeTax(),
   ]);
+  let isCruise = false;
+  try {
+    const rows = await db.$queryRaw<Array<{ isCruise: boolean | null }>>`
+      SELECT "isCruise"
+      FROM "Booking"
+      WHERE id = ${id}
+      LIMIT 1
+    `;
+    isCruise = Boolean(rows[0]?.isCruise);
+  } catch {
+    isCruise = false;
+  }
+
+  const cruiseRatesByCategoryId = new Map<string, number | null>();
+  try {
+    const rows = await db.$queryRaw<Array<{ id: string; cruiseDailyRate: number | null }>>`
+      SELECT id, "cruiseDailyRate"
+      FROM "VehicleCategory"
+      WHERE "isActive" = true
+    `;
+    for (const row of rows) {
+      cruiseRatesByCategoryId.set(row.id, row.cruiseDailyRate ?? null);
+    }
+  } catch {
+    // Ignore when cruise price column is not available yet.
+  }
 
   let bookingExtras: Array<{ id: string; quantity: number; lineTotal: number; extraId: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }> = [];
   try {
@@ -163,6 +189,7 @@ export default async function BookingEditPage({
           endDate: formatDateTimeInputInLaPaz(booking.endDate),
           pickupLocationId: booking.pickupLocationId || "",
           dropoffLocationId: booking.dropoffLocationId || "",
+          isCruise,
           additionalDrivers: booking.additionalDrivers.map((driver) => ({
             id: driver.id,
             fullName: driver.fullName,
@@ -174,7 +201,10 @@ export default async function BookingEditPage({
           })),
           notes: booking.notes || "",
         }}
-        categories={categories}
+        categories={categories.map((category) => ({
+          ...category,
+          cruiseDailyRate: cruiseRatesByCategoryId.get(category.id) ?? null,
+        }))}
         locations={locations}
         vehicles={vehicles}
         bookingExtras={bookingExtras}

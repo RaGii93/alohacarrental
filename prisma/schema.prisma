@@ -122,6 +122,7 @@ model VehicleCategory {
   hasCarPlay  Boolean   @default(false)
   hasBackupCamera Boolean @default(false)
   dailyRate   Int       // stored in cents
+  cruiseDailyRate Int?
   fuelChargePerQuarter Int @default(2500) // stored in cents
   isActive    Boolean   @default(true)
   sortOrder   Int       @default(0)
@@ -481,6 +482,7 @@ model Booking {
   dropoffLocationAddress String?
   dropoffLatitude     Float?
   dropoffLongitude    Float?
+  isCruise            Boolean   @default(false)
   totalAmount         Int       // stored in cents
   status              BookingStatus @default(PENDING)
   bookingCode         String    @unique

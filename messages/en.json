@@ -704,6 +704,8 @@
       "next": "We will contact you shortly to confirm."
     },
     "baseTotal": "Base total",
+    "cruiseBookingToggle": "Cruise booking (use cruise rates)",
+    "fullInsuranceMinimumDays": "Full insurance is only available for bookings of {days} days or more.",
     "subtotal": "Subtotal",
     "belowMinimumSurcharge": "Short-rental surcharge",
     "lastMinuteSurcharge": "Last-minute surcharge",
@@ -1172,6 +1174,8 @@
         "fields": {
           "pickupDateTime": "Pickup Date & Time",
           "dropoffDateTime": "Dropoff Date & Time",
+          "cruiseBookingLabel": "Cruise Booking",
+          "cruiseBookingHelp": "Use cruise pricing for this booking",
           "assignedVehicle": "Assigned Vehicle",
           "selectVehicle": "Select vehicle",
           "selectPickupLocation": "Select pickup location",
@@ -1816,6 +1820,7 @@
       "imageUrl": "Image URL",
       "previewAlt": "Category preview",
       "dailyRate": "Daily Rate ($)",
+      "cruiseDailyRate": "Cruise Daily Rate",
       "fuelChargePerQuarter": "Fuel Charge Per 1/4 Tank ($)",
       "sortOrder": "Sort Order",
       "seats": "Seats",
@@ -1857,6 +1862,7 @@
       "table": {
         "image": "Image",
         "features": "Features",
+        "cruiseRate": "Cruise Rate",
         "fuelCharge": "Fuel Charge",
         "vehicles": "Vehicles",
         "bookings": "Bookings",
@@ -1868,6 +1874,7 @@
       },
       "pricingCard": {
         "features": "{seats} seats • {transmission} • {features}",
+        "cruiseRate": "Cruise rate: {amount}",
         "fuelRefill": "Fuel refill: {amount} per 1/4 tank"
       },
       "messages": {

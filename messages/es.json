@@ -704,6 +704,8 @@
       "next": "Nos pondremos en contacto pronto para confirmarla."
     },
     "baseTotal": "Total base",
+    "cruiseBookingToggle": "Reserva de crucero (usar tarifas de crucero)",
+    "fullInsuranceMinimumDays": "El seguro total solo está disponible para reservas de {days} días o más.",
     "subtotal": "Subtotal",
     "belowMinimumSurcharge": "Recargo por alquiler corto",
     "lastMinuteSurcharge": "Recargo de última hora",
@@ -1142,6 +1144,8 @@
         "fields": {
           "pickupDateTime": "Fecha y hora de recogida",
           "dropoffDateTime": "Fecha y hora de entrega",
+          "cruiseBookingLabel": "Reserva de crucero",
+          "cruiseBookingHelp": "Usar precios de crucero para esta reserva",
           "assignedVehicle": "Vehículo asignado",
           "selectVehicle": "Selecciona un vehículo",
           "selectPickupLocation": "Selecciona lugar de recogida",
@@ -1786,6 +1790,7 @@
       "imageUrl": "URL de la imagen",
       "previewAlt": "Vista previa de categoría",
       "dailyRate": "Tarifa diaria ($)",
+      "cruiseDailyRate": "Tarifa diaria de crucero",
       "fuelChargePerQuarter": "Cargo de combustible por 1/4 de tanque ($)",
       "sortOrder": "Orden",
       "seats": "Asientos",
@@ -1827,6 +1832,7 @@
       "table": {
         "image": "Imagen",
         "features": "Características",
+        "cruiseRate": "Tarifa de crucero",
         "fuelCharge": "Cargo de combustible",
         "vehicles": "Vehículos",
         "bookings": "Reservas",
@@ -1838,6 +1844,7 @@
       },
       "pricingCard": {
         "features": "{seats} asientos • {transmission} • {features}",
+        "cruiseRate": "Tarifa de crucero: {amount}",
         "fuelRefill": "Recarga de combustible: {amount} por 1/4 de tanque"
       },
       "messages": {

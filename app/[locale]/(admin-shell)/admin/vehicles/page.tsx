@@ -68,6 +68,19 @@ export default async function VehiclesPage({
       orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
     }),
   ]);
+  const cruiseRatesByCategoryId = new Map<string, number | null>();
+  try {
+    const rows = await db.$queryRaw<Array<{ id: string; cruiseDailyRate: number | null }>>`
+      SELECT id, "cruiseDailyRate"
+      FROM "VehicleCategory"
+      WHERE "isActive" = true
+    `;
+    for (const row of rows) {
+      cruiseRatesByCategoryId.set(row.id, row.cruiseDailyRate ?? null);
+    }
+  } catch {
+    // Ignore when cruise pricing column is not available yet.
+  }
   const vehicleCategories = categories.map((category) => ({ id: category.id, name: category.name }));
 
   const [vehiclesTotal, vehicleRows] = await Promise.all([
@@ -309,6 +322,11 @@ export default async function VehiclesPage({
                 })}
               </p>
               <p className="mt-2 text-lg font-bold">{currency(category.dailyRate)}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("admin.categories.pricingCard.cruiseRate", {
+                  amount: cruiseRatesByCategoryId.get(category.id) ? currency(cruiseRatesByCategoryId.get(category.id) || 0) : "-",
+                })}
+              </p>
               <p className="text-xs text-muted-foreground">{t("admin.categories.pricingCard.fuelRefill", { amount: currency(category.fuelChargePerQuarter ?? 2500) })}</p>
             </Card>
           ))}

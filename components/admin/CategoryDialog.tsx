@@ -34,6 +34,7 @@ type Category = {
   transmission?: "AUTOMATIC" | "MANUAL";
   features?: Array<{ featureId?: string; feature?: { id: string; name: string; isActive?: boolean } | null }>;
   dailyRate?: number;
+  cruiseDailyRate?: number | null;
   fuelChargePerQuarter?: number;
   sortOrder?: number;
   isActive?: boolean;
@@ -67,6 +68,7 @@ export function CategoryDialog({
       transmission: category?.transmission || "AUTOMATIC",
       featureIds: category ? getCategoryFeatureIds(category) : [],
       dailyRate: category?.dailyRate ? category.dailyRate / 100 : 0,
+      cruiseDailyRate: category?.cruiseDailyRate ? category.cruiseDailyRate / 100 : 0,
       fuelChargePerQuarter: category?.fuelChargePerQuarter ? category.fuelChargePerQuarter / 100 : 25,
       sortOrder: category?.sortOrder ?? 0,
       isActive: category?.isActive ?? true,
@@ -85,6 +87,7 @@ export function CategoryDialog({
         transmission: category.transmission || "AUTOMATIC",
         featureIds: getCategoryFeatureIds(category),
         dailyRate: category.dailyRate ? category.dailyRate / 100 : 0,
+        cruiseDailyRate: category.cruiseDailyRate ? category.cruiseDailyRate / 100 : 0,
         fuelChargePerQuarter: category.fuelChargePerQuarter ? category.fuelChargePerQuarter / 100 : 25,
         sortOrder: category.sortOrder ?? 0,
         isActive: category.isActive ?? true,
@@ -257,6 +260,24 @@ export function CategoryDialog({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>{t("admin.categories.dailyRate")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value || "0"))}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="cruiseDailyRate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("admin.categories.cruiseDailyRate")}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"

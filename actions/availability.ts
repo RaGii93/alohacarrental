@@ -6,6 +6,7 @@ import { getBookingRuleSettings } from "@/lib/settings";
 import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 import { evaluateBookingRules, type BookingSource } from "@/lib/pricing";
+import { resolveCategoryDailyRate } from "@/lib/booking-pricing-rules";
 
 export interface AvailabilityResult {
   categoryId: string;
@@ -34,7 +35,8 @@ type InfoSchemaColumn = {
 export async function searchAvailabilityAction(
   startDate: Date,
   endDate: Date,
-  bookingSource: BookingSource = "public"
+  bookingSource: BookingSource = "public",
+  isCruise = false,
 ): Promise<AvailabilityResult[]> {
   const bookingRules = await getBookingRuleSettings();
   const days = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
@@ -77,6 +79,20 @@ export async function searchAvailabilityAction(
   const hasVehicleCategoryId = vehicleColumns.some((column: InfoSchemaColumn) => column.column_name === "categoryId");
   const hasVehicleCategory = vehicleColumns.some((column: InfoSchemaColumn) => column.column_name === "category");
   const hasBookingCategoryId = bookingColumns.some((column: InfoSchemaColumn) => column.column_name === "categoryId");
+  const cruiseRatesByCategoryId = new Map<string, number | null>();
+
+  try {
+    const cruiseRows = await db.$queryRaw<Array<{ id: string; cruiseDailyRate: number | null }>>`
+      SELECT id, "cruiseDailyRate"
+      FROM "VehicleCategory"
+      WHERE "isActive" = true
+    `;
+    for (const row of cruiseRows) {
+      cruiseRatesByCategoryId.set(row.id, row.cruiseDailyRate ?? null);
+    }
+  } catch {
+    // Ignore if database hasn't been migrated yet.
+  }
 
   for (const category of categories) {
     let availableCount = 0;
@@ -169,10 +185,16 @@ export async function searchAvailabilityAction(
       const blockedVehicles = blockedVehicleRows?.[0]?.count ?? 0;
       availableCount = hasGlobalBlock ? 0 : Math.max(0, totalVehicles - categoryBookings - blockedVehicles);
     }
+    const effectiveDailyRate = resolveCategoryDailyRate({
+      dailyRateCents: category.dailyRate,
+      cruiseDailyRateCents: cruiseRatesByCategoryId.get(category.id),
+      bookingSource,
+      isCruise,
+    });
     const pricing = evaluateBookingRules({
       startDate,
       endDate,
-      basePriceCents: category.dailyRate,
+      basePriceCents: effectiveDailyRate,
       extrasCents: 0,
       bookingSource,
       settings: bookingRules,
@@ -185,7 +207,7 @@ export async function searchAvailabilityAction(
       seats: category.seats ?? 5,
       transmission: category.transmission ?? "AUTOMATIC",
       features: getCategoryFeatureNames(category),
-      dailyRate: category.dailyRate,
+      dailyRate: effectiveDailyRate,
       availableCount,
       totalForRange: pricing.totalAmountCents,
       baseTotalForRange: pricing.baseTotalCents,

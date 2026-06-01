@@ -56,6 +56,32 @@ export default async function BookingDetailPage({
     );
   }
 
+  let isCruise = false;
+  try {
+    const rows = await db.$queryRaw<Array<{ isCruise: boolean | null }>>`
+      SELECT "isCruise"
+      FROM "Booking"
+      WHERE id = ${id}
+      LIMIT 1
+    `;
+    isCruise = Boolean(rows[0]?.isCruise);
+  } catch {
+    isCruise = false;
+  }
+
+  let cruiseDailyRate: number | null = null;
+  try {
+    const rows = await db.$queryRaw<Array<{ cruiseDailyRate: number | null }>>`
+      SELECT "cruiseDailyRate"
+      FROM "VehicleCategory"
+      WHERE id = ${booking.categoryId}
+      LIMIT 1
+    `;
+    cruiseDailyRate = rows[0]?.cruiseDailyRate ?? null;
+  } catch {
+    cruiseDailyRate = null;
+  }
+
   let bookingExtras: any[] = [];
   try {
     bookingExtras = await db.$queryRaw<Array<any>>`
@@ -302,7 +328,17 @@ export default async function BookingDetailPage({
       </Link>
 
       <BookingDetailClient
-        booking={{ ...bookingWithAdjustments, ...operational, ...quickBooksState, ...zohoState }}
+        booking={{
+          ...bookingWithAdjustments,
+          ...operational,
+          ...quickBooksState,
+          ...zohoState,
+          isCruise,
+          category: {
+            ...bookingWithAdjustments.category,
+            cruiseDailyRate,
+          },
+        }}
         pickupChecklistState={pickupChecklistState}
         locale={locale}
         extras={extras}

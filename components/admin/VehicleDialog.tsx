@@ -39,7 +39,6 @@ interface Vehicle {
   name?: string;
   plateNumber?: string;
   categoryId?: string;
-  dailyRate?: number;
   status?: string;
   notes?: string;
 }
@@ -78,7 +77,6 @@ export function VehicleDialog({
       name: vehicle?.name || "",
       plateNumber: vehicle?.plateNumber || "",
       categoryId: vehicle?.categoryId || "",
-      dailyRate: vehicle?.dailyRate ? vehicle.dailyRate / 100 : 0,
       status: (vehicle?.status as "ACTIVE" | "ON_RENT" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
       notes: vehicle?.notes || "",
     },
@@ -92,7 +90,6 @@ export function VehicleDialog({
         name: vehicle.name || "",
         plateNumber: vehicle.plateNumber || "",
         categoryId: vehicle.categoryId || "",
-        dailyRate: vehicle.dailyRate ? vehicle.dailyRate / 100 : 0,
         status: (vehicle?.status as "ACTIVE" | "ON_RENT" | "MAINTENANCE" | "INACTIVE") || "ACTIVE",
         notes: vehicle.notes || "",
       });
@@ -260,25 +257,6 @@ export function VehicleDialog({
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="dailyRate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("admin.vehicles.dailyRate")}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value || "0"))}
-                          />
-                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

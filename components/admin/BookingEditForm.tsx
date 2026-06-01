@@ -14,6 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BadgeDollarSign, Banknote, CalendarClock, CarFront, FileText, MapPin, Plane, Plus, Receipt, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { updateCategoryBookingAction } from "@/actions/booking";
 import { calculateBookingAmounts, calculateDays, formatCurrency } from "@/lib/pricing";
+import {
+  computeExtraLineTotal,
+  FULL_INSURANCE_MIN_DAYS,
+  hasIneligibleFullInsuranceSelection,
+  resolveCategoryDailyRate,
+} from "@/lib/booking-pricing-rules";
 import { AdditionalDriversEditor, type AdditionalDriverFormValue } from "@/components/shared/AdditionalDriversEditor";
 import { serializeAdditionalDrivers } from "@/lib/additional-drivers";
 import {
@@ -53,9 +59,10 @@ export function BookingEditForm({
     dropoffLocationId: string;
     additionalDrivers: AdditionalDriverFormValue[];
     notes: string;
+    isCruise: boolean;
   };
   locale: string;
-  categories: Array<{ id: string; name: string; dailyRate: number }>;
+  categories: Array<{ id: string; name: string; dailyRate: number; cruiseDailyRate?: number | null }>;
   locations: Array<{ id: string; name: string }>;
   vehicles: Array<{ id: string; name: string; categoryId: string; plateNumber?: string | null }>;
   bookingExtras: Array<{ id: string; quantity: number; lineTotal: number; extraId: string; name: string; pricingType: "DAILY" | "FLAT"; amount: number }>;
@@ -82,6 +89,7 @@ export function BookingEditForm({
   const [endDate, setEndDate] = useState(booking.endDate);
   const [additionalDrivers, setAdditionalDrivers] = useState<AdditionalDriverFormValue[]>(booking.additionalDrivers);
   const [notes, setNotes] = useState(booking.notes);
+  const [isCruise, setIsCruise] = useState(Boolean(booking.isCruise));
   const [draftExtraId, setDraftExtraId] = useState("");
   const [selectedExtras, setSelectedExtras] = useState<Array<{
     extraId: string;
@@ -102,6 +110,10 @@ export function BookingEditForm({
   const handleSubmit = async () => {
     if (!birthDate || !licenseExpiryDate || !startDate || !endDate || !pickupLocationId || !dropoffLocationId) {
       toast.error(t("admin.bookings.edit.messages.completeRequired"));
+      return;
+    }
+    if (hasInvalidFullInsurance) {
+      toast.error(t("booking.fullInsuranceMinimumDays", { days: FULL_INSURANCE_MIN_DAYS }));
       return;
     }
     setIsSaving(true);
@@ -142,6 +154,7 @@ export function BookingEditForm({
       formData.append("dropoffLocationId", dropoffLocationId);
       formData.append("additionalDrivers", serializeAdditionalDrivers(additionalDrivers));
       formData.append("notes", notes);
+      formData.append("isCruise", isCruise ? "true" : "false");
       formData.append("selectedExtras", JSON.stringify(selectedExtras.map((line) => ({
         extraId: line.extraId,
         quantity: line.quantity,
@@ -171,14 +184,28 @@ export function BookingEditForm({
     parsedStartDate && parsedEndDate && parsedEndDate > parsedStartDate
       ? calculateDays(parsedStartDate, parsedEndDate)
       : 1;
-  const baseAmount = (selectedCategory?.dailyRate || 0) * rentalDays;
+  const effectiveDailyRate = resolveCategoryDailyRate({
+    dailyRateCents: selectedCategory?.dailyRate || 0,
+    cruiseDailyRateCents: selectedCategory?.cruiseDailyRate,
+    bookingSource: "admin",
+    isCruise,
+  });
+  const baseAmount = effectiveDailyRate * rentalDays;
   const recalculatedExtras = selectedExtras.map((line) => ({
     ...line,
-    previewLineTotal:
-      line.pricingType === "DAILY"
-        ? line.amount * rentalDays * line.quantity
-        : line.amount * line.quantity,
+    previewLineTotal: computeExtraLineTotal({
+      extraName: line.name,
+      pricingType: line.pricingType,
+      amountCents: line.amount,
+      quantity: line.quantity,
+      days: rentalDays,
+      baseTotalCents: baseAmount,
+    }),
   }));
+  const hasInvalidFullInsurance = hasIneligibleFullInsuranceSelection({
+    days: rentalDays,
+    selectedExtras: recalculatedExtras.map((line) => ({ name: line.name })),
+  });
   const extrasAmount = recalculatedExtras.reduce((sum, line) => sum + line.previewLineTotal, 0);
   const discountAmount = bookingDiscount ? Math.round((baseAmount * bookingDiscount.percentage) / 100) : 0;
   const { subtotalBeforeTax, taxAmount, totalAmount } = calculateBookingAmounts({
@@ -326,6 +353,13 @@ export function BookingEditForm({
               </Select>
             </div>
             <div className={fieldClass}>
+              <Label>{t("admin.bookings.edit.fields.cruiseBookingLabel")}</Label>
+              <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+                <input type="checkbox" checked={isCruise} onChange={(e) => setIsCruise(e.target.checked)} />
+                <span className="text-sm text-slate-700">{t("admin.bookings.edit.fields.cruiseBookingHelp")}</span>
+              </label>
+            </div>
+            <div className={fieldClass}>
               <Label>{t("admin.bookings.edit.fields.assignedVehicle")}</Label>
               <Select value={vehicleId} onValueChange={setVehicleId}>
                 <SelectTrigger className={inputClass}>
@@ -430,10 +464,14 @@ export function BookingEditForm({
           {selectedExtras.length > 0 ? (
             <div className="mt-5 space-y-3">
               {selectedExtras.map((line) => {
-                const lineTotal =
-                  line.pricingType === "DAILY"
-                    ? line.amount * rentalDays * line.quantity
-                    : line.amount * line.quantity;
+                const lineTotal = computeExtraLineTotal({
+                  extraName: line.name,
+                  pricingType: line.pricingType,
+                  amountCents: line.amount,
+                  quantity: line.quantity,
+                  days: rentalDays,
+                  baseTotalCents: baseAmount,
+                });
                 return (
                   <div key={line.extraId} className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_110px_120px_auto] md:items-center">
                     <div>
@@ -572,13 +610,18 @@ export function BookingEditForm({
                 ))}
               </div>
             )}
+            {hasInvalidFullInsurance ? (
+              <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-700">
+                {t("booking.fullInsuranceMinimumDays", { days: FULL_INSURANCE_MIN_DAYS })}
+              </div>
+            ) : null}
           </div>
 
           <div className="mt-6 flex flex-col gap-3">
             <Button variant="outline" onClick={() => router.push(`/${locale}/admin/bookings/${booking.id}`)} disabled={isSaving} className="rounded-xl border-slate-300 bg-white hover:bg-slate-50">
               {t("common.cancel")}
             </Button>
-            <Button onClick={handleSubmit} disabled={isSaving} className="rounded-xl bg-[hsl(var(--primary))] text-white shadow-[0_16px_30px_-18px_hsl(var(--primary)/0.34)] hover:bg-[hsl(var(--primary)/0.92)]">
+            <Button onClick={handleSubmit} disabled={isSaving || hasInvalidFullInsurance} className="rounded-xl bg-[hsl(var(--primary))] text-white shadow-[0_16px_30px_-18px_hsl(var(--primary)/0.34)] hover:bg-[hsl(var(--primary)/0.92)]">
               {isSaving ? t("admin.settings.saving") : t("admin.bookings.edit.actions.saveChanges")}
             </Button>
           </div>
