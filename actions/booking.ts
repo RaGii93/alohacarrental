@@ -31,6 +31,7 @@ import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { ensureZohoBookingColumns, markBookingBillingDocumentZoho, queueBookingZohoTransfer } from "@/lib/zoho-bookings";
 import { triggerAutomationEvent } from "@/lib/automations";
 import { reconcileVehicleRentalStatuses } from "@/lib/vehicle-status";
+import { parseLaPazDateTimeInput } from "@/lib/timezone";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
@@ -115,6 +116,7 @@ type BookingInspectionInput = {
   acceptedBy: string;
   imageUrls: string[];
   damageChargeCents?: number;
+  actualReturnedAt?: string;
 };
 
 async function replaceInspectionPhotos(tx: typeof db, bookingId: string, stage: InspectionStageValue, imageUrls: string[]) {
@@ -130,22 +132,92 @@ async function replaceInspectionPhotos(tx: typeof db, bookingId: string, stage: 
 async function ensureBookingOperationalColumns(client: typeof db = db) {
   await client.$executeRawUnsafe(`
     ALTER TABLE "Booking"
-    ADD COLUMN IF NOT EXISTS "deliveredAt" TIMESTAMP NULL
-  `);
-  await client.$executeRawUnsafe(`
-    ALTER TABLE "Booking"
-    ADD COLUMN IF NOT EXISTS "returnedAt" TIMESTAMP NULL
+    ADD COLUMN IF NOT EXISTS "deliveredAt" TIMESTAMP NULL,
+    ADD COLUMN IF NOT EXISTS "returnedAt" TIMESTAMP NULL,
+    ADD COLUMN IF NOT EXISTS "actualReturnedAt" TIMESTAMP NULL
   `);
 }
 
 async function getBookingOperationalState(client: typeof db, bookingId: string) {
-  const rows = await client.$queryRaw<Array<{ deliveredAt: Date | null; returnedAt: Date | null }>>`
-    SELECT "deliveredAt", "returnedAt"
+  const rows = await client.$queryRaw<Array<{ deliveredAt: Date | null; returnedAt: Date | null; actualReturnedAt: Date | null }>>`
+    SELECT "deliveredAt", "returnedAt", "actualReturnedAt"
     FROM "Booking"
     WHERE id = ${bookingId}
     LIMIT 1
   `;
-  return rows[0] || { deliveredAt: null, returnedAt: null };
+  return rows[0] || { deliveredAt: null, returnedAt: null, actualReturnedAt: null };
+}
+
+async function sendBookingConfirmationEmail(bookingId: string) {
+  const booking = await db.booking.findUnique({
+    where: { id: bookingId },
+    select: {
+      id: true,
+      status: true,
+      customerEmail: true,
+      customerName: true,
+      bookingCode: true,
+      startDate: true,
+      endDate: true,
+      totalAmount: true,
+    },
+  });
+  if (!booking) return { success: false as const, error: "Booking not found" };
+  if (booking.status !== "CONFIRMED") return { success: false as const, error: "BOOKING_NOT_CONFIRMABLE" };
+
+  try {
+    const rentalAgreement = await buildAndUploadBookingDocument(bookingId, "RENTAL_AGREEMENT");
+    const termsEmailData = await getCustomerTermsEmailData();
+    await sendEmail({
+      to: booking.customerEmail,
+      subject: `Booking Confirmed - ${booking.bookingCode}`,
+      html: await bookingEmailHtml({
+        title: "Your booking has been confirmed",
+        customerName: booking.customerName,
+        bookingCode: booking.bookingCode,
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        totalAmountCents: booking.totalAmount,
+        termsUrl: termsEmailData.termsUrl,
+      }),
+      attachments: [
+        ...(rentalAgreement.success && rentalAgreement.pdfBuffer
+          ? [
+              {
+                filename: rentalAgreement.filename,
+                content: rentalAgreement.pdfBuffer,
+                contentType: "application/pdf",
+              },
+            ]
+          : []),
+        ...termsEmailData.attachments,
+      ],
+    });
+    return { success: true as const };
+  } catch (error: any) {
+    return { success: false as const, error: error?.message || "Failed to send booking confirmation email" };
+  }
+}
+
+export async function sendBookingConfirmationEmailAction(bookingId: string, locale: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+    if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+
+    const result = await sendBookingConfirmationEmail(bookingId);
+    if (!result.success) return result;
+
+    await logAdminAction({
+      adminUserId: session.adminUserId,
+      action: "BOOKING_CONFIRMATION_EMAIL_SENT",
+      bookingId,
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Failed to send booking confirmation email" };
+  }
 }
 
 async function loadBookingAdjustments(bookingId: string) {
@@ -431,35 +503,7 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
       },
     });
 
-    try {
-      const rentalAgreement = await buildAndUploadBookingDocument(bookingId, "RENTAL_AGREEMENT");
-      const termsEmailData = await getCustomerTermsEmailData();
-      await sendEmail({
-        to: booking.customerEmail,
-        subject: `Booking Confirmed - ${booking.bookingCode}`,
-        html: await bookingEmailHtml({
-          title: "Your booking has been confirmed",
-          customerName: booking.customerName,
-          bookingCode: booking.bookingCode,
-          startDate: booking.startDate,
-          endDate: booking.endDate,
-          totalAmountCents: booking.totalAmount,
-          termsUrl: termsEmailData.termsUrl,
-        }),
-        attachments: [
-          ...(rentalAgreement.success && rentalAgreement.pdfBuffer
-            ? [
-                {
-                  filename: rentalAgreement.filename,
-                  content: rentalAgreement.pdfBuffer,
-                  contentType: "application/pdf",
-                },
-              ]
-            : []),
-          ...termsEmailData.attachments,
-        ],
-      });
-    } catch {}
+    await sendBookingConfirmationEmail(bookingId);
 
     // Automation: booking_confirmed event
     triggerAutomationEvent("booking_confirmed", bookingId).catch(() => {});
@@ -682,7 +726,11 @@ async function buildAndUploadBookingDocument(
   };
 }
 
-export async function sendInvoiceEstimateAction(bookingId: string, locale: string) {
+export async function sendInvoiceEstimateAction(
+  bookingId: string,
+  locale: string,
+  options?: { sendEmailToCustomer?: boolean }
+) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized" };
@@ -715,33 +763,36 @@ export async function sendInvoiceEstimateAction(bookingId: string, locale: strin
       bookingId,
     });
 
-    try {
-      const termsEmailData = await getCustomerTermsEmailData();
-      await sendEmail({
-        to: updated.customerEmail,
-        subject: `Invoice for Payment - ${updated.bookingCode}`,
-        html: await bookingEmailHtml({
-          title: "Your invoice is ready for payment",
-          customerName: updated.customerName,
-          bookingCode: updated.bookingCode,
-          startDate: updated.startDate,
-          endDate: updated.endDate,
-          totalAmountCents: updated.totalAmount,
-          extras: generated.extras,
-          invoiceUrl: generated.invoiceUrl,
-          documentLabel: "Invoice",
-          termsUrl: termsEmailData.termsUrl,
-        }),
-        attachments: [
-          {
-            filename: generated.filename,
-            content: generated.pdfBuffer,
-            contentType: "application/pdf",
-          },
-          ...termsEmailData.attachments,
-        ],
-      });
-    } catch {}
+    const sendEmailToCustomer = options?.sendEmailToCustomer !== false;
+    if (sendEmailToCustomer) {
+      try {
+        const termsEmailData = await getCustomerTermsEmailData();
+        await sendEmail({
+          to: updated.customerEmail,
+          subject: `Invoice for Payment - ${updated.bookingCode}`,
+          html: await bookingEmailHtml({
+            title: "Your invoice is ready for payment",
+            customerName: updated.customerName,
+            bookingCode: updated.bookingCode,
+            startDate: updated.startDate,
+            endDate: updated.endDate,
+            totalAmountCents: updated.totalAmount,
+            extras: generated.extras,
+            invoiceUrl: generated.invoiceUrl,
+            documentLabel: "Invoice",
+            termsUrl: termsEmailData.termsUrl,
+          }),
+          attachments: [
+            {
+              filename: generated.filename,
+              content: generated.pdfBuffer,
+              contentType: "application/pdf",
+            },
+            ...termsEmailData.attachments,
+          ],
+        });
+      } catch {}
+    }
 
     return { success: true, booking: updated };
   } catch (error: any) {
@@ -1143,7 +1194,15 @@ export async function completeReturnInspectionAction(
     if (!operational.deliveredAt) return { success: false, error: "BOOKING_NOT_DELIVERED" };
     if (operational.returnedAt) return { success: false, error: "BOOKING_ALREADY_RETURNED" };
 
-    const returnedAt = new Date();
+    const parsedActualReturnedAt = input.actualReturnedAt ? parseLaPazDateTimeInput(input.actualReturnedAt) : null;
+    if (input.actualReturnedAt && !parsedActualReturnedAt) {
+      return { success: false, error: "Invalid return date/time" };
+    }
+    const actualReturnedAt = parsedActualReturnedAt || new Date();
+    if (operational.deliveredAt && actualReturnedAt < operational.deliveredAt) {
+      return { success: false, error: "Return date/time cannot be before delivery" };
+    }
+    const inspectionCompletedAt = new Date();
     const [isCruise, cruiseDailyRate] = await Promise.all([
       getBookingIsCruise(bookingId),
       getCategoryCruiseDailyRateCents(booking.category.id),
@@ -1162,7 +1221,7 @@ export async function completeReturnInspectionAction(
     }).chargeCents;
     const lateReturn = calculateLateReturnCharge({
       scheduledDropoffAt: booking.endDate,
-      actualReturnedAt: returnedAt,
+      actualReturnedAt,
       dailyRateCents: effectiveDailyRate,
     });
     const lateCharge = lateReturn.chargeCents;
@@ -1178,21 +1237,17 @@ export async function completeReturnInspectionAction(
           returnHasDamage: Boolean(input.hasDamage),
           returnDamageNotes: input.damageNotes?.trim() || null,
           returnAcceptedBy: input.acceptedBy.trim(),
-          returnAcceptedAt: returnedAt,
+          returnAcceptedAt: inspectionCompletedAt,
           returnAgentNotes: input.agentNotes?.trim() || null,
           returnLateCharge: lateCharge,
           returnFuelCharge: fuelCharge,
           returnDamageCharge: damageCharge,
           totalAmount: booking.totalAmount + totalAdjustment,
-          returnedAt: returnedAt,
+          returnedAt: inspectionCompletedAt,
+          actualReturnedAt,
         } as any,
       });
-      if (booking.vehicleId) {
-        await tx.vehicle.update({
-          where: { id: booking.vehicleId },
-          data: { status: "ACTIVE" },
-        });
-      }
+      await reconcileVehicleRentalStatuses(tx as typeof db);
       await replaceInspectionPhotos(tx as typeof db, bookingId, "RETURN", input.imageUrls);
       await tx.auditLog.create({
         data: {
@@ -1286,15 +1341,10 @@ export async function markBookingReturnedAction(bookingId: string, locale: strin
       const now = new Date();
       await tx.$executeRaw`
         UPDATE "Booking"
-        SET "returnedAt" = ${now}
+        SET "returnedAt" = ${now}, "actualReturnedAt" = COALESCE("actualReturnedAt", ${now})
         WHERE id = ${bookingId}
       `;
-      if (booking.vehicleId) {
-        await tx.vehicle.update({
-          where: { id: booking.vehicleId },
-          data: { status: "ACTIVE" },
-        });
-      }
+      await reconcileVehicleRentalStatuses(tx as typeof db);
       await tx.auditLog.create({
         data: {
           adminUserId: session.adminUserId,
@@ -2063,6 +2113,8 @@ export async function updateCategoryBookingAction(
     const pickupLocationId = String(formData.get("pickupLocationId") || "");
     const dropoffLocationId = String(formData.get("dropoffLocationId") || "");
     const notes = String(formData.get("notes") || "");
+    const sendConfirmationEmail = String(formData.get("sendConfirmationEmail") || "false") === "true";
+    const sendBillingEmail = String(formData.get("sendBillingEmail") || "false") === "true";
     const extrasPayload = String(formData.get("selectedExtras") || "[]");
 
     const validated = await adminCategoryBookingUpdateSchemaRefined.parseAsync({
@@ -2285,16 +2337,33 @@ export async function updateCategoryBookingAction(
       });
     });
 
+    await reconcileVehicleRentalStatuses();
+
     if (existing.status === "PENDING" || existing.status === "CONFIRMED") {
-      const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
+      const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale, {
+        sendEmailToCustomer: sendBillingEmail,
+      });
       if (!invoiceResult.success) {
         return { success: false, error: invoiceResult.error || "Booking updated but invoice refresh failed" };
+      }
+    }
+
+    let warning: string | undefined;
+    if (sendConfirmationEmail) {
+      if (existing.status !== "CONFIRMED") {
+        warning = "Confirmation email skipped because the booking is not confirmed.";
+      } else {
+        const confirmationResult = await sendBookingConfirmationEmail(bookingId);
+        if (!confirmationResult.success) {
+          return { success: false, error: confirmationResult.error || "Booking updated but confirmation email failed" };
+        }
       }
     }
 
     return {
       success: true,
       redirectUrl: `/${locale}/admin/bookings/${bookingId}`,
+      warning,
     };
   } catch (error: any) {
     if (error?.message === "CATEGORY_UNAVAILABLE") {
