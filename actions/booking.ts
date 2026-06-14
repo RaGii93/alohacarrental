@@ -30,6 +30,7 @@ import {
 import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { ensureZohoBookingColumns, markBookingBillingDocumentZoho, queueBookingZohoTransfer } from "@/lib/zoho-bookings";
 import { triggerAutomationEvent } from "@/lib/automations";
+import { reconcileVehicleRentalStatuses } from "@/lib/vehicle-status";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
@@ -297,11 +298,12 @@ async function selectAvailableVehicleForBooking(params: {
   specificVehicleId?: string | null;
 }) {
   const { tx, bookingIdToExclude, categoryId, startDate, endDate, preferredVehicleId, specificVehicleId } = params;
+  await reconcileVehicleRentalStatuses(tx);
   const vehicleRows = await tx.$queryRaw<Array<{ id: string }>>`
     SELECT v.id
     FROM "Vehicle" v
     WHERE v."categoryId" = ${categoryId}
-      AND (v."status" = 'ACTIVE' OR v.id = ${preferredVehicleId || ""})
+      AND (v."status" <> 'INACTIVE' OR v.id = ${preferredVehicleId || ""})
       AND (${specificVehicleId || null}::text IS NULL OR v.id = ${specificVehicleId || null})
       AND NOT EXISTS (
         SELECT 1
@@ -1778,12 +1780,13 @@ export async function createCategoryBookingAction(
       const driverLicenseDeleteAfter = calculateDriverLicenseDeleteAfter(validated.endDate);
       booking = await db.$transaction(async (tx) =>  {
         await ensureVehicleBlockoutsTable(tx as typeof db);
+        await reconcileVehicleRentalStatuses(tx as typeof db);
         // Find available vehicle in category for the date range
         const availableVehicleRows = await tx.$queryRaw<Array<{ id: string }>>`
           SELECT v.id
           FROM "Vehicle" v
           WHERE v."categoryId" = ${categoryId}
-            AND v."status" = 'ACTIVE'
+            AND v."status" <> 'INACTIVE'
             AND NOT EXISTS (
               SELECT 1
               FROM "Booking" b

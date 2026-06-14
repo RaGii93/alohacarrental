@@ -7,6 +7,7 @@ import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { getCategoryFeatureNames } from "@/lib/vehicle-features";
 import { evaluateBookingRules, type BookingSource } from "@/lib/pricing";
 import { resolveCategoryDailyRate } from "@/lib/booking-pricing-rules";
+import { reconcileVehicleRentalStatuses } from "@/lib/vehicle-status";
 
 export interface AvailabilityResult {
   categoryId: string;
@@ -44,6 +45,7 @@ export async function searchAvailabilityAction(
   // Cancel expired holds first
   await cancelExpiredHolds();
   await ensureVehicleBlockoutsTable();
+  await reconcileVehicleRentalStatuses();
 
   // Some runtime environments may not expose the generated model accessor (db.vehicleCategory)
   // fall back to a raw query if it's not available to avoid TypeError on server.
@@ -100,7 +102,7 @@ export async function searchAvailabilityAction(
       const rows = await db.$queryRaw<Array<{ count: number }>>`
         SELECT COUNT(*)::int AS count
         FROM "Vehicle" v
-        WHERE v."status" = 'ACTIVE'
+        WHERE v."status" <> 'INACTIVE'
           AND v."categoryId" = ${category.id}
           AND NOT EXISTS (
             SELECT 1
@@ -126,7 +128,7 @@ export async function searchAvailabilityAction(
       const rows = await db.$queryRaw<Array<{ count: number }>>`
         SELECT COUNT(*)::int AS count
         FROM "Vehicle" v
-        WHERE v."status" = 'ACTIVE'
+        WHERE v."status" <> 'INACTIVE'
           AND v."category" = ${category.name}
           AND NOT EXISTS (
             SELECT 1
@@ -152,7 +154,7 @@ export async function searchAvailabilityAction(
       const totalRows = await db.$queryRaw<Array<{ count: number }>>`
         SELECT COUNT(*)::int AS count
         FROM "Vehicle"
-        WHERE "status" = 'ACTIVE'
+        WHERE "status" <> 'INACTIVE'
       `;
       const totalVehicles = totalRows?.[0]?.count ?? 0;
       const bookingRows = await db.$queryRaw<Array<{ count: number }>>`

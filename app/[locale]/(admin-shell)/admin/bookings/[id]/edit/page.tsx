@@ -6,6 +6,7 @@ import { requireAdminSection } from "@/app/[locale]/admin/_lib";
 import { getTaxPercentage, getVehicleRatesIncludeTax } from "@/lib/settings";
 import { formatDateInputInLaPaz, formatDateTimeInputInLaPaz } from "@/lib/timezone";
 import { ensureBookingAdditionalDriversTable } from "@/lib/additional-drivers.server";
+import { reconcileVehicleRentalStatuses } from "@/lib/vehicle-status";
 
 export default async function BookingEditPage({
   params,
@@ -20,6 +21,7 @@ export default async function BookingEditPage({
   }
 
   await ensureBookingAdditionalDriversTable();
+  await reconcileVehicleRentalStatuses();
 
   const booking = await db.booking.findUnique({
     where: { id },
@@ -64,11 +66,11 @@ export default async function BookingEditPage({
       where: booking.vehicleId
         ? {
             OR: [
-              { status: "ACTIVE" },
+              { status: { not: "INACTIVE" } },
               { id: booking.vehicleId },
             ],
           }
-        : { status: "ACTIVE" },
+        : { status: { not: "INACTIVE" } },
       select: { id: true, name: true, categoryId: true, plateNumber: true },
       orderBy: { name: "asc" },
     }),
