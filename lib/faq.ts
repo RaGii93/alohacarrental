@@ -66,11 +66,11 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Call Emergency Services:"), t(" Dial "), b("911"), t(" if anyone is injured or needs urgent medical help.")],
-          [b("Call Caribbean Road Service:"), t(" Contact CRS at "), b("+599 717 9292"), t(" or WhatsApp "), b("+599 795 9292"), t(" for roadside support." )],
-          [b("Contact Aloha Support Immediately:"), t(" Contact Aloha Car Rental support as soon as it is safe so our team can guide local reporting and insurance steps.")],
+          [b("Call Caribbean Road Service:"), t(" Contact CRS at "), b("+599 717 9292"), t(" or WhatsApp "), b("+599 795 9292"), t(" right away. Calling CRS is mandatory." )],
+          [b("Contact Aloha Support Immediately:"), t(" After contacting CRS, notify Aloha Car Rental immediately so our team can coordinate the next steps.")],
           [b("Police Report Is Mandatory:"), t(" A valid police report is required for insurance processing.")],
-          [b("Do Not Move the Vehicle:"), t(" Leave the vehicle where it is unless emergency services, police, or CRS instruct you to move it.")],
-          [b("Do Not Leave the Scene:"), t(" Stay there until the incident is properly documented. Leaving too early can affect insurance coverage.")],
+          [b("Do Not Move the Vehicle:"), t(" Wait for CRS, police, or emergency services to tell you it is safe to move the vehicle.")],
+          [b("Do Not Leave the Scene:"), t(" Stay there until CRS and the authorities finish the report. Without that report, insurance coverage can be void and the renter may have to pay all costs.")],
         ),
         p(t("Following these steps helps document the incident properly and protects your coverage.")),
       ],
@@ -82,22 +82,11 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Do Not Move the Car:"), t(" Leave the vehicle where the damage happened, whether it was a post, stone, windshield damage, parking damage, or road accident.")],
-          [b("Contact Aloha Support Immediately:"), t(" Reach out right away so Aloha Car Rental support can explain the local reporting process and next steps.")],
-          [b("Follow Instructions:"), t(" Move the car only after police, emergency responders, or support confirms it is safe.")],
+          [b("Call Caribbean Road Service:"), t(" Contact CRS at "), b("+599 717 9292"), t(" or WhatsApp "), b("+599 795 9292"), t(" immediately.")],
+          [b("Contact Aloha Support Immediately:"), t(" After contacting CRS, notify Aloha Car Rental right away so we can coordinate next steps.")],
+          [b("Follow Instructions:"), t(" Move the car only after CRS staff, police, or emergency responders confirm it is safe.")],
         ),
-        p(t("This procedure keeps the incident documented correctly and helps keep your insurance valid.")),
-      ],
-    },
-    {
-      id: "theft",
-      question: "What should I do if the rental car is stolen?",
-      keywords: ["theft", "stolen", "police", "punda", "otrobanda", "911"],
-      blocks: [
-        list(
-          [b("Contact Us Immediately:"), t(" Call Aloha Car Rental immediately using the support phone number shown on this FAQ page (and on your booking confirmation) as soon as you realize the vehicle is missing.")],
-          [b("Report It to the Police:"), t(" Call "), b("911"), t(" and file a police report as soon as possible.")],
-          [b("Act Quickly:"), t(" Delays can make you fully responsible for the theft if negligence is involved.")],
-        ),
+        p(t("This procedure keeps the incident documented correctly and helps keep your insurance valid. Without the CRS and police report, insurance coverage can be void and the renter may have to pay all costs.")),
       ],
     },
     {
@@ -105,8 +94,10 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "What is the minimum age to rent a vehicle?",
       keywords: ["minimum age", "young driver", "license", "van", "vehicle", "eligibility", "driving license", "license requirement", "terms pdf"],
       blocks: [
-        p(t("Minimum age and driving-license eligibility are defined by Aloha Car Rental Terms and Conditions and validated during booking.")),
-        p(t("For the current legal requirements for your vehicle type, open the Terms and Conditions PDF or contact Aloha support before confirming.")),
+        p(t("The standard minimum age is "), b("21 years old"), t(".")),
+        p(t("Drivers aged "), b("19 and 20"), t(" can still rent, but a "), b("$750"), t(" security deposit is required.")),
+        p(t("Drivers aged "), b("21 and over"), t(" require the standard "), b("$500"), t(" security deposit.")),
+        p(t("All authorized drivers must be listed on the rental agreement and hold a valid driving license.")),
       ],
     },
     {
@@ -114,11 +105,21 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "What are your insurance coverage and deposit options?",
       keywords: ["insurance", "coverage", "deposit", "deductible", "all risk", "all-risk", "cdw", "full insurance", "all-risk premium", "$100", "$500", "$600", "police report"],
       blocks: [
-        p(b("CDW (basic insurance).")),
-        p(t("When CDW is accepted, the deductible is "), b("$500"), t(" for cars and "), b("$600"), t(" for pickups, jeeps, SUVs, and vans.")),
-        p(b("Full insurance (all-risk premium).")),
-        p(t("When full insurance is accepted, the deductible is "), b("$100"), t(". A valid police report is required.")),
-        p(t("Coverage exclusions and payment authorization details are governed by the official Terms and Conditions PDF.")),
+        p(t("All rentals include "), b("basic CDW"), t(" as the standard insurance option.")),
+        p(t("With accepted CDW, the deductible is "), b("$500"), t(" for cars and "), b("$600"), t(" for pickups, jeeps, SUVs, and vans.")),
+        p(t("A "), b("full insurance / all-risk premium"), t(" option is also available. If accepted, the deductible is "), b("$100"), t(".")),
+        p(t("Full insurance covers theft, joy-riding, and single-vehicle accidents. A valid police report is mandatory for claims.")),
+        p(t("CDW and full insurance do not cover driving under the influence of alcohol or drugs, speeding, unauthorized off-road driving, or third-party damages above "), b("$50,000"), t(".")),
+        p(t("If insurance is not accepted, or if coverage is invalidated, the renter is responsible for the total amount of damages and losses, including water damage.")),
+      ],
+    },
+    {
+      id: "pricing-includes",
+      question: "Do your rental prices include taxes and insurance?",
+      keywords: ["tax", "abb", "included", "rates", "price includes", "cdw", "insurance included"],
+      blocks: [
+        p(t("Yes. Rental prices include "), b("6% ABB"), t(" and "), b("basic CDW"), t(".")),
+        p(t("For extra protection, you can choose the premium/full insurance upgrade at the counter for an additional daily fee.")),
       ],
     },
     {
@@ -132,8 +133,10 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Do you accept cash or credit cards?",
       keywords: ["cash", "credit card", "cards", "maestro", "amex", "visa", "mastercard", "payment", "payment authorization", "power of attorney", "damage payment", "counter payment"],
       blocks: [
-        p(t("Aloha Car Rental accepts available local payment methods including card and cash options at the counter.")),
-        p(t("Payment authorization terms for damages and losses are defined in the official Terms and Conditions.")),
+        p(t("Aloha Car Rental accepts cash in "), b("US dollars"), t(", "), b("Maestro"), t(", "), b("Visa"), t(", "), b("Mastercard"), t(", "), b("Discover"), t(", and "), b("Diners Club"), t(".")),
+        p(t("A "), b("6% administration fee"), t(" applies to credit card payments.")),
+        p(t("We do "), b("not"), t(" accept "), b("American Express (AMEX)"), t(".")),
+        p(t("Under the Terms and Conditions, the renter authorizes Aloha Car Rental to use any provided credit card to pay for damages or losses when applicable.")),
       ],
     },
     {
@@ -141,7 +144,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Can I pay in euros?",
       keywords: ["euro", "euros", "currency", "guilders", "dollars"],
       blocks: [
-        p(t("No, we do not accept euros. Cash payments can be made in Caribbean guilders or US dollars.")),
+        p(t("No, we do not accept euros. Cash payments can be made in US dollars.")),
         p(t("You can also pay using our bank mobile pin machine.")),
       ],
     },
@@ -156,16 +159,85 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       ],
     },
     {
+      id: "wrong-fuel",
+      question: "What should I do if I fill the car with the wrong fuel?",
+      keywords: ["wrong fuel", "misfuel", "diesel", "gasoline", "petrol", "engine damage"],
+      blocks: [
+        p(t("Do not start the engine.")),
+        p(t("Contact Aloha Car Rental immediately for instructions.")),
+        p(t("Misfueling and any resulting engine damage are not covered by standard insurance.")),
+      ],
+    },
+    {
       id: "authorized-drivers",
       question: "Who is allowed to drive the rental car?",
       keywords: ["driver", "additional driver", "authorized driver", "co-sign"],
-      blocks: [p(t("The primary renter and the additional driver who co-signs the agreement and has a valid driving license may drive the vehicle."))],
+      blocks: [p(t("Only the lessee and any additional driver listed on the rental agreement are authorized to drive the vehicle."))],
     },
     {
-      id: "early-flight-return",
-      question: "Where do I leave the vehicle if my flight departs before opening hours?",
-      keywords: ["flight", "departure", "opening hours", "return", "early return"],
-      blocks: [p(t("If your return flight leaves before opening hours, tell the rental agent when you pick up the vehicle. They will give you the return instructions."))],
+      id: "off-road",
+      question: "Can I drive the rental vehicle off-road?",
+      keywords: ["off-road", "white sand", "dunes", "unauthorized use", "terrain"],
+      blocks: [
+        p(t("No. Off-road driving, driving on white sand, and driving in dunes are not permitted.")),
+        p(t("Any damage caused by unauthorized off-road use is the renter's responsibility and can invalidate insurance coverage.")),
+      ],
+    },
+    {
+      id: "flat-tire",
+      question: "What happens if I get a flat tire?",
+      keywords: ["flat tire", "puncture", "tire repair", "roadside assistance", "$35"],
+      blocks: [
+        p(t("Assistance for a flat tire near town is available.")),
+        p(t("The repair cost is "), b("$35"), t(".")),
+      ],
+    },
+    {
+      id: "lost-keys",
+      question: "What should I do if I lose the car keys?",
+      keywords: ["lost keys", "replacement key", "chip key", "remote", "lockout"],
+      blocks: [
+        p(t("Contact Aloha Car Rental immediately so we can arrange a replacement key or lockout support.")),
+        p(t("Replacement costs are charged to the renter. Reference prices in the terms are "), b("$20"), t(" for a standard key, "), b("$160"), t(" for a chip key, "), b("$260"), t(" for a chip key with remote, and "), b("$20"), t(" for lockout service.")),
+      ],
+    },
+    {
+      id: "warning-light",
+      question: "What should I do if a warning light appears on the dashboard?",
+      keywords: ["warning light", "dashboard", "check engine", "indicator"],
+      blocks: [
+        p(t("Park the vehicle in a safe location and contact Aloha Car Rental immediately.")),
+        p(t("We will guide you on the next step so you can continue safely.")),
+      ],
+    },
+    {
+      id: "breakdown",
+      question: "What should I do if the car breaks down or will not start?",
+      keywords: ["breakdown", "won't start", "roadside", "technical issue", "785 2604"],
+      blocks: [
+        p(t("Contact roadside assistance immediately if the car breaks down or will not start.")),
+        p(t("For technical issues, the FAQ support document lists "), b("Road Service Bonaire +599 785 2604"), t(".")),
+        p(t("Do not attempt repairs yourself without authorization from Aloha Car Rental.")),
+      ],
+    },
+    {
+      id: "returns",
+      question: "Where do I return the vehicle?",
+      keywords: ["return location", "same location", "pickup location", "785 5999"],
+      blocks: [
+        p(t("Vehicles must be returned to the same location where they were picked up.")),
+        p(t("If you need to change the return location, contact the office at "), b("+599 785 5999"), t(".")),
+      ],
+    },
+    {
+      id: "cleanliness",
+      question: "How should I return the vehicle?",
+      keywords: ["clean", "cleaning fee", "personal belongings", "return condition"],
+      blocks: [
+        p(t("The vehicle must be returned clean.")),
+        p(t("If it is returned dirty, the renter can be charged for cleaning and any repair or replacement costs.")),
+        p(t("Aloha Car Rental is not responsible for personal belongings left in the vehicle.")),
+      ],
     },
     {
       id: "long-term",
@@ -177,27 +249,37 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       id: "delivery",
       question: "Do you deliver the car to a specific location?",
       keywords: ["delivery", "deliver", "specific location", "hotel", "address"],
-      blocks: [p(t("Yes, Aloha Car Rental can deliver your rental car to your preferred location."))],
+      blocks: [
+        p(t("No. Vehicles are collected from the main office rather than delivered to hotels or other custom locations.")),
+        p(t("Aloha Car Rental provides a complimentary shuttle service from the airport, hotels, and most parts of Bonaire to the office.")),
+        p(t("Shuttles to and from Rincon are available for an additional fee.")),
+      ],
     },
     {
       id: "airport",
       question: "Can I receive the rental car at the airport?",
       keywords: ["airport", "arrival", "pickup airport", "receive car"],
-      blocks: [p(t("Yes. Depending on your flight time, Aloha Car Rental can have the car ready near the airport and send detailed instructions before arrival."))],
+      blocks: [
+        p(t("Not directly inside the terminal.")),
+        p(t("The main office is about "), b("5 minutes"), t(" from the airport, and Aloha Car Rental provides a complimentary pickup service to bring you there so you can collect your vehicle quickly.")),
+      ],
     },
     {
       id: "advance-booking",
       question: "How far in advance should I reserve my rental car?",
       keywords: ["reserve", "book in advance", "advance", "last minute", "24 hours"],
-      blocks: [p(t("You can reserve up to one year in advance. For last-minute bookings within 24 hours, contact Aloha Car Rental directly by WhatsApp or phone using the support number shown on this FAQ page."))],
+      blocks: [
+        p(t("Reserve as early as possible to secure your preferred vehicle and dates.")),
+        p(t("For last-minute bookings within "), b("24 hours"), t(", contact Aloha Car Rental directly by WhatsApp or phone.")),
+      ],
     },
     {
       id: "minimum-rental-rules",
       question: "Why can’t I book a very short rental online?",
       keywords: ["minimum rental", "minimum days", "short rental", "admin only", "booking rules"],
       blocks: [
-        p(t("Some Aloha Car Rental rentals have a minimum number of days configured in the booking flow.")),
-        p(t("If a booking is shorter than that minimum, the site may apply an extra short-rental surcharge or require staff assistance instead of letting the public request continue online.")),
+        p(t("Online bookings are optimized for a "), b("3-day minimum"), t(".")),
+        p(t("Shorter rental durations may still be possible at a premium rate, but you need to contact Aloha Car Rental directly by phone or WhatsApp.")),
       ],
     },
     {
@@ -214,8 +296,17 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Do you sometimes arrange rentals with partner vehicles?",
       keywords: ["partner rentals", "outside company", "supplier car", "other company", "partner vehicle"],
       blocks: [
-        p(t("Yes. In some cases an Aloha Car Rental booking may be fulfilled with a partner-supplied vehicle instead of our own saved fleet.")),
-        p(t("Those rentals are handled separately on the operational side so they do not mix into the normal public fleet inventory, while the customer still receives the normal booking communication.")),
+        p(t("Yes. If Aloha Car Rental is fully booked for your dates, we may still be able to secure a vehicle through our local partner network.")),
+        p(t("Contact us directly if you do not see availability online, because a partner vehicle may still be possible.")),
+      ],
+    },
+    {
+      id: "soft-top-jeeps",
+      question: "Are there special rules for soft-top jeeps?",
+      keywords: ["soft-top", "jeep", "roof", "rain", "overnight"],
+      blocks: [
+        p(t("Yes. Soft-top jeep roofs must be closed overnight and whenever it rains.")),
+        p(t("If they are left open, the renter is liable for any interior electrical damage.")),
       ],
     },
   ],
@@ -237,11 +328,11 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Bel de hulpdiensten:"), t(" Bel "), b("911"), t(" als er gewonden zijn of als medische hulp direct nodig is.")],
-          [b("Bel Caribbean Road Service:"), t(" Neem contact op met CRS via "), b("+599 717 9292"), t(" of WhatsApp "), b("+599 795 9292"), t(" voor pechhulp." )],
-          [b("Neem direct contact op met Aloha support:"), t(" Neem contact op zodra het veilig is, zodat het team van Aloha Car Rental je door de lokale meldings- en verzekeringsstappen kan begeleiden.")],
+          [b("Bel Caribbean Road Service:"), t(" Neem direct contact op met CRS via "), b("+599 717 9292"), t(" of WhatsApp "), b("+599 795 9292"), t(". Het bellen van CRS is verplicht." )],
+          [b("Neem direct contact op met Aloha support:"), t(" Meld het na contact met CRS meteen aan Aloha Car Rental zodat wij de volgende stappen kunnen coördineren.")],
           [b("Politierapport is verplicht:"), t(" Een geldig politierapport is verplicht voor verzekeringsafhandeling." )],
-          [b("Verplaats het voertuig niet:"), t(" Laat de auto staan tenzij hulpdiensten, politie of CRS aangeven dat je hem mag verplaatsen.")],
-          [b("Verlaat de plaats niet:"), t(" Blijf ter plaatse totdat het incident correct is vastgelegd. Te vroeg vertrekken kan gevolgen hebben voor de verzekering.")],
+          [b("Verplaats het voertuig niet:"), t(" Wacht tot CRS, politie of hulpdiensten aangeven dat het veilig is om de auto te verplaatsen.")],
+          [b("Verlaat de plaats niet:"), t(" Blijf ter plaatse totdat CRS en de autoriteiten het rapport hebben afgerond. Zonder dat rapport kan de verzekering vervallen en kan de huurder alle kosten moeten betalen.")],
         ),
         p(t("Door deze stappen te volgen, wordt alles correct vastgelegd en blijft je dekking beschermd.")),
       ],
@@ -253,22 +344,11 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Verplaats de auto niet:"), t(" Laat het voertuig staan waar de schade is ontstaan, of het nu gaat om een paal, steen, ruitschade, parkeerschade of een verkeersongeval.")],
-          [b("Neem direct contact op met Aloha support:"), t(" Laat het direct weten zodat Aloha Car Rental support de lokale meldingsprocedure en vervolgstappen kan uitleggen.")],
-          [b("Volg de instructies:"), t(" Verplaats de auto pas nadat politie, hulpdiensten of support aangeven dat het veilig is.")],
+          [b("Bel Caribbean Road Service:"), t(" Neem direct contact op met CRS via "), b("+599 717 9292"), t(" of WhatsApp "), b("+599 795 9292"), t("." )],
+          [b("Neem direct contact op met Aloha support:"), t(" Meld het na contact met CRS meteen aan Aloha Car Rental zodat wij de vervolgstappen kunnen coördineren.")],
+          [b("Volg de instructies:"), t(" Verplaats de auto pas nadat CRS-medewerkers, politie of hulpdiensten aangeven dat het veilig is.")],
         ),
-        p(t("Zo wordt de schade correct vastgelegd en blijft de verzekering geldig.")),
-      ],
-    },
-    {
-      id: "theft",
-      question: "Wat moet ik doen bij diefstal van de huurauto?",
-      keywords: ["diefstal", "gestolen", "politie", "punda", "otrobanda", "911"],
-      blocks: [
-        list(
-          [b("Neem direct contact met ons op:"), t(" Bel Aloha Car Rental direct via het supporttelefoonnummer op deze FAQ-pagina (en op je boekingsbevestiging) zodra je merkt dat het voertuig weg is.")],
-          [b("Doe direct aangifte bij de politie:"), t(" Bel "), b("911"), t(" en laat zo snel mogelijk een politierapport opmaken.")],
-          [b("Handel snel:"), t(" Als je te laat reageert, kun je aansprakelijk worden gehouden bij nalatigheid.")],
-        ),
+        p(t("Zo wordt de schade correct vastgelegd en blijft de verzekering geldig. Zonder CRS- en politierapport kan de verzekering vervallen en kan de huurder alle kosten moeten betalen.")),
       ],
     },
     {
@@ -276,8 +356,10 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Wat is de minimumleeftijd om een voertuig te huren?",
       keywords: ["minimumleeftijd", "jonge bestuurder", "rijbewijs", "bus", "auto", "geschiktheid", "rijbewijseis", "voorwaarden pdf"],
       blocks: [
-        p(t("Minimumleeftijd en rijbewijseisen worden bepaald door de Algemene Voorwaarden van Aloha Car Rental en gecontroleerd tijdens de boeking.")),
-        p(t("Voor de actuele wettelijke eisen per voertuigtype: open de voorwaarden-PDF of neem vooraf contact op met Aloha support.")),
+        p(t("De standaard minimumleeftijd is "), b("21 jaar"), t(".")),
+        p(t("Bestuurders van "), b("19 en 20 jaar"), t(" kunnen ook huren, maar daarvoor geldt een "), b("$750"), t(" waarborgsom.")),
+        p(t("Bestuurders van "), b("21 jaar en ouder"), t(" betalen de standaard "), b("$500"), t(" waarborgsom.")),
+        p(t("Alle bevoegde bestuurders moeten op de huurovereenkomst staan en een geldig rijbewijs hebben.")),
       ],
     },
     {
@@ -285,11 +367,21 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Wat zijn de opties voor verzekering en borg?",
       keywords: ["verzekering", "dekking", "borg", "eigen risico", "all risk", "all-risk", "cdw", "volledige verzekering", "$100", "$500", "$600", "politierapport"],
       blocks: [
-        p(b("CDW (basisverzekering).")),
-        p(t("Bij acceptatie van CDW is het eigen risico "), b("$500"), t(" voor auto’s en "), b("$600"), t(" voor pick-ups, jeeps, SUV’s en busjes.")),
-        p(b("Volledige verzekering (all-risk premium).")),
-        p(t("Bij acceptatie van volledige verzekering is het eigen risico "), b("$100"), t(". Een geldig politierapport is verplicht.")),
-        p(t("Dekkingsuitsluitingen en betalingsmachtiging vallen onder de officiële voorwaarden-PDF.")),
+        p(t("Alle huurprijzen zijn inclusief "), b("basis-CDW"), t(" als standaard verzekeringsoptie.")),
+        p(t("Bij geaccepteerde CDW is het eigen risico "), b("$500"), t(" voor auto’s en "), b("$600"), t(" voor pick-ups, jeeps, SUV’s en busjes.")),
+        p(t("Er is ook een "), b("volledige / all-risk premium verzekering"), t(" beschikbaar. Als die wordt geaccepteerd, is het eigen risico "), b("$100"), t(".")),
+        p(t("Volledige verzekering dekt diefstal, joy-riding en eenzijdige ongevallen. Een geldig politierapport is verplicht voor claims.")),
+        p(t("CDW en volledige verzekering dekken geen rijden onder invloed van alcohol of drugs, snelheidsovertredingen, ongeoorloofd off-road rijden of schade aan derden boven "), b("$50.000"), t(".")),
+        p(t("Als verzekering niet wordt geaccepteerd, of als de dekking vervalt, is de huurder verantwoordelijk voor het totale schade- en verliesbedrag, inclusief waterschade.")),
+      ],
+    },
+    {
+      id: "pricing-includes",
+      question: "Zijn belastingen en verzekering inbegrepen in de huurprijs?",
+      keywords: ["belasting", "abb", "inbegrepen", "tarief", "cdw", "verzekering inbegrepen"],
+      blocks: [
+        p(t("Ja. Huurprijzen zijn inclusief "), b("6% ABB"), t(" en "), b("basis-CDW"), t(".")),
+        p(t("Voor extra bescherming kun je aan de balie upgraden naar de premium/volledige verzekering tegen een extra dagtarief.")),
       ],
     },
     {
@@ -303,8 +395,10 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Accepteren jullie contant geld of creditcards?",
       keywords: ["contant", "cash", "creditcard", "kaart", "maestro", "amex", "visa", "mastercard", "betalingsmachtiging", "volmacht", "schadebetaling", "baliebetaling"],
       blocks: [
-        p(t("Aloha Car Rental accepteert beschikbare lokale betaalmethoden, waaronder kaart- en cashbetalingen aan de balie.")),
-        p(t("Voorwaarden rond betalingsmachtiging bij schade of verlies staan in de officiële Algemene Voorwaarden.")),
+        p(t("Aloha Car Rental accepteert contant geld in "), b("Amerikaanse dollars"), t(", "), b("Maestro"), t(", "), b("Visa"), t(", "), b("Mastercard"), t(", "), b("Discover"), t(" en "), b("Diners Club"), t(".")),
+        p(t("Voor creditcardbetalingen geldt een "), b("6% administratiekost"), t(".")),
+        p(t("Wij accepteren "), b("geen American Express (AMEX)"), t(".")),
+        p(t("Volgens de Algemene Voorwaarden machtigt de huurder Aloha Car Rental om een opgegeven creditcard te gebruiken voor schade of verlies wanneer dat van toepassing is.")),
       ],
     },
     {
@@ -312,7 +406,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Kan ik in euro's betalen?",
       keywords: ["euro", "euro's", "valuta", "guilders", "dollars"],
       blocks: [
-        p(t("Nee, wij accepteren geen euro's. Contante betalingen kunnen in Caribische guldens of Amerikaanse dollars worden gedaan.")),
+        p(t("Nee, wij accepteren geen euro's. Contante betalingen kunnen in Amerikaanse dollars worden gedaan.")),
         p(t("Je kunt ook betalen met onze mobiele pinmachine van de bank.")),
       ],
     },
@@ -327,16 +421,85 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       ],
     },
     {
+      id: "wrong-fuel",
+      question: "Wat moet ik doen als ik de verkeerde brandstof heb getankt?",
+      keywords: ["verkeerde brandstof", "misfuel", "diesel", "benzine", "motorschade"],
+      blocks: [
+        p(t("Start de motor niet.")),
+        p(t("Neem direct contact op met Aloha Car Rental voor instructies.")),
+        p(t("Verkeerd tanken en eventuele motorschade daardoor vallen niet onder de standaardverzekering.")),
+      ],
+    },
+    {
       id: "authorized-drivers",
       question: "Wie mag de huurauto besturen?",
       keywords: ["bestuurder", "extra bestuurder", "gemachtigde bestuurder", "medeondertekenen"],
-      blocks: [p(t("De hoofdhuurder en de extra bestuurder die de overeenkomst mede ondertekent en een geldig rijbewijs heeft, mogen rijden."))],
+      blocks: [p(t("Alleen de huurder en eventuele extra bestuurder(s) die op de huurovereenkomst staan, mogen het voertuig besturen."))],
     },
     {
-      id: "early-flight-return",
-      question: "Waar laat ik het voertuig als mijn vlucht vertrekt vóór openingstijd?",
-      keywords: ["vlucht", "vertrek", "openingstijd", "inleveren", "vroeg"],
-      blocks: [p(t("Als je retourvlucht vertrekt vóór openingstijd, meld dit dan bij het ophalen. Onze rental agent geeft je dan instructies voor het inleveren."))],
+      id: "off-road",
+      question: "Mag ik met het huurvoertuig off-road rijden?",
+      keywords: ["off-road", "wit zand", "duinen", "ongeoorloofd gebruik", "terrein"],
+      blocks: [
+        p(t("Nee. Off-road rijden, rijden op wit zand en rijden in duinen is niet toegestaan.")),
+        p(t("Schade door ongeoorloofd off-road gebruik is voor rekening van de huurder en kan de verzekeringsdekking ongeldig maken.")),
+      ],
+    },
+    {
+      id: "flat-tire",
+      question: "Wat gebeurt er als ik een lekke band krijg?",
+      keywords: ["lekke band", "bandenpech", "reparatie", "pechhulp", "$35"],
+      blocks: [
+        p(t("Hulp bij een lekke band in de buurt van de stad is beschikbaar.")),
+        p(t("De reparatiekosten bedragen "), b("$35"), t(".")),
+      ],
+    },
+    {
+      id: "lost-keys",
+      question: "Wat moet ik doen als ik mijn autosleutels verlies?",
+      keywords: ["sleutels kwijt", "vervangende sleutel", "chipsleutel", "afstandsbediening", "buitensluiting"],
+      blocks: [
+        p(t("Neem direct contact op met Aloha Car Rental zodat we een vervangende sleutel of hulp bij buitensluiting kunnen regelen.")),
+        p(t("Vervangingskosten zijn voor rekening van de huurder. De richtprijzen in de voorwaarden zijn "), b("$20"), t(" voor een standaardsleutel, "), b("$160"), t(" voor een chipsleutel, "), b("$260"), t(" voor een chipsleutel met afstandsbediening en "), b("$20"), t(" voor buitensluitingsservice.")),
+      ],
+    },
+    {
+      id: "warning-light",
+      question: "Wat moet ik doen als er een waarschuwingslampje op het dashboard verschijnt?",
+      keywords: ["waarschuwingslampje", "dashboard", "check engine", "storingslamp"],
+      blocks: [
+        p(t("Parkeer het voertuig op een veilige plek en neem direct contact op met Aloha Car Rental.")),
+        p(t("Wij begeleiden je bij de volgende stap zodat je veilig verder kunt.")),
+      ],
+    },
+    {
+      id: "breakdown",
+      question: "Wat moet ik doen als de auto pech krijgt of niet start?",
+      keywords: ["pech", "start niet", "roadside", "technisch probleem", "785 2604"],
+      blocks: [
+        p(t("Neem direct contact op met pechhulp als de auto pech krijgt of niet wil starten.")),
+        p(t("Voor technische problemen vermeldt het FAQ-supportdocument "), b("Road Service Bonaire +599 785 2604"), t(".")),
+        p(t("Probeer niet zelf reparaties uit te voeren zonder toestemming van Aloha Car Rental.")),
+      ],
+    },
+    {
+      id: "returns",
+      question: "Waar moet ik het voertuig inleveren?",
+      keywords: ["inleverlocatie", "zelfde locatie", "ophaallocatie", "785 5999"],
+      blocks: [
+        p(t("Voertuigen moeten worden ingeleverd op dezelfde locatie waar ze zijn opgehaald.")),
+        p(t("Als je de inleverlocatie wilt wijzigen, neem dan contact op met het kantoor via "), b("+599 785 5999"), t(".")),
+      ],
+    },
+    {
+      id: "cleanliness",
+      question: "In welke staat moet ik het voertuig terugbrengen?",
+      keywords: ["schoon", "schoonmaakkosten", "persoonlijke eigendommen", "inleverconditie"],
+      blocks: [
+        p(t("Het voertuig moet schoon worden ingeleverd.")),
+        p(t("Als het voertuig vuil wordt ingeleverd, kan de huurder schoonmaak- en eventuele reparatie- of vervangingskosten in rekening gebracht krijgen.")),
+        p(t("Aloha Car Rental is niet verantwoordelijk voor persoonlijke eigendommen die in het voertuig achterblijven.")),
+      ],
     },
     {
       id: "long-term",
@@ -348,27 +511,37 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       id: "delivery",
       question: "Leveren jullie de auto op een specifieke locatie af?",
       keywords: ["leveren", "afleveren", "specifieke locatie", "hotel", "adres"],
-      blocks: [p(t("Ja, Aloha Car Rental kan de huurauto op jouw gewenste locatie afleveren."))],
+      blocks: [
+        p(t("Nee. Voertuigen worden opgehaald bij het hoofdkantoor en niet afgeleverd bij hotels of andere gewenste locaties.")),
+        p(t("Aloha Car Rental biedt wel een gratis shuttleservice van de luchthaven, hotels en de meeste delen van Bonaire naar het kantoor.")),
+        p(t("Shuttles van en naar Rincon zijn beschikbaar tegen een extra toeslag.")),
+      ],
     },
     {
       id: "airport",
       question: "Kan ik de huurauto op de luchthaven ontvangen?",
       keywords: ["luchthaven", "airport", "aankomst", "ophalen"],
-      blocks: [p(t("Ja. Afhankelijk van je vluchttijd kan Aloha Car Rental de auto vlak bij de luchthaven voor je klaarzetten en sturen we vooraf de instructies."))],
+      blocks: [
+        p(t("Niet direct in de terminal.")),
+        p(t("Het hoofdkantoor ligt op ongeveer "), b("5 minuten"), t(" van de luchthaven en Aloha Car Rental biedt een gratis ophaalservice zodat je daar snel je voertuig kunt ophalen.")),
+      ],
     },
     {
       id: "advance-booking",
       question: "Hoe ver van tevoren moet ik mijn huurauto reserveren?",
       keywords: ["reserveren", "van tevoren", "vooraf", "last minute", "24 uur"],
-      blocks: [p(t("Je kunt tot één jaar van tevoren reserveren. Voor last-minute boekingen binnen 24 uur kun je Aloha Car Rental het beste direct bellen of appen via het supportnummer op deze FAQ-pagina."))],
+      blocks: [
+        p(t("Reserveer zo vroeg mogelijk om jouw gewenste voertuig en data vast te leggen.")),
+        p(t("Voor last-minute boekingen binnen "), b("24 uur"), t(" kun je Aloha Car Rental het beste direct bellen of appen.")),
+      ],
     },
     {
       id: "minimum-rental-rules",
       question: "Waarom kan ik een heel korte huurperiode niet online boeken?",
       keywords: ["minimum huur", "minimum dagen", "korte huur", "alleen admin", "boekingsregels"],
       blocks: [
-        p(t("Voor sommige Aloha Car Rental-huurperiodes is een minimum aantal dagen ingesteld in de boekingsflow.")),
-        p(t("Als een boeking korter is dan dat minimum, kan de site een extra korte-huurtoeslag toevoegen of vragen dat medewerkers de boeking handmatig afhandelen in plaats van online door te gaan.")),
+        p(t("Online boekingen zijn ingesteld op een "), b("minimum van 3 dagen"), t(".")),
+        p(t("Kortere huurperiodes kunnen soms wel tegen een hoger tarief, maar daarvoor moet je Aloha Car Rental direct bellen of appen.")),
       ],
     },
     {
@@ -385,8 +558,17 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "Regelen jullie soms huur met partner-voertuigen?",
       keywords: ["partnerverhuur", "ander bedrijf", "leveranciersauto", "partnervoertuig"],
       blocks: [
-        p(t("Ja. In sommige gevallen kan een Aloha Car Rental-boeking worden uitgevoerd met een voertuig van een partner in plaats van uit onze eigen opgeslagen vloot.")),
-        p(t("Die huur wordt operationeel apart afgehandeld zodat ze niet in de normale publieke vlootinventaris terechtkomt, terwijl de klant wel de normale boekingscommunicatie ontvangt.")),
+        p(t("Ja. Als Aloha Car Rental voor jouw data volgeboekt is, kunnen we mogelijk via ons lokale partnernetwerk toch een voertuig regelen.")),
+        p(t("Neem dan direct contact met ons op, want ook als je online geen beschikbaarheid ziet, kan een partnervoertuig nog mogelijk zijn.")),
+      ],
+    },
+    {
+      id: "soft-top-jeeps",
+      question: "Gelden er speciale regels voor soft-top jeeps?",
+      keywords: ["soft-top", "jeep", "dak", "regen", "nacht"],
+      blocks: [
+        p(t("Ja. Het dak van een soft-top jeep moet 's nachts en bij regen gesloten zijn.")),
+        p(t("Als het dak open blijft, is de huurder aansprakelijk voor eventuele elektrische schade aan het interieur.")),
       ],
     },
   ],
@@ -408,11 +590,11 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("Llame a emergencias:"), t(" Marque "), b("911"), t(" si hay heridos o si alguien necesita atención médica urgente.")],
-          [b("Llame a Caribbean Road Service:"), t(" Contacte a CRS al "), b("+599 717 9292"), t(" o WhatsApp "), b("+599 795 9292"), t(" para asistencia en carretera." )],
-          [b("Contacte soporte de Aloha de inmediato:"), t(" Contacte a Aloha Car Rental apenas sea seguro para que nuestro equipo le guíe con el reporte local y el seguro.")],
+          [b("Llame a Caribbean Road Service:"), t(" Contacte a CRS al "), b("+599 717 9292"), t(" o WhatsApp "), b("+599 795 9292"), t(" de inmediato. Llamar a CRS es obligatorio." )],
+          [b("Contacte soporte de Aloha de inmediato:"), t(" Después de contactar a CRS, avise enseguida a Aloha Car Rental para que podamos coordinar los siguientes pasos.")],
           [b("El informe policial es obligatorio:"), t(" Un informe policial válido es obligatorio para la gestión del seguro." )],
-          [b("No mueva el vehículo:"), t(" Deje el auto en su lugar salvo que emergencias, policía o CRS le indiquen moverlo.")],
-          [b("No abandone el lugar:"), t(" Permanezca allí hasta que el incidente quede bien documentado. Irse demasiado pronto puede afectar la cobertura del seguro.")],
+          [b("No mueva el vehículo:"), t(" Espere a que CRS, la policía o emergencias le indiquen que es seguro mover el vehículo.")],
+          [b("No abandone el lugar:"), t(" Permanezca allí hasta que CRS y las autoridades terminen el informe. Sin ese informe, la cobertura del seguro puede quedar anulada y el arrendatario puede tener que pagar todos los costos.")],
         ),
         p(t("Seguir estos pasos ayuda a documentar correctamente el incidente y a proteger su cobertura.")),
       ],
@@ -424,22 +606,11 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       blocks: [
         list(
           [b("No mueva el auto:"), t(" Deje el vehículo donde ocurrió el daño, ya sea por un poste, piedra, parabrisas, estacionamiento o accidente de tránsito.")],
-          [b("Contacte soporte de Aloha de inmediato:"), t(" Avise enseguida para que el soporte de Aloha Car Rental explique el proceso local de reporte y los siguientes pasos.")],
-          [b("Siga las instrucciones:"), t(" Mueva el auto solo cuando policía, emergencias o soporte indiquen que es seguro hacerlo.")],
+          [b("Llame a Caribbean Road Service:"), t(" Contacte a CRS al "), b("+599 717 9292"), t(" o WhatsApp "), b("+599 795 9292"), t(" de inmediato." )],
+          [b("Contacte soporte de Aloha de inmediato:"), t(" Después de contactar a CRS, avise enseguida a Aloha Car Rental para que podamos coordinar los siguientes pasos.")],
+          [b("Siga las instrucciones:"), t(" Mueva el auto solo cuando el personal de CRS, la policía o emergencias indiquen que es seguro hacerlo.")],
         ),
-        p(t("Este procedimiento mantiene el caso bien documentado y ayuda a conservar la validez del seguro.")),
-      ],
-    },
-    {
-      id: "theft",
-      question: "¿Qué debo hacer si roban el auto alquilado?",
-      keywords: ["robo", "robado", "policía", "punda", "otrobanda", "911"],
-      blocks: [
-        list(
-          [b("Contáctenos inmediatamente:"), t(" Llame a Aloha Car Rental de inmediato usando el número de soporte que aparece en esta página FAQ (y en su confirmación de reserva) apenas note que el vehículo desapareció.")],
-          [b("Repórtelo a la policía:"), t(" Llame al "), b("911"), t(" y presente una denuncia policial lo antes posible.")],
-          [b("Actúe rápido:"), t(" Si tarda demasiado, podría ser considerado responsable por negligencia.")],
-        ),
+        p(t("Este procedimiento mantiene el caso bien documentado y ayuda a conservar la validez del seguro. Sin el informe de CRS y la policía, la cobertura del seguro puede quedar anulada y el arrendatario puede tener que pagar todos los costos.")),
       ],
     },
     {
@@ -447,8 +618,10 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿Cuál es la edad mínima para alquilar un vehículo?",
       keywords: ["edad mínima", "conductor joven", "licencia", "van", "vehículo", "elegibilidad", "requisito licencia", "términos pdf"],
       blocks: [
-        p(t("La edad mínima y los requisitos de licencia están definidos por los Términos y Condiciones de Aloha Car Rental y se validan durante la reserva.")),
-        p(t("Para ver los requisitos vigentes por tipo de vehículo, abra el PDF de Términos y Condiciones o contacte a soporte de Aloha antes de confirmar.")),
+        p(t("La edad mínima estándar es "), b("21 años"), t(".")),
+        p(t("Los conductores de "), b("19 y 20 años"), t(" también pueden alquilar, pero deben dejar un depósito de seguridad de "), b("$750"), t(".")),
+        p(t("Los conductores de "), b("21 años o más"), t(" requieren el depósito estándar de "), b("$500"), t(".")),
+        p(t("Todos los conductores autorizados deben aparecer en el contrato y tener una licencia de conducir válida.")),
       ],
     },
     {
@@ -456,11 +629,21 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿Cuáles son las opciones de seguro y depósito?",
       keywords: ["seguro", "cobertura", "depósito", "deducible", "all risk", "todo riesgo", "cdw", "seguro full", "$100", "$500", "$600", "informe policial"],
       blocks: [
-        p(b("CDW (seguro básico).")),
-        p(t("Cuando se acepta CDW, el deducible es de "), b("$500"), t(" para autos y "), b("$600"), t(" para pickups, jeeps, SUVs y vans.")),
-        p(b("Seguro Full (todo riesgo premium).")),
-        p(t("Cuando se acepta Seguro Full, el deducible es de "), b("$100"), t(". Es obligatorio presentar un informe policial válido.")),
-        p(t("Las exclusiones de cobertura y la autorización de pago se rigen por el PDF oficial de Términos y Condiciones.")),
+        p(t("Todos los alquileres incluyen "), b("CDW básico"), t(" como la opción de seguro estándar.")),
+        p(t("Con CDW aceptado, el deducible es de "), b("$500"), t(" para autos y "), b("$600"), t(" para pickups, jeeps, SUVs y vans.")),
+        p(t("También hay una opción de "), b("seguro full / premium todo riesgo"), t(". Si se acepta, el deducible es de "), b("$100"), t(".")),
+        p(t("El seguro full cubre robo, joy-riding y accidentes de un solo vehículo. Es obligatorio presentar un informe policial válido para reclamos.")),
+        p(t("Ni el CDW ni el seguro full cubren conducir bajo la influencia del alcohol o drogas, exceso de velocidad, conducción off-road no autorizada o daños a terceros por encima de "), b("$50,000"), t(".")),
+        p(t("Si no se acepta el seguro, o si la cobertura queda invalidada, el arrendatario es responsable del monto total de daños y pérdidas, incluyendo daños por agua.")),
+      ],
+    },
+    {
+      id: "pricing-includes",
+      question: "¿Los precios de alquiler incluyen impuestos y seguro?",
+      keywords: ["impuestos", "abb", "incluido", "tarifa", "cdw", "seguro incluido"],
+      blocks: [
+        p(t("Sí. Los precios de alquiler incluyen "), b("6% ABB"), t(" y "), b("CDW básico"), t(".")),
+        p(t("Para mayor protección, puede elegir en el mostrador la mejora a seguro premium/full por una tarifa diaria adicional.")),
       ],
     },
     {
@@ -474,8 +657,10 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿Aceptan efectivo o tarjetas de crédito?",
       keywords: ["efectivo", "cash", "tarjeta", "tarjetas", "maestro", "amex", "visa", "mastercard", "pago", "autorización de pago", "poder notarial", "pago por daños", "pago en oficina"],
       blocks: [
-        p(t("Aloha Car Rental acepta métodos de pago locales disponibles, incluyendo opciones con tarjeta y efectivo en oficina.")),
-        p(t("La autorización de pago para daños o pérdidas se define en los Términos y Condiciones oficiales.")),
+        p(t("Aloha Car Rental acepta efectivo en "), b("dólares estadounidenses"), t(", "), b("Maestro"), t(", "), b("Visa"), t(", "), b("Mastercard"), t(", "), b("Discover"), t(" y "), b("Diners Club"), t(".")),
+        p(t("Los pagos con tarjeta de crédito tienen un "), b("cargo administrativo del 6%"), t(".")),
+        p(t("No aceptamos "), b("American Express (AMEX)"), t(".")),
+        p(t("Según los Términos y Condiciones, el arrendatario autoriza a Aloha Car Rental a usar cualquier tarjeta de crédito proporcionada para pagar daños o pérdidas cuando corresponda.")),
       ],
     },
     {
@@ -483,7 +668,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿Puedo pagar en euros?",
       keywords: ["euro", "euros", "moneda", "guilder", "dólares", "dolares"],
       blocks: [
-        p(t("No, no aceptamos euros. Los pagos en efectivo pueden hacerse en florines caribeños o en dólares estadounidenses.")),
+        p(t("No, no aceptamos euros. Los pagos en efectivo pueden hacerse en dólares estadounidenses.")),
         p(t("También puede pagar con nuestra máquina móvil bancaria.")),
       ],
     },
@@ -498,16 +683,85 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       ],
     },
     {
+      id: "wrong-fuel",
+      question: "¿Qué debo hacer si pongo el combustible equivocado?",
+      keywords: ["combustible equivocado", "misfuel", "diesel", "gasolina", "daño motor"],
+      blocks: [
+        p(t("No encienda el motor.")),
+        p(t("Contacte a Aloha Car Rental inmediatamente para recibir instrucciones.")),
+        p(t("El combustible equivocado y cualquier daño al motor resultante no están cubiertos por el seguro estándar.")),
+      ],
+    },
+    {
       id: "authorized-drivers",
       question: "¿Quién puede conducir el auto alquilado?",
       keywords: ["conductor", "conductor adicional", "autorizado", "cofirmante", "cosign"],
-      blocks: [p(t("Puede conducir el arrendatario principal y el conductor adicional que firme el contrato y tenga licencia válida."))],
+      blocks: [p(t("Solo el arrendatario y cualquier conductor adicional que figure en el contrato están autorizados para conducir el vehículo."))],
     },
     {
-      id: "early-flight-return",
-      question: "¿Dónde dejo el vehículo si mi vuelo sale antes del horario de apertura?",
-      keywords: ["vuelo", "salida", "horario", "devolución", "temprano"],
-      blocks: [p(t("Si su vuelo de regreso sale antes del horario de apertura, informe al agente al recoger el vehículo. Le dará las instrucciones para la devolución."))],
+      id: "off-road",
+      question: "¿Puedo conducir el vehículo de alquiler fuera de carretera?",
+      keywords: ["off-road", "arena blanca", "dunas", "uso no autorizado", "terreno"],
+      blocks: [
+        p(t("No. No se permite conducir fuera de carretera, sobre arena blanca ni en dunas.")),
+        p(t("Cualquier daño causado por uso off-road no autorizado es responsabilidad del arrendatario y puede invalidar la cobertura del seguro.")),
+      ],
+    },
+    {
+      id: "flat-tire",
+      question: "¿Qué pasa si se me pincha una llanta?",
+      keywords: ["llanta pinchada", "ponchada", "reparación", "asistencia", "$35"],
+      blocks: [
+        p(t("Hay asistencia disponible para una llanta pinchada cerca de la ciudad.")),
+        p(t("El costo de reparación es de "), b("$35"), t(".")),
+      ],
+    },
+    {
+      id: "lost-keys",
+      question: "¿Qué debo hacer si pierdo las llaves del auto?",
+      keywords: ["llaves perdidas", "llave de reemplazo", "llave con chip", "control remoto", "lockout"],
+      blocks: [
+        p(t("Contacte a Aloha Car Rental inmediatamente para que podamos organizar una llave de reemplazo o asistencia por cierre fuera del vehículo.")),
+        p(t("Los costos de reemplazo se cobran al arrendatario. Los precios de referencia en los términos son "), b("$20"), t(" por llave estándar, "), b("$160"), t(" por llave con chip, "), b("$260"), t(" por llave con chip y control remoto, y "), b("$20"), t(" por servicio de apertura.")),
+      ],
+    },
+    {
+      id: "warning-light",
+      question: "¿Qué debo hacer si aparece una luz de advertencia en el tablero?",
+      keywords: ["luz de advertencia", "tablero", "check engine", "indicador"],
+      blocks: [
+        p(t("Estacione el vehículo en un lugar seguro y contacte a Aloha Car Rental inmediatamente.")),
+        p(t("Le indicaremos el siguiente paso para que pueda continuar con seguridad.")),
+      ],
+    },
+    {
+      id: "breakdown",
+      question: "¿Qué debo hacer si el auto se avería o no enciende?",
+      keywords: ["avería", "no enciende", "asistencia", "problema técnico", "785 2604"],
+      blocks: [
+        p(t("Contacte inmediatamente la asistencia en carretera si el auto se avería o no enciende.")),
+        p(t("Para problemas técnicos, el documento de soporte FAQ indica "), b("Road Service Bonaire +599 785 2604"), t(".")),
+        p(t("No intente hacer reparaciones por su cuenta sin autorización de Aloha Car Rental.")),
+      ],
+    },
+    {
+      id: "returns",
+      question: "¿Dónde debo devolver el vehículo?",
+      keywords: ["lugar de devolución", "misma ubicación", "lugar de recogida", "785 5999"],
+      blocks: [
+        p(t("Los vehículos deben devolverse en el mismo lugar donde fueron recogidos.")),
+        p(t("Si necesita cambiar el lugar de devolución, contacte a la oficina al "), b("+599 785 5999"), t(".")),
+      ],
+    },
+    {
+      id: "cleanliness",
+      question: "¿En qué estado debo devolver el vehículo?",
+      keywords: ["limpio", "cargo de limpieza", "objetos personales", "condición de devolución"],
+      blocks: [
+        p(t("El vehículo debe devolverse limpio.")),
+        p(t("Si se devuelve sucio, al arrendatario se le pueden cobrar costos de limpieza y cualquier reparación o reemplazo necesario.")),
+        p(t("Aloha Car Rental no se hace responsable por objetos personales dejados dentro del vehículo.")),
+      ],
     },
     {
       id: "long-term",
@@ -519,27 +773,37 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       id: "delivery",
       question: "¿Entregan el auto en una ubicación específica?",
       keywords: ["entrega", "entregar", "ubicación específica", "hotel", "dirección"],
-      blocks: [p(t("Sí, Aloha Car Rental puede entregar el auto de alquiler en la ubicación que prefiera."))],
+      blocks: [
+        p(t("No. Los vehículos se recogen en la oficina principal y no se entregan en hoteles u otras ubicaciones personalizadas.")),
+        p(t("Aloha Car Rental sí ofrece un servicio de traslado gratuito desde el aeropuerto, hoteles y la mayoría de las zonas de Bonaire hasta la oficina.")),
+        p(t("Los traslados hacia y desde Rincon están disponibles por una tarifa adicional.")),
+      ],
     },
     {
       id: "airport",
       question: "¿Puedo recibir el auto de alquiler en el aeropuerto?",
       keywords: ["aeropuerto", "llegada", "recibir auto", "recoger"],
-      blocks: [p(t("Sí. Dependiendo del horario de su vuelo, Aloha Car Rental puede tener el auto listo cerca del aeropuerto y enviarle instrucciones antes de su llegada."))],
+      blocks: [
+        p(t("No directamente dentro de la terminal.")),
+        p(t("La oficina principal está a unos "), b("5 minutos"), t(" del aeropuerto, y Aloha Car Rental ofrece un servicio de recogida gratuito para llevarle allí y retirar su vehículo rápidamente.")),
+      ],
     },
     {
       id: "advance-booking",
       question: "¿Con cuánta anticipación debo reservar mi auto de alquiler?",
       keywords: ["reservar", "anticipación", "adelantado", "último minuto", "24 horas"],
-      blocks: [p(t("Puede reservar hasta con un año de anticipación. Para reservas de último minuto dentro de 24 horas, contacte a Aloha Car Rental directamente por WhatsApp o teléfono usando el número de soporte que aparece en esta página FAQ."))],
+      blocks: [
+        p(t("Reserve lo antes posible para asegurar el vehículo y las fechas que prefiere.")),
+        p(t("Para reservas de último minuto dentro de "), b("24 horas"), t(", contacte a Aloha Car Rental directamente por WhatsApp o teléfono.")),
+      ],
     },
     {
       id: "minimum-rental-rules",
       question: "¿Por qué no puedo reservar un alquiler muy corto en línea?",
       keywords: ["alquiler mínimo", "días mínimos", "alquiler corto", "solo admin", "reglas de reserva"],
       blocks: [
-        p(t("Algunos alquileres de Aloha Car Rental tienen un número mínimo de días configurado en el flujo de reservas.")),
-        p(t("Si una reserva es más corta que ese mínimo, el sitio puede aplicar un recargo por alquiler corto o pedir que el personal la gestione manualmente en lugar de dejar continuar al público en línea.")),
+        p(t("Las reservas en línea están configuradas para un "), b("mínimo de 3 días"), t(".")),
+        p(t("Los alquileres más cortos pueden ser posibles con una tarifa premium, pero debe contactar directamente a Aloha Car Rental por teléfono o WhatsApp.")),
       ],
     },
     {
@@ -556,8 +820,17 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       question: "¿A veces gestionan alquileres con vehículos de socios?",
       keywords: ["alquiler de socios", "otra empresa", "vehículo de proveedor", "vehículo socio"],
       blocks: [
-        p(t("Sí. En algunos casos una reserva de Aloha Car Rental puede cumplirse con un vehículo suministrado por un socio en lugar de uno de nuestra flota guardada.")),
-        p(t("Esos alquileres se gestionan por separado en la parte operativa para no mezclarse con el inventario público normal, mientras el cliente sigue recibiendo la comunicación habitual de la reserva.")),
+        p(t("Sí. Si Aloha Car Rental está completo para sus fechas, aún podemos intentar conseguirle un vehículo a través de nuestra red local de socios.")),
+        p(t("Contáctenos directamente si no ve disponibilidad en línea, porque un vehículo de un socio todavía puede ser posible.")),
+      ],
+    },
+    {
+      id: "soft-top-jeeps",
+      question: "¿Hay reglas especiales para los jeeps soft-top?",
+      keywords: ["soft-top", "jeep", "techo", "lluvia", "noche"],
+      blocks: [
+        p(t("Sí. Los techos de los jeeps soft-top deben permanecer cerrados por la noche y cuando llueve.")),
+        p(t("Si se dejan abiertos, el arrendatario será responsable de cualquier daño eléctrico interior.")),
       ],
     },
   ],
