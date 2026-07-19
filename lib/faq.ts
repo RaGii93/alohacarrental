@@ -50,6 +50,39 @@ function coerceFaqLocale(locale: string | null | undefined): FaqLocale {
 const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
   en: [
     {
+      id: "daily-cruise-ship",
+      question: "Do you offer daily rentals for cruise ship passengers?",
+      keywords: ["cruise", "daily", "ship", "cruise ship", "daily rentals"],
+      blocks: [
+        p(t("Yes.")),
+        p(t("We offer daily rentals for guests arriving by cruise ship.")),
+        p(t("Please contact us via WhatsApp at +599 785 5999 or email booking@alohacarrentalbonaire.com.")),
+        p(t("Our team will be happy to assist you with availability, pricing, and your reservation.")),
+      ],
+    },
+    {
+      id: "last-minute-daily",
+      question: "Can I make a last-minute or daily booking online?",
+      keywords: ["last minute", "daily", "same day", "urgent booking"],
+      blocks: [
+        p(t("No.")),
+        p(t("Our online booking system requires a minimum rental period of 3 days.")),
+        p(t("For last-minute or daily rentals, please contact us via WhatsApp at +599 785 5999 or email booking@alohacarrentalbonaire.com.")),
+        p(t("We'll be happy to assist you with your reservation.")),
+      ],
+    },
+    {
+      id: "pricing-includes",
+      question: "Do your rental prices include taxes and insurance?",
+      keywords: ["tax", "included", "insurance", "pricing"],
+      blocks: [
+        p(t("Yes. All quoted rental prices already include applicable taxes.")),
+        p(t("Basic insurance coverage is included according to your selected rental package.")),
+        p(t("Optional coverage and extras may be available for additional protection during your trip.")),
+        p(t("Please review the rental summary or contact us if you have any questions before confirming your reservation.")),
+      ],
+    },
+    {
       id: "terms-priority",
       question: "Do these FAQ answers replace the rental terms and conditions?",
       keywords: ["terms", "conditions", "policy", "official", "legal", "priority", "faq", "binding", "pdf", "agreement", "contract", "override"],
@@ -113,15 +146,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
         p(t("If insurance is not accepted, or if coverage is invalidated, the renter is responsible for the total amount of damages and losses, including water damage.")),
       ],
     },
-    {
-      id: "pricing-includes",
-      question: "Do your rental prices include taxes and insurance?",
-      keywords: ["tax", "abb", "included", "rates", "price includes", "cdw", "insurance included"],
-      blocks: [
-        p(t("Yes. Rental prices include "), b("6% ABB"), t(" and "), b("basic CDW"), t(".")),
-        p(t("For extra protection, you can choose the premium/full insurance upgrade at the counter for an additional daily fee.")),
-      ],
-    },
+
     {
       id: "kilometers",
       question: "How many kilometers can I drive per day?",
@@ -283,15 +308,6 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
       ],
     },
     {
-      id: "last-minute-rules",
-      question: "Can I make a last-minute booking online?",
-      keywords: ["last minute", "same day", "same-day", "urgent booking", "24 hours"],
-      blocks: [
-        p(t("That depends on Aloha Car Rental active booking rules.")),
-        p(t("If your pickup is inside the configured last-minute window, the website may add an extra percentage or require the booking to be handled directly by staff.")),
-      ],
-    },
-    {
       id: "partner-rentals",
       question: "Do you sometimes arrange rentals with partner vehicles?",
       keywords: ["partner rentals", "outside company", "supplier car", "other company", "partner vehicle"],
@@ -311,6 +327,39 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
     },
   ],
   nl: [
+    {
+      id: "daily-cruise-ship",
+      question: "Bieden jullie dagverhuur voor cruisepassagiers?",
+      keywords: ["cruise", "dag", "passagiers", "cruise ship", "daghuur"],
+      blocks: [
+        p(t("Ja.")),
+        p(t("We bieden dagverhuur aan voor gasten die per cruiseschip aankomen.")),
+        p(t("Neem contact op via WhatsApp op +599 785 5999 of mail naar booking@alohacarrentalbonaire.com.")),
+        p(t("Ons team helpt je graag met beschikbaarheid, prijzen en je reservering.")),
+      ],
+    },
+    {
+      id: "last-minute-daily",
+      question: "Kan ik een last-minute of dagelijkse boeking online maken?",
+      keywords: ["last minute", "dagelijks", "samedag", "spoedboeking"],
+      blocks: [
+        p(t("Nee.")),
+        p(t("Ons online boekingssysteem vereist een minimale huurperiode van 3 dagen.")),
+        p(t("Voor last-minute of dagelijkse huur neem contact op via WhatsApp op +599 785 5999 of mail naar booking@alohacarrentalbonaire.com.")),
+        p(t("We helpen je graag met je reservering.")),
+      ],
+    },
+    {
+      id: "pricing-includes",
+      question: "Zijn belastingen en verzekering inbegrepen in de huurprijs?",
+      keywords: ["belasting", "inbegrepen", "verzekering", "prijs"],
+      blocks: [
+        p(t("Ja. Alle aangegeven huurtarieven zijn inclusief de toepasselijke belastingen.")),
+        p(t("Basisverzekering is inbegrepen volgens het door jou gekozen huurpakket.")),
+        p(t("Optionele dekking en extra’s kunnen beschikbaar zijn tegen een meerprijs.")),
+        p(t("Bekijk de huuroverzicht of neem contact op als je vragen hebt voordat je boekt.")),
+      ],
+    },
     {
       id: "terms-priority",
       question: "Vervangen deze FAQ-antwoorden de huurvoorwaarden?",
@@ -375,15 +424,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
         p(t("Als verzekering niet wordt geaccepteerd, of als de dekking vervalt, is de huurder verantwoordelijk voor het totale schade- en verliesbedrag, inclusief waterschade.")),
       ],
     },
-    {
-      id: "pricing-includes",
-      question: "Zijn belastingen en verzekering inbegrepen in de huurprijs?",
-      keywords: ["belasting", "abb", "inbegrepen", "tarief", "cdw", "verzekering inbegrepen"],
-      blocks: [
-        p(t("Ja. Huurprijzen zijn inclusief "), b("6% ABB"), t(" en "), b("basis-CDW"), t(".")),
-        p(t("Voor extra bescherming kun je aan de balie upgraden naar de premium/volledige verzekering tegen een extra dagtarief.")),
-      ],
-    },
+    
     {
       id: "kilometers",
       question: "Hoeveel kilometers mag ik per dag rijden?",
@@ -543,16 +584,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
         p(t("Online boekingen zijn ingesteld op een "), b("minimum van 3 dagen"), t(".")),
         p(t("Kortere huurperiodes kunnen soms wel tegen een hoger tarief, maar daarvoor moet je Aloha Car Rental direct bellen of appen.")),
       ],
-    },
-    {
-      id: "last-minute-rules",
-      question: "Kan ik een last-minute boeking online maken?",
-      keywords: ["last minute", "zelfde dag", "spoedboeking", "24 uur"],
-      blocks: [
-        p(t("Dat hangt af van de actieve boekingsregels van Aloha Car Rental.")),
-        p(t("Als je pickup binnen het ingestelde last-minute venster valt, kan de website een extra percentage toevoegen of vereisen dat medewerkers de boeking rechtstreeks verwerken.")),
-      ],
-    },
+    },    
     {
       id: "partner-rentals",
       question: "Regelen jullie soms huur met partner-voertuigen?",
@@ -573,6 +605,39 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
     },
   ],
   es: [
+    {
+      id: "daily-cruise-ship",
+      question: "¿Ofrecen alquileres diarios para pasajeros de cruceros?",
+      keywords: ["crucero", "diario", "pasajeros", "cruise", "día"],
+      blocks: [
+        p(t("Sí.")),
+        p(t("Ofrecemos alquileres diarios para huéspedes que llegan en crucero.")),
+        p(t("Por favor contacte por WhatsApp al +599 785 5999 o por email a booking@alohacarrentalbonaire.com.")),
+        p(t("Nuestro equipo te ayudará con disponibilidad, precios y tu reserva.")),
+      ],
+    },
+    {
+      id: "last-minute-daily",
+      question: "¿Puedo hacer una reserva last-minute o diaria en línea?",
+      keywords: ["last minute", "diario", "mismo día", "reserva urgente"],
+      blocks: [
+        p(t("No.")),
+        p(t("Nuestro sistema de reservas en línea requiere un período mínimo de alquiler de 3 días.")),
+        p(t("Para reservas last-minute o diarias, por favor contacta por WhatsApp al +599 785 5999 o por email a booking@alohacarrentalbonaire.com.")),
+        p(t("Estaremos encantados de ayudarte con tu reserva.")),
+      ],
+    },
+    {
+      id: "pricing-includes",
+      question: "¿Los precios de alquiler incluyen impuestos y seguro?",
+      keywords: ["impuestos", "incluido", "seguro", "precio"],
+      blocks: [
+        p(t("Sí. Todos los precios cotizados ya incluyen los impuestos aplicables.")),
+        p(t("La cobertura de seguro básica está incluida según el paquete de alquiler seleccionado.")),
+        p(t("Coberturas opcionales y extras pueden estar disponibles por protección adicional durante tu viaje.")),
+        p(t("Por favor revisa el resumen del alquiler o contáctanos si tienes preguntas antes de confirmar tu reserva.")),
+      ],
+    },
     {
       id: "terms-priority",
       question: "¿Estas respuestas del FAQ reemplazan los términos y condiciones de alquiler?",
@@ -805,16 +870,7 @@ const rentalFaqByLocale: Record<FaqLocale, FaqEntry[]> = {
         p(t("Las reservas en línea están configuradas para un "), b("mínimo de 3 días"), t(".")),
         p(t("Los alquileres más cortos pueden ser posibles con una tarifa premium, pero debe contactar directamente a Aloha Car Rental por teléfono o WhatsApp.")),
       ],
-    },
-    {
-      id: "last-minute-rules",
-      question: "¿Puedo hacer una reserva de última hora en línea?",
-      keywords: ["última hora", "mismo día", "reserva urgente", "24 horas"],
-      blocks: [
-        p(t("Depende de las reglas activas de reserva de Aloha Car Rental.")),
-        p(t("Si la recogida cae dentro de la ventana configurada de última hora, el sitio puede añadir un porcentaje extra o requerir que el personal gestione la reserva directamente.")),
-      ],
-    },
+    },    
     {
       id: "partner-rentals",
       question: "¿A veces gestionan alquileres con vehículos de socios?",

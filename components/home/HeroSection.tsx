@@ -203,6 +203,9 @@ export default function HeroSection({ locations }: HeroSectionProps) {
               >
                 {t("booking.searchAvailability")}
               </Button>
+              <p className="mt-2 text-xs text-[hsl(var(--foreground)/0.6)]">
+                {t("booking.minimumNotice")}
+              </p>
             </div>
           </div>
         </div>

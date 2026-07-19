@@ -79,6 +79,7 @@ export function BookingWizard({
   termsPdfUrl,
   bookingSource = "public",
   initialData,
+  showHeader = true,
 }: {
   locale: string;
   locations: { id: string; name: string; code?: string | null; address?: string | null; latitude?: number | null; longitude?: number | null }[];
@@ -98,6 +99,7 @@ export function BookingWizard({
   bookingRuleSettings: BookingRuleSettings;
   termsPdfUrl: string;
   bookingSource?: "public" | "admin";
+  showHeader?: boolean;
   initialData?: BookingWizardInitialData;
 }) {
   const t = useTranslations();
@@ -248,10 +250,12 @@ export function BookingWizard({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <Card className="overflow-hidden rounded-[2rem] border-[#efe7df] bg-white p-6 shadow-[0_30px_80px_-50px_rgba(0,0,0,0.18)] sm:p-8">
-          <div className="mb-6 text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#FF912C]">{t("nav.booking")}</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#111111] sm:text-4xl">{t("booking.title")}</h1>
-          </div>
+          {showHeader && (
+            <div className="mb-6 text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#FF912C]">{t("nav.booking")}</p>
+              <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[#111111] sm:text-4xl">{t("booking.title")}</h1>
+            </div>
+          )}
 
           {renderStepIndicator()}
 

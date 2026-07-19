@@ -20,36 +20,33 @@ export const revalidate = 0;
 
 const bookCopy = {
   en: {
-    eyebrow: "Aloha booking",
-    title: "Reserve your Bonaire vehicle in a few clear steps",
-    description: "The premium layout is new, but the same production booking rules, validation, and submission logic remain intact.",
-    asideTitle: "Why guests book here",
+    eyebrow: "ALOHA BOOKING",
+    title: "Reserve Your Local Island Ride",
+    description: "Book your vehicle in just a few simple steps and get ready to explore Bonaire with confidence.",
+    asideTitle: "Before You Book",
     asidePoints: [
-      "Secure your travel dates early",
-      "Upload documents before arrival",
-      "Review pricing before submission",
+      "Online bookings require a minimum 3-day rental.",
+      "Last-minute or daily rentals? Contact us via WhatsApp or email.",
     ],
   },
   es: {
-    eyebrow: "Reservas Aloha",
-    title: "Reserva tu vehiculo en Bonaire en pocos pasos",
-    description: "La interfaz es nueva, pero la logica real de validacion y reserva sigue igual.",
-    asideTitle: "Por que reservar aqui",
+    eyebrow: "ALOHA BOOKING",
+    title: "Reserve Your Local Island Ride",
+    description: "Book your vehicle in just a few simple steps and get ready to explore Bonaire with confidence.",
+    asideTitle: "Before You Book",
     asidePoints: [
-      "Asegura tus fechas con anticipacion",
-      "Sube documentos antes de llegar",
-      "Revisa el precio antes de enviar",
+      "Online bookings require a minimum 3-day rental.",
+      "Last-minute or daily rentals? Contact us via WhatsApp or email.",
     ],
   },
   nl: {
-    eyebrow: "Aloha boeking",
-    title: "Reserveer je voertuig op Bonaire in een paar duidelijke stappen",
-    description: "De uitstraling is vernieuwd, maar dezelfde productie-logica voor boeken en valideren blijft actief.",
-    asideTitle: "Waarom hier boeken",
+    eyebrow: "ALOHA BOOKING",
+    title: "Reserve Your Local Island Ride",
+    description: "Book your vehicle in just a few simple steps and get ready to explore Bonaire with confidence.",
+    asideTitle: "Before You Book",
     asidePoints: [
-      "Leg je reisdata vroeg vast",
-      "Upload documenten voor aankomst",
-      "Controleer prijzen voor verzending",
+      "Online bookings require a minimum 3-day rental.",
+      "Last-minute or daily rentals? Contact us via WhatsApp or email.",
     ],
   },
 } as const;
@@ -183,6 +180,7 @@ export default async function BookingPage({
             vehicleRatesIncludeTax={vehicleRatesIncludeTax}
             bookingRuleSettings={bookingRules}
             termsPdfUrl={localizedTermsPdfUrl}
+            showHeader={false}
             initialData={{
               startDate: startDate ? parseLaPazDateInput(startDate) : null,
               endDate: endDate ? parseLaPazDateInput(endDate) : null,

@@ -602,7 +602,7 @@
     }
   },
   "booking": {
-    "title": "Book a Vehicle",
+    "title": "Reserve Your Local Island Ride",
     "customerName": "Full Name",
     "customerEmail": "Email Address",
     "customerPhone": "Phone Number",
@@ -632,6 +632,7 @@
     "selectLocation": "Select location",
     "selectDateRange": "Select date range",
     "searchAvailability": "Search Availability",
+    "minimumNotice": "Minimum 3-day rental. For daily or last-minute rentals, please contact us.",
     "selectCategory": "Select Category",
     "category": "Category",
     "available": "Available",

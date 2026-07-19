@@ -602,7 +602,7 @@
     }
   },
   "booking": {
-    "title": "Voertuig Reserveren",
+    "title": "Reserve Your Local Island Ride",
     "customerName": "Volledige Naam",
     "customerEmail": "E-mailadres",
     "customerPhone": "Telefoonnummer",
@@ -632,6 +632,7 @@
     "selectLocation": "Selecteer locatie",
     "selectDateRange": "Selecteer datumbereik",
     "searchAvailability": "Beschikbaarheid Zoeken",
+      "minimumNotice": "Minimum 3-daagse huur. Voor dagelijkse of last-minute verhuur, neem contact met ons op.",
     "selectCategory": "Selecteer Categorie",
     "category": "Categorie",
     "available": "Beschikbaar",
