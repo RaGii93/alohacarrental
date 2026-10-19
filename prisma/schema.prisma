@@ -455,6 +455,7 @@ model VehicleCategoryFeature {
 }
 
 model Booking {
+  emailPreference     BookingEmailPreference?
   id                  String    @id @default(cuid())
   categoryId          String
   category            VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -858,4 +859,10 @@ model RentalAgreementSignature {
 
   @@index([rentalAgreementId])
   @@index([signerRole])
+}
+
+model BookingEmailPreference {
+  bookingId String  @id
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  locale    String  @default("en")
 }

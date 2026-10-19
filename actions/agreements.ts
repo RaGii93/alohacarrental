@@ -10,6 +10,8 @@ import {
 } from "@/lib/agreements";
 import { db } from "@/lib/db";
 import type { AgreementSignerRole } from "@prisma/client";
+import { getCustomerEmailContent, getEmailLabels } from "@/lib/email-locale";
+import { resolveBookingEmailLocale } from "@/lib/booking-email-locale";
 
 export async function generateRentalAgreementAction(locale: string, bookingId: string) {
   await requireAdminSection(locale, "bookings");
@@ -59,6 +61,9 @@ export async function emailAgreementToCustomerAction(locale: string, agreementId
     include: {
       booking: {
         select: {
+          id: true,
+          startDate: true,
+          endDate: true,
           customerName: true,
           customerEmail: true,
           bookingCode: true,
@@ -71,23 +76,32 @@ export async function emailAgreementToCustomerAction(locale: string, agreementId
   const pdfUrl = agreement.signedPdfUrl || agreement.pdfUrl;
   if (!pdfUrl) return { success: false as const, error: "No PDF available to email" };
 
-  const { sendEmail } = await import("@/lib/email");
-  const { getTenantConfig } = await import("@/lib/tenant");
-  const tenantConfig = await getTenantConfig();
-
-  await sendEmail({
-    to: agreement.booking.customerEmail,
-    subject: `Your Rental Agreement — ${agreement.agreementNumber}`,
-    html: `
-      <p>Dear ${agreement.booking.customerName},</p>
-      <p>Please find your rental agreement attached for booking <strong>${agreement.booking.bookingCode}</strong>.</p>
-      <p>Agreement number: <strong>${agreement.agreementNumber}</strong></p>
-      <p>You can download your agreement here:<br/>
-        <a href="${pdfUrl}">${pdfUrl}</a>
-      </p>
-      <p>Thank you for choosing ${tenantConfig.tenantName}.</p>
-    `,
+  const { sendEmail, bookingEmailHtml } = await import("@/lib/email");
+  const { getTermsEmailAttachment } = await import("@/lib/terms");
+  locale = await resolveBookingEmailLocale(agreement.booking.id, locale);
+  const content = getCustomerEmailContent("agreement", locale, {
+    bookingCode: agreement.booking.bookingCode,
+    agreementNumber: agreement.agreementNumber,
   });
+  const terms = await getTermsEmailAttachment(locale);
+  const result = await sendEmail({
+    to: agreement.booking.customerEmail,
+    subject: `${content.subject} — ${agreement.agreementNumber}`,
+    html: await bookingEmailHtml({
+      ...content,
+      locale,
+      customerName: agreement.booking.customerName,
+      bookingCode: agreement.booking.bookingCode,
+      startDate: agreement.booking.startDate,
+      endDate: agreement.booking.endDate,
+      invoiceUrl: pdfUrl,
+      documentLabel: getEmailLabels(locale).agreement,
+      termsUrl: terms.url,
+      showFinancialSummary: false,
+    }),
+    attachments: terms.attachment ? [terms.attachment] : [],
+  });
+  if (!result.success) return { success: false as const, error: result.error || "Failed to send agreement email" };
 
   return { success: true as const };
 }

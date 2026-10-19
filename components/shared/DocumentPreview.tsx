@@ -40,11 +40,11 @@ export function DocumentPreview({ url, title, openLabel, emptyLabel }: DocumentP
           />
         )}
       </div>
-      <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-        <Button type="button" variant="outline" size="sm">
+      <Button asChild variant="outline" size="sm">
+        <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
           {openLabel}
-        </Button>
-      </a>
+        </a>
+      </Button>
     </div>
   );
 }

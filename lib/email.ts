@@ -1,7 +1,8 @@
 import { getTenantConfig, tenantThemeTokenToHex } from "@/lib/tenant";
-import { formatDateTime } from "@/lib/datetime";
+import { formatEmailDateTime, formatEmailText, getEmailLabels, normalizeEmailLocale } from "@/lib/email-locale";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { getBlobProxyUrl, toAbsoluteAppUrl } from "@/lib/blob";
 
 type SendEmailParams = {
   to: string | string[];
@@ -93,6 +94,7 @@ export async function sendEmail(params: SendEmailParams): Promise<{ success: boo
 }
 
 export async function bookingEmailHtml(input: {
+  locale?: string;
   title: string;
   customerName: string;
   bookingCode: string;
@@ -123,9 +125,11 @@ export async function bookingEmailHtml(input: {
   const primaryForegroundHex = tenantThemeTokenToHex(tenant.theme.primaryForeground);
   const accentHex = tenantThemeTokenToHex(tenant.theme.accent);
   const accentForegroundHex = tenantThemeTokenToHex(tenant.theme.accentForeground);
-  const documentLabel = input.documentLabel || "Billing document";
-  const pickup = formatDateTime(input.startDate);
-  const dropoff = formatDateTime(input.endDate);
+  const locale = normalizeEmailLocale(input.locale);
+  const copy = getEmailLabels(locale);
+  const documentLabel = input.documentLabel || copy.billingDocument;
+  const pickup = formatEmailDateTime(input.startDate, locale);
+  const dropoff = formatEmailDateTime(input.endDate, locale);
   const showFinancialSummary = input.showFinancialSummary !== false && typeof input.totalAmountCents === "number";
   const amount = showFinancialSummary
     ? `${tenant.currency} ${(input.totalAmountCents! / 100).toFixed(2)}`
@@ -163,11 +167,14 @@ export async function bookingEmailHtml(input: {
   const safeCustomerPhone = escapeHtml(input.customerPhone || "-");
   const safePickupLocation = escapeHtml(input.pickupLocation || "-");
   const safeDropoffLocation = escapeHtml(input.dropoffLocation || "-");
-  const safeIntroText = escapeHtml(input.introText || `Thank you for choosing ${tenant.tenantName}. Below is your booking summary.`);
-  const safeOutroText = escapeHtml(input.outroText || `If you need assistance, contact us at ${tenant.email || "-"}.`);
-  const safeInvoiceUrl = input.invoiceUrl ? escapeHtml(input.invoiceUrl) : null;
-  const safeTermsUrl = input.termsUrl ? escapeHtml(input.termsUrl) : null;
-  const safeTermsLabel = escapeHtml(input.termsLabel || "Terms and Conditions");
+  const safeIntroText = escapeHtml(input.introText || formatEmailText(copy.intro, { tenantName: tenant.tenantName }));
+  const safeOutroText = escapeHtml(input.outroText || formatEmailText(copy.outro, { email: tenant.email || "-" }));
+  // Private billing files must be served by the app, and email links need an origin.
+  const invoiceUrl = getBlobProxyUrl(input.invoiceUrl, { download: true, absolute: true });
+  const termsUrl = toAbsoluteAppUrl(input.termsUrl);
+  const safeInvoiceUrl = invoiceUrl ? escapeHtml(invoiceUrl) : null;
+  const safeTermsUrl = termsUrl ? escapeHtml(termsUrl) : null;
+  const safeTermsLabel = escapeHtml(input.termsLabel || copy.terms);
   const accentSoft = accentHex;
   const accentBorder = primaryHex;
   const neutralBorder = accentHex;
@@ -181,7 +188,7 @@ export async function bookingEmailHtml(input: {
     ? (input.extras || [])
     .map((extra) => `
       <tr>
-        <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${neutralBorder};">Extra</td>
+        <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${neutralBorder};">${copy.extra}</td>
         <td style="padding:10px 12px;font-size:13px;color:#111111;border-top:1px solid ${neutralBorder};">${escapeHtml(`${extra.name} x${extra.quantity}`)} - ${escapeHtml(`${tenant.currency} ${(extra.lineTotal / 100).toFixed(2)}`)}</td>
       </tr>
     `)
@@ -189,7 +196,7 @@ export async function bookingEmailHtml(input: {
     : "";
 
   return `
-    <div style="margin:0;background:${luxurySurface};padding:28px 14px;font-family:Arial,Helvetica,sans-serif;color:#111111;" class="email-shell">
+    <div lang="${locale}" style="margin:0;background:${luxurySurface};padding:28px 14px;font-family:Arial,Helvetica,sans-serif;color:#111111;" class="email-shell">
       <style>
         @media only screen and (max-width: 620px) {
           .email-shell { padding:16px 8px !important; }
@@ -233,7 +240,7 @@ export async function bookingEmailHtml(input: {
         </div>
 
         <div style="padding:24px 26px;" class="email-section">
-          <p style="margin:0 0 12px 0;font-size:15px;">Hello ${safeName},</p>
+          <p style="margin:0 0 12px 0;font-size:15px;">${copy.hello} ${safeName},</p>
           <p style="margin:0 0 18px 0;font-size:14px;color:${neutralText};">
             ${safeIntroText}
           </p>
@@ -242,18 +249,18 @@ export async function bookingEmailHtml(input: {
             <tr>
               <td style="width:50%;vertical-align:top;padding-right:6px;" class="email-stack-left">
                 <div style="border:1px solid ${luxuryBorder};border-radius:14px;overflow:hidden;background:#ffffff;">
-                  <div style="padding:12px 14px;background:${primaryHex};color:${primaryForegroundHex};font-size:12px;font-weight:700;letter-spacing:.06em;">CUSTOMER INFORMATION</div>
+                  <div style="padding:12px 14px;background:${primaryHex};color:${primaryForegroundHex};font-size:12px;font-weight:700;letter-spacing:.06em;">${copy.customerInformation}</div>
                   <table role="presentation" style="width:100%;border-collapse:collapse;">
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};width:40%;">Customer</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};width:40%;">${copy.customer}</td>
                       <td style="padding:10px 12px;font-size:13px;font-weight:700;color:#111111;" class="email-word-break">${safeName}</td>
                     </tr>
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">Email</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">${copy.email}</td>
                       <td style="padding:10px 12px;font-size:13px;color:#111111;border-top:1px solid ${luxuryBorder};" class="email-word-break">${safeCustomerEmail}</td>
                     </tr>
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">Phone</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">${copy.phone}</td>
                       <td style="padding:10px 12px;font-size:13px;color:#111111;border-top:1px solid ${luxuryBorder};" class="email-word-break">${safeCustomerPhone}</td>
                     </tr>
                   </table>
@@ -261,33 +268,33 @@ export async function bookingEmailHtml(input: {
               </td>
               <td style="width:50%;vertical-align:top;padding-left:6px;" class="email-stack-right">
                 <div style="border:1px solid ${luxuryBorder};border-radius:14px;overflow:hidden;background:#ffffff;">
-                  <div style="padding:12px 14px;background:${primaryHex};color:${primaryForegroundHex};font-size:12px;font-weight:700;letter-spacing:.06em;">BOOKING INFORMATION</div>
+                  <div style="padding:12px 14px;background:${primaryHex};color:${primaryForegroundHex};font-size:12px;font-weight:700;letter-spacing:.06em;">${copy.bookingInformation}</div>
                   <table role="presentation" style="width:100%;border-collapse:collapse;">
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};width:42%;">Reference</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};width:42%;">${copy.reference}</td>
                       <td style="padding:10px 12px;font-size:13px;font-weight:700;color:#111111;" class="email-word-break">${safeBookingCode}</td>
                     </tr>
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">Pickup</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">${copy.pickup}</td>
                       <td style="padding:10px 12px;font-size:13px;color:#111111;border-top:1px solid ${luxuryBorder};" class="email-word-break">${safePickup}</td>
                     </tr>
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">Dropoff</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">${copy.dropoff}</td>
                       <td style="padding:10px 12px;font-size:13px;color:#111111;border-top:1px solid ${luxuryBorder};" class="email-word-break">${safeDropoff}</td>
                     </tr>
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">Pickup location</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">${copy.pickupLocation}</td>
                       <td style="padding:10px 12px;font-size:13px;color:#111111;border-top:1px solid ${luxuryBorder};" class="email-word-break">${safePickupLocation}</td>
                     </tr>
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">Dropoff location</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">${copy.dropoffLocation}</td>
                       <td style="padding:10px 12px;font-size:13px;color:#111111;border-top:1px solid ${luxuryBorder};" class="email-word-break">${safeDropoffLocation}</td>
                     </tr>
                     ${
                       showFinancialSummary
                         ? `
                     <tr>
-                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">Total Amount</td>
+                      <td style="padding:10px 12px;font-size:13px;color:${neutralText};border-top:1px solid ${luxuryBorder};">${copy.total}</td>
                       <td style="padding:10px 12px;font-size:15px;font-weight:700;color:#111111;border-top:1px solid ${luxuryBorder};" class="email-word-break">${safeAmount}</td>
                     </tr>
                     `
@@ -303,7 +310,7 @@ export async function bookingEmailHtml(input: {
             extrasRows
               ? `
           <div style="margin-top:6px;border:1px solid ${luxuryBorder};border-radius:14px;overflow:hidden;background:#ffffff;">
-            <div style="padding:12px 14px;background:${luxurySurface};color:${sectionTitle};font-size:12px;font-weight:700;letter-spacing:.06em;">BOOKING DETAILS</div>
+            <div style="padding:12px 14px;background:${luxurySurface};color:${sectionTitle};font-size:12px;font-weight:700;letter-spacing:.06em;">${copy.details}</div>
             <table role="presentation" style="width:100%;border-collapse:collapse;">
               ${extrasRows}
             </table>
@@ -317,7 +324,9 @@ export async function bookingEmailHtml(input: {
               ? `
           <div style="margin-top:18px;padding:16px;border:1px solid ${accentBorder};background:${accentSoft};border-radius:14px;">
             <p style="margin:0 0 10px 0;font-size:13px;color:${accentForegroundHex};font-weight:600;">${safeDocumentLabel}</p>
-            <a href="${safeInvoiceUrl}" style="display:inline-block;background:${primaryHex};color:${primaryForegroundHex};text-decoration:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;" class="email-cta">Open ${safeDocumentLabel}</a>
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td bgcolor="${primaryHex}" style="background-color:${primaryHex};border-radius:8px;text-align:center;">
+              <a href="${safeInvoiceUrl}" target="_blank" style="display:inline-block;background-color:${primaryHex};color:${primaryForegroundHex} !important;text-decoration:none;border:1px solid ${primaryHex};padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;mso-padding-alt:0;" class="email-cta"><span style="color:${primaryForegroundHex};">${copy.open} ${safeDocumentLabel}</span></a>
+            </td></tr></table>
           </div>
           `
               : ""
@@ -328,7 +337,9 @@ export async function bookingEmailHtml(input: {
               ? `
           <div style="margin-top:18px;padding:14px;border:1px solid ${luxuryBorder};background:${neutralSurface};border-radius:14px;">
             <p style="margin:0 0 10px 0;font-size:13px;color:${neutralText};font-weight:600;">${safeTermsLabel}</p>
-            <a href="${safeTermsUrl}" style="display:inline-block;background:${accentHex};color:${accentForegroundHex};text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid ${luxuryBorder};font-size:13px;font-weight:600;" class="email-cta">Open ${safeTermsLabel}</a>
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td bgcolor="${accentHex}" style="background-color:${accentHex};border-radius:8px;text-align:center;">
+              <a href="${safeTermsUrl}" target="_blank" style="display:inline-block;background-color:${accentHex};color:${accentForegroundHex} !important;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid ${luxuryBorder};font-size:13px;font-weight:600;mso-padding-alt:0;" class="email-cta"><span style="color:${accentForegroundHex};">${copy.open} ${safeTermsLabel}</span></a>
+            </td></tr></table>
           </div>
           `
               : ""
@@ -340,7 +351,7 @@ export async function bookingEmailHtml(input: {
         </div>
 
         <div style="padding:16px 26px;background:${luxurySurface};border-top:1px solid ${luxuryBorder};" class="email-footer">
-          <p style="margin:0;font-size:12px;color:${neutralText};">This is a no-reply mailbox. Please do not reply to this email.</p>
+          <p style="margin:0;font-size:12px;color:${neutralText};">${copy.noReply}</p>
           <p style="margin:8px 0 0 0;font-size:12px;color:${neutralText};" class="email-word-break">${safeAddress}</p>
           <p style="margin:4px 0 0 0;font-size:12px;color:${neutralText};" class="email-word-break">${safeEmail} · ${safePhone}</p>
         </div>

@@ -7,6 +7,8 @@ import { isLicenseActive } from "@/lib/license";
 import { uploadBuffer, uploadFile } from "@/lib/uploads";
 import { adminCategoryBookingUpdateSchemaRefined, categoryBookingFormSchemaRefined } from "@/lib/validators";
 import { bookingEmailHtml, sendEmail } from "@/lib/email";
+import { getCustomerEmailContent, getEmailLabels } from "@/lib/email-locale";
+import { resolveBookingEmailLocale } from "@/lib/booking-email-locale";
 import { getTenantConfig } from "@/lib/tenant";
 import { generateInvoicePDF } from "@/lib/pdf";
 import { getBlobProxyUrl } from "@/lib/blob";
@@ -35,9 +37,11 @@ import { parseLaPazDateTimeInput } from "@/lib/timezone";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
-async function getCustomerTermsEmailData() {
-  const terms = await getTermsEmailAttachment();
+async function getCustomerTermsEmailData(locale: string, bookingId: string) {
+  locale = await resolveBookingEmailLocale(bookingId, locale);
+  const terms = await getTermsEmailAttachment(locale);
   return {
+    locale,
     termsUrl: terms.url,
     attachments: terms.attachment ? [terms.attachment] : [],
   };
@@ -80,29 +84,14 @@ async function queuePaymentTransferForActiveProvider(bookingId: string) {
 function buildDeclineEmailContent(params: {
   reason?: string | null;
   automatic?: boolean;
+  locale?: string;
 }) {
-  const trimmedReason = String(params.reason || "").trim();
-
-  if (params.automatic) {
-    return {
-      subject: "We’re Sorry, Your Booking Request Has Expired",
-      title: "We’re sorry, your booking request has expired",
-      introText:
-        "We sincerely apologize, but your booking request was not completed before the reservation hold period ended, so it has now been declined automatically.",
-      outroText:
-        "We understand this may be disappointing. If you would still like to reserve a vehicle, please contact us and we will gladly help you arrange a new booking as quickly as possible.",
-    };
+  const content = getCustomerEmailContent(params.automatic ? "expired" : "declined", params.locale);
+  const reason = String(params.reason || "").trim();
+  if (reason && !params.automatic) {
+    content.outroText = `${getCustomerEmailContent("reason", params.locale, { reason }).outroText} ${content.outroText}`;
   }
-
-  return {
-    subject: "We’re Sorry, We’re Unable to Approve Your Booking",
-    title: "We’re sorry, we’re unable to approve your booking",
-    introText:
-      "We sincerely apologize, but we’re unable to approve your booking request at this time.",
-    outroText: trimmedReason
-      ? `Reason provided: ${trimmedReason} If you would like help finding another option or making a new reservation, please contact us and our team will be happy to assist.`
-      : "If you would like help finding another option or making a new reservation, please contact us and our team will be happy to assist.",
-  };
+  return content;
 }
 
 type InspectionStageValue = "PICKUP" | "RETURN";
@@ -148,7 +137,7 @@ async function getBookingOperationalState(client: typeof db, bookingId: string) 
   return rows[0] || { deliveredAt: null, returnedAt: null, actualReturnedAt: null };
 }
 
-async function sendBookingConfirmationEmail(bookingId: string) {
+async function sendBookingConfirmationEmail(bookingId: string, locale: string) {
   const booking = await db.booking.findUnique({
     where: { id: bookingId },
     select: {
@@ -167,12 +156,13 @@ async function sendBookingConfirmationEmail(bookingId: string) {
 
   try {
     const rentalAgreement = await buildAndUploadBookingDocument(bookingId, "RENTAL_AGREEMENT");
-    const termsEmailData = await getCustomerTermsEmailData();
+    const termsEmailData = await getCustomerTermsEmailData(locale, bookingId);
     await sendEmail({
       to: booking.customerEmail,
-      subject: `Booking Confirmed - ${booking.bookingCode}`,
+      subject: `${getCustomerEmailContent("confirmed", termsEmailData.locale).subject} - ${booking.bookingCode}`,
       html: await bookingEmailHtml({
-        title: "Your booking has been confirmed",
+        ...getCustomerEmailContent("confirmed", termsEmailData.locale),
+        locale: termsEmailData.locale,
         customerName: booking.customerName,
         bookingCode: booking.bookingCode,
         startDate: booking.startDate,
@@ -205,7 +195,7 @@ export async function sendBookingConfirmationEmailAction(bookingId: string, loca
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
 
-    const result = await sendBookingConfirmationEmail(bookingId);
+    const result = await sendBookingConfirmationEmail(bookingId, locale);
     if (!result.success) return result;
 
     await logAdminAction({
@@ -438,11 +428,13 @@ export async function cancelExpiredHolds() {
   await Promise.all(
     expiredBookings.map(async (booking) => {
       try {
-        const emailContent = buildDeclineEmailContent({ automatic: true });
+        const locale = await resolveBookingEmailLocale(booking.id);
+        const emailContent = buildDeclineEmailContent({ automatic: true, locale });
         await sendEmail({
           to: booking.customerEmail,
           subject: `${emailContent.subject} - ${booking.bookingCode}`,
           html: await bookingEmailHtml({
+            locale,
             title: emailContent.title,
             customerName: booking.customerName,
             bookingCode: booking.bookingCode,
@@ -503,7 +495,7 @@ export async function confirmBookingAction(bookingId: string, locale: string) {
       },
     });
 
-    await sendBookingConfirmationEmail(bookingId);
+    await sendBookingConfirmationEmail(bookingId, locale);
 
     // Automation: booking_confirmed event
     triggerAutomationEvent("booking_confirmed", bookingId).catch(() => {});
@@ -548,11 +540,13 @@ export async function declineBookingAction(
     });
 
     try {
-      const emailContent = buildDeclineEmailContent({ reason });
+      locale = await resolveBookingEmailLocale(bookingId, locale);
+      const emailContent = buildDeclineEmailContent({ reason, locale });
       await sendEmail({
         to: booking.customerEmail,
         subject: `${emailContent.subject} - ${booking.bookingCode}`,
         html: await bookingEmailHtml({
+          locale,
           title: emailContent.title,
           customerName: booking.customerName,
           bookingCode: booking.bookingCode,
@@ -766,12 +760,13 @@ export async function sendInvoiceEstimateAction(
     const sendEmailToCustomer = options?.sendEmailToCustomer !== false;
     if (sendEmailToCustomer) {
       try {
-        const termsEmailData = await getCustomerTermsEmailData();
+        const termsEmailData = await getCustomerTermsEmailData(locale, bookingId);
         await sendEmail({
           to: updated.customerEmail,
-          subject: `Invoice for Payment - ${updated.bookingCode}`,
+          subject: `${getCustomerEmailContent("invoice", termsEmailData.locale).subject} - ${updated.bookingCode}`,
           html: await bookingEmailHtml({
-            title: "Your invoice is ready for payment",
+            ...getCustomerEmailContent("invoice", termsEmailData.locale),
+            locale: termsEmailData.locale,
             customerName: updated.customerName,
             bookingCode: updated.bookingCode,
             startDate: updated.startDate,
@@ -779,7 +774,7 @@ export async function sendInvoiceEstimateAction(
             totalAmountCents: updated.totalAmount,
             extras: generated.extras,
             invoiceUrl: generated.invoiceUrl,
-            documentLabel: "Invoice",
+            documentLabel: getEmailLabels(termsEmailData.locale).invoice,
             termsUrl: termsEmailData.termsUrl,
           }),
           attachments: [
@@ -825,13 +820,14 @@ export async function sendBillingDocumentEmailAction(bookingId: string, locale: 
 
     const billingDocumentUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true }) || booking.invoiceUrl;
     const { extras: adjustmentExtras } = await loadBookingAdjustments(bookingId);
-    const termsEmailData = await getCustomerTermsEmailData();
+    const termsEmailData = await getCustomerTermsEmailData(locale, bookingId);
 
     const mailResult = await sendEmail({
       to: booking.customerEmail,
-      subject: `Billing Document - ${booking.bookingCode}`,
+      subject: `${getCustomerEmailContent("billing", termsEmailData.locale).subject} - ${booking.bookingCode}`,
       html: await bookingEmailHtml({
-        title: "Your billing document is ready",
+        ...getCustomerEmailContent("billing", termsEmailData.locale),
+        locale: termsEmailData.locale,
         customerName: booking.customerName,
         bookingCode: booking.bookingCode,
         startDate: booking.startDate,
@@ -843,7 +839,7 @@ export async function sendBillingDocumentEmailAction(bookingId: string, locale: 
           lineTotal: line.lineTotal,
         })),
         invoiceUrl: billingDocumentUrl,
-        documentLabel: "Billing document",
+        documentLabel: getEmailLabels(termsEmailData.locale).billingDocument,
         termsUrl: termsEmailData.termsUrl,
       }),
       attachments: termsEmailData.attachments,
@@ -933,12 +929,13 @@ export async function createSalesReceiptAction(
     });
 
     try {
-      const termsEmailData = await getCustomerTermsEmailData();
+      const termsEmailData = await getCustomerTermsEmailData(locale, bookingId);
       await sendEmail({
         to: updated.customerEmail,
-        subject: `Sales Receipt - ${updated.bookingCode}`,
+        subject: `${getCustomerEmailContent("receipt", termsEmailData.locale).subject} - ${updated.bookingCode}`,
         html: await bookingEmailHtml({
-          title: "Payment received. Your sales receipt is ready",
+          ...getCustomerEmailContent("receipt", termsEmailData.locale),
+          locale: termsEmailData.locale,
           customerName: updated.customerName,
           bookingCode: updated.bookingCode,
           startDate: updated.startDate,
@@ -946,7 +943,7 @@ export async function createSalesReceiptAction(
           totalAmountCents: updated.totalAmount,
           extras: generated.extras,
           invoiceUrl: generated.invoiceUrl,
-          documentLabel: "Sales receipt",
+          documentLabel: getEmailLabels(termsEmailData.locale).salesReceipt,
           termsUrl: termsEmailData.termsUrl,
         }),
         attachments: [
@@ -1012,12 +1009,13 @@ export async function receiveInvoicePaymentAction(bookingId: string, locale: str
     });
 
     try {
-      const termsEmailData = await getCustomerTermsEmailData();
+      const termsEmailData = await getCustomerTermsEmailData(locale, bookingId);
       await sendEmail({
         to: updated.customerEmail,
-        subject: `Payment Received - ${updated.bookingCode}`,
+        subject: `${getCustomerEmailContent("payment", termsEmailData.locale).subject} - ${updated.bookingCode}`,
         html: await bookingEmailHtml({
-          title: "Payment received for your invoice",
+          ...getCustomerEmailContent("payment", termsEmailData.locale),
+          locale: termsEmailData.locale,
           customerName: updated.customerName,
           bookingCode: updated.bookingCode,
           startDate: updated.startDate,
@@ -1029,7 +1027,7 @@ export async function receiveInvoicePaymentAction(bookingId: string, locale: str
             lineTotal: line.lineTotal,
           })),
           invoiceUrl: updated.invoiceUrl,
-          documentLabel: "Invoice",
+          documentLabel: getEmailLabels(termsEmailData.locale).invoice,
           termsUrl: termsEmailData.termsUrl,
         }),
         attachments: termsEmailData.attachments,
@@ -2013,11 +2011,11 @@ export async function createCategoryBookingAction(
 
     try {
       const tenant = await getTenantConfig();
-      const subject = `New Booking Created - ${booking.bookingCode}`;
       const createdExtras = await loadBookingAdjustments(booking.id);
-      const termsEmailData = await getCustomerTermsEmailData();
+      const termsEmailData = await getCustomerTermsEmailData(locale, booking.id);
       const customerHtml = await bookingEmailHtml({
-        title: "Booking request received",
+        ...getCustomerEmailContent("created", termsEmailData.locale),
+        locale: termsEmailData.locale,
         customerName: booking.customerName,
         bookingCode: booking.bookingCode,
         startDate: booking.startDate,
@@ -2032,7 +2030,7 @@ export async function createCategoryBookingAction(
       });
       await sendEmail({
         to: booking.customerEmail,
-        subject,
+        subject: `${getCustomerEmailContent("created", termsEmailData.locale).subject} - ${booking.bookingCode}`,
         html: customerHtml,
         attachments: termsEmailData.attachments,
       });
@@ -2353,7 +2351,7 @@ export async function updateCategoryBookingAction(
       if (existing.status !== "CONFIRMED") {
         warning = "Confirmation email skipped because the booking is not confirmed.";
       } else {
-        const confirmationResult = await sendBookingConfirmationEmail(bookingId);
+        const confirmationResult = await sendBookingConfirmationEmail(bookingId, locale);
         if (!confirmationResult.success) {
           return { success: false, error: confirmationResult.error || "Booking updated but confirmation email failed" };
         }

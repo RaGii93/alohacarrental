@@ -3,6 +3,7 @@
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/session";
 import { sendEmail, bookingEmailHtml } from "@/lib/email";
+import { getCustomerEmailContent } from "@/lib/email-locale";
 import { getTenantConfig } from "@/lib/tenant";
 import { getTermsEmailAttachment } from "@/lib/terms";
 import { logAdminAction } from "@/lib/audit";
@@ -147,24 +148,21 @@ export async function createExternalRentalAction(formData: FormData, locale: str
 
     try {
       const tenant = await getTenantConfig();
-      const terms = await getTermsEmailAttachment();
+      const terms = await getTermsEmailAttachment(locale);
       const html = await bookingEmailHtml({
-        title: "Your booking has been confirmed",
+        ...getCustomerEmailContent("partner", locale),
+        locale,
         customerName,
         bookingCode,
         startDate,
         endDate,
         totalAmountCents: incomeAmount,
-        introText:
-          "Your booking has been arranged successfully. We have reserved the requested vehicle for your selected dates and will contact you if anything else is needed before pickup.",
-        outroText:
-          "If you need to update this reservation or have any questions before pickup, please contact us and we will be happy to assist.",
         termsUrl: terms.url,
       });
 
       await sendEmail({
         to: customerEmail,
-        subject: `Booking Confirmed - ${bookingCode}`,
+        subject: `${getCustomerEmailContent("partner", locale).subject} - ${bookingCode}`,
         html,
         attachments: terms.attachment ? [terms.attachment] : [],
       });

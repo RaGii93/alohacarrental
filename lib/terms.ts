@@ -2,9 +2,13 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getTenantConfig } from "./tenant";
 import { getBlobProxyUrl } from "./blob";
+import { getLocalizedTermsPdfUrl } from "./terms-locale";
 
-export async function getTermsPdfUrl(): Promise<string> {
-  return (await getTenantConfig()).termsPdfUrl;
+export async function getTermsPdfUrl(locale?: string): Promise<string> {
+  const sourceUrl = (await getTenantConfig()).termsPdfUrl.trim();
+  // Older tenant settings used this filename, which was replaced by localized PDFs.
+  const fallbackUrl = sourceUrl === "/terms.pdf" ? "/terms-en.pdf" : sourceUrl;
+  return locale ? getLocalizedTermsPdfUrl(locale, fallbackUrl) : fallbackUrl;
 }
 
 function guessTermsFilename(sourceUrl: string) {
@@ -44,7 +48,7 @@ async function tryReadLocalTermsFile(sourceUrl: string) {
   return null;
 }
 
-export async function getTermsEmailAttachment(): Promise<{
+export async function getTermsEmailAttachment(locale?: string): Promise<{
   url: string | null;
   attachment?: {
     filename: string;
@@ -52,7 +56,7 @@ export async function getTermsEmailAttachment(): Promise<{
     contentType: string;
   };
 }> {
-  const sourceUrl = (await getTermsPdfUrl())?.trim();
+  const sourceUrl = (await getTermsPdfUrl(locale))?.trim();
   if (!sourceUrl) return { url: null };
 
   const publicUrl = sourceUrl.startsWith("/")

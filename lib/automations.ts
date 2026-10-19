@@ -11,9 +11,10 @@ import {
 } from "@prisma/client";
 import { db } from "@/lib/db";
 import { sendEmail, bookingEmailHtml } from "@/lib/email";
+import { formatEmailDateTime, getCustomerEmailContent, localizeAutomationEmailConfig } from "@/lib/email-locale";
+import { resolveBookingEmailLocale } from "@/lib/booking-email-locale";
 import { getTenantConfig } from "@/lib/tenant";
 import { createNotification } from "@/lib/notifications";
-import { formatDateTime } from "@/lib/datetime";
 import { startOfLaPazDay, addLaPazDays } from "@/lib/timezone";
 
 // ─── Template variable substitution ──────────────────────────────────────────
@@ -60,13 +61,14 @@ async function getBookingForAutomation(bookingId: string) {
 }
 
 function buildTemplateVars(
-  booking: NonNullable<Awaited<ReturnType<typeof getBookingForAutomation>>>
+  booking: NonNullable<Awaited<ReturnType<typeof getBookingForAutomation>>>,
+  locale = "en"
 ): TemplateVariables {
   return {
     customerName: booking.customerName,
     bookingCode: booking.bookingCode,
-    pickupDate: formatDateTime(booking.startDate),
-    dropoffDate: formatDateTime(booking.endDate),
+    pickupDate: formatEmailDateTime(booking.startDate, locale),
+    dropoffDate: formatEmailDateTime(booking.endDate, locale),
     pickupLocation: booking.pickupLocation ?? undefined,
     dropoffLocation: booking.dropoffLocation ?? undefined,
     amountDue: `$${(booking.totalAmount / 100).toFixed(2)}`,
@@ -121,8 +123,10 @@ async function dispatchSendEmail(params: {
   actionConfig: Record<string, unknown>;
   idempotencyKey: string;
 }) {
-  const { booking, actionConfig, idempotencyKey, ruleId } = params;
-  const vars = buildTemplateVars(booking);
+  const { booking, idempotencyKey, ruleId } = params;
+  const locale = await resolveBookingEmailLocale(booking.id);
+  const actionConfig = localizeAutomationEmailConfig(params.actionConfig, locale);
+  const vars = buildTemplateVars(booking, locale);
 
   const subject = renderTemplate(String(actionConfig.subject ?? ""), vars);
   const bodyTemplate = String(actionConfig.body ?? "");
@@ -131,6 +135,7 @@ async function dispatchSendEmail(params: {
   const introText = renderTemplate(String(actionConfig.introText ?? body), vars);
 
   const html = await bookingEmailHtml({
+    locale,
     title,
     customerName: booking.customerName,
     bookingCode: booking.bookingCode,
@@ -257,15 +262,16 @@ async function dispatchSendReviewRequest(params: {
       ? String(actionConfig.reviewUrl)
       : `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || ""}/review/${booking.bookingCode}`;
 
-  const subject = `How was your experience? - ${tenant.tenantName}`;
+  const locale = await resolveBookingEmailLocale(booking.id);
+  const content = getCustomerEmailContent("review", locale, { reviewUrl });
+  const subject = `${content.subject} - ${tenant.tenantName}`;
   const html = await bookingEmailHtml({
-    title: "How was your rental experience?",
+    ...content,
+    locale,
     customerName: booking.customerName,
     bookingCode: booking.bookingCode,
     startDate: booking.startDate,
     endDate: booking.endDate,
-    introText: `We hope you enjoyed your rental! We'd love to hear your feedback. Please take a moment to leave a review.`,
-    outroText: `<p style="margin:0 0 12px">Leave your review here: <a href="${reviewUrl}" target="_blank" style="color:#0f766e">${reviewUrl}</a></p>`,
     showFinancialSummary: false,
   });
 
