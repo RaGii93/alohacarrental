@@ -1,3 +1,4 @@
+import { getBookingCustomDailyRate } from "@/lib/booking-price";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BookingEditForm } from "@/components/admin/BookingEditForm";
@@ -23,6 +24,7 @@ export default async function BookingEditPage({
   await ensureBookingAdditionalDriversTable();
   await reconcileVehicleRentalStatuses();
 
+  const customDailyRate = await getBookingCustomDailyRate(id);
   const booking = await db.booking.findUnique({
     where: { id },
     select: {
@@ -192,6 +194,7 @@ export default async function BookingEditPage({
           pickupLocationId: booking.pickupLocationId || "",
           dropoffLocationId: booking.dropoffLocationId || "",
           isCruise,
+          customDailyRate,
           additionalDrivers: booking.additionalDrivers.map((driver) => ({
             id: driver.id,
             fullName: driver.fullName,

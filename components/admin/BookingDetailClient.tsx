@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { AlertCircle, Banknote, CalendarClock, CarFront, CheckCircle2, ClipboardCheck, ClipboardX, Copy, FileText, Mail, MapPin, PackagePlus, Receipt, Truck, Undo2, UserRound, Wallet } from "lucide-react";
 import { DocumentPreview } from "@/components/shared/DocumentPreview";
+import { ForceReturnDialog } from "@/components/admin/ForceReturnDialog";
 import { BookingInspectionDialog } from "@/components/admin/BookingInspectionDialog";
 import { SendBillingEmailButton } from "@/components/admin/SendBillingEmailButton";
 import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
@@ -82,6 +83,7 @@ export function BookingDetailClient({
   const [showSalesReceiptDialog, setShowSalesReceiptDialog] = useState(false);
   const [deliverNowForReceipt, setDeliverNowForReceipt] = useState(false);
   const [showPickupInspection, setShowPickupInspection] = useState(false);
+  const [showForceReturn, setShowForceReturn] = useState(false);
   const [showReturnInspection, setShowReturnInspection] = useState(false);
 
   const invoiceDownloadUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true });
@@ -95,6 +97,7 @@ export function BookingDetailClient({
   );
   const effectiveDailyRate = resolveCategoryDailyRate({
     dailyRateCents: booking.category?.dailyRate || 0,
+    customDailyRateCents: booking.customDailyRate,
     cruiseDailyRateCents: booking.category?.cruiseDailyRate,
     bookingSource: "admin",
     isCruise: Boolean(booking.isCruise),
@@ -141,7 +144,7 @@ export function BookingDetailClient({
         ? t("admin.bookings.detail.summaryCards.lifecyclePaid")
         : t("admin.bookings.detail.summaryCards.lifecycleOpen");
   const lifecycleDateLabel = booking.returnedAt
-    ? formatDateTime(booking.returnedAt)
+    ? formatDateTime(booking.actualReturnedAt || booking.returnedAt)
     : booking.deliveredAt
       ? formatDateTime(booking.deliveredAt)
       : booking.paymentReceivedAt
@@ -151,12 +154,12 @@ export function BookingDetailClient({
   const canEdit = (role === "ROOT" || role === "OWNER") && !booking.returnedAt;
   const canConfirm = booking.status === "PENDING";
   const canDecline = booking.status === "PENDING" || booking.status === "CONFIRMED";
-  const canSendInvoice = booking.status === "PENDING" || booking.status === "CONFIRMED";
-  const canCreateSalesReceipt = booking.status === "PENDING" || booking.status === "CONFIRMED";
-  const canReceivePayment = !!booking.invoiceUrl && (!booking.paymentReceivedAt || Boolean(pickupChecklistState?.closeoutPaymentDueAt && !pickupChecklistState?.closeoutPaymentReceivedAt));
-  const canMarkDelivered = !!booking.paymentReceivedAt && !booking.deliveredAt;
+  const canSendInvoice = booking.status === "CONFIRMED";
+  const canCreateSalesReceipt = booking.status === "CONFIRMED";
+  const canReceivePayment = booking.status === "CONFIRMED" && !!booking.invoiceUrl && (!booking.paymentReceivedAt || Boolean(pickupChecklistState?.closeoutPaymentDueAt && !pickupChecklistState?.closeoutPaymentReceivedAt));
+  const canMarkDelivered = booking.status === "CONFIRMED" && !!booking.paymentReceivedAt && !booking.deliveredAt;
   const canOpenPickupCheckIn = canMarkDelivered && hasSignedRentalAgreement;
-  const canMarkReturned = !!booking.deliveredAt && !booking.returnedAt;
+  const canMarkReturned = booking.status === "CONFIRMED" && !!booking.deliveredAt && !booking.returnedAt;
   const hasOpenBillingDoc = !!booking.invoiceUrl;
   const latestOdometerKm = booking.vehicle?.currentOdometerKm ?? booking.returnOdometerKm ?? booking.pickupOdometerKm ?? null;
 
@@ -342,6 +345,7 @@ export function BookingDetailClient({
         onConfirm={submitDecline}
       />
 
+      <ForceReturnDialog open={showForceReturn} onOpenChange={setShowForceReturn} bookingId={booking.id} locale={locale} endDate={booking.endDate} dailyRate={effectiveDailyRate} totalAmount={booking.totalAmount} onCompleted={() => router.refresh()} />
       <BookingInspectionDialog
         open={showPickupInspection}
         onOpenChange={setShowPickupInspection}
@@ -349,7 +353,7 @@ export function BookingDetailClient({
         bookingId={booking.id}
         locale={locale}
         categoryName={booking.category?.name}
-        dailyRate={booking.category?.dailyRate}
+        dailyRate={effectiveDailyRate}
         scheduledDropoffAt={booking.endDate}
         fuelChargePerQuarter={booking.category?.fuelChargePerQuarter}
         pickupFuelLevel={booking.pickupFuelLevel}
@@ -364,7 +368,7 @@ export function BookingDetailClient({
         bookingId={booking.id}
         locale={locale}
         categoryName={booking.category?.name}
-        dailyRate={booking.category?.dailyRate}
+        dailyRate={effectiveDailyRate}
         scheduledDropoffAt={booking.endDate}
         fuelChargePerQuarter={booking.category?.fuelChargePerQuarter}
         pickupFuelLevel={booking.pickupFuelLevel}
@@ -540,6 +544,9 @@ export function BookingDetailClient({
                     {t("admin.bookings.detail.inspection.title.return")}
                   </Button>
                 )}
+                {(role === "ROOT" || role === "OWNER") && booking.status === "CONFIRMED" && !booking.returnedAt ? (
+                  <Button type="button" onClick={() => setShowForceReturn(true)} disabled={isLoading} variant="outline" className="rounded-xl">{t("bookingOperations.forceReturn")}</Button>
+                ) : null}
                 {canDecline && (
                   <Button onClick={() => setShowDeclineDialog(true)} disabled={isLoading} variant="destructive" className="rounded-xl">
                     <ClipboardX className="h-4 w-4" />
@@ -821,7 +828,7 @@ export function BookingDetailClient({
                 </span>
               </div>
               <div className="flex items-center justify-between"><span>{t("admin.bookings.actions.delivered")}</span><span className="font-medium text-slate-900">{booking.deliveredAt ? formatDateTime(booking.deliveredAt) : t("common.no")}</span></div>
-              <div className="flex items-center justify-between"><span>{t("admin.bookings.actions.returned")}</span><span className="font-medium text-slate-900">{booking.returnedAt ? formatDateTime(booking.returnedAt) : t("common.no")}</span></div>
+              <div className="flex items-center justify-between"><span>{t("admin.bookings.actions.returned")}</span><span className="font-medium text-slate-900">{booking.returnedAt ? formatDateTime(booking.actualReturnedAt || booking.returnedAt) : t("common.no")}</span></div>
               {(accountingProvider === "ZOHO" ? booking.zohoLastError : booking.quickBooksLastError) && (
                 <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-3 text-rose-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em]">{accountingProvider === "ZOHO" ? t("admin.bookings.detail.sync.zohoError") : t("admin.bookings.detail.sync.quickbooksError")}</p>
@@ -877,9 +884,16 @@ export function BookingDetailClient({
                   <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.conditionLog.damageRecorded")}</span><span className="font-medium text-slate-900">{booking.returnHasDamage ? t("common.yes") : t("common.no")}</span></div>
                   <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.conditionLog.acceptedBy")}</span><span className="font-medium text-slate-900">{booking.returnAcceptedBy || "-"}</span></div>
                   <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.conditionLog.scheduledDropoff")}</span><span className="font-medium text-slate-900">{formatDateTime(booking.endDate)}</span></div>
-                  <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.conditionLog.actualReturn")}</span><span className="font-medium text-slate-900">{booking.returnedAt ? formatDateTime(booking.returnedAt) : "-"}</span></div>
+                  <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.conditionLog.actualReturn")}</span><span className="font-medium text-slate-900">{booking.returnedAt ? formatDateTime(booking.actualReturnedAt || booking.returnedAt) : "-"}</span></div>
                   <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.billing.lateReturnCharge")}</span><span className="font-medium text-slate-900">${(closeoutLateCharge / 100).toFixed(2)}</span></div>
                 </div>
+                {(booking.returnChecklistData?.forced || booking.returnChecklistData?.keepAgreedPrice) ? (
+                  <div className="mt-3 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                    {booking.returnChecklistData.forced ? <p>{t("bookingOperations.forceReturnRecorded")}</p> : null}
+                    {booking.returnChecklistData.keepAgreedPrice ? <p>{t("bookingOperations.keepAgreedPrice")}</p> : null}
+                    <p>{t("bookingOperations.overrideReason")}: {booking.returnChecklistData.reason || booking.returnChecklistData.overrideReason}</p>
+                  </div>
+                ) : null}
                 {booking.returnDamageNotes ? <p className="mt-3 rounded-xl bg-white px-3 py-3 text-sm text-slate-700">{booking.returnDamageNotes}</p> : null}
                 {returnPhotos.length > 0 ? (
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">

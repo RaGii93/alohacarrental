@@ -2586,5 +2586,28 @@
     "forbidden": "Prohibido",
     "serverError": "Ocurrió un error en el servidor",
     "tryAgain": "Intentar de nuevo"
+  },
+  "bookingOperations": {
+    "customDailyRate": "Precio personalizado por día (USD)",
+    "categoryPrice": "Usar precio de la categoría",
+    "customDailyRateHelp": "Opcional. Se aplica solo a esta reserva. Déjelo vacío para usar el precio de la categoría.",
+    "checkAll": "Marcar todo",
+    "uncheckAll": "Desmarcar todo",
+    "actualReturnTime": "Fecha y hora real de devolución",
+    "keepAgreedPrice": "Mantener precio acordado — no añadir cargos de devolución",
+    "keepAgreedPriceHelp": "No se añadirán cargos por retraso, combustible ni daños. El motivo se guardará con la devolución.",
+    "overrideReason": "Motivo de la excepción",
+    "returnDetailsRequired": "Introduzca una fecha válida de devolución y el motivo de cualquier excepción de precio.",
+    "forceReturnRecorded": "Devolución forzada registrada. No se realizó la inspección.",
+    "forceReturn": "Forzar devolución",
+    "forceReturnHelp": "Cerrar esta reserva confirmada aunque los registros de recogida o inspección estén incompletos. La inspección no se marcará como realizada. Se guardarán el motivo y su cuenta de administrador.",
+    "forceReturnPriceHelp": "Mantenga el total actual o desmarque la opción para aplicar un cargo por retraso. Este proceso no evalúa combustible ni daños.",
+    "returnTotal": "Total de la reserva tras la devolución: {amount}",
+    "returnCompleted": "Vehículo devuelto correctamente.",
+    "returnFailed": "No se pudo devolver el vehículo.",
+    "cancel": "Cancelar",
+    "saving": "Guardando…",
+    "invalidPrice": "Introduzca un precio diario positivo con un máximo de dos decimales.",
+    "confirmedBookingHelp": "Las reservas del administrador se confirman de inmediato. Las solicitudes de la web requieren confirmación manual."
   }
 }

@@ -1,5 +1,9 @@
 "use client";
 
+import { parseCustomDailyRate } from "@/lib/booking-pricing-rules";
+
+import { CustomDailyRateInput } from "@/components/booking/CustomDailyRateInput";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -60,6 +64,7 @@ export function BookingEditForm({
     additionalDrivers: AdditionalDriverFormValue[];
     notes: string;
     isCruise: boolean;
+    customDailyRate?: number | null;
   };
   locale: string;
   categories: Array<{ id: string; name: string; dailyRate: number; cruiseDailyRate?: number | null }>;
@@ -89,6 +94,7 @@ export function BookingEditForm({
   const [endDate, setEndDate] = useState(booking.endDate);
   const [additionalDrivers, setAdditionalDrivers] = useState<AdditionalDriverFormValue[]>(booking.additionalDrivers);
   const [notes, setNotes] = useState(booking.notes);
+  const [customDailyRate, setCustomDailyRate] = useState(booking.customDailyRate ? (booking.customDailyRate / 100).toFixed(2) : "");
   const [isCruise, setIsCruise] = useState(Boolean(booking.isCruise));
   const [draftExtraId, setDraftExtraId] = useState("");
   const [selectedExtras, setSelectedExtras] = useState<Array<{
@@ -108,6 +114,10 @@ export function BookingEditForm({
   );
 
   const handleSubmit = async () => {
+    try { parseCustomDailyRate(customDailyRate); } catch {
+      toast.error(t("bookingOperations.invalidPrice"));
+      return;
+    }
     if (!birthDate || !licenseExpiryDate || !startDate || !endDate || !pickupLocationId || !dropoffLocationId) {
       toast.error(t("admin.bookings.edit.messages.completeRequired"));
       return;
@@ -154,6 +164,7 @@ export function BookingEditForm({
       formData.append("dropoffLocationId", dropoffLocationId);
       formData.append("additionalDrivers", serializeAdditionalDrivers(additionalDrivers));
       formData.append("notes", notes);
+      formData.append("customDailyRate", customDailyRate);
       formData.append("isCruise", isCruise ? "true" : "false");
       formData.append("selectedExtras", JSON.stringify(selectedExtras.map((line) => ({
         extraId: line.extraId,
@@ -186,6 +197,7 @@ export function BookingEditForm({
       : 1;
   const effectiveDailyRate = resolveCategoryDailyRate({
     dailyRateCents: selectedCategory?.dailyRate || 0,
+    customDailyRateCents: Math.round(Number(customDailyRate) * 100),
     cruiseDailyRateCents: selectedCategory?.cruiseDailyRate,
     bookingSource: "admin",
     isCruise,
@@ -352,6 +364,7 @@ export function BookingEditForm({
                 </SelectContent>
               </Select>
             </div>
+            <CustomDailyRateInput value={customDailyRate} onChange={setCustomDailyRate} disabled={isSaving} />
             <div className={fieldClass}>
               <Label>{t("admin.bookings.edit.fields.cruiseBookingLabel")}</Label>
               <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">

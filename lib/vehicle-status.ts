@@ -8,8 +8,8 @@ async function ensureVehicleRentalColumns(client: typeof db = db) {
   `);
 }
 
-export async function reconcileVehicleRentalStatuses(client: typeof db = db) {
-  await ensureVehicleRentalColumns(client);
+export async function reconcileVehicleRentalStatuses(client: typeof db = db, options?: { ensureColumns?: boolean }) {
+  if (options?.ensureColumns !== false) await ensureVehicleRentalColumns(client);
 
   const activeRentalRows = await client.$queryRaw<Array<{ vehicleId: string }>>`
     SELECT DISTINCT "vehicleId"

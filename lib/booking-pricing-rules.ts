@@ -47,10 +47,14 @@ export function hasIneligibleFullInsuranceSelection(params: {
 
 export function resolveCategoryDailyRate(params: {
   dailyRateCents: number;
+  customDailyRateCents?: number | null;
   cruiseDailyRateCents?: number | null;
   bookingSource: BookingSource;
   isCruise?: boolean;
 }) {
+  if (params.bookingSource === "admin" && typeof params.customDailyRateCents === "number" && Number.isSafeInteger(params.customDailyRateCents) && params.customDailyRateCents > 0) {
+    return params.customDailyRateCents;
+  }
   const normalRate = Math.max(0, Math.round(params.dailyRateCents || 0));
   if (params.bookingSource !== "admin" || !params.isCruise) {
     return normalRate;
@@ -61,4 +65,14 @@ export function resolveCategoryDailyRate(params: {
 
   // Cruise bookings must always be more expensive than normal bookings.
   return Math.max(normalRate + 1, cruiseRate);
+}
+
+export function parseCustomDailyRate(value: FormDataEntryValue | null): number | null {
+  if (value === null || value === "") return null;
+  const amount = typeof value === "string" ? Number(value) : NaN;
+  const cents = Math.round(amount * 100);
+  if (!Number.isFinite(amount) || cents <= 0 || cents > 100_000_000 || Math.abs(amount * 100 - cents) > 0.000001) {
+    throw new Error("Custom daily price must be positive, with at most two decimal places");
+  }
+  return cents;
 }

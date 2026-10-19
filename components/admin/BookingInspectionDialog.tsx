@@ -28,6 +28,7 @@ import {
 } from "@/lib/pricing";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { formatDateTime } from "@/lib/datetime";
+import { formatDateTimeInputInLaPaz, parseLaPazDateTimeInput } from "@/lib/timezone";
 
 type Props = {
   open: boolean;
@@ -88,7 +89,11 @@ export function BookingInspectionDialog({
   onCompleted,
 }: Props) {
   const t = useTranslations();
+  const op = useTranslations("bookingOperations");
   const isReturn = mode === "return";
+  const [actualReturnedAt, setActualReturnedAt] = useState(() => formatDateTimeInputInLaPaz(new Date()));
+  const [keepAgreedPrice, setKeepAgreedPrice] = useState(false);
+  const [overrideReason, setOverrideReason] = useState("");
   const [step, setStep] = useState(0);
   const [odometerKm, setOdometerKm] = useState("");
   const [fuelLevel, setFuelLevel] = useState(isReturn ? String(pickupFuelLevel ?? 4) : "4");
@@ -142,17 +147,20 @@ export function BookingInspectionDialog({
       isReturn && scheduledDropoffAt
         ? calculateLateReturnCharge({
             scheduledDropoffAt,
-            actualReturnedAt: new Date(),
+            actualReturnedAt: parseLaPazDateTimeInput(actualReturnedAt) || new Date(),
             dailyRateCents: dailyRate || 0,
           })
         : { isLate: false, lateMs: 0, lateDays: 0, chargeCents: 0 },
-    [dailyRate, isReturn, scheduledDropoffAt]
+    [actualReturnedAt, dailyRate, isReturn, scheduledDropoffAt]
   );
   const damageChargeCents = isReturn && hasDamage ? Math.max(0, Math.round((Number(damageCharge || "0") || 0) * 100)) : 0;
-  const totalCloseoutCents = latePreview.chargeCents + fuelPreview.chargeCents + damageChargeCents;
+  const totalCloseoutCents = keepAgreedPrice ? 0 : latePreview.chargeCents + fuelPreview.chargeCents + damageChargeCents;
 
   const reset = () => {
     setStep(0);
+    setActualReturnedAt(formatDateTimeInputInLaPaz(new Date()));
+    setKeepAgreedPrice(false);
+    setOverrideReason("");
     setOdometerKm(formatOdometerInput(initialOdometerKm));
     setFuelLevel(isReturn ? String(pickupFuelLevel ?? 4) : "4");
     setHasDamage(false);
@@ -236,6 +244,10 @@ export function BookingInspectionDialog({
 
   const onSubmit = async () => {
     if (!validateStep()) return;
+    if (isReturn && (!parseLaPazDateTimeInput(actualReturnedAt) || (keepAgreedPrice && !overrideReason.trim()))) {
+      toast.error(op("returnDetailsRequired"));
+      return;
+    }
     setSaving(true);
 
     const payload = {
@@ -249,13 +261,23 @@ export function BookingInspectionDialog({
       damageChargeCents,
       checklistItemIds,
       closeoutPaidOnSpot,
+      actualReturnedAt: isReturn ? actualReturnedAt : undefined,
+      keepAgreedPrice: isReturn && keepAgreedPrice,
+      overrideReason,
     };
 
-    const result = isReturn
-      ? await completeReturnInspectionAction(bookingId, payload, locale)
-      : await completePickupInspectionAction(bookingId, payload, locale);
+    let result;
+    try {
+      result = isReturn
+        ? await completeReturnInspectionAction(bookingId, payload, locale)
+        : await completePickupInspectionAction(bookingId, payload, locale);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t(`admin.bookings.detail.inspection.toasts.completeFailed.${mode}`));
+      return;
+    } finally {
+      setSaving(false);
+    }
 
-    setSaving(false);
     if (!result.success) {
       toast.error(result.error || t(`admin.bookings.detail.inspection.toasts.completeFailed.${mode}`));
       return;
@@ -289,7 +311,7 @@ export function BookingInspectionDialog({
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-h-[90dvh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -322,6 +344,16 @@ export function BookingInspectionDialog({
               </div>
             ) : null}
 
+            {isReturn ? (
+              <div className="space-y-3 rounded-2xl border border-slate-200 p-4">
+                <label className="block space-y-2 text-sm font-medium">{op("actualReturnTime")}
+                  <Input type="datetime-local" value={actualReturnedAt} max={formatDateTimeInputInLaPaz(new Date())} onChange={(event) => setActualReturnedAt(event.target.value)} />
+                </label>
+                <label className="flex items-center gap-3 text-sm"><Checkbox checked={keepAgreedPrice} onCheckedChange={(value) => setKeepAgreedPrice(value === true)} />{op("keepAgreedPrice")}</label>
+                <p className="text-sm text-slate-600">{op("keepAgreedPriceHelp")}</p>
+                {keepAgreedPrice ? <label className="block space-y-2 text-sm font-medium">{op("overrideReason")}<Textarea value={overrideReason} onChange={(event) => setOverrideReason(event.target.value)} /></label> : null}
+              </div>
+            ) : null}
             <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-slate-200 p-4">
               <div className="mb-4 flex items-center gap-2 text-slate-900">
@@ -392,11 +424,11 @@ export function BookingInspectionDialog({
                     </div>
                     <div className="flex items-center justify-between">
                       <span>{t("admin.bookings.detail.inspection.summary.lateReturnCharge")}</span>
-                      <span className="font-medium text-slate-900">{formatCurrency(latePreview.chargeCents)}</span>
+                      <span className="font-medium text-slate-900">{formatCurrency(keepAgreedPrice ? 0 : latePreview.chargeCents)}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>{t("admin.bookings.detail.inspection.summary.fuelChargePreview")}</span>
-                      <span className="font-medium text-slate-900">{formatCurrency(fuelPreview.chargeCents)}</span>
+                      <span className="font-medium text-slate-900">{formatCurrency(keepAgreedPrice ? 0 : fuelPreview.chargeCents)}</span>
                     </div>
                     {latePreview.chargeCents > 0 ? (
                       <p className="rounded-xl bg-amber-50 px-3 py-3 text-sm text-amber-900">
@@ -431,6 +463,9 @@ export function BookingInspectionDialog({
                 </p>
               </div>
             </div>
+            <Button type="button" variant="outline" size="sm" onClick={() => setChecklistItemIds(checklistItemIds.length === checklistItems.length ? [] : checklistItems.map((item) => item.id))}>
+              {op(checklistItemIds.length === checklistItems.length ? "uncheckAll" : "checkAll")}
+            </Button>
             <div className="grid gap-3">
               {checklistItems.map((item) => {
                 const checked = checklistItemIds.includes(item.id);
@@ -503,9 +538,9 @@ export function BookingInspectionDialog({
                 {isReturn ? (
                   <>
                     <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.category")}</span><span className="font-medium text-slate-900">{categoryName || "-"}</span></div>
-                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.summary.lateReturnCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(latePreview.chargeCents)}</span></div>
-                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.fuelCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(fuelPreview.chargeCents)}</span></div>
-                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.summary.damageCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(damageChargeCents)}</span></div>
+                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.summary.lateReturnCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(keepAgreedPrice ? 0 : latePreview.chargeCents)}</span></div>
+                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.acceptance.fuelCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(keepAgreedPrice ? 0 : fuelPreview.chargeCents)}</span></div>
+                    <div className="flex items-center justify-between"><span>{t("admin.bookings.detail.inspection.summary.damageCharge")}</span><span className="font-medium text-slate-900">{formatCurrency(keepAgreedPrice ? 0 : damageChargeCents)}</span></div>
                     <div className="flex items-center justify-between rounded-xl bg-slate-900 px-3 py-3 text-white"><span>{t("admin.bookings.detail.inspection.acceptance.totalCloseout")}</span><span className="font-semibold">{formatCurrency(totalCloseoutCents)}</span></div>
                     {totalCloseoutCents > 0 ? (
                       <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">

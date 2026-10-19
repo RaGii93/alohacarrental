@@ -2608,5 +2608,28 @@
         "transactionSaved": "Inventory transaction saved"
       }
     }
+  },
+  "bookingOperations": {
+    "customDailyRate": "Custom price per day (USD)",
+    "categoryPrice": "Use category price",
+    "customDailyRateHelp": "Optional. Applies only to this booking. Leave empty to use the category price.",
+    "checkAll": "Check all",
+    "uncheckAll": "Uncheck all",
+    "actualReturnTime": "Actual return date and time",
+    "keepAgreedPrice": "Keep agreed price — waive return charges",
+    "keepAgreedPriceHelp": "No additional late, fuel or damage charges will be added. The reason is saved with the return.",
+    "overrideReason": "Reason for override",
+    "returnDetailsRequired": "Enter a valid return date and a reason for any price override.",
+    "forceReturnRecorded": "Force return recorded. The inspection was bypassed.",
+    "forceReturn": "Force return",
+    "forceReturnHelp": "Close this confirmed booking even if pickup or return inspection records are incomplete. No inspection is recorded as completed. The reason and your admin account are saved.",
+    "forceReturnPriceHelp": "Keep the current total, or uncheck to apply a late return charge. Fuel and damage are not assessed in this flow.",
+    "returnTotal": "Booking total after return: {amount}",
+    "returnCompleted": "Vehicle returned successfully.",
+    "returnFailed": "Unable to return the vehicle.",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "invalidPrice": "Enter a positive daily price with at most two decimal places.",
+    "confirmedBookingHelp": "Admin bookings are confirmed immediately. Website requests need manual confirmation."
   }
 }

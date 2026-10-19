@@ -1,5 +1,7 @@
 "use client";
 
+import { CustomDailyRateInput } from "../CustomDailyRateInput";
+
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -191,6 +193,7 @@ export function Step1Search({
           </div>
         </div>
 
+        {bookingSource === "admin" ? <CustomDailyRateInput value={bookingData.customDailyRate || ""} onChange={(value) => updateBookingData({ customDailyRate: value })} disabled={disabled} /> : null}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
             <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#44403c]">

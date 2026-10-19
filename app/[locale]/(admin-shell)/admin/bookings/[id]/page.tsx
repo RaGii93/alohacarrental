@@ -1,3 +1,4 @@
+import { getBookingCustomDailyRate } from "@/lib/booking-price";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -34,6 +35,7 @@ export default async function BookingDetailPage({
   await ensurePickupChecklistColumns();
   await ensureBookingAdditionalDriversTable();
 
+  const customDailyRate = await getBookingCustomDailyRate(id);
   const booking = await db.booking.findUnique({
     where: { id },
     include: {
@@ -134,20 +136,21 @@ export default async function BookingDetailPage({
         }
       : null,
   };
-  let operational: { deliveredAt: Date | null; returnedAt: Date | null } = {
+  let operational: { deliveredAt: Date | null; returnedAt: Date | null; actualReturnedAt: Date | null } = {
     deliveredAt: null,
     returnedAt: null,
+    actualReturnedAt: null,
   };
   try {
-    const rows = await db.$queryRaw<Array<{ deliveredAt: Date | null; returnedAt: Date | null }>>`
-      SELECT "deliveredAt", "returnedAt"
+    const rows = await db.$queryRaw<Array<{ deliveredAt: Date | null; returnedAt: Date | null; actualReturnedAt: Date | null }>>`
+      SELECT "deliveredAt", "returnedAt", "actualReturnedAt"
       FROM "Booking"
       WHERE id = ${id}
       LIMIT 1
     `;
     if (rows[0]) operational = rows[0];
   } catch {
-    operational = { deliveredAt: null, returnedAt: null };
+    operational = { deliveredAt: null, returnedAt: null, actualReturnedAt: null };
   }
 
   let pickupChecklistState: {
@@ -334,6 +337,7 @@ export default async function BookingDetailPage({
           ...quickBooksState,
           ...zohoState,
           isCruise,
+          customDailyRate,
           category: {
             ...bookingWithAdjustments.category,
             cruiseDailyRate,

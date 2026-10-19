@@ -2586,5 +2586,28 @@
     "forbidden": "Verboden",
     "serverError": "Serverfout opgetreden",
     "tryAgain": "Probeer opnieuw"
+  },
+  "bookingOperations": {
+    "customDailyRate": "Aangepaste prijs per dag (USD)",
+    "categoryPrice": "Categorieprijs gebruiken",
+    "customDailyRateHelp": "Optioneel. Geldt alleen voor deze reservering. Laat leeg om de categorieprijs te gebruiken.",
+    "checkAll": "Alles aanvinken",
+    "uncheckAll": "Alles uitvinken",
+    "actualReturnTime": "Werkelijke inleverdatum en -tijd",
+    "keepAgreedPrice": "Afgesproken prijs behouden — geen extra inleverkosten",
+    "keepAgreedPriceHelp": "Er worden geen extra kosten voor te laat inleveren, brandstof of schade toegevoegd. De reden wordt bij de inlevering opgeslagen.",
+    "overrideReason": "Reden voor afwijking",
+    "returnDetailsRequired": "Vul een geldige inleverdatum en een reden voor de prijsafwijking in.",
+    "forceReturnRecorded": "Geforceerde inlevering geregistreerd. De inspectie is overgeslagen.",
+    "forceReturn": "Inlevering forceren",
+    "forceReturnHelp": "Sluit deze bevestigde reservering af, ook als de ophaal- of inspectiegegevens onvolledig zijn. De inspectie wordt niet als voltooid geregistreerd. De reden en uw beheerdersaccount worden opgeslagen.",
+    "forceReturnPriceHelp": "Behoud het huidige totaal of vink de optie uit om kosten voor te laat inleveren toe te voegen. Brandstof en schade worden in deze stap niet beoordeeld.",
+    "returnTotal": "Reserveringstotaal na inlevering: {amount}",
+    "returnCompleted": "Voertuig succesvol ingeleverd.",
+    "returnFailed": "Het voertuig kon niet worden ingeleverd.",
+    "cancel": "Annuleren",
+    "saving": "Opslaan…",
+    "invalidPrice": "Vul een positieve dagprijs in met maximaal twee decimalen.",
+    "confirmedBookingHelp": "Beheerdersreserveringen worden direct bevestigd. Aanvragen via de website vereisen handmatige bevestiging."
   }
 }

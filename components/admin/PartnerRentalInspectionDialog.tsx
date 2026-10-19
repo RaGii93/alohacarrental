@@ -70,6 +70,7 @@ export function PartnerRentalInspectionDialog({
   onCompleted,
 }: Props) {
   const t = useTranslations();
+  const op = useTranslations("bookingOperations");
   const isReturn = mode === "return";
   const [step, setStep] = useState(0);
   const [odometerKm, setOdometerKm] = useState("");
@@ -326,6 +327,9 @@ export function PartnerRentalInspectionDialog({
             <p className="text-sm text-slate-600">
               {t(isReturn ? "admin.bookings.detail.inspection.returnChecklist.description" : "admin.bookings.detail.inspection.checklist.description")}
             </p>
+            <Button type="button" variant="outline" size="sm" onClick={() => setChecklistItemIds(checklistItemIds.length === checklistItems.length ? [] : checklistItems.map((item) => item.id))}>
+              {op(checklistItemIds.length === checklistItems.length ? "uncheckAll" : "checkAll")}
+            </Button>
             <div className="grid gap-3">
               {checklistItems.map((item) => {
                 const checked = checklistItemIds.includes(item.id);

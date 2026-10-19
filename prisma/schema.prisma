@@ -456,6 +456,7 @@ model VehicleCategoryFeature {
 
 model Booking {
   emailPreference     BookingEmailPreference?
+  priceOverride       BookingPriceOverride?
   id                  String    @id @default(cuid())
   categoryId          String
   category            VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -511,6 +512,7 @@ model Booking {
   returnFuelCharge    Int       @default(0)
   returnDamageCharge  Int       @default(0)
   returnedAt          DateTime?
+  actualReturnedAt    DateTime?
   returnChecklistData Json?
   returnChecklistDocumentUrl String?
   closeoutPaymentDueAt DateTime?
@@ -865,4 +867,10 @@ model BookingEmailPreference {
   bookingId String  @id
   booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   locale    String  @default("en")
+}
+
+model BookingPriceOverride {
+  bookingId String  @id
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  dailyRate Int
 }

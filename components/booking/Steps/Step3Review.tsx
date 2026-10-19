@@ -1,5 +1,7 @@
 "use client";
 
+import { parseCustomDailyRate } from "@/lib/booking-pricing-rules";
+
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -96,6 +98,10 @@ export function Step3Review({
   );
 
   const handleSubmit = async () => {
+    try { parseCustomDailyRate(bookingData.customDailyRate || ""); } catch {
+      toast.error(t("bookingOperations.invalidPrice"));
+      return;
+    }
     if (bookingSource === "public" && !hasReadTerms) {
       toast.error(t("booking.errors.termsScrollRequired"));
       return;
@@ -165,6 +171,7 @@ export function Step3Review({
       formData.append("selectedExtras", JSON.stringify(bookingData.selectedExtras));
       formData.append("privacyConsentAccepted", "true");
       formData.append("termsAccepted", "true");
+      if (bookingSource === "admin") formData.append("customDailyRate", bookingData.customDailyRate || "");
       formData.append("bookingSource", bookingSource);
       formData.append("isCruise", isCruise ? "true" : "false");
 
@@ -184,7 +191,7 @@ export function Step3Review({
 
   const days = pickupDateTime && dropoffDateTime ? calculateDays(pickupDateTime, dropoffDateTime) : 1;
   const selectedCategory = availability.find(cat => cat.categoryId === bookingData.categoryId);
-  const categoryRate = selectedCategory?.dailyRate || 2500;
+  const categoryRate = bookingSource === "admin" && Number(bookingData.customDailyRate) > 0 ? Math.round(Number(bookingData.customDailyRate) * 100) : selectedCategory?.dailyRate || 2500;
   const baseAmount = categoryRate * days;
   const extrasAmount = bookingData.selectedExtras.reduce((sum, item) => {
     const extra = extras.find((row) => row.id === item.extraId);

@@ -2,7 +2,11 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { initialBookingStatus } from "@/lib/booking-policy";
+import { ensureBookingPriceOverrides, getBookingCustomDailyRate, parseCustomDailyRate, saveBookingCustomDailyRate } from "@/lib/booking-price";
 import { getSession } from "@/lib/session";
+import { resolveActualReturnTime, resolveReturnCharges } from "@/lib/return-policy";
+import { getAgrChecklistItems, normalizeAgrChecklistSelection } from "@/lib/pickup-checklist";
 import { isLicenseActive } from "@/lib/license";
 import { uploadBuffer, uploadFile } from "@/lib/uploads";
 import { adminCategoryBookingUpdateSchemaRefined, categoryBookingFormSchemaRefined } from "@/lib/validators";
@@ -33,7 +37,6 @@ import { ensureVehicleBlockoutsTable } from "@/lib/vehicle-blockouts";
 import { ensureZohoBookingColumns, markBookingBillingDocumentZoho, queueBookingZohoTransfer } from "@/lib/zoho-bookings";
 import { triggerAutomationEvent } from "@/lib/automations";
 import { reconcileVehicleRentalStatuses } from "@/lib/vehicle-status";
-import { parseLaPazDateTimeInput } from "@/lib/timezone";
 
 type BookingDocumentType = "INVOICE" | "SALES_RECEIPT" | "RENTAL_AGREEMENT";
 
@@ -104,8 +107,11 @@ type BookingInspectionInput = {
   agentNotes?: string;
   acceptedBy: string;
   imageUrls: string[];
+  checklistItemIds?: string[];
   damageChargeCents?: number;
   actualReturnedAt?: string;
+  keepAgreedPrice?: boolean;
+  overrideReason?: string;
 };
 
 async function replaceInspectionPhotos(tx: typeof db, bookingId: string, stage: InspectionStageValue, imageUrls: string[]) {
@@ -614,8 +620,8 @@ async function buildAndUploadBookingDocument(
   if (!booking.vehicleId || !booking.vehicle) {
     return { success: false as const, error: "No vehicle assigned to booking" };
   }
-  if (booking.status === "DECLINED" || booking.status === "CANCELLED") {
-    return { success: false as const, error: "Cannot invoice declined/cancelled booking" };
+  if (booking.status !== "CONFIRMED") {
+    return { success: false as const, error: "Confirm the booking before creating a billing document" };
   }
 
   const { extras: adjustmentExtras, discount: bookingDiscount } = await loadBookingAdjustments(bookingId);
@@ -626,6 +632,7 @@ async function buildAndUploadBookingDocument(
   ]);
   const effectiveDailyRate = resolveCategoryDailyRate({
     dailyRateCents: booking.category.dailyRate,
+    customDailyRateCents: await getBookingCustomDailyRate(bookingId),
     cruiseDailyRateCents: cruiseDailyRate,
     bookingSource: "admin",
     isCruise,
@@ -812,10 +819,12 @@ export async function sendBillingDocumentEmailAction(bookingId: string, locale: 
         endDate: true,
         totalAmount: true,
         invoiceUrl: true,
+        status: true,
       },
     });
 
     if (!booking) return { success: false, error: "Booking not found" };
+    if (booking.status !== "CONFIRMED") return { success: false, error: "Confirm the booking before sending a billing document" };
     if (!booking.invoiceUrl) return { success: false, error: "No billing document available" };
 
     const billingDocumentUrl = getBlobProxyUrl(booking.invoiceUrl, { download: true }) || booking.invoiceUrl;
@@ -977,8 +986,8 @@ export async function receiveInvoicePaymentAction(bookingId: string, locale: str
       },
     });
     if (!booking) return { success: false, error: "Booking not found" };
-    if (booking.status === "DECLINED" || booking.status === "CANCELLED") {
-      return { success: false, error: "Cannot receive payment for declined/cancelled booking" };
+    if (booking.status !== "CONFIRMED") {
+      return { success: false, error: "Confirm the booking before receiving invoice payment" };
     }
     if (!booking.invoiceUrl) return { success: false, error: "INVOICE_REQUIRED" };
     if (booking.paymentReceivedAt) return { success: true, booking };
@@ -1083,6 +1092,14 @@ export async function completePickupInspectionAction(
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
     await ensureBookingOperationalColumns();
+    if (!Number.isFinite(input.odometerKm) || input.odometerKm < 0 || !Number.isInteger(input.fuelLevel) || input.fuelLevel < 0 || input.fuelLevel > 4 || !input.acceptedBy?.trim()) {
+      return { success: false, error: "Enter a valid odometer, fuel level and acceptance name" };
+    }
+    const checklistMode = "pickup" as const;
+    const checklistItemIds = normalizeAgrChecklistSelection(checklistMode, input.checklistItemIds);
+    if (checklistItemIds.length !== getAgrChecklistItems(checklistMode).length) {
+      return { success: false, error: "Complete all inspection checklist items" };
+    }
 
     const booking = await db.booking.findUnique({
       where: { id: bookingId },
@@ -1126,6 +1143,7 @@ export async function completePickupInspectionAction(
           pickupAcceptedBy: input.acceptedBy.trim(),
           pickupAcceptedAt: now,
           pickupAgentNotes: input.agentNotes?.trim() || null,
+          pickupChecklistData: { checklistItemIds },
         } as any,
       });
       await tx.$executeRaw`
@@ -1165,6 +1183,14 @@ export async function completeReturnInspectionAction(
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
     await ensureBookingOperationalColumns();
+    if (!Number.isFinite(input.odometerKm) || input.odometerKm < 0 || !Number.isInteger(input.fuelLevel) || input.fuelLevel < 0 || input.fuelLevel > 4 || !input.acceptedBy?.trim()) {
+      return { success: false, error: "Enter a valid odometer, fuel level and acceptance name" };
+    }
+    const checklistMode = "return" as const;
+    const checklistItemIds = normalizeAgrChecklistSelection(checklistMode, input.checklistItemIds);
+    if (checklistItemIds.length !== getAgrChecklistItems(checklistMode).length) {
+      return { success: false, error: "Complete all inspection checklist items" };
+    }
 
     const booking = await db.booking.findUnique({
       where: { id: bookingId },
@@ -1172,7 +1198,9 @@ export async function completeReturnInspectionAction(
         id: true,
         status: true,
         vehicleId: true,
+        startDate: true,
         endDate: true,
+        pickupOdometerKm: true,
         pickupFuelLevel: true,
         totalAmount: true,
         category: {
@@ -1192,14 +1220,11 @@ export async function completeReturnInspectionAction(
     if (!operational.deliveredAt) return { success: false, error: "BOOKING_NOT_DELIVERED" };
     if (operational.returnedAt) return { success: false, error: "BOOKING_ALREADY_RETURNED" };
 
-    const parsedActualReturnedAt = input.actualReturnedAt ? parseLaPazDateTimeInput(input.actualReturnedAt) : null;
-    if (input.actualReturnedAt && !parsedActualReturnedAt) {
-      return { success: false, error: "Invalid return date/time" };
+    const actualReturnedAt = resolveActualReturnTime({ value: input.actualReturnedAt, startDate: booking.startDate, deliveredAt: operational.deliveredAt });
+    if (booking.pickupOdometerKm !== null && input.odometerKm < booking.pickupOdometerKm) {
+      return { success: false, error: "Return odometer cannot be below pickup odometer" };
     }
-    const actualReturnedAt = parsedActualReturnedAt || new Date();
-    if (operational.deliveredAt && actualReturnedAt < operational.deliveredAt) {
-      return { success: false, error: "Return date/time cannot be before delivery" };
-    }
+    if (input.keepAgreedPrice && !input.overrideReason?.trim()) return { success: false, error: "Enter a reason for keeping the agreed price" };
     const inspectionCompletedAt = new Date();
     const [isCruise, cruiseDailyRate] = await Promise.all([
       getBookingIsCruise(bookingId),
@@ -1207,6 +1232,7 @@ export async function completeReturnInspectionAction(
     ]);
     const effectiveDailyRate = resolveCategoryDailyRate({
       dailyRateCents: booking.category?.dailyRate || 0,
+      customDailyRateCents: await getBookingCustomDailyRate(bookingId),
       cruiseDailyRateCents: cruiseDailyRate,
       bookingSource: "admin",
       isCruise,
@@ -1222,11 +1248,13 @@ export async function completeReturnInspectionAction(
       actualReturnedAt,
       dailyRateCents: effectiveDailyRate,
     });
-    const lateCharge = lateReturn.chargeCents;
-    const damageCharge = Math.max(0, Math.round(input.damageChargeCents || 0));
-    const totalAdjustment = lateCharge + fuelCharge + damageCharge;
+    const charges = resolveReturnCharges({ keepAgreedPrice: input.keepAgreedPrice, lateCharge: lateReturn.chargeCents, fuelCharge, damageCharge: Math.max(0, Math.round(input.damageChargeCents || 0)) });
+    const { lateCharge, damageCharge, totalAdjustment } = charges;
 
     await db.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "Booking" WHERE id = ${bookingId} FOR UPDATE`;
+      const current = await getBookingOperationalState(tx as typeof db, bookingId);
+      if (current.returnedAt) throw new Error("BOOKING_ALREADY_RETURNED");
       await tx.booking.update({
         where: { id: bookingId },
         data: {
@@ -1237,15 +1265,16 @@ export async function completeReturnInspectionAction(
           returnAcceptedBy: input.acceptedBy.trim(),
           returnAcceptedAt: inspectionCompletedAt,
           returnAgentNotes: input.agentNotes?.trim() || null,
+          returnChecklistData: { checklistItemIds, keepAgreedPrice: Boolean(input.keepAgreedPrice), overrideReason: input.overrideReason?.trim() || null, recordedBy: session.adminUserId, actualReturnedAt: actualReturnedAt.toISOString(), waivedCharges: input.keepAgreedPrice ? { late: lateReturn.chargeCents, fuel: fuelCharge, damage: Math.max(0, Math.round(input.damageChargeCents || 0)) } : null },
           returnLateCharge: lateCharge,
-          returnFuelCharge: fuelCharge,
+          returnFuelCharge: charges.fuelCharge,
           returnDamageCharge: damageCharge,
           totalAmount: booking.totalAmount + totalAdjustment,
           returnedAt: inspectionCompletedAt,
-          actualReturnedAt,
         } as any,
       });
-      await reconcileVehicleRentalStatuses(tx as typeof db);
+      await tx.$executeRaw`UPDATE "Booking" SET "actualReturnedAt" = ${actualReturnedAt} WHERE id = ${bookingId}`;
+      await reconcileVehicleRentalStatuses(tx as typeof db, { ensureColumns: false });
       await replaceInspectionPhotos(tx as typeof db, bookingId, "RETURN", input.imageUrls);
       await tx.auditLog.create({
         data: {
@@ -1254,9 +1283,10 @@ export async function completeReturnInspectionAction(
           bookingId,
         },
       });
-    });
+    }, { timeout: 15000 });
 
-    return { success: true, lateCharge, lateDays: lateReturn.lateDays, fuelCharge, damageCharge, totalAdjustment };
+    triggerAutomationEvent("return_completed", bookingId).catch(() => {});
+    return { success: true, ...charges, lateDays: lateReturn.lateDays };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to complete return inspection" };
   }
@@ -1313,49 +1343,47 @@ export async function markBookingDeliveredAction(bookingId: string, locale: stri
   }
 }
 
-export async function markBookingReturnedAction(bookingId: string, locale: string) {
+export async function markBookingReturnedAction(
+  bookingId: string,
+  locale: string,
+  options?: { force?: boolean; actualReturnedAt?: string; keepAgreedPrice?: boolean; reason?: string }
+) {
   try {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized" };
     if (!isLicenseActive() && session.role !== "ROOT") return { success: false, error: "BOOKING_DISABLED" };
+    if (options?.force && !isPrivilegedAdminRole(session.role)) return { success: false, error: "Unauthorized" };
+    if ((options?.force || options?.keepAgreedPrice) && !options.reason?.trim()) return { success: false, error: "Enter a reason for the return override" };
     await ensureBookingOperationalColumns();
-
-    const booking = await db.booking.findUnique({
-      where: { id: bookingId },
-      select: {
-        id: true,
-        status: true,
-        vehicleId: true,
-      },
-    });
+    const booking = await db.booking.findUnique({ where: { id: bookingId }, include: { category: true } });
     if (!booking) return { success: false, error: "Booking not found" };
     if (booking.status !== "CONFIRMED") return { success: false, error: "BOOKING_NOT_RETURNABLE" };
-
     const operational = await getBookingOperationalState(db, bookingId);
-    if (!operational.deliveredAt) return { success: false, error: "BOOKING_NOT_DELIVERED" };
+    if (!operational.deliveredAt && !options?.force) return { success: false, error: "BOOKING_NOT_DELIVERED" };
     if (operational.returnedAt) return { success: false, error: "BOOKING_ALREADY_RETURNED" };
-
-    await db.$transaction(async (tx) => {
-      const now = new Date();
-      await tx.$executeRaw`
-        UPDATE "Booking"
-        SET "returnedAt" = ${now}, "actualReturnedAt" = COALESCE("actualReturnedAt", ${now})
-        WHERE id = ${bookingId}
-      `;
-      await reconcileVehicleRentalStatuses(tx as typeof db);
-      await tx.auditLog.create({
-        data: {
-          adminUserId: session.adminUserId,
-          action: "BOOKING_MARKED_RETURNED",
-          bookingId,
-        },
-      });
+    const actualReturnedAt = resolveActualReturnTime({ value: options?.actualReturnedAt, startDate: booking.startDate, deliveredAt: operational.deliveredAt });
+    const dailyRate = resolveCategoryDailyRate({
+      dailyRateCents: booking.category.dailyRate, customDailyRateCents: await getBookingCustomDailyRate(bookingId),
+      cruiseDailyRateCents: await getCategoryCruiseDailyRateCents(booking.categoryId), bookingSource: "admin", isCruise: await getBookingIsCruise(bookingId),
     });
-
-    // Automation: return_completed event
+    const late = calculateLateReturnCharge({ scheduledDropoffAt: booking.endDate, actualReturnedAt, dailyRateCents: dailyRate });
+    const charges = resolveReturnCharges({ keepAgreedPrice: options?.keepAgreedPrice, lateCharge: late.chargeCents, fuelCharge: 0, damageCharge: 0 });
+    await db.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "Booking" WHERE id = ${bookingId} FOR UPDATE`;
+      const current = await getBookingOperationalState(tx as typeof db, bookingId);
+      if (current.returnedAt) throw new Error("BOOKING_ALREADY_RETURNED");
+      await tx.booking.update({ where: { id: bookingId }, data: {
+        returnedAt: new Date(),
+        returnLateCharge: charges.lateCharge,
+        totalAmount: booking.totalAmount + charges.totalAdjustment,
+        returnChecklistData: { forced: Boolean(options?.force), inspectionCompleted: false, keepAgreedPrice: Boolean(options?.keepAgreedPrice), reason: options?.reason?.trim() || null, recordedBy: session.adminUserId, actualReturnedAt: actualReturnedAt.toISOString(), waivedLateCharge: options?.keepAgreedPrice ? late.chargeCents : 0 },
+      } });
+      await tx.$executeRaw`UPDATE "Booking" SET "actualReturnedAt" = ${actualReturnedAt} WHERE id = ${bookingId}`;
+      await reconcileVehicleRentalStatuses(tx as typeof db, { ensureColumns: false });
+      await tx.auditLog.create({ data: { adminUserId: session.adminUserId, action: options?.force ? "BOOKING_FORCE_RETURNED" : "BOOKING_MARKED_RETURNED", bookingId } });
+    }, { timeout: 15000 });
     triggerAutomationEvent("return_completed", bookingId).catch(() => {});
-
-    return { success: true };
+    return { success: true, ...charges };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to mark booking as returned" };
   }
@@ -1380,6 +1408,7 @@ async function recomputeBookingTotals(bookingId: string) {
   ]);
   const effectiveDailyRate = resolveCategoryDailyRate({
     dailyRateCents: booking.category.dailyRate,
+    customDailyRateCents: await getBookingCustomDailyRate(bookingId),
     cruiseDailyRateCents: cruiseDailyRate,
     bookingSource: "admin",
     isCruise,
@@ -1451,9 +1480,11 @@ export async function applyDiscountCodeToBookingAction(bookingId: string, code: 
       }
     });
 
-    await recomputeBookingTotals(bookingId);
-    const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
-    if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Discount applied but invoice update failed" };
+    const totals = await recomputeBookingTotals(bookingId);
+    if (totals.booking.status === "CONFIRMED") {
+      const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
+      if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Discount applied but invoice update failed" };
+    }
     await logAdminAction({
       adminUserId: session.adminUserId,
       action: "BOOKING_DISCOUNT_APPLIED",
@@ -1490,6 +1521,7 @@ export async function addExtraToBookingAction(bookingId: string, extraId: string
     ]);
     const effectiveDailyRate = resolveCategoryDailyRate({
       dailyRateCents: booking.category.dailyRate,
+      customDailyRateCents: await getBookingCustomDailyRate(bookingId),
       cruiseDailyRateCents: cruiseDailyRate,
       bookingSource: "admin",
       isCruise,
@@ -1512,8 +1544,10 @@ export async function addExtraToBookingAction(bookingId: string, extraId: string
     });
 
     await recomputeBookingTotals(bookingId);
-    const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
-    if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Extra added but invoice update failed" };
+    if (booking.status === "CONFIRMED") {
+      const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale);
+      if (!invoiceResult.success) return { success: false, error: invoiceResult.error || "Extra added but invoice update failed" };
+    }
     await logAdminAction({
       adminUserId: session.adminUserId,
       action: "BOOKING_EXTRA_ADDED",
@@ -1607,6 +1641,12 @@ export async function createCategoryBookingAction(
         return { success: false, error: "Unauthorized" };
       }
     }
+    if (bookingSource !== "admin" && formData.get("customDailyRate")) {
+      return { success: false, error: "Only admins can set a custom daily price" };
+    }
+    const bookingStatus = initialBookingStatus(bookingSource, session?.role);
+    const customDailyRateCents = bookingSource === "admin" ? parseCustomDailyRate(formData.get("customDailyRate")) : null;
+    await ensureBookingPriceOverrides();
     const isCruise = bookingSource === "admin" ? requestedCruise : false;
     await ensureCruisePricingColumns();
 
@@ -1717,6 +1757,7 @@ export async function createCategoryBookingAction(
     const cruiseDailyRate = isCruise ? await getCategoryCruiseDailyRateCents(category.id) : null;
     const effectiveDailyRate = resolveCategoryDailyRate({
       dailyRateCents: category.dailyRate,
+      customDailyRateCents,
       cruiseDailyRateCents: cruiseDailyRate,
       bookingSource: bookingSource === "admin" ? "admin" : "public",
       isCruise,
@@ -1896,7 +1937,7 @@ export async function createCategoryBookingAction(
           dropoffLatitude: dropoffLatitude ?? dropoffLocationRecord?.latitude ?? null,
           dropoffLongitude: dropoffLongitude ?? dropoffLocationRecord?.longitude ?? null,
           totalAmount,
-          status: "PENDING" as const,
+          status: bookingStatus,
           bookingCode,
           holdExpiresAt: new Date(Date.now() + bookingHoldDays * 24 * 60 * 60 * 1000),
           driverLicenseUrl,
@@ -1987,6 +2028,7 @@ export async function createCategoryBookingAction(
           }
         }
 
+        await saveBookingCustomDailyRate(tx as typeof db, created.id, customDailyRateCents);
         return created;
       });
     } catch (error: any) {
@@ -2014,7 +2056,7 @@ export async function createCategoryBookingAction(
       const createdExtras = await loadBookingAdjustments(booking.id);
       const termsEmailData = await getCustomerTermsEmailData(locale, booking.id);
       const customerHtml = await bookingEmailHtml({
-        ...getCustomerEmailContent("created", termsEmailData.locale),
+        ...getCustomerEmailContent(booking.status === "CONFIRMED" ? "confirmed" : "created", termsEmailData.locale),
         locale: termsEmailData.locale,
         customerName: booking.customerName,
         bookingCode: booking.bookingCode,
@@ -2030,7 +2072,7 @@ export async function createCategoryBookingAction(
       });
       await sendEmail({
         to: booking.customerEmail,
-        subject: `${getCustomerEmailContent("created", termsEmailData.locale).subject} - ${booking.bookingCode}`,
+        subject: `${getCustomerEmailContent(booking.status === "CONFIRMED" ? "confirmed" : "created", termsEmailData.locale).subject} - ${booking.bookingCode}`,
         html: customerHtml,
         attachments: termsEmailData.attachments,
       });
@@ -2043,6 +2085,7 @@ export async function createCategoryBookingAction(
 
     // Automation: booking_created event
     triggerAutomationEvent("booking_created", booking.id).catch(() => {});
+    if (booking.status === "CONFIRMED") triggerAutomationEvent("booking_confirmed", booking.id).catch(() => {});
 
     return {
       success: true,
@@ -2088,6 +2131,11 @@ export async function updateCategoryBookingAction(
     if (!existing) {
       return { success: false, error: "Booking not found" };
     }
+    await ensureBookingOperationalColumns();
+    const customDailyRateCents = formData.has("customDailyRate")
+      ? parseCustomDailyRate(formData.get("customDailyRate"))
+      : await getBookingCustomDailyRate(bookingId);
+    await ensureBookingPriceOverrides();
     const requestedCruiseRaw = formData.get("isCruise");
     const operational = await getBookingOperationalState(db, bookingId);
     await ensureCruisePricingColumns();
@@ -2164,6 +2212,7 @@ export async function updateCategoryBookingAction(
     const cruiseDailyRate = isCruise ? await getCategoryCruiseDailyRateCents(validated.categoryId) : null;
     const effectiveDailyRate = resolveCategoryDailyRate({
       dailyRateCents: category.dailyRate,
+      customDailyRateCents,
       cruiseDailyRateCents: cruiseDailyRate,
       bookingSource: "admin",
       isCruise,
@@ -2284,6 +2333,8 @@ export async function updateCategoryBookingAction(
         } as any,
       });
 
+      await saveBookingCustomDailyRate(tx as typeof db, bookingId, customDailyRateCents);
+
       await tx.$executeRaw`
         UPDATE "Booking"
         SET "isCruise" = ${isCruise}
@@ -2337,7 +2388,7 @@ export async function updateCategoryBookingAction(
 
     await reconcileVehicleRentalStatuses();
 
-    if (existing.status === "PENDING" || existing.status === "CONFIRMED") {
+    if (existing.status === "CONFIRMED") {
       const invoiceResult = await sendInvoiceEstimateAction(bookingId, locale, {
         sendEmailToCustomer: sendBillingEmail,
       });

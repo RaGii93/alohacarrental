@@ -55,6 +55,7 @@ export interface BookingData {
   privacyConsentAccepted: boolean;
   selectedExtras: Array<{ extraId: string; quantity: number }>;
   isCruise: boolean;
+  customDailyRate?: string;
 }
 
 type BookingWizardInitialData = {
@@ -137,6 +138,7 @@ export function BookingWizard({
     privacyConsentAccepted: false,
     selectedExtras: [],
     isCruise: false,
+    customDailyRate: "",
     ...initialData,
   });
 
@@ -176,6 +178,7 @@ export function BookingWizard({
   const effectiveDailyRate = selectedCategory
     ? resolveCategoryDailyRate({
         dailyRateCents: selectedCategory.dailyRate,
+        customDailyRateCents: Math.round(Number(bookingData.customDailyRate) * 100),
         cruiseDailyRateCents: selectedCategory.cruiseDailyRate,
         bookingSource,
         isCruise: bookingData.isCruise,
