@@ -1,4 +1,6 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { formatDateTime } from "@/lib/datetime";
 import {
@@ -19,6 +21,24 @@ import {
   OccupancyChart,
   RevenueTrendChart,
 } from "@/components/admin/AdminDashboardCharts";
+
+function DashboardLink({ href, children, className = "" }: { href: string; children: ReactNode; className?: string }) {
+  return (
+    <Link href={href} className={`group relative block rounded-xl transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 ${className}`}>
+      {children}
+      <ArrowUpRight aria-hidden="true" className="absolute right-3 top-3 size-4 text-slate-400 transition group-hover:text-slate-900" />
+    </Link>
+  );
+}
+
+function DashboardTitleLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link href={href} className="inline-flex items-center gap-2 rounded hover:underline focus-visible:outline-2 focus-visible:outline-offset-4">
+      {children}
+      <ArrowUpRight aria-hidden="true" className="size-4 text-slate-400" />
+    </Link>
+  );
+}
 
 function money(cents: number) {
   return new Intl.NumberFormat("en-US", {
@@ -75,6 +95,28 @@ export default async function AdminRootPage({
     : data.kpis.utilizationRate >= 85
       ? "High utilization pressure"
       : "Utilization in normal range";
+
+  const bookingsHref = (filter: string) => `/${locale}/admin/bookings?dashboard_filter=${filter}`;
+  const vehicleHref = (id: string) => `/${locale}/admin/vehicles?vehicle=${encodeURIComponent(id)}`;
+  const kpiHrefs: Record<string, string> = {
+    bookingsToday: bookingsHref("today"),
+    activeRentalsNow: bookingsHref("active"),
+    vehiclesAvailableNow: `/${locale}/admin/fleet`,
+    vehiclesInMaintenance: `/${locale}/admin/vehicles?status=MAINTENANCE`,
+    unpaidInvoicesCount: bookingsHref("unpaid"),
+    revenueToday: bookingsHref("revenue-today"),
+    revenueThisMonth: bookingsHref("revenue-month"),
+    utilizationRate: `/${locale}/admin/fleet`,
+    averageBookingValue: bookingsHref("average"),
+  };
+  const alertHrefs: Record<string, string> = {
+    "overdue-returns": bookingsHref("overdue"),
+    "unpaid-near-pickup": bookingsHref("unpaid-pickup"),
+    "vehicles-maintenance": `/${locale}/admin/vehicles?status=MAINTENANCE`,
+    "docs-review": `/${locale}/admin/maintenance`,
+    "low-availability": `/${locale}/admin/fleet?fleet_view=forecast`,
+    "reviews-pending": `/${locale}/admin/reviews`,
+  };
 
   const kpiCards = [
     {
@@ -157,30 +199,32 @@ export default async function AdminRootPage({
 
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {kpiCards.map((card) => (
-            <Card key={card.key} className="gap-2 py-4">
-              <CardHeader className="px-4 pb-0">
-                <CardDescription className="text-xs uppercase tracking-[0.12em]">{card.label}</CardDescription>
-                <CardTitle className="text-2xl font-black tracking-tight text-slate-900">{card.value}</CardTitle>
-                {card.interpretation ? (
-                  <p
-                    className={
-                      card.interpretationTone === "warning"
-                        ? "text-xs font-semibold text-amber-700"
-                        : "text-xs font-semibold text-slate-600"
-                    }
-                  >
-                    {card.interpretation}
-                  </p>
-                ) : null}
-              </CardHeader>
-            </Card>
+            <DashboardLink key={card.key} href={kpiHrefs[card.key]} className="h-full rounded-[1.5rem]">
+              <Card className="h-full gap-2 py-4 pr-5 transition group-hover:bg-slate-50">
+                <CardHeader className="px-4 pb-0">
+                  <CardDescription className="text-xs uppercase tracking-[0.12em]">{card.label}</CardDescription>
+                  <CardTitle className="text-2xl font-black tracking-tight text-slate-900">{card.value}</CardTitle>
+                  {card.interpretation ? (
+                    <p
+                      className={
+                        card.interpretationTone === "warning"
+                          ? "text-xs font-semibold text-amber-700"
+                          : "text-xs font-semibold text-slate-600"
+                      }
+                    >
+                      {card.interpretation}
+                    </p>
+                  ) : null}
+                </CardHeader>
+              </Card>
+            </DashboardLink>
           ))}
         </section>
 
         <section className="grid gap-4 xl:grid-cols-3">
           <Card className="xl:col-span-2">
             <CardHeader>
-              <CardTitle>{t("analytics.revenueTrend")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={`/${locale}/admin/financial`}>{t("analytics.revenueTrend")}</DashboardTitleLink></CardTitle>
               <CardDescription>{t("analytics.last30Days")}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -189,7 +233,7 @@ export default async function AdminRootPage({
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t("analytics.bookingsTrend")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={`/${locale}/admin/bookings`}>{t("analytics.bookingsTrend")}</DashboardTitleLink></CardTitle>
               <CardDescription>{t("analytics.last30Days")}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -201,7 +245,7 @@ export default async function AdminRootPage({
         <section className="grid gap-4 xl:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle>{t("analytics.categoryPerformance")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={`/${locale}/admin/financial`}>{t("analytics.categoryPerformance")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent>
               {data.categoryPerformance.length === 0 ? (
@@ -213,7 +257,7 @@ export default async function AdminRootPage({
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t("analytics.occupancyByCategory")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={`/${locale}/admin/fleet`}>{t("analytics.occupancyByCategory")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent>
               {data.occupancyByCategory.length === 0 ? (
@@ -251,14 +295,14 @@ export default async function AdminRootPage({
                 <p className="text-sm text-slate-500">{t("empty.noAlerts")}</p>
               ) : (
                 data.alerts.map((alert) => (
-                  <div key={alert.id} className="rounded-xl border border-slate-200 p-3">
+                  <DashboardLink key={alert.id} href={alertHrefs[alert.id]} className="border border-slate-200 p-3 pr-9">
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-semibold text-slate-900">{alert.title}</p>
                       <AlertTone type={alert.type} />
                     </div>
                     <p className="mt-1 text-sm text-slate-600">{alert.description}</p>
                     <p className="mt-1 text-sm font-semibold text-slate-900">{t("alerts.affected", { count: alert.count })}</p>
-                  </div>
+                  </DashboardLink>
                 ))
               )}
             </CardContent>
@@ -266,7 +310,7 @@ export default async function AdminRootPage({
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.topVehiclesByRevenue")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={`/${locale}/admin/financial`}>{t("widgets.topVehiclesByRevenue")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent>
               {data.topVehiclesByRevenue.length === 0 ? (
@@ -283,7 +327,7 @@ export default async function AdminRootPage({
                   <TableBody>
                     {data.topVehiclesByRevenue.map((row) => (
                       <TableRow key={row.vehicleId}>
-                        <TableCell>{row.vehicleName}</TableCell>
+                        <TableCell><Link href={vehicleHref(row.vehicleId)} className="font-semibold underline underline-offset-4">{row.vehicleName}</Link></TableCell>
                         <TableCell>{row.bookings}</TableCell>
                         <TableCell>{money(row.revenue)}</TableCell>
                       </TableRow>
@@ -298,18 +342,18 @@ export default async function AdminRootPage({
         <section className="grid gap-4 xl:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.upcomingPickups")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={bookingsHref("pickups")}>{t("widgets.upcomingPickups")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.upcomingPickups.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("empty.noUpcomingPickups")}</p>
               ) : (
                 data.upcomingPickups.map((row) => (
-                  <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                  <DashboardLink key={row.id} href={`/${locale}/admin/bookings/${row.id}`} className="border border-slate-200 p-3 pr-9">
                     <p className="font-semibold text-slate-900">{row.customerName}</p>
                     <p className="text-xs text-slate-600">#{row.bookingCode} • {row.vehicle?.name || t("table.unassigned")}</p>
                     <p className="text-xs text-slate-600">{formatDateTime(row.startDate)}</p>
-                  </div>
+                  </DashboardLink>
                 ))
               )}
             </CardContent>
@@ -317,18 +361,18 @@ export default async function AdminRootPage({
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.upcomingReturns")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={bookingsHref("returns")}>{t("widgets.upcomingReturns")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.upcomingReturns.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("empty.noUpcomingReturns")}</p>
               ) : (
                 data.upcomingReturns.map((row) => (
-                  <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                  <DashboardLink key={row.id} href={`/${locale}/admin/bookings/${row.id}`} className="border border-slate-200 p-3 pr-9">
                     <p className="font-semibold text-slate-900">{row.customerName}</p>
                     <p className="text-xs text-slate-600">#{row.bookingCode} • {row.vehicle?.name || t("table.unassigned")}</p>
                     <p className="text-xs text-slate-600">{formatDateTime(row.endDate)}</p>
-                  </div>
+                  </DashboardLink>
                 ))
               )}
             </CardContent>
@@ -336,18 +380,18 @@ export default async function AdminRootPage({
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.overdueReturns")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={bookingsHref("overdue")}>{t("widgets.overdueReturns")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.overdueReturns.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("empty.noOverdueReturns")}</p>
               ) : (
                 data.overdueReturns.map((row) => (
-                  <div key={row.id} className="rounded-xl border border-red-200 bg-red-50/40 p-3">
+                  <DashboardLink key={row.id} href={`/${locale}/admin/bookings/${row.id}`} className="border border-red-200 bg-red-50/40 p-3 pr-9">
                     <p className="font-semibold text-red-900">{row.customerName}</p>
                     <p className="text-xs text-red-700">#{row.bookingCode} • {row.vehicle?.name || t("table.unassigned")}</p>
                     <p className="text-xs text-red-700">{formatDateTime(row.endDate)}</p>
-                  </div>
+                  </DashboardLink>
                 ))
               )}
             </CardContent>
@@ -357,18 +401,18 @@ export default async function AdminRootPage({
         <section className="grid gap-4 xl:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.recentBookings")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={bookingsHref("recent")}>{t("widgets.recentBookings")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.recentBookings.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("empty.noRecentBookings")}</p>
               ) : (
                 data.recentBookings.map((row) => (
-                  <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                  <DashboardLink key={row.id} href={`/${locale}/admin/bookings/${row.id}`} className="border border-slate-200 p-3 pr-9">
                     <p className="font-semibold text-slate-900">{row.customerName}</p>
                     <p className="text-xs text-slate-600">#{row.bookingCode} • {row.vehicle?.name || t("table.unassigned")}</p>
                     <p className="text-xs text-slate-600">{formatDateTime(row.createdAt)} • {money(row.totalAmount)}</p>
-                  </div>
+                  </DashboardLink>
                 ))
               )}
             </CardContent>
@@ -376,18 +420,18 @@ export default async function AdminRootPage({
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.vehiclesNeedingAttention")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={`/${locale}/admin/maintenance`}>{t("widgets.vehiclesNeedingAttention")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.vehiclesNeedingAttention.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("empty.noVehiclesAttention")}</p>
               ) : (
                 data.vehiclesNeedingAttention.map((row) => (
-                  <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                  <DashboardLink key={row.id} href={vehicleHref(row.id)} className="border border-slate-200 p-3 pr-9">
                     <p className="font-semibold text-slate-900">{row.name}</p>
                     <p className="text-xs text-slate-600">{row.plateNumber || "-"} • {row.category?.name || "-"}</p>
                     <p className="text-xs text-slate-600">{row.status}</p>
-                  </div>
+                  </DashboardLink>
                 ))
               )}
             </CardContent>
@@ -395,18 +439,18 @@ export default async function AdminRootPage({
 
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.recentPayments")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={bookingsHref("payments")}>{t("widgets.recentPayments")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.recentPayments.length === 0 ? (
                 <p className="text-sm text-slate-500">{t("empty.noRecentPayments")}</p>
               ) : (
                 data.recentPayments.map((row) => (
-                  <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                  <DashboardLink key={row.id} href={`/${locale}/admin/bookings/${row.id}`} className="border border-slate-200 p-3 pr-9">
                     <p className="font-semibold text-slate-900">{row.customerName}</p>
                     <p className="text-xs text-slate-600">#{row.bookingCode} • {money(row.totalAmount)}</p>
                     <p className="text-xs text-slate-600">{formatDateTime(row.paymentReceivedAt)}</p>
-                  </div>
+                  </DashboardLink>
                 ))
               )}
             </CardContent>
@@ -416,7 +460,7 @@ export default async function AdminRootPage({
         <section>
           <Card>
             <CardHeader>
-              <CardTitle>{t("widgets.reviewsPendingModeration")}</CardTitle>
+              <CardTitle><DashboardTitleLink href={`/${locale}/admin/reviews`}>{t("widgets.reviewsPendingModeration")}</DashboardTitleLink></CardTitle>
             </CardHeader>
             <CardContent>
               {data.pendingReviews.length === 0 ? (
@@ -434,7 +478,7 @@ export default async function AdminRootPage({
                   <TableBody>
                     {data.pendingReviews.map((review) => (
                       <TableRow key={review.id}>
-                        <TableCell>{review.customerName}</TableCell>
+                        <TableCell><Link href={`/${locale}/admin/reviews`} className="font-semibold underline underline-offset-4">{review.customerName}</Link></TableCell>
                         <TableCell>{review.bookingCode}</TableCell>
                         <TableCell>{review.rating}/5</TableCell>
                         <TableCell>{formatDateTime(review.createdAt)}</TableCell>

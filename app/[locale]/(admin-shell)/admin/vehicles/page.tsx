@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Prisma, VehicleStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { Card } from "@/components/ui/card";
@@ -36,6 +37,8 @@ export default async function VehiclesPage({
 }: {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{
+    vehicle?: string;
+    status?: string;
     vehicles_subtab?: string;
     vehicles_page?: string;
     categories_page?: string;
@@ -46,7 +49,7 @@ export default async function VehiclesPage({
   }>;
 }) {
   const { locale } = await params;
-  const { vehicles_subtab, vehicles_page, categories_page, features_page, extras_page, discounts_page, page_size } = await searchParams;
+  const { vehicle, status, vehicles_subtab, vehicles_page, categories_page, features_page, extras_page, discounts_page, page_size } = await searchParams;
   const t = await getTranslations();
   await requireAdminSection(locale, "vehicles");
   const activeSubtab = vehicles_subtab && ["manage", "pricing", "categories", "features", "extras", "discounts"].includes(vehicles_subtab) ? vehicles_subtab : "manage";
@@ -83,9 +86,15 @@ export default async function VehiclesPage({
   }
   const vehicleCategories = categories.map((category) => ({ id: category.id, name: category.name }));
 
+  const selectedStatus = Object.values(VehicleStatus).find((value) => value === status);
+  const vehicleWhere: Prisma.VehicleWhereInput = {
+    ...(vehicle ? { id: vehicle } : {}),
+    ...(selectedStatus ? { status: selectedStatus } : {}),
+  };
   const [vehiclesTotal, vehicleRows] = await Promise.all([
-    db.vehicle.count(),
+    db.vehicle.count({ where: vehicleWhere }),
     db.vehicle.findMany({
+      where: vehicleWhere,
       include: { category: true },
       orderBy: { createdAt: "desc" },
       skip: (vehiclesPage - 1) * pageSize,
@@ -177,6 +186,8 @@ export default async function VehiclesPage({
   const buildPaginationHref = (subtab: string, updates: Record<string, string | number | undefined>) => {
     const qp = new URLSearchParams();
     qp.set("vehicles_subtab", subtab);
+    if (vehicle) qp.set("vehicle", vehicle);
+    if (selectedStatus) qp.set("status", selectedStatus);
     qp.set("page_size", String(pageSize));
     if (vehicles_page) qp.set("vehicles_page", vehicles_page);
     if (categories_page) qp.set("categories_page", categories_page);
@@ -296,6 +307,12 @@ export default async function VehiclesPage({
       {activeSubtab === "manage" && (
         <>
           {renderPagination(vehiclesPage, vehiclesTotal, "vehicles_page", "manage")}
+          {(vehicle || selectedStatus) && (
+            <div className="mb-4 flex items-center justify-between gap-3 text-sm text-slate-600">
+              <span>{vehicle ? transformedVehicles[0]?.name || "—" : selectedStatus}</span>
+              <Link href={`/${locale}/admin/vehicles`} className="font-semibold underline underline-offset-4">{t("admin.fleetOps.reset")}</Link>
+            </div>
+          )}
           <VehiclesTable vehicles={transformedVehicles} categories={vehicleCategories} locale={locale} />
           {renderPager(vehiclesPage, vehiclesTotal, "vehicles_page", "manage")}
         </>

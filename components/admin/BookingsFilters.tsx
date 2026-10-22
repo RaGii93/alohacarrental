@@ -61,6 +61,7 @@ export function BookingsFilters({
 
   const resetFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
+    params.delete("dashboard_filter");
     params.delete("start");
     params.delete("end");
     params.delete("q");

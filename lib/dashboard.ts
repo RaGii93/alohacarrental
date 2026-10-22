@@ -52,7 +52,7 @@ export type DashboardAlert = {
   count: number;
 };
 
-function getTimeContext() {
+export function getDashboardTimeContext() {
   const now = new Date();
   const parts = getLaPazDateTimeParts(now);
   const todayStart = startOfLaPazDay(now);
@@ -104,7 +104,7 @@ async function hasColumn(tableName: string, columnName: string) {
 }
 
 export async function getDashboardKpis(): Promise<DashboardKpis> {
-  const { now, todayStart, tomorrowStart, monthStart, previousMonthStart, last30Start } = getTimeContext();
+  const { now, todayStart, tomorrowStart, monthStart, previousMonthStart, last30Start } = getDashboardTimeContext();
 
   const [
     bookingsToday,
@@ -186,7 +186,7 @@ export async function getDashboardKpis(): Promise<DashboardKpis> {
 }
 
 export async function getUpcomingPickups(limit = 8) {
-  const { now, nowPlus24h } = getTimeContext();
+  const { now, nowPlus24h } = getDashboardTimeContext();
   return db.booking.findMany({
     where: {
       status: BookingStatus.CONFIRMED,
@@ -207,7 +207,7 @@ export async function getUpcomingPickups(limit = 8) {
 }
 
 export async function getUpcomingReturns(limit = 8) {
-  const { now, nowPlus24h } = getTimeContext();
+  const { now, nowPlus24h } = getDashboardTimeContext();
   return db.booking.findMany({
     where: {
       status: BookingStatus.CONFIRMED,
@@ -227,7 +227,7 @@ export async function getUpcomingReturns(limit = 8) {
 }
 
 export async function getOverdueReturns(limit = 8) {
-  const { now } = getTimeContext();
+  const { now } = getDashboardTimeContext();
   return db.booking.findMany({
     where: {
       status: BookingStatus.CONFIRMED,
@@ -324,7 +324,7 @@ export async function getLatestReviewsPendingModeration(limit = 8) {
 }
 
 export async function getRevenueSeries(days = 30): Promise<TrendPoint[]> {
-  const { todayStart, tomorrowStart } = getTimeContext();
+  const { todayStart, tomorrowStart } = getDashboardTimeContext();
   const start = addLaPazDays(todayStart, -(days - 1));
 
   const rows = await db.$queryRaw<Array<{ day: Date; revenue: bigint | number | null }>>`
@@ -359,7 +359,7 @@ export async function getRevenueSeries(days = 30): Promise<TrendPoint[]> {
 }
 
 export async function getBookingsSeries(days = 30): Promise<TrendPoint[]> {
-  const { todayStart, tomorrowStart } = getTimeContext();
+  const { todayStart, tomorrowStart } = getDashboardTimeContext();
   const start = addLaPazDays(todayStart, -(days - 1));
 
   const rows = await db.$queryRaw<Array<{ day: Date; bookings: bigint | number | null }>>`
@@ -393,7 +393,7 @@ export async function getBookingsSeries(days = 30): Promise<TrendPoint[]> {
 }
 
 export async function getCategoryPerformance(): Promise<CategoryPerformancePoint[]> {
-  const { last30Start } = getTimeContext();
+  const { last30Start } = getDashboardTimeContext();
   const grouped = await db.booking.groupBy({
     by: ["categoryId"],
     where: {
@@ -421,7 +421,7 @@ export async function getCategoryPerformance(): Promise<CategoryPerformancePoint
 }
 
 export async function getTopVehiclesByRevenue(): Promise<VehicleRevenuePoint[]> {
-  const { last30Start } = getTimeContext();
+  const { last30Start } = getDashboardTimeContext();
   const grouped = await db.booking.groupBy({
     by: ["vehicleId"],
     where: {
@@ -453,7 +453,7 @@ export async function getTopVehiclesByRevenue(): Promise<VehicleRevenuePoint[]> 
 }
 
 export async function getOccupancyByCategory(): Promise<OccupancyPoint[]> {
-  const { now } = getTimeContext();
+  const { now } = getDashboardTimeContext();
 
   const [activeVehiclesByCategory, activeRentalsByCategory, categories] = await Promise.all([
     db.vehicle.groupBy({
@@ -496,7 +496,7 @@ export async function getOccupancyByCategory(): Promise<OccupancyPoint[]> {
 }
 
 export async function getCancellationRate() {
-  const { last30Start } = getTimeContext();
+  const { last30Start } = getDashboardTimeContext();
   const [total, cancelled] = await Promise.all([
     db.booking.count({ where: { createdAt: { gte: last30Start } } }),
     db.booking.count({
@@ -545,7 +545,7 @@ export async function getRepeatCustomerPercentage() {
 }
 
 export async function getDashboardAlerts(): Promise<DashboardAlert[]> {
-  const { now, nowPlus24h } = getTimeContext();
+  const { now, nowPlus24h } = getDashboardTimeContext();
   const soon = addLaPazDays(now, 7);
 
   const inspectionExists = await hasColumn("Vehicle", "inspectionExpiryDate");

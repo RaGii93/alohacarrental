@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getDashboardBookingFilter } from "@/lib/dashboard-booking-filters";
 import { Prisma } from "@prisma/client";
 import { Clock3, XCircle, CheckCircle2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -47,6 +48,7 @@ export default async function AdminBookingsPage({
 }: {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{
+    dashboard_filter?: string;
     bookings_status?: string;
     pending_page?: string;
     confirmed_page?: string;
@@ -58,15 +60,17 @@ export default async function AdminBookingsPage({
   }>;
 }) {
   const { locale } = await params;
-  const { bookings_status, pending_page, confirmed_page, declined_page, page_size, q, start, end } = await searchParams;
+  const { dashboard_filter, bookings_status, pending_page, confirmed_page, declined_page, page_size, q, start, end } = await searchParams;
   const t = await getTranslations();
   const auth = await requireAdminSection(locale, "bookings");
   await ensureBookingAdditionalDriversTable();
   const tOr = (key: string, values: Record<string, any>, fallback: string) =>
     t.has(key as any) ? t(key as any, values as any) : fallback;
 
+  const dashboardFilter = getDashboardBookingFilter(dashboard_filter);
   const activeStatus =
-    bookings_status === "confirmed" || bookings_status === "declined" ? bookings_status : "pending";
+    bookings_status === "confirmed" || bookings_status === "declined" || bookings_status === "pending"
+      ? bookings_status : dashboardFilter?.defaultStatus ?? "pending";
   const pageSize = toPageSize(page_size);
   const page = activeStatus === "pending"
     ? toPositiveInt(pending_page)
@@ -76,7 +80,7 @@ export default async function AdminBookingsPage({
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const startDate = parseDateInput(start, false) || today;
+  const startDate = parseDateInput(start, false) || (dashboardFilter ? null : today);
   const endDate = parseDateInput(end, true);
   const searchTerm = (q || "").trim();
 
@@ -92,10 +96,13 @@ export default async function AdminBookingsPage({
           ],
         }
       : {}),
-    startDate: {
-      gte: startDate,
-      ...(endDate ? { lte: endDate } : {}),
-    },
+    AND: [
+      ...(dashboardFilter ? [dashboardFilter.where] : []),
+      ...(startDate || endDate ? [{ startDate: {
+        ...(startDate ? { gte: startDate } : {}),
+        ...(endDate ? { lte: endDate } : {}),
+      } }] : []),
+    ],
   };
 
   const pendingWhere: Prisma.BookingWhereInput = { ...baseWhere, status: "PENDING" };
@@ -139,13 +146,20 @@ export default async function AdminBookingsPage({
         },
       },
     },
-    orderBy: [{ startDate: "asc" }, { createdAt: "desc" }],
+    orderBy: dashboard_filter === "recent" || dashboard_filter === "today"
+      ? [{ createdAt: "desc" }]
+      : dashboard_filter === "payments" || dashboard_filter?.startsWith("revenue-")
+        ? [{ paymentReceivedAt: "desc" }]
+        : dashboard_filter === "overdue" || dashboard_filter === "returns"
+          ? [{ endDate: "asc" }, { createdAt: "desc" }]
+          : [{ startDate: "asc" }, { createdAt: "desc" }],
     skip: (page - 1) * pageSize,
     take: pageSize,
   });
 
   const buildHref = (updates: Record<string, string | number | undefined>) => {
     const qp = new URLSearchParams();
+    if (dashboardFilter && dashboard_filter) qp.set("dashboard_filter", dashboard_filter);
     qp.set("bookings_status", activeStatus);
     qp.set("page_size", String(pageSize));
     if (q) qp.set("q", q);
@@ -163,6 +177,7 @@ export default async function AdminBookingsPage({
 
   const buildStatusHref = (statusKey: "pending" | "confirmed" | "declined") => {
     const qp = new URLSearchParams();
+    if (dashboardFilter && dashboard_filter) qp.set("dashboard_filter", dashboard_filter);
     qp.set("bookings_status", statusKey);
     qp.set("page_size", String(pageSize));
     if (searchTerm) qp.set("q", searchTerm);
@@ -185,7 +200,8 @@ export default async function AdminBookingsPage({
   const nextLabel = t("common.next");
   const activeFilterPills = [
     searchTerm ? t("admin.bookings.list.pills.search", { value: searchTerm }) : "",
-    t("admin.bookings.list.pills.from", { value: toInputDate(startDate) }),
+    dashboardFilter ? t(`admin.dashboard.commandCenter.${dashboardFilter.labelKey}` as any) : "",
+    startDate ? t("admin.bookings.list.pills.from", { value: toInputDate(startDate) }) : "",
     endDate ? t("admin.bookings.list.pills.to", { value: toInputDate(endDate) }) : "",
   ].filter(Boolean);
 
@@ -258,7 +274,7 @@ export default async function AdminBookingsPage({
         </div>
 
         <BookingsFilters
-          initialStart={toInputDate(startDate)}
+          initialStart={startDate ? toInputDate(startDate) : ""}
           initialEnd={endDate ? toInputDate(endDate) : ""}
           initialQuery={searchTerm}
         />
