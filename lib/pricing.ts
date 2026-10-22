@@ -65,7 +65,9 @@ export function getEffectiveMinimumRentalDays(params: {
   startDate: Date;
   endDate: Date;
   settings: BookingRuleSettings;
+  isCruise?: boolean;
 }) {
+  if (params.isCruise) return 1;
   let effectiveMinimumRentalDays = Math.max(1, params.settings.minimumRentalDays);
 
   for (const rule of params.settings.seasonalMinimumRentalRules || []) {
@@ -83,7 +85,9 @@ export function getMinimumDropoffDateForBooking(params: {
   startDate: Date;
   settings: BookingRuleSettings;
   selectedEndDate?: Date | null;
+  isCruise?: boolean;
 }) {
+  if (params.isCruise) return startOfLaPazDay(params.startDate);
   const selectedEndDate = params.selectedEndDate && params.selectedEndDate > params.startDate
     ? params.selectedEndDate
     : addLaPazDays(startOfLaPazDay(params.startDate), params.settings.minimumRentalDays);
@@ -92,6 +96,7 @@ export function getMinimumDropoffDateForBooking(params: {
     startDate: params.startDate,
     endDate: selectedEndDate,
     settings: params.settings,
+    isCruise: params.isCruise,
   });
 
   return addLaPazDays(startOfLaPazDay(params.startDate), effectiveMinimumRentalDays);
@@ -123,12 +128,14 @@ export function evaluateBookingRules(params: {
   bookingSource: BookingSource;
   settings: BookingRuleSettings;
   now?: Date;
+  isCruise?: boolean;
 }) : BookingRuleEvaluation {
   const days = calculateDays(params.startDate, params.endDate);
   const effectiveMinimumRentalDays = getEffectiveMinimumRentalDays({
     startDate: params.startDate,
     endDate: params.endDate,
     settings: params.settings,
+    isCruise: params.isCruise,
   });
   const baseTotalCents = Math.max(0, Math.round(params.basePriceCents)) * days;
   const extrasTotalCents = Math.max(0, Math.round(params.extrasCents || 0));

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle2, Gauge, Home, Settings2, User } from "lucide-react";
+import { AlertCircle, CheckCircle2, Gauge, Home, Settings2, Ship, User } from "lucide-react";
 import { isLicenseActive } from "@/lib/license";
 import { getBlobProxyUrl } from "@/lib/blob";
 import {
@@ -104,7 +104,7 @@ export function BookingWizard({
   initialData?: BookingWizardInitialData;
 }) {
   const t = useTranslations();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [availability, setAvailability] = useState<AvailabilityResult[]>([]);
   const [bookingData, setBookingData] = useState<BookingData>({
     startDate: null,
@@ -157,6 +157,7 @@ export function BookingWizard({
             startDate: nextStartDate,
             selectedEndDate: currentEndDate,
             settings: bookingRuleSettings,
+            isCruise: next.isCruise,
           });
 
           if (!currentEndDate || currentEndDate < minimumDropoffDate) {
@@ -206,6 +207,7 @@ export function BookingWizard({
         taxPercentage,
         baseRentalIncludesTax: vehicleRatesIncludeTax,
         bookingSource,
+        isCruise: bookingData.isCruise,
         settings: bookingRuleSettings,
       })
     : null;
@@ -242,6 +244,39 @@ export function BookingWizard({
     </div>
   );
 
+  if (currentStep === 0) {
+    return (
+      <Card className="mx-auto max-w-3xl rounded-[2rem] border border-[#efe7df] bg-white p-6 sm:p-10">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[#FFF4E6] text-[#FF912C]">
+          <Ship aria-hidden="true" className="size-7" />
+        </div>
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-[#111111]">{t("booking.passengerType.title")}</h2>
+          <p className="mt-3 text-[#57534e]">{t("booking.passengerType.description")}</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[true, false].map((isCruise) => (
+            <button
+              key={String(isCruise)}
+              type="button"
+              disabled={!licenseActive}
+              onClick={() => {
+                updateBookingData({ isCruise, startDate: bookingData.startDate });
+                setAvailability([]);
+                setCurrentStep(1);
+              }}
+              className="rounded-2xl border border-[#e7dcd5] p-6 text-left transition hover:border-[#FF912C] hover:bg-[#FFF4E6] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF912C] disabled:opacity-50"
+            >
+              <span className="block text-lg font-semibold text-[#111111]">{t(isCruise ? "booking.passengerType.cruise" : "booking.passengerType.regular")}</span>
+              <span className="mt-2 block text-sm leading-6 text-[#57534e]">{t(isCruise ? "booking.passengerType.cruiseDescription" : "booking.passengerType.regularDescription")}</span>
+            </button>
+          ))}
+        </div>
+        {!licenseActive && <p role="alert" className="text-sm text-orange-700">{t("booking.errors.bookingDisabled")}</p>}
+      </Card>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto">
       {!licenseActive && (
@@ -260,6 +295,16 @@ export function BookingWizard({
             </div>
           )}
 
+          {currentStep === 1 && (
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#faf8f6] p-3 text-sm">
+              <span>{t(bookingData.isCruise ? "booking.passengerType.cruise" : "booking.passengerType.regular")}</span>
+              <Button variant="ghost" onClick={() => {
+                setAvailability([]);
+                updateBookingData({ categoryId: null });
+                setCurrentStep(0);
+              }}>{t("booking.passengerType.change")}</Button>
+            </div>
+          )}
           {renderStepIndicator()}
 
           {currentStep === 1 && (

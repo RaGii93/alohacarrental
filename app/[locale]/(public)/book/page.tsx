@@ -25,8 +25,8 @@ const bookCopy = {
     description: "Book your vehicle in just a few simple steps and get ready to explore Bonaire with confidence.",
     asideTitle: "Before You Book",
     asidePoints: [
-      "Online bookings require a minimum 3-day rental.",
-      "Last-minute or daily rentals? Contact us via WhatsApp or email.",
+      "Regular rentals follow our standard minimum rental period.",
+      "Cruise ship passengers can book one-day rentals at cruise daily rates.",
     ],
   },
   es: {
@@ -35,8 +35,8 @@ const bookCopy = {
     description: "Book your vehicle in just a few simple steps and get ready to explore Bonaire with confidence.",
     asideTitle: "Before You Book",
     asidePoints: [
-      "Online bookings require a minimum 3-day rental.",
-      "Last-minute or daily rentals? Contact us via WhatsApp or email.",
+      "Regular rentals follow our standard minimum rental period.",
+      "Cruise ship passengers can book one-day rentals at cruise daily rates.",
     ],
   },
   nl: {
@@ -45,8 +45,8 @@ const bookCopy = {
     description: "Book your vehicle in just a few simple steps and get ready to explore Bonaire with confidence.",
     asideTitle: "Before You Book",
     asidePoints: [
-      "Online bookings require a minimum 3-day rental.",
-      "Last-minute or daily rentals? Contact us via WhatsApp or email.",
+      "Regular rentals follow our standard minimum rental period.",
+      "Cruise ship passengers can book one-day rentals at cruise daily rates.",
     ],
   },
 } as const;
@@ -113,6 +113,14 @@ export default async function BookingPage({
     }
   }
   const categories = await getPublicVehicleCategories();
+  const cruiseRates = await db.$queryRaw<Array<{ id: string; cruiseDailyRate: number | null }>>`
+    SELECT id, "cruiseDailyRate" FROM "VehicleCategory" WHERE "isActive" = true
+  `.catch(() => []);
+  const cruiseRatesByCategory = new Map(cruiseRates.map((row) => [row.id, row.cruiseDailyRate]));
+  const bookingCategories = categories.map((category) => ({
+    ...category,
+    cruiseDailyRate: cruiseRatesByCategory.get(category.id) ?? null,
+  }));
 
   return (
     <>
@@ -175,7 +183,7 @@ export default async function BookingPage({
             locale={locale}
             locations={locations}
             extras={extras}
-            categories={categories as any}
+            categories={bookingCategories}
             taxPercentage={taxPercentage}
             vehicleRatesIncludeTax={vehicleRatesIncludeTax}
             bookingRuleSettings={bookingRules}

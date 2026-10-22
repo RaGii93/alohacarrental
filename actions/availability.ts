@@ -200,6 +200,7 @@ export async function searchAvailabilityAction(
       extrasCents: 0,
       bookingSource,
       settings: bookingRules,
+      isCruise,
     });
 
     results.push({

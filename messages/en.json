@@ -705,6 +705,15 @@
       "next": "We will contact you shortly to confirm."
     },
     "baseTotal": "Base total",
+    "passengerType": {
+      "title": "Are you a cruise ship passenger?",
+      "description": "Choose your passenger type before starting your booking.",
+      "cruise": "Yes, I am a cruise ship passenger",
+      "regular": "No, I am not a cruise ship passenger",
+      "cruiseDescription": "Book for one day or longer at our cruise ship daily rates.",
+      "regularDescription": "Book at our regular daily rates. Standard minimum rental periods apply.",
+      "change": "Change passenger type"
+    },
     "cruiseBookingToggle": "Cruise booking (use cruise rates)",
     "fullInsuranceMinimumDays": "Full insurance is only available for bookings of {days} days or more.",
     "subtotal": "Subtotal",

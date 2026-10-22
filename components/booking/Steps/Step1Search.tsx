@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapLocationPickerDialog } from "@/components/shared/MapLocationPickerDialog";
 import { cn } from "@/lib/utils";
@@ -86,6 +85,7 @@ export function Step1Search({
       startDate: minimumEndDate,
       selectedEndDate: bookingData.endDate,
       settings: bookingRuleSettings,
+      isCruise,
     });
     minimumEndDate.setTime(nextMinimumEndDate.getTime());
   }
@@ -103,6 +103,7 @@ export function Step1Search({
         basePriceCents: 0,
         bookingSource,
         settings: bookingRuleSettings,
+        isCruise,
       })
     : null;
   const blockedMessage = bookingRules?.belowMinimumBlocked
@@ -223,21 +224,6 @@ export function Step1Search({
           </div>
         </div>
 
-        {bookingSource === "admin" ? (
-          <div className="mt-4 rounded-xl border border-[#ece7e2] bg-white px-4 py-3">
-            <label className="flex items-center gap-2 text-sm font-semibold text-[#44403c]">
-              <Checkbox
-                checked={bookingData.isCruise}
-                onCheckedChange={(checked) => {
-                  updateBookingData({ isCruise: !!checked });
-                  setAvailability([]);
-                }}
-                disabled={disabled}
-              />
-              {t("booking.cruiseBookingToggle")}
-            </label>
-          </div>
-        ) : null}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>

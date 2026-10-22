@@ -222,6 +222,7 @@ export function Step3Review({
         baseRentalIncludesTax: vehicleRatesIncludeTax,
         bookingSource,
         settings: bookingRuleSettings,
+        isCruise,
       })
     : null;
   const taxAmount = pricing?.taxAmountCents ?? 0;

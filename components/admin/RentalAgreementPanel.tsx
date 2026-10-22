@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { ConfirmActionDialog } from "@/components/shared/ConfirmActionDialog";
 import { SignaturePad } from "@/components/shared/SignaturePad";
 import { getBlobProxyUrl } from "@/lib/blob";
 import { formatDateTime } from "@/lib/datetime";
@@ -72,7 +73,8 @@ type SignatureCapture = "CUSTOMER" | "AGENT" | null;
 
 export function RentalAgreementPanel({ bookingId, bookingCode, customerName, customerEmail, locale, agreement: initialAgreement, role }: Props) {
   const router = useRouter();
-  const [agreement, setAgreement] = useState(initialAgreement);
+  const agreement = initialAgreement;
+  const [emailAgreementId, setEmailAgreementId] = useState<string | null>(null);
   const [capturing, setCapturing] = useState<SignatureCapture>(null);
   const [signerName, setSignerName] = useState("");
   const [signerEmail, setSignerEmail] = useState("");
@@ -96,6 +98,7 @@ export function RentalAgreementPanel({ bookingId, bookingCode, customerName, cus
       const result = await generateRentalAgreementAction(locale, bookingId);
       if (result.success) {
         toast.success("Agreement generated successfully");
+        if (result.agreementId) setEmailAgreementId(result.agreementId);
         refresh();
       } else {
         toast.error(result.error || "Failed to generate agreement");
@@ -139,11 +142,12 @@ export function RentalAgreementPanel({ bookingId, bookingCode, customerName, cus
   }
 
   function handleEmail() {
-    if (!agreement) return;
+    if (!emailAgreementId) return;
     startEmail(async () => {
-      const result = await emailAgreementToCustomerAction(locale, agreement.id);
+      const result = await emailAgreementToCustomerAction(locale, emailAgreementId);
       if (result.success) {
         toast.success("Agreement emailed to customer");
+        setEmailAgreementId(null);
       } else {
         toast.error(result.error || "Failed to send email");
       }
@@ -162,6 +166,16 @@ export function RentalAgreementPanel({ bookingId, bookingCode, customerName, cus
 
   return (
     <Card className="rounded-2xl border border-slate-200 bg-white p-0 overflow-hidden shadow-sm">
+      <ConfirmActionDialog
+        open={Boolean(emailAgreementId)}
+        onOpenChange={(open) => { if (!open && !isEmailing) setEmailAgreementId(null); }}
+        title="Send rental agreement to customer?"
+        description={`The agreement is saved. Would you like to email it to ${customerName} at ${customerEmail}?`}
+        confirmLabel="Send agreement"
+        cancelLabel="Keep without sending"
+        loading={isEmailing}
+        onConfirm={handleEmail}
+      />
       {/* Header */}
       <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50 px-5 py-4">
         <div className="flex items-center gap-2">
@@ -245,7 +259,7 @@ export function RentalAgreementPanel({ bookingId, bookingCode, customerName, cus
               )}
               {canWrite && (agreement.status === "GENERATED" || agreement.status === "SIGNED") && (
                 <button
-                  onClick={handleEmail}
+                  onClick={() => setEmailAgreementId(agreement.id)}
                   disabled={isEmailing}
                   className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                 >

@@ -161,7 +161,6 @@ async function sendBookingConfirmationEmail(bookingId: string, locale: string) {
   if (booking.status !== "CONFIRMED") return { success: false as const, error: "BOOKING_NOT_CONFIRMABLE" };
 
   try {
-    const rentalAgreement = await buildAndUploadBookingDocument(bookingId, "RENTAL_AGREEMENT");
     const termsEmailData = await getCustomerTermsEmailData(locale, bookingId);
     await sendEmail({
       to: booking.customerEmail,
@@ -176,18 +175,7 @@ async function sendBookingConfirmationEmail(bookingId: string, locale: string) {
         totalAmountCents: booking.totalAmount,
         termsUrl: termsEmailData.termsUrl,
       }),
-      attachments: [
-        ...(rentalAgreement.success && rentalAgreement.pdfBuffer
-          ? [
-              {
-                filename: rentalAgreement.filename,
-                content: rentalAgreement.pdfBuffer,
-                contentType: "application/pdf",
-              },
-            ]
-          : []),
-        ...termsEmailData.attachments,
-      ],
+      attachments: termsEmailData.attachments,
     });
     return { success: true as const };
   } catch (error: any) {
@@ -323,6 +311,7 @@ async function evaluateBookingPricingRules(params: {
   taxPercentage: number;
   baseRentalIncludesTax: boolean;
   bookingSource: "public" | "admin";
+  isCruise?: boolean;
 }) {
   const settings = await getBookingRuleSettings();
   const evaluation = evaluateBookingRules({
@@ -333,6 +322,7 @@ async function evaluateBookingPricingRules(params: {
     taxPercentage: params.taxPercentage,
     baseRentalIncludesTax: params.baseRentalIncludesTax,
     bookingSource: params.bookingSource,
+    isCruise: params.isCruise,
     settings,
   });
 
@@ -1647,7 +1637,7 @@ export async function createCategoryBookingAction(
     const bookingStatus = initialBookingStatus(bookingSource, session?.role);
     const customDailyRateCents = bookingSource === "admin" ? parseCustomDailyRate(formData.get("customDailyRate")) : null;
     await ensureBookingPriceOverrides();
-    const isCruise = bookingSource === "admin" ? requestedCruise : false;
+    const isCruise = requestedCruise;
     await ensureCruisePricingColumns();
 
     // Basic validation
@@ -1856,6 +1846,7 @@ export async function createCategoryBookingAction(
       taxPercentage,
       baseRentalIncludesTax: vehicleRatesIncludeTax,
       bookingSource: bookingSource === "admin" ? "admin" : "public",
+      isCruise,
     });
     if (!pricingRules.ok) {
       return { success: false, error: pricingRules.error };
@@ -2280,6 +2271,7 @@ export async function updateCategoryBookingAction(
       taxPercentage,
       baseRentalIncludesTax: vehicleRatesIncludeTax,
       bookingSource: "admin",
+      isCruise,
     });
     if (!pricingRules.ok) {
       return { success: false, error: pricingRules.error };

@@ -705,6 +705,15 @@
       "next": "We nemen binnenkort contact met je op ter bevestiging."
     },
     "baseTotal": "Basistotaal",
+    "passengerType": {
+      "title": "Bent u een cruiseschippassagier?",
+      "description": "Kies uw type passagier voordat u begint met boeken.",
+      "cruise": "Ja, ik ben een cruiseschippassagier",
+      "regular": "Nee, ik ben geen cruiseschippassagier",
+      "cruiseDescription": "Boek voor één dag of langer tegen onze dagtarieven voor cruisepassagiers.",
+      "regularDescription": "Boek tegen onze reguliere dagtarieven. De standaard minimale huurperiode geldt.",
+      "change": "Type passagier wijzigen"
+    },
     "cruiseBookingToggle": "Cruiseboeking (gebruik cruisetarieven)",
     "fullInsuranceMinimumDays": "Volledige verzekering is alleen beschikbaar voor boekingen van {days} dagen of langer.",
     "subtotal": "Subtotaal",

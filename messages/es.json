@@ -705,6 +705,15 @@
       "next": "Nos pondremos en contacto pronto para confirmarla."
     },
     "baseTotal": "Total base",
+    "passengerType": {
+      "title": "¿Es pasajero de un crucero?",
+      "description": "Seleccione su tipo de pasajero antes de comenzar la reserva.",
+      "cruise": "Sí, soy pasajero de un crucero",
+      "regular": "No, no soy pasajero de un crucero",
+      "cruiseDescription": "Reserve por un día o más con nuestras tarifas diarias para cruceros.",
+      "regularDescription": "Reserve con nuestras tarifas diarias habituales. Se aplica el período mínimo de alquiler habitual.",
+      "change": "Cambiar tipo de pasajero"
+    },
     "cruiseBookingToggle": "Reserva de crucero (usar tarifas de crucero)",
     "fullInsuranceMinimumDays": "El seguro total solo está disponible para reservas de {days} días o más.",
     "subtotal": "Subtotal",

@@ -56,7 +56,7 @@ export function resolveCategoryDailyRate(params: {
     return params.customDailyRateCents;
   }
   const normalRate = Math.max(0, Math.round(params.dailyRateCents || 0));
-  if (params.bookingSource !== "admin" || !params.isCruise) {
+  if (!params.isCruise) {
     return normalRate;
   }
 
