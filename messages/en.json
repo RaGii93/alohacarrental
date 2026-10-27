@@ -827,6 +827,7 @@
         "delivered": "Delivered",
         "returned": "Returned",
         "awaitingPayment": "Awaiting payment",
+        "cruiseBadge": "Cruise",
         "notDelivered": "Not delivered",
         "deliverSuccess": "Booking marked as delivered.",
         "returnSuccess": "Booking marked as returned.",

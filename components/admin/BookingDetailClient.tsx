@@ -437,6 +437,11 @@ export function BookingDetailClient({
                     {t("admin.bookings.actions.awaitingPayment")}
                   </span>
                 )}
+                {booking.isCruise && (
+                  <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-200">
+                    {t("admin.bookings.actions.cruiseBadge")}
+                  </span>
+                )}
               </div>
 
               <div>

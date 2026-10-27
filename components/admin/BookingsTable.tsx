@@ -36,6 +36,7 @@ interface Booking {
   paymentReceivedAt?: Date | null;
   deliveredAt?: Date | null;
   returnedAt?: Date | null;
+  isCruise?: boolean;
 }
 
 export function BookingsTable({
@@ -157,6 +158,9 @@ export function BookingsTable({
               <TableCell>
                 <div className="font-medium">{booking.customerName}</div>
                 <div className="text-sm text-gray-500">{booking.bookingCode} · {booking.customerEmail}</div>
+                {booking.isCruise && (
+                  <Badge className="mt-1 bg-sky-100 text-sky-800">{t("admin.bookings.actions.cruiseBadge")}</Badge>
+                )}
                 {(booking.additionalDrivers?.length || 0) > 0 ? (
                   <div className="text-xs text-gray-500">
                     {booking.additionalDrivers?.length} {t("booking.additionalDrivers.dashboardCount")}

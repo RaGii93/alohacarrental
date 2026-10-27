@@ -157,6 +157,19 @@ export default async function AdminBookingsPage({
     take: pageSize,
   });
 
+  const cruiseIds = new Set<string>();
+  if (rows.length > 0) {
+    try {
+      const cruiseRows = await db.$queryRaw<Array<{ id: string }>>`
+        SELECT id FROM "Booking" WHERE "isCruise" = true AND id IN (${Prisma.join(rows.map((row) => row.id))})
+      `;
+      for (const row of cruiseRows) cruiseIds.add(row.id);
+    } catch {
+      // The cruise column may not exist yet.
+    }
+  }
+  const bookingRows = rows.map((row) => ({ ...row, isCruise: cruiseIds.has(row.id) }));
+
   const buildHref = (updates: Record<string, string | number | undefined>) => {
     const qp = new URLSearchParams();
     if (dashboardFilter && dashboard_filter) qp.set("dashboard_filter", dashboard_filter);
@@ -310,7 +323,7 @@ export default async function AdminBookingsPage({
         </div>
 
         <BookingsTable
-          bookings={rows as any}
+          bookings={bookingRows as any}
           locale={locale}
           status={activeStatus === "pending" ? "PENDING" : activeStatus === "confirmed" ? "CONFIRMED" : "DECLINED"}
         />
